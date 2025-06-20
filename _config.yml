@@ -6,10 +6,11 @@ baseurl: ""
 url: ""
 github_username:  aidan79225
 
-theme: minimal-mistakes-jekyll
+remote_theme: "mmistakes/minimal-mistakes@4.27.1"
 minimal_mistakes_skin: "dark"
 name: Aidan Wang
 
 plugins:
   - jekyll-feed
+  - jekyll-include-cache
 
