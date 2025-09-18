@@ -40,11 +40,26 @@ permalink: /lottery/
       margin-top: 20px;
       white-space: pre-line;
     }
+
+    .seed-block {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .seed-block h3 {
+      margin: 0;
+      white-space: nowrap;
+    }
   </style>
 </head>
 
 <body>
   <h2>車位抽籤系統</h2>
+  <div class="block seed-block">
+    <h3>抽籤 seed</h3>
+    <input type="text" id="seed" placeholder="可留空自動生成">
+  </div>
   <div class="container">
     <div class="block">
       <h3>一般戶名</h3>
@@ -81,12 +96,14 @@ permalink: /lottery/
 
       // 先將每個 textarea 高度重置自動計算
       allTextareas.forEach(t => {
+        if (t.id === 'seed') return;
         t.style.height = 'auto';
         maxHeight = Math.max(maxHeight, t.scrollHeight);
       });
 
       // 將最大高度套用到所有 textarea
       allTextareas.forEach(t => {
+        if (t.id === 'seed') return;
         t.style.height = maxHeight + 'px';
       });
     }
@@ -101,15 +118,36 @@ permalink: /lottery/
       return [...new Set(document.getElementById(id).value.split(/\n+/).map(s => s.trim()).filter(Boolean))];
     }
 
-    function shuffleArray(array) {
-      for (let i = array.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1));
-        [array[i], array[j]] = [array[j], array[i]];
+
+    function shuffleArray(array, seed) {
+      const result = array.slice(); // 複製陣列
+
+      let s = seed;
+      let randomFunc = () => {
+        s = (s * 9301 + 49297) % 233280;
+        return s / 233280;
+      };
+
+      for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(randomFunc() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
       }
-      return array;
+
+      return result;
     }
 
+
     function drawLots() {
+      const seedInputElement = document.getElementById('seed');
+      const seedInput = seedInputElement.value.trim();
+      if (seedInput && !/^\d+$/.test(seedInput)) {
+        alert("請輸入有效數字作為 seed");
+        return;
+      }
+      const seed = seedInput ? parseInt(seedInput, 10) : Date.now();
+      seedInputElement.value = seed;
+
+
       let households = getUniqueList('households');
       let priorityHouseholds = getUniqueList('priorityHouseholds');
       let parkings = getUniqueList('parkings');
@@ -118,16 +156,16 @@ permalink: /lottery/
       households = households.filter(h => !priorityHouseholds.includes(h));
       parkings = parkings.filter(p => !priorityParkings.includes(p));
 
-      households = shuffleArray(households);
-      priorityHouseholds = shuffleArray(priorityHouseholds);
+      households = shuffleArray(households, seed);
+      priorityHouseholds = shuffleArray(priorityHouseholds, seed);
 
-      parkings = shuffleArray(parkings);
-      priorityParkings = shuffleArray(priorityParkings);
+      parkings = shuffleArray(parkings, seed);
+      priorityParkings = shuffleArray(priorityParkings, seed);
 
       const totalHouseholds = [...priorityHouseholds, ...households];
       const totalParkings = [...priorityParkings, ...parkings];
 
-      const winners = shuffleArray([...totalHouseholds]).slice(0, totalParkings.length);
+      const winners = shuffleArray([...totalHouseholds], seed).slice(0, totalParkings.length);
 
       const result = {};
       const remainingPriorityHouseholds = winners.filter(w => priorityHouseholds.includes(w));
@@ -139,7 +177,7 @@ permalink: /lottery/
       });
 
       const remainingWinners = winners.filter(w => !Object.values(result).includes(w));
-      const remainingParkings = shuffleArray(totalParkings.filter(p => !Object.keys(result).includes(p)));
+      const remainingParkings = shuffleArray(totalParkings.filter(p => !Object.keys(result).includes(p)), seed);
       remainingParkings.forEach(p => {
         if (remainingWinners.length > 0) {
           result[p] = remainingWinners.shift();
@@ -161,6 +199,7 @@ permalink: /lottery/
       if (leftoverParkings.length > 0) {
         output += "\n\n剩餘車位：\n" + leftoverParkings.join("\n");
       }
+      output += "\n\n抽籤 seed: " + seed;
 
       resultDiv.textContent = output;
     }
@@ -196,6 +235,7 @@ permalink: /lottery/
       if (allocation.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(allocation), "分配結果");
       if (losers.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(losers), "未中籤戶");
       if (leftovers.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(leftovers), "剩餘車位");
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([{ "抽籤 seed": document.getElementById('seed').value }]), "抽籤 seed");
 
       XLSX.writeFile(wb, "lottery_result.xlsx");
     }
