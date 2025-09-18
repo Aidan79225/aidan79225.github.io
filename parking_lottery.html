@@ -136,6 +136,10 @@ permalink: /lottery/
       return result;
     }
 
+    function seedOffset() {
+      return [2 * 23, 3 * 29, 5 * 31, 8 * 37, 13 * 41, 17 * 43];
+    }
+
 
     function drawLots() {
       const seedInputElement = document.getElementById('seed');
@@ -155,17 +159,16 @@ permalink: /lottery/
 
       households = households.filter(h => !priorityHouseholds.includes(h));
       parkings = parkings.filter(p => !priorityParkings.includes(p));
-
+      let offsets = seedOffset();
       households = shuffleArray(households, seed);
-      priorityHouseholds = shuffleArray(priorityHouseholds, seed);
-
-      parkings = shuffleArray(parkings, seed);
-      priorityParkings = shuffleArray(priorityParkings, seed);
+      priorityHouseholds = shuffleArray(priorityHouseholds, seed + offsets[0]);
+      parkings = shuffleArray(parkings, seed + offsets[1]);
+      priorityParkings = shuffleArray(priorityParkings, seed + offsets[2]);
 
       const totalHouseholds = [...priorityHouseholds, ...households];
       const totalParkings = [...priorityParkings, ...parkings];
 
-      const winners = shuffleArray([...totalHouseholds], seed).slice(0, totalParkings.length);
+      const winners = shuffleArray([...totalHouseholds], seed + offsets[3]).slice(0, totalParkings.length);
 
       const result = {};
       const remainingPriorityHouseholds = winners.filter(w => priorityHouseholds.includes(w));
@@ -177,7 +180,7 @@ permalink: /lottery/
       });
 
       const remainingWinners = winners.filter(w => !Object.values(result).includes(w));
-      const remainingParkings = shuffleArray(totalParkings.filter(p => !Object.keys(result).includes(p)), seed);
+      const remainingParkings = shuffleArray(totalParkings.filter(p => !Object.keys(result).includes(p)), seed + offsets[4]);
       remainingParkings.forEach(p => {
         if (remainingWinners.length > 0) {
           result[p] = remainingWinners.shift();
