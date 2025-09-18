@@ -237,6 +237,14 @@ permalink: /lottery/
       if (leftovers.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(leftovers), "剩餘車位");
       XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([{ "抽籤 seed": document.getElementById('seed').value }]), "抽籤 seed");
 
+      let households = getUniqueList('households');
+      let priorityHouseholds = getUniqueList('priorityHouseholds');
+      let parkings = getUniqueList('parkings');
+      let priorityParkings = getUniqueList('priorityParkings');
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(households.map(h => ({ "一般戶名": h }))), "原始資料一般戶名");
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(priorityHouseholds.map(h => ({ "優先戶名": h }))), "原始資料優先戶名");
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(parkings.map(p => ({ "一般車位": p }))), "原始資料一般車位");
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(priorityParkings.map(p => ({ "優先車位": p }))), "原始資料優先車位");
       XLSX.writeFile(wb, "lottery_result.xlsx");
     }
 
