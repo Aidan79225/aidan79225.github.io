@@ -73,14 +73,28 @@ permalink: /lottery/
 
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script>
-    function autoResize(textarea) {
-      textarea.style.height = 'auto';
-      textarea.style.height = textarea.scrollHeight + 'px';
+
+
+    function autoResizeAll() {
+      const allTextareas = document.querySelectorAll('textarea');
+      let maxHeight = 0;
+
+      // 先將每個 textarea 高度重置自動計算
+      allTextareas.forEach(t => {
+        t.style.height = 'auto';
+        maxHeight = Math.max(maxHeight, t.scrollHeight);
+      });
+
+      // 將最大高度套用到所有 textarea
+      allTextareas.forEach(t => {
+        t.style.height = maxHeight + 'px';
+      });
     }
 
+
     document.querySelectorAll('textarea').forEach(t => {
-      autoResize(t);
-      t.addEventListener('input', () => autoResize(t));
+      autoResizeAll();
+      t.addEventListener('input', () => autoResizeAll());
     });
 
     function getUniqueList(id) {
@@ -175,6 +189,10 @@ permalink: /lottery/
         }
       });
 
+      allocation.sort((a, b) => a.戶名.localeCompare(b.戶名, 'zh-Hant'));
+      losers.sort((a, b) => a.未中籤戶.localeCompare(b.未中籤戶, 'zh-Hant'));
+      leftovers.sort((a, b) => a.剩餘車位.localeCompare(b.剩餘車位, 'zh-Hant'));
+
       const wb = XLSX.utils.book_new();
       if (allocation.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(allocation), "分配結果");
       if (losers.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(losers), "未中籤戶");
@@ -195,6 +213,7 @@ permalink: /lottery/
         + "41\n42\n43\n44\n45\n46\n47\n48\n49\n"
         + "51\n52\n53\n54\n55\n56\n57\n58\n59\n60\n"
         + "61\n62\n63";
+      autoResizeAll();
     }
 
     function clearInputs() {
@@ -202,7 +221,7 @@ permalink: /lottery/
       document.getElementById('priorityHouseholds').value = '';
       document.getElementById('parkings').value = '';
       document.getElementById('priorityParkings').value = '';
-      document.querySelectorAll('textarea').forEach(t => autoResize(t));
+      autoResizeAll();
     }
   </script>
 </body>
