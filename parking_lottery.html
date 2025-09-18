@@ -1,0 +1,210 @@
+---
+layout: none
+permalink: /lottery/
+---
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+  <meta charset="UTF-8">
+  <title>車位抽籤</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 20px;
+    }
+
+    textarea {
+      width: 300px;
+      min-height: 100px;
+      margin: 5px;
+      padding: 5px;
+      resize: none;
+    }
+
+    button {
+      margin: 5px;
+      padding: 5px 10px;
+    }
+
+    .container {
+      display: flex;
+      flex-wrap: wrap;
+    }
+
+    .block {
+      margin-right: 20px;
+    }
+
+    .result {
+      margin-top: 20px;
+      white-space: pre-line;
+    }
+  </style>
+</head>
+
+<body>
+  <h2>車位抽籤系統</h2>
+  <div class="container">
+    <div class="block">
+      <h3>一般戶名</h3>
+      <textarea id="households"></textarea>
+    </div>
+    <div class="block">
+      <h3>優先戶名</h3>
+      <textarea id="priorityHouseholds"></textarea>
+    </div>
+    <div class="block">
+      <h3>一般車位</h3>
+      <textarea id="parkings"></textarea>
+    </div>
+    <div class="block">
+      <h3>優先車位</h3>
+      <textarea id="priorityParkings"></textarea>
+    </div>
+  </div>
+  <div>
+    <button onclick="drawLots()">抽籤</button>
+    <button onclick="downloadExcel()">下載 Excel</button>
+    <button onclick="fillExample()">範例填入</button>
+    <button onclick="clearInputs()">清空輸入</button>
+  </div>
+  <div class="result" id="result"></div>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script>
+    function autoResize(textarea) {
+      textarea.style.height = 'auto';
+      textarea.style.height = textarea.scrollHeight + 'px';
+    }
+
+    document.querySelectorAll('textarea').forEach(t => {
+      autoResize(t);
+      t.addEventListener('input', () => autoResize(t));
+    });
+
+    function getUniqueList(id) {
+      return [...new Set(document.getElementById(id).value.split(/\n+/).map(s => s.trim()).filter(Boolean))];
+    }
+
+    function shuffleArray(array) {
+      for (let i = array.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [array[i], array[j]] = [array[j], array[i]];
+      }
+      return array;
+    }
+
+    function drawLots() {
+      let households = getUniqueList('households');
+      let priorityHouseholds = getUniqueList('priorityHouseholds');
+      let parkings = getUniqueList('parkings');
+      let priorityParkings = getUniqueList('priorityParkings');
+
+      households = households.filter(h => !priorityHouseholds.includes(h));
+      parkings = parkings.filter(p => !priorityParkings.includes(p));
+
+      households = shuffleArray(households);
+      priorityHouseholds = shuffleArray(priorityHouseholds);
+
+      parkings = shuffleArray(parkings);
+      priorityParkings = shuffleArray(priorityParkings);
+
+      const totalHouseholds = [...priorityHouseholds, ...households];
+      const totalParkings = [...priorityParkings, ...parkings];
+
+      const winners = shuffleArray([...totalHouseholds]).slice(0, totalParkings.length);
+
+      const result = {};
+      const remainingPriorityHouseholds = winners.filter(w => priorityHouseholds.includes(w));
+
+      priorityParkings.forEach(p => {
+        if (remainingPriorityHouseholds.length > 0) {
+          result[p] = remainingPriorityHouseholds.shift();
+        }
+      });
+
+      const remainingWinners = winners.filter(w => !Object.values(result).includes(w));
+
+      const remainingParkings = shuffleArray([...priorityParkings.filter(p => !Object.keys(result).includes(p)), ...parkings]);
+      remainingParkings.forEach(p => {
+        if (remainingWinners.length > 0) {
+          result[p] = remainingWinners.shift();
+        }
+      });
+
+      const resultDiv = document.getElementById('result');
+      let output = "分配結果：\n";
+      for (const [p, h] of Object.entries(result)) {
+        output += `${h} → 車位 ${p}\n`;
+      }
+
+      const losers = totalHouseholds.filter(h => !Object.values(result).includes(h));
+      const leftoverParkings = totalParkings.filter(p => !Object.keys(result).includes(p));
+
+      if (losers.length > 0) {
+        output += "\n未中籤的戶：\n" + losers.join("\n");
+      }
+      if (leftoverParkings.length > 0) {
+        output += "\n\n剩餘車位：\n" + leftoverParkings.join("\n");
+      }
+
+      resultDiv.textContent = output;
+    }
+
+    function downloadExcel() {
+      const resultText = document.getElementById('result').textContent.split("\n");
+
+      const allocation = [];
+      const losers = [];
+      const leftovers = [];
+
+      let section = 'allocation';
+      resultText.forEach(line => {
+        if (line.startsWith('未中籤的戶')) section = 'losers';
+        else if (line.startsWith('剩餘車位')) section = 'leftovers';
+        else if (line.trim() !== '' && !line.includes('分配結果')) {
+          if (section === 'allocation' && line.includes('→')) {
+            const [h, p] = line.split('→').map(s => s.trim());
+            allocation.push({ 戶名: h, 車位: p.replace('車位 ', '') });
+          } else if (section === 'losers') {
+            losers.push({ 未中籤戶: line });
+          } else if (section === 'leftovers') {
+            leftovers.push({ 剩餘車位: line });
+          }
+        }
+      });
+
+      const wb = XLSX.utils.book_new();
+      if (allocation.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(allocation), "分配結果");
+      if (losers.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(losers), "未中籤戶");
+      if (leftovers.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(leftovers), "剩餘車位");
+
+      XLSX.writeFile(wb, "lottery_result.xlsx");
+    }
+
+
+    function fillExample() {
+      document.getElementById("households").value = "53-1F\n53-2F\n53-3F\n53-4F\n53-5F";
+      document.getElementById("priorityHouseholds").value = "53-12F\n53-13F";
+      document.getElementById("priorityParkings").value = "1\n2\n3\n4\n5\n6\n7\n8\n9\n10";
+      document.getElementById("parkings").value =
+        "13\n14\n15\n16\n17\n18\n19\n20\n"
+        + "21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n"
+        + "31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n"
+        + "41\n42\n43\n44\n45\n46\n47\n48\n49\n"
+        + "51\n52\n53\n54\n55\n56\n57\n58\n59\n60\n"
+        + "61\n62\n63";
+    }
+
+    function clearInputs() {
+      document.getElementById('households').value = '';
+      document.getElementById('priorityHouseholds').value = '';
+      document.getElementById('parkings').value = '';
+      document.getElementById('priorityParkings').value = '';
+      document.querySelectorAll('textarea').forEach(t => autoResize(t));
+    }
+  </script>
+</body>
+
+</html>
