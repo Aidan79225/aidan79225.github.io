@@ -42,9 +42,6 @@ collections:
 
 categories:
   - tech
-  - backend
+  - food
 
-category_archive:
-  type: liquid
-  path: /categories/
-
+include: ["_pages"]
