@@ -3,7 +3,7 @@ email: aidan79225@gmail.com
 description: >-
   This is my blog.
 baseurl: ""
-url: ""
+url: "https://aidan79225.github.io"
 github_username:  aidan79225
 
 remote_theme: "mmistakes/minimal-mistakes@4.27.1"
@@ -21,3 +21,30 @@ defaults:
     values:
       author_profile: true
       author: Aidan Wang
+      show_date: true
+enable_copy_code_button: true
+
+atom_feed:
+  hide: true
+
+search: true
+lunr:
+  search_within_pages: true
+
+footer:
+  links:
+    - label: "GitHub"
+      icon: "fab fa-fw fa-github"
+      url: "https://github.com/Aidan79225"
+  content: "© 2025 Aidan's Blog"
+collections:
+  - staff_members
+
+categories:
+  - tech
+  - backend
+
+category_archive:
+  type: liquid
+  path: /categories/
+
