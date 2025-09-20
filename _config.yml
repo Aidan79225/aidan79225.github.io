@@ -45,3 +45,8 @@ categories:
   - food
 
 include: ["_pages"]
+mathjax: true
+mathjax_options:
+  tex:
+    inlineMath: [["$", "$"]]
+    displayMath: [["$$", "$$"]]
