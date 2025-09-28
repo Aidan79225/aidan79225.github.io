@@ -141,8 +141,7 @@ permalink: /lottery/
       }
     }
 
-
-    function drawLots() {
+    function getSeed() {
       const seedInputElement = document.getElementById('seed');
       const seedInput = seedInputElement.value.trim();
       if (seedInput && !/^\d+$/.test(seedInput)) {
@@ -153,7 +152,12 @@ permalink: /lottery/
       seedInputElement.value = seed;
       const dateDisplay = document.getElementById("date-display");
       dateDisplay.innerText = getUTC8DateString(new Date(seed));
+      return seed;
+    }
 
+
+    function drawLots() {
+      const seed = getSeed();
 
       let households = getUniqueList('households');
       let priorityHouseholds = getUniqueList('priorityHouseholds');
@@ -190,6 +194,10 @@ permalink: /lottery/
         }
       });
 
+      displayResult(totalHouseholds, totalParkings, result, seed);
+    }
+
+    function displayResult(totalHouseholds, totalParkings, result, seed) {
       const resultDiv = document.getElementById('result');
       let output = "分配結果：\n";
       for (const [p, h] of Object.entries(result)) {
