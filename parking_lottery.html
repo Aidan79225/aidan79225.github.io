@@ -59,6 +59,8 @@ permalink: /lottery/
   <div class="block seed-block">
     <h3>抽籤 seed</h3>
     <input type="text" id="seed" placeholder="可留空自動生成">
+    <h3>對應日期</h3>
+    <div id="date-display">尚未輸入 seed</div>
   </div>
   <div class="container">
     <div class="block">
@@ -108,12 +110,6 @@ permalink: /lottery/
       });
     }
 
-
-    document.querySelectorAll('textarea').forEach(t => {
-      autoResizeAll();
-      t.addEventListener('input', () => autoResizeAll());
-    });
-
     function getUniqueList(id) {
       return [...new Set(document.getElementById(id).value.split(/\n+/).map(s => s.trim()).filter(Boolean))];
     }
@@ -136,8 +132,13 @@ permalink: /lottery/
       return result;
     }
 
-    function seedOffset() {
-      return [2 * 23, 3 * 29, 5 * 31, 8 * 37, 13 * 41, 17 * 43];
+    function getSeedOffsetGenerator() {
+      let idx = 0
+      let offsets = [2 * 23, 3 * 29, 5 * 31, 8 * 37, 13 * 41, 17 * 43]
+      return () => {
+        idx = (idx + 1) % offsets.length;
+        return offsets[idx];
+      }
     }
 
 
@@ -150,6 +151,8 @@ permalink: /lottery/
       }
       const seed = seedInput ? parseInt(seedInput, 10) : Date.now();
       seedInputElement.value = seed;
+      const dateDisplay = document.getElementById("date-display");
+      dateDisplay.innerText = getUTC8DateString(new Date(seed));
 
 
       let households = getUniqueList('households');
@@ -159,16 +162,16 @@ permalink: /lottery/
 
       households = households.filter(h => !priorityHouseholds.includes(h));
       parkings = parkings.filter(p => !priorityParkings.includes(p));
-      let offsets = seedOffset();
+      let offsets = getSeedOffsetGenerator();
       households = shuffleArray(households, seed);
-      priorityHouseholds = shuffleArray(priorityHouseholds, seed + offsets[0]);
-      parkings = shuffleArray(parkings, seed + offsets[1]);
-      priorityParkings = shuffleArray(priorityParkings, seed + offsets[2]);
+      priorityHouseholds = shuffleArray(priorityHouseholds, seed + offsets());
+      parkings = shuffleArray(parkings, seed + offsets());
+      priorityParkings = shuffleArray(priorityParkings, seed + offsets());
 
       const totalHouseholds = [...priorityHouseholds, ...households];
       const totalParkings = [...priorityParkings, ...parkings];
 
-      const winners = shuffleArray([...totalHouseholds], seed + offsets[3]).slice(0, totalParkings.length);
+      const winners = shuffleArray([...totalHouseholds], seed + offsets()).slice(0, totalParkings.length);
 
       const result = {};
       const remainingPriorityHouseholds = winners.filter(w => priorityHouseholds.includes(w));
@@ -202,7 +205,7 @@ permalink: /lottery/
       if (leftoverParkings.length > 0) {
         output += "\n\n剩餘車位：\n" + leftoverParkings.join("\n");
       }
-      output += "\n\n抽籤 seed: " + seed;
+      output += "\n\n抽籤 seed: \n" + seed;
 
       resultDiv.textContent = output;
     }
@@ -213,12 +216,15 @@ permalink: /lottery/
       const allocation = [];
       const losers = [];
       const leftovers = [];
+      const seed = [];
 
       let section = 'allocation';
       resultText.forEach(line => {
-        if (line.startsWith('未中籤的戶')) section = 'losers';
+        if (line.startsWith('分配結果')) section = 'allocation';
+        else if (line.startsWith('未中籤的戶')) section = 'losers';
         else if (line.startsWith('剩餘車位')) section = 'leftovers';
-        else if (line.trim() !== '' && !line.includes('分配結果')) {
+        else if (line.startsWith('抽籤 seed')) section = 'seed';
+        else if (line.trim() !== '') {
           if (section === 'allocation' && line.includes('→')) {
             const [h, p] = line.split('→').map(s => s.trim());
             allocation.push({ 戶名: h, 車位: p.replace('車位 ', '') });
@@ -226,19 +232,21 @@ permalink: /lottery/
             losers.push({ 未中籤戶: line });
           } else if (section === 'leftovers') {
             leftovers.push({ 剩餘車位: line });
+          } else if (section === 'seed') {
+            seed.push({ seed: line });
           }
         }
       });
 
       allocation.sort((a, b) => a.戶名.localeCompare(b.戶名, 'zh-Hant'));
       losers.sort((a, b) => a.未中籤戶.localeCompare(b.未中籤戶, 'zh-Hant'));
-      leftovers.sort((a, b) => a.剩餘車位.localeCompare(b.剩餘車位, 'zh-Hant'));
+      leftovers.sort((a, b) => parseInt(a.剩餘車位) - parseInt(b.剩餘車位));
 
       const wb = XLSX.utils.book_new();
       if (allocation.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(allocation), "分配結果");
       if (losers.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(losers), "未中籤戶");
       if (leftovers.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(leftovers), "剩餘車位");
-      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([{ "抽籤 seed": document.getElementById('seed').value }]), "抽籤 seed");
+      XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(seed), "抽籤 seed");
 
       let households = getUniqueList('households');
       let priorityHouseholds = getUniqueList('priorityHouseholds');
@@ -273,6 +281,51 @@ permalink: /lottery/
       document.getElementById('priorityParkings').value = '';
       autoResizeAll();
     }
+
+    function getUTC8DateString(d) {
+      return d.toLocaleString("zh-TW", {
+        timeZone: "Asia/Taipei",
+        hour12: false,
+        year: "numeric", month: "2-digit", day: "2-digit",
+        hour: "2-digit", minute: "2-digit", second: "2-digit",
+        fractionalSecondDigits: 3
+      });
+    }
+
+    function init() {
+
+      document.querySelectorAll('textarea').forEach(t => {
+        autoResizeAll();
+        t.addEventListener('input', () => autoResizeAll());
+      });
+      const seedInput = document.getElementById("seed");
+      const dateDisplay = document.getElementById("date-display");
+
+      seedInput.addEventListener("input", () => {
+        const value = seedInput.value.trim();
+        if (!value) {
+          dateDisplay.innerText = "尚未輸入 seed";
+          return;
+        }
+
+        const seedNum = Number(value);
+        if (isNaN(seedNum)) {
+          dateDisplay.innerText = "⚠️ seed 必須是數字";
+          return;
+        }
+
+        const date = new Date(seedNum);
+        if (isNaN(date.getTime())) {
+          dateDisplay.innerText = "⚠️ 無效的日期";
+          return;
+        }
+
+        dateDisplay.innerText = getUTC8DateString(date);
+      });
+    }
+
+
+
   </script>
 </body>
 
