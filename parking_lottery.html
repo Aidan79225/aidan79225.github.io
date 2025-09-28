@@ -183,7 +183,7 @@ permalink: /lottery/
       });
 
       const remainingWinners = winners.filter(w => !Object.values(result).includes(w));
-      const remainingParkings = shuffleArray(totalParkings.filter(p => !Object.keys(result).includes(p)), seed + offsets[4]);
+      const remainingParkings = shuffleArray(totalParkings.filter(p => !Object.keys(result).includes(p)), seed + offsets());
       remainingParkings.forEach(p => {
         if (remainingWinners.length > 0) {
           result[p] = remainingWinners.shift();
