@@ -1,5 +1,5 @@
 ---
-layout: posts
+layout: single
 title:  "三重滷肉飯 - 店小二"
 date:   2025-09-20 02:24:07 +0800
 categories: food

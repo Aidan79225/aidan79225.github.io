@@ -5,8 +5,9 @@ description: >-
 baseurl: ""
 url: "https://aidan79225.github.io"
 github_username:  aidan79225
+repository: "Aidan79225/aidan79225.github.io"
 
-remote_theme: "mmistakes/minimal-mistakes@4.27.1"
+remote_theme: "mmistakes/minimal-mistakes@4.27.3"
 minimal_mistakes_skin: "dark"
 name: Aidan Wang
 
@@ -23,6 +24,7 @@ defaults:
       author: Aidan Wang
       show_date: true
       comments: true
+
 enable_copy_code_button: true
 
 atom_feed:
@@ -57,5 +59,4 @@ comments:
   utterances:
     theme: "dark-blue"
     issue_term: "pathname"
-    label: "Comment"
-    repo: "Aidan79225/aidan79225.github.io"
+    label: "comment"
