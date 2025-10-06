@@ -1,0 +1,150 @@
+---
+layout: single
+title: 線上節拍器
+permalink: /metronome/
+---
+
+<style>
+    .metronome-container {
+        text-align: center;
+        margin-top: 3rem;
+    }
+
+    .metronome-controls {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 1rem;
+    }
+
+    .bpm-control {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 0.5rem;
+    }
+
+    .bpm-control input[type="range"] {
+        width: 600px;
+        max-width: 90vw;
+    }
+
+    .metronome-display {
+        font-size: 4rem;
+        margin: 2rem 0;
+        transition: color 0.1s;
+    }
+
+    .metronome-display.active {
+        color: #1e90ff;
+        /* 亮藍色 */
+    }
+
+    button {
+        padding: 0.6rem 1.2rem;
+        font-size: 1rem;
+    }
+
+    @media (max-width: 600px) {
+        .metronome-display {
+            font-size: 3rem;
+        }
+    }
+
+    select {
+
+        color: black;
+    }
+
+
+    select option {
+        color: black;
+    }
+</style>
+
+<div class="metronome-container">
+    <div class="metronome-controls">
+        <div class="bpm-control">
+            <div>BPM:<input type="number" id="bpmValue" value="60" oninput="updateBpmDisplayFromValue()"></div>
+            <input type="range" id="bpmRange" min="40" max="240" value="60" step="1" oninput="updateBpmDisplay()">
+        </div>
+
+        <div>
+            <label id="l_beats" for="beats">拍數:</label>
+            <select id="beats">
+                <option value="2">2/4</option>
+                <option value="3">3/4</option>
+                <option value="4" selected>4/4</option>
+                <option value="6">6/8</option>
+            </select>
+        </div>
+    </div>
+
+    <div class="metronome-display" id="beatDisplay">●</div>
+
+    <div>
+        <button onclick="startMetronome()">開始</button>
+        <button onclick="stopMetronome()">停止</button>
+    </div>
+</div>
+
+<script>
+    let audioCtx, intervalId;
+    let currentBeat = 0;
+    let currentBpm = 100;
+
+    function playClick(isAccent) {
+        if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.frequency.value = isAccent ? 1200 : 800;
+        gain.gain.setValueAtTime(1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.05);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.05);
+    }
+
+    function updateBpmDisplayFromValue() {
+        const bpmRange = document.getElementById("bpmRange");
+        const bpmValue = document.getElementById("bpmValue");
+        bpmRange.value = bpmValue.value;
+        currentBpm = parseInt(bpmRange.value);
+        if (intervalId) { // 如果正在播放，就即時更新速度
+            startMetronome();
+        }
+    }
+
+
+    function updateBpmDisplay() {
+        const bpmRange = document.getElementById("bpmRange");
+        const bpmValue = document.getElementById("bpmValue");
+        bpmValue.value = bpmRange.value;
+        currentBpm = parseInt(bpmRange.value);
+        if (intervalId) { // 如果正在播放，就即時更新速度
+            startMetronome();
+        }
+    }
+
+    function startMetronome() {
+        stopMetronome();
+        const beatsPerMeasure = parseInt(document.getElementById("beats").value);
+        const beatDisplay = document.getElementById("beatDisplay");
+        const interval = 60000 / currentBpm;
+        currentBeat = 0;
+        intervalId = setInterval(() => {
+            const isAccent = currentBeat === 0;
+            playClick(isAccent);
+            beatDisplay.textContent = currentBeat + 1;
+            beatDisplay.classList.add("active");
+            setTimeout(() => beatDisplay.classList.remove("active"), 100);
+            currentBeat = (currentBeat + 1) % beatsPerMeasure;
+        }, interval);
+    }
+
+    function stopMetronome() {
+        if (intervalId) clearInterval(intervalId);
+        currentBeat = 0;
+    }
+</script>
