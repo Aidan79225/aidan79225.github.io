@@ -7,3 +7,5 @@ main:
     url: "/tech/"
   - title: "Food"
     url: "/food/"
+  - title: "Metronome"
+    url: "/metronome/"
