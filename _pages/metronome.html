@@ -66,7 +66,7 @@ permalink: /metronome/
     <div class="metronome-controls">
         <div class="bpm-control">
             <div>BPM:<input type="number" id="bpmValue" value="60" oninput="updateBpmDisplayFromValue()"></div>
-            <input type="range" id="bpmRange" min="40" max="240" value="60" step="1" oninput="updateBpmDisplay()">
+            <input type="range" id="bpmRange" min="40" max="240" value="100" step="1" oninput="updateBpmDisplay()">
         </div>
 
         <div>
@@ -85,6 +85,7 @@ permalink: /metronome/
     <div>
         <button onclick="startMetronome()">開始</button>
         <button onclick="stopMetronome()">停止</button>
+        <button onclick="updateDot()">手打拍速</button>
     </div>
 </div>
 
@@ -92,6 +93,27 @@ permalink: /metronome/
     let audioCtx, intervalId;
     let currentBeat = 0;
     let currentBpm = 100;
+
+    let dotCnt = 0
+    let currentDot = 0;
+    let dot = [0, 0, 0, 0, 0, 0, 0, 0];
+
+    function updateDot() {
+        dotCnt += 1;
+        dot[currentDot] = Math.floor(Date.now())
+        if (dotCnt < dot.length) {
+            return;
+        }
+
+        let s = (currentDot - (dot.length - 1) + dot.length) % dot.length;
+        currentBpm = Math.round(60000 / ((dot[currentDot] - dot[s]) / (dot.length - 1)))
+        const bpmRange = document.getElementById("bpmRange");
+        const bpmValue = document.getElementById("bpmValue");
+        bpmValue.value = currentBpm;
+        bpmRange.value = currentBpm;
+        currentDot = (currentDot + 1) % dot.length;
+        startMetronome();
+    }
 
     function playClick(isAccent) {
         if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
