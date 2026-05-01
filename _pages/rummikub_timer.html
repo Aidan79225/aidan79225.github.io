@@ -168,5 +168,48 @@ permalink: /rummikub-timer/
 
     <button type="button" class="start-btn" id="startBtn">開始遊戲</button>
   </section>
+
+  <script>
+    // ---------- Constants ----------
+    const COLORS = ['#8957e5', '#388bfd', '#3fb950', '#d29922', '#db6d28', '#f85149'];
+
+    // ---------- State ----------
+    const config = {
+      playerCount: 4,
+      turnSeconds: 90
+    };
+
+    // ---------- DOM refs ----------
+    const playerCountRow = document.getElementById('playerCountRow');
+    const colorPreview = document.getElementById('colorPreview');
+
+    // ---------- Setup wiring ----------
+    function renderColorPreview() {
+      colorPreview.innerHTML = '';
+      for (let i = 0; i < config.playerCount; i++) {
+        const dot = document.createElement('div');
+        dot.className = 'color-dot';
+        dot.style.background = COLORS[i];
+        colorPreview.appendChild(dot);
+      }
+    }
+
+    function setPlayerCount(n) {
+      config.playerCount = n;
+      for (const btn of playerCountRow.querySelectorAll('.player-count-btn')) {
+        btn.classList.toggle('active', Number(btn.dataset.count) === n);
+      }
+      renderColorPreview();
+    }
+
+    playerCountRow.addEventListener('click', (e) => {
+      const btn = e.target.closest('.player-count-btn');
+      if (!btn) return;
+      setPlayerCount(Number(btn.dataset.count));
+    });
+
+    // ---------- Init ----------
+    renderColorPreview();
+  </script>
 </body>
 </html>
