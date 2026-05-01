@@ -289,6 +289,58 @@ permalink: /rummikub-timer/
     minutesSelect.addEventListener('change', updateTurnSeconds);
     secondsSelect.addEventListener('change', updateTurnSeconds);
 
+    // ---------- Game refs ----------
+    const setupView = document.getElementById('setupView');
+    const gameView = document.getElementById('gameView');
+    const playerLabel = document.getElementById('playerLabel');
+    const countdownEl = document.getElementById('countdown');
+
+    // ---------- Game state ----------
+    const game = {
+      currentPlayer: 0,
+      endTime: 0,
+      tickIntervalId: null,
+      timeIsUp: false
+    };
+
+    function formatTime(ms) {
+      if (ms < 0) ms = 0;
+      const totalSec = Math.ceil(ms / 1000);
+      const m = Math.floor(totalSec / 60);
+      const s = totalSec % 60;
+      return String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    }
+
+    function tick() {
+      const remaining = game.endTime - Date.now();
+      countdownEl.textContent = formatTime(remaining);
+      if (remaining <= 0 && !game.timeIsUp) {
+        game.timeIsUp = true;
+        clearInterval(game.tickIntervalId);
+        game.tickIntervalId = null;
+        // Alarm hook in a later task
+      }
+    }
+
+    function startTurn() {
+      game.timeIsUp = false;
+      gameView.style.background = COLORS[game.currentPlayer];
+      playerLabel.textContent = '玩家 ' + (game.currentPlayer + 1);
+      game.endTime = Date.now() + config.turnSeconds * 1000;
+      countdownEl.textContent = formatTime(config.turnSeconds * 1000);
+      if (game.tickIntervalId) clearInterval(game.tickIntervalId);
+      game.tickIntervalId = setInterval(tick, 100);
+    }
+
+    function startGame() {
+      setupView.style.display = 'none';
+      gameView.classList.add('visible');
+      game.currentPlayer = 0;
+      startTurn();
+    }
+
+    startBtn.addEventListener('click', startGame);
+
     // ---------- Init ----------
     renderColorPreview();
     updateTurnSeconds();
