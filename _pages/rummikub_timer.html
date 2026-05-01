@@ -379,6 +379,8 @@ permalink: /rummikub-timer/
     }
 
     function startAlarm() {
+      stopAlarm();
+      ensureAudioCtx();
       playBeep();
       alarmIntervalId = setInterval(playBeep, 600);
       if (navigator.vibrate) {
