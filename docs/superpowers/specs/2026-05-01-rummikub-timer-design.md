@@ -98,16 +98,31 @@ const COLORS = ['#8957e5','#388bfd','#3fb950','#d29922','#db6d28','#f85149'];
 
 ## 計時邏輯
 
-每次「換人」（包括首次「開始遊戲」）：
+兩個函式分工：
+
+**`startGame()`** — 由「開始遊戲」按鈕呼叫
+1. 初始化 `audioCtx` (使用者 gesture，iOS 可用)
+2. request Wake Lock
+3. 切到 game state
+4. `currentPlayer = 0`
+5. 呼叫 `startTurn()`
+
+**`nextPlayer()`** — 由 game state 點擊呼叫
 1. 停止目前倒數 (`clearInterval(intervalId)`)
 2. 停止 alarm（嗶聲 + 震動）
-3. 首次開始時 `currentPlayer = 0`，否則 `currentPlayer = (currentPlayer + 1) % playerCount`
-4. 背景換成 `COLORS[currentPlayer]`，更新「玩家 N」文字
-5. `endTime = Date.now() + turnSeconds * 1000`
-6. 啟動 `setInterval` 100ms 一次：
+3. `currentPlayer = (currentPlayer + 1) % playerCount`
+4. 呼叫 `startTurn()`
+
+**`startTurn()`** — 共用
+1. 背景換成 `COLORS[currentPlayer]`
+2. 更新顯示「玩家 N」（**1-indexed UI**：`currentPlayer + 1`）
+3. `endTime = Date.now() + turnSeconds * 1000`
+4. 啟動 `setInterval` 100ms 一次：
    - `remainingMs = endTime - Date.now()`
    - 更新顯示 `MM:SS`
    - 若 `remainingMs <= 0`：顯示 `00:00`、停止倒數 interval、啟動 alarm
+
+**Indexing 規則**：內部 `currentPlayer` 一律 0-indexed (對應 `COLORS[i]`)，UI 顯示時統一 +1 顯示為「玩家 1」～「玩家 6」。
 
 **為什麼用 `Date.now()` 基準**：手機螢幕關閉、tab 切走時 `setInterval` 不準。用結束時刻減目前時間，回到前景時自動正確。
 
@@ -150,7 +165,7 @@ function stopAlarm() {
 
 | 動作 | 觸發 | 行為 |
 |---|---|---|
-| 設定人數 | 點 2-6 任一按鈕 | 該按鈕高亮 (active class)，更新 `config.playerCount`，更新配色預覽 |
+| 設定人數 | 點 2-6 任一按鈕 | 該按鈕高亮 (active class)，更新 `config.playerCount`，配色預覽動態顯示對應數量的色點 (`COLORS.slice(0, playerCount)`) |
 | 設定分鐘 | 分鐘 select (0-5) | 更新 `config.turnSeconds` |
 | 設定秒鐘 | 秒鐘 select (0/15/30/45) | 更新 `config.turnSeconds` |
 | 開始遊戲 | 大按鈕 | 初始化 audioCtx + wakeLock，切到 game state，玩家 0，開始計時 |
@@ -225,14 +240,23 @@ iOS Safari < 16.4 不支援 → feature detection 跳過，不影響功能。
 
 ## Navigation 整合
 
-`_data/navigation.yml` 加入口（依現有結構，可能在 main 或某個 collection 下）：
+`_data/navigation.yml` 在 `main` 下加入口（與 Metronome 同層）：
 
 ```yaml
-- title: "拉密計時"
-  url: /rummikub-timer/
+main:
+  - title: "Home"
+    url: "/"
+  - title: "About"
+    url: "/about/"
+  - title: "Tech"
+    url: "/tech/"
+  - title: "Food"
+    url: "/food/"
+  - title: "Metronome"
+    url: "/metronome/"
+  - title: "Rummikub Timer"
+    url: "/rummikub-timer/"
 ```
-
-實作時確認現有 navigation 結構並依樣加入。
 
 ## 實作 checklist (供 plan 階段參考)
 
