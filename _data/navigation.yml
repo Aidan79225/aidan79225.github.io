@@ -9,3 +9,5 @@ main:
     url: "/food/"
   - title: "Metronome"
     url: "/metronome/"
+  - title: "Rummikub Timer"
+    url: "/rummikub-timer/"
