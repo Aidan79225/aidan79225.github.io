@@ -401,6 +401,27 @@ permalink: /rummikub-timer/
       if (navigator.vibrate) navigator.vibrate(0);
     }
 
+    // ---------- End game ----------
+    const endBtn = document.getElementById('endBtn');
+
+    function endGame() {
+      if (game.tickIntervalId) {
+        clearInterval(game.tickIntervalId);
+        game.tickIntervalId = null;
+      }
+      stopAlarm();
+      gameView.classList.remove('visible');
+      gameView.style.background = '';
+      setupView.style.display = '';
+    }
+
+    endBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (confirm('結束遊戲？')) {
+        endGame();
+      }
+    });
+
     // ---------- Init ----------
     renderColorPreview();
     updateTurnSeconds();
