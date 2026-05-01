@@ -338,6 +338,7 @@ permalink: /rummikub-timer/
       gameView.classList.add('visible');
       game.currentPlayer = 0;
       startTurn();
+      requestWakeLock();
     }
 
     startBtn.addEventListener('click', startGame);
@@ -410,6 +411,7 @@ permalink: /rummikub-timer/
         game.tickIntervalId = null;
       }
       stopAlarm();
+      releaseWakeLock();
       gameView.classList.remove('visible');
       gameView.style.background = '';
       setupView.style.display = '';
@@ -419,6 +421,31 @@ permalink: /rummikub-timer/
       e.stopPropagation();
       if (confirm('結束遊戲？')) {
         endGame();
+      }
+    });
+
+    // ---------- Wake Lock ----------
+    let wakeLock = null;
+
+    async function requestWakeLock() {
+      if (!('wakeLock' in navigator)) return;
+      try {
+        wakeLock = await navigator.wakeLock.request('screen');
+      } catch (_) {
+        wakeLock = null;
+      }
+    }
+
+    function releaseWakeLock() {
+      if (wakeLock) {
+        try { wakeLock.release(); } catch (_) {}
+        wakeLock = null;
+      }
+    }
+
+    document.addEventListener('visibilitychange', () => {
+      if (document.visibilityState === 'visible' && gameView.classList.contains('visible')) {
+        requestWakeLock();
       }
     });
 
