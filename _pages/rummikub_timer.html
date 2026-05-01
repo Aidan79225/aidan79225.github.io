@@ -410,6 +410,7 @@ permalink: /rummikub-timer/
         clearInterval(game.tickIntervalId);
         game.tickIntervalId = null;
       }
+      game.timeIsUp = false;
       stopAlarm();
       releaseWakeLock();
       gameView.classList.remove('visible');
