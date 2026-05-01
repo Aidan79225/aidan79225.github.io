@@ -341,6 +341,13 @@ permalink: /rummikub-timer/
 
     startBtn.addEventListener('click', startGame);
 
+    function nextPlayer() {
+      game.currentPlayer = (game.currentPlayer + 1) % config.playerCount;
+      startTurn();
+    }
+
+    gameView.addEventListener('click', nextPlayer);
+
     // ---------- Init ----------
     renderColorPreview();
     updateTurnSeconds();
