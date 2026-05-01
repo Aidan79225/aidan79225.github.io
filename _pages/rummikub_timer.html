@@ -122,6 +122,66 @@ permalink: /rummikub-timer/
       color: #8b949e;
       cursor: not-allowed;
     }
+
+    /* ---------- Game state ---------- */
+    .game {
+      position: fixed;
+      inset: 0;
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: #0d1117;
+      transition: background-color 0.3s ease;
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-touch-callout: none;
+      touch-action: manipulation;
+      cursor: pointer;
+    }
+
+    .game.visible {
+      display: flex;
+    }
+
+    .game .player-label {
+      font-size: 1.5rem;
+      font-weight: 500;
+      color: rgba(255, 255, 255, 0.85);
+      margin-bottom: 1rem;
+    }
+
+    .game .countdown {
+      font-size: clamp(4rem, 20vw, 8rem);
+      font-weight: 700;
+      color: #fff;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: 0.05em;
+    }
+
+    .game .hint {
+      position: absolute;
+      bottom: 2rem;
+      font-size: 0.9rem;
+      color: rgba(255, 255, 255, 0.6);
+    }
+
+    .end-btn {
+      position: absolute;
+      top: 16px;
+      left: 16px;
+      width: 48px;
+      height: 48px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.4);
+      color: #fff;
+      border: none;
+      font-size: 1.4rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
   </style>
 </head>
 <body>
@@ -167,6 +227,13 @@ permalink: /rummikub-timer/
     </div>
 
     <button type="button" class="start-btn" id="startBtn">開始遊戲</button>
+  </section>
+
+  <section class="game" id="gameView">
+    <button type="button" class="end-btn" id="endBtn" aria-label="結束遊戲">✕</button>
+    <div class="player-label" id="playerLabel">玩家 1</div>
+    <div class="countdown" id="countdown">00:00</div>
+    <div class="hint">點擊任何位置換下一位</div>
   </section>
 
   <script>
