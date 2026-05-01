@@ -318,7 +318,7 @@ permalink: /rummikub-timer/
         game.timeIsUp = true;
         clearInterval(game.tickIntervalId);
         game.tickIntervalId = null;
-        // Alarm hook in a later task
+        startAlarm();
       }
     }
 
@@ -333,6 +333,7 @@ permalink: /rummikub-timer/
     }
 
     function startGame() {
+      ensureAudioCtx();
       setupView.style.display = 'none';
       gameView.classList.add('visible');
       game.currentPlayer = 0;
@@ -342,11 +343,61 @@ permalink: /rummikub-timer/
     startBtn.addEventListener('click', startGame);
 
     function nextPlayer() {
+      stopAlarm();
       game.currentPlayer = (game.currentPlayer + 1) % config.playerCount;
       startTurn();
     }
 
     gameView.addEventListener('click', nextPlayer);
+
+    // ---------- Audio + vibration ----------
+    let audioCtx = null;
+    let alarmIntervalId = null;
+    let vibrateIntervalId = null;
+
+    function ensureAudioCtx() {
+      if (!audioCtx) {
+        audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      }
+      // Resume if suspended (mobile browsers can suspend after backgrounding)
+      if (audioCtx.state === 'suspended') {
+        audioCtx.resume();
+      }
+    }
+
+    function playBeep() {
+      if (!audioCtx) return;
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.frequency.value = 800;
+      gain.gain.setValueAtTime(1, audioCtx.currentTime);
+      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.1);
+      osc.start();
+      osc.stop(audioCtx.currentTime + 0.1);
+    }
+
+    function startAlarm() {
+      playBeep();
+      alarmIntervalId = setInterval(playBeep, 600);
+      if (navigator.vibrate) {
+        navigator.vibrate(200);
+        vibrateIntervalId = setInterval(() => navigator.vibrate(200), 600);
+      }
+    }
+
+    function stopAlarm() {
+      if (alarmIntervalId) {
+        clearInterval(alarmIntervalId);
+        alarmIntervalId = null;
+      }
+      if (vibrateIntervalId) {
+        clearInterval(vibrateIntervalId);
+        vibrateIntervalId = null;
+      }
+      if (navigator.vibrate) navigator.vibrate(0);
+    }
 
     // ---------- Init ----------
     renderColorPreview();
