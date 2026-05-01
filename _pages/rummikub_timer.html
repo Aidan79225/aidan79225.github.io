@@ -208,8 +208,23 @@ permalink: /rummikub-timer/
       setPlayerCount(Number(btn.dataset.count));
     });
 
+    const minutesSelect = document.getElementById('minutesSelect');
+    const secondsSelect = document.getElementById('secondsSelect');
+    const startBtn = document.getElementById('startBtn');
+
+    function updateTurnSeconds() {
+      const m = Number(minutesSelect.value);
+      const s = Number(secondsSelect.value);
+      config.turnSeconds = m * 60 + s;
+      startBtn.disabled = config.turnSeconds === 0;
+    }
+
+    minutesSelect.addEventListener('change', updateTurnSeconds);
+    secondsSelect.addEventListener('change', updateTurnSeconds);
+
     // ---------- Init ----------
     renderColorPreview();
+    updateTurnSeconds();
   </script>
 </body>
 </html>
