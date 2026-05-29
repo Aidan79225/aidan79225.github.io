@@ -11,3 +11,5 @@ main:
     url: "/metronome/"
   - title: "Rummikub Timer"
     url: "/rummikub-timer/"
+  - title: "Odoo 使用指南"
+    url: "/odoo-usage-guide/"
