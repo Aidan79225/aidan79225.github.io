@@ -1,8 +1,8 @@
 # 車位抽籤亂數引擎優化設計
 
 - 日期:2026-06-08
-- 檔案:`parking_lottery.html`
-- 範圍:**只更換亂數引擎**,不動分配規則、介面、Excel 下載與 seed↔日期功能
+- 檔案:`parking_lottery.html`、`_posts/2025-09-20-lottery.md`
+- 範圍:**更換亂數引擎**(不動分配規則、介面、Excel 下載與 seed↔日期功能),並**同步更新部落格文章**說明此次升級
 
 ## 背景與問題
 
@@ -97,9 +97,21 @@ const remainingParkings = shuffleArray(
 
 - 同一個 seed 仍 **100% 可重現**;但因更換引擎,**新舊 seed 對應的結果會不同**,這是預期行為。
 
+## 部落格文章更新(`_posts/2025-09-20-lottery.md`)
+
+採「保留 LCG、新增升級段落」取向 —— 維持文章原有的黑箱論述與 LCG 教學,以呈現演進過程:
+
+- **保留不動**:前言、黑箱定義/條件、「可重現的隨機算法」總論、LCG 原理與範例、Fisher–Yates 段落、seed 來源、抽籤流程、結論。
+- **新增一節**(置於 Fisher–Yates 段落之後、「seed 的來源」之前),標題如「從 LCG 升級到 Mulberry32」,內容涵蓋:
+  - LCG 在本案的實際弱點:用 `seed + 小 offset` 衍生多份洗牌造成**假獨立**(相鄰 seed 序列相關)、**首筆可預測**、低位元隨機性差。
+  - 改用 **Mulberry32**(統計品質佳、仍可重現)+ **xmur3 具名標籤分流**(`makeRng(seed, label)`)解決上述問題。
+  - 附新版 `xmur3` / `mulberry32` / `makeRng` / `shuffleArray(array, rng)` 範例程式碼,與 `parking_lottery.html` 一致。
+- **可重現性論述不變**:換引擎後同 seed 仍 100% 可重現,黑箱論證完全成立。
+
 ## 驗證方式
 
 - 同一 seed 連按兩次「抽籤」→ 結果完全相同(可重現)。
 - 換不同 seed → 結果分佈不同。
 - 四份清單與 winners 之間因標籤不同而為獨立流,不再因相鄰 seed 相關。
 - 既有功能(Excel 下載、範例填入、清空、日期顯示)行為不變。
+- 部落格文章新版範例程式碼與 `parking_lottery.html` 實作一致,Jekyll 正常渲染(含 MathJax 數式不受影響)。
