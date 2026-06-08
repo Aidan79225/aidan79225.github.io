@@ -1,0 +1,22 @@
+---
+import '../styles/global.css';
+import Nav from '../components/Nav.astro';
+const { title = "Aidan's Blog" } = Astro.props;
+---
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+  </head>
+  <body class="bg-base text-ink min-h-screen">
+    <Nav />
+    <main class="max-w-3xl mx-auto px-4 py-8">
+      <slot />
+    </main>
+    <footer class="max-w-3xl mx-auto px-4 py-8 mt-12 border-t border-line text-muted text-sm">
+      © 2026 Aidan's Blog
+    </footer>
+  </body>
+</html>

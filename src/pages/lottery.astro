@@ -1,0 +1,328 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/tools.css';
+---
+<BaseLayout title="車位抽籤">
+  <div class="tool-page">
+  <h2>車位抽籤系統</h2>
+  <div class="block seed-block">
+    <h3>抽籤 seed</h3>
+    <input type="text" id="seed" placeholder="可留空自動生成">
+    <h3>對應日期</h3>
+    <div id="date-display">尚未輸入 seed</div>
+  </div>
+  <div class="container">
+    <div class="block">
+      <h3>一般戶名</h3>
+      <textarea id="households"></textarea>
+    </div>
+    <div class="block">
+      <h3>優先戶名</h3>
+      <textarea id="priorityHouseholds"></textarea>
+    </div>
+    <div class="block">
+      <h3>一般車位</h3>
+      <textarea id="parkings"></textarea>
+    </div>
+    <div class="block">
+      <h3>優先車位</h3>
+      <textarea id="priorityParkings"></textarea>
+    </div>
+  </div>
+  <div>
+    <button onclick="drawLots()">抽籤</button>
+    <button onclick="downloadExcel()">下載 Excel</button>
+    <button onclick="fillExample()">範例填入</button>
+    <button onclick="clearInputs()">清空輸入</button>
+  </div>
+  <div class="result" id="result"></div>
+</div>
+
+  <style is:global>
+  .tool-page {
+    margin: 20px 0;
+  }
+  .tool-page textarea {
+    width: 300px;
+    min-height: 100px;
+    margin: 5px;
+    padding: 5px;
+    resize: none;
+  }
+  .tool-page button {
+    margin: 5px;
+    padding: 5px 10px;
+  }
+  .tool-page .container {
+    display: flex;
+    flex-wrap: wrap;
+  }
+  .tool-page .block {
+    margin-right: 20px;
+  }
+  .tool-page .result {
+    margin-top: 20px;
+    white-space: pre-line;
+  }
+  .tool-page .seed-block {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .tool-page .seed-block h3 {
+    margin: 0;
+    white-space: nowrap;
+  }
+  </style>
+  <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script is:inline>
+
+
+  function autoResizeAll() {
+    const allTextareas = document.querySelectorAll('textarea');
+    let maxHeight = 0;
+
+    // 先將每個 textarea 高度重置自動計算
+    allTextareas.forEach(t => {
+      if (t.id === 'seed') return;
+      t.style.height = 'auto';
+      maxHeight = Math.max(maxHeight, t.scrollHeight);
+    });
+
+    // 將最大高度套用到所有 textarea
+    allTextareas.forEach(t => {
+      if (t.id === 'seed') return;
+      t.style.height = maxHeight + 'px';
+    });
+  }
+
+  function getUniqueList(id) {
+    return [...new Set(document.getElementById(id).value.split(/\n+/).map(s => s.trim()).filter(Boolean))];
+  }
+
+  function xmur3(str) {
+    let h = 1779033703 ^ str.length;
+    for (let i = 0; i < str.length; i++) {
+      h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+      h = (h << 13) | (h >>> 19);
+    }
+    return (h ^= h >>> 16) >>> 0;
+  }
+
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = (a + 0x6D2B79F5) | 0;
+      let t = Math.imul(a ^ (a >>> 15), 1 | a);
+      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    };
+  }
+
+  function makeRng(seed, label) {
+    return mulberry32(xmur3(`${seed}:${label}`));
+  }
+
+  function shuffleArray(array, rng) {
+    const result = array.slice();
+    for (let i = result.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [result[i], result[j]] = [result[j], result[i]];
+    }
+    return result;
+  }
+
+  function getSeed() {
+    const seedInputElement = document.getElementById('seed');
+    const seedInput = seedInputElement.value.trim();
+    if (seedInput && !/^\d+$/.test(seedInput)) {
+      alert("請輸入有效數字作為 seed");
+      return;
+    }
+    const seed = seedInput ? parseInt(seedInput, 10) : Date.now();
+    seedInputElement.value = seed;
+    const dateDisplay = document.getElementById("date-display");
+    dateDisplay.innerText = getUTC8DateString(new Date(seed));
+    return seed;
+  }
+
+
+  function drawLots() {
+    const seed = getSeed();
+
+    let households = getUniqueList('households');
+    let priorityHouseholds = getUniqueList('priorityHouseholds');
+    let parkings = getUniqueList('parkings');
+    let priorityParkings = getUniqueList('priorityParkings');
+
+    households = households.filter(h => !priorityHouseholds.includes(h));
+    parkings = parkings.filter(p => !priorityParkings.includes(p));
+    households = shuffleArray(households, makeRng(seed, 'households'));
+    priorityHouseholds = shuffleArray(priorityHouseholds, makeRng(seed, 'priorityHouseholds'));
+    parkings = shuffleArray(parkings, makeRng(seed, 'parkings'));
+    priorityParkings = shuffleArray(priorityParkings, makeRng(seed, 'priorityParkings'));
+
+    const totalHouseholds = [...priorityHouseholds, ...households];
+    const totalParkings = [...priorityParkings, ...parkings];
+
+    const winners = shuffleArray([...totalHouseholds], makeRng(seed, 'winners')).slice(0, totalParkings.length);
+
+    const result = {};
+    const remainingPriorityHouseholds = winners.filter(w => priorityHouseholds.includes(w));
+
+    priorityParkings.forEach(p => {
+      if (remainingPriorityHouseholds.length > 0) {
+        result[p] = remainingPriorityHouseholds.shift();
+      }
+    });
+
+    const remainingWinners = winners.filter(w => !Object.values(result).includes(w));
+    const remainingParkings = shuffleArray(totalParkings.filter(p => !Object.keys(result).includes(p)), makeRng(seed, 'remainingParkings'));
+    remainingParkings.forEach(p => {
+      if (remainingWinners.length > 0) {
+        result[p] = remainingWinners.shift();
+      }
+    });
+
+    displayResult(totalHouseholds, totalParkings, result, seed);
+  }
+
+  function displayResult(totalHouseholds, totalParkings, result, seed) {
+    const resultDiv = document.getElementById('result');
+    let output = "分配結果：\n";
+    for (const [p, h] of Object.entries(result)) {
+      output += `${h} → 車位 ${p}\n`;
+    }
+
+    const losers = totalHouseholds.filter(h => !Object.values(result).includes(h));
+    const leftoverParkings = totalParkings.filter(p => !Object.keys(result).includes(p));
+
+    if (losers.length > 0) {
+      output += "\n未中籤的戶：\n" + losers.join("\n");
+    }
+    if (leftoverParkings.length > 0) {
+      output += "\n\n剩餘車位：\n" + leftoverParkings.join("\n");
+    }
+    output += "\n\n抽籤 seed: \n" + seed;
+
+    resultDiv.textContent = output;
+  }
+
+  function downloadExcel() {
+    const resultText = document.getElementById('result').textContent.split("\n");
+
+    const allocation = [];
+    const losers = [];
+    const leftovers = [];
+    const seed = [];
+
+    let section = 'allocation';
+    resultText.forEach(line => {
+      if (line.startsWith('分配結果')) section = 'allocation';
+      else if (line.startsWith('未中籤的戶')) section = 'losers';
+      else if (line.startsWith('剩餘車位')) section = 'leftovers';
+      else if (line.startsWith('抽籤 seed')) section = 'seed';
+      else if (line.trim() !== '') {
+        if (section === 'allocation' && line.includes('→')) {
+          const [h, p] = line.split('→').map(s => s.trim());
+          allocation.push({ 戶名: h, 車位: p.replace('車位 ', '') });
+        } else if (section === 'losers') {
+          losers.push({ 未中籤戶: line });
+        } else if (section === 'leftovers') {
+          leftovers.push({ 剩餘車位: line });
+        } else if (section === 'seed') {
+          seed.push({ seed: line });
+        }
+      }
+    });
+
+    allocation.sort((a, b) => a.戶名.localeCompare(b.戶名, 'zh-Hant'));
+    losers.sort((a, b) => a.未中籤戶.localeCompare(b.未中籤戶, 'zh-Hant'));
+    leftovers.sort((a, b) => parseInt(a.剩餘車位) - parseInt(b.剩餘車位));
+
+    const wb = XLSX.utils.book_new();
+    if (allocation.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(allocation), "分配結果");
+    if (losers.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(losers), "未中籤戶");
+    if (leftovers.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(leftovers), "剩餘車位");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(seed), "抽籤 seed");
+
+    let households = getUniqueList('households');
+    let priorityHouseholds = getUniqueList('priorityHouseholds');
+    let parkings = getUniqueList('parkings');
+    let priorityParkings = getUniqueList('priorityParkings');
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(households.map(h => ({ "一般戶名": h }))), "原始資料一般戶名");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(priorityHouseholds.map(h => ({ "優先戶名": h }))), "原始資料優先戶名");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(parkings.map(p => ({ "一般車位": p }))), "原始資料一般車位");
+    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(priorityParkings.map(p => ({ "優先車位": p }))), "原始資料優先車位");
+    XLSX.writeFile(wb, "lottery_result.xlsx");
+  }
+
+
+  function fillExample() {
+    document.getElementById("households").value = "53-1F\n53-2F\n53-3F\n53-4F\n53-5F";
+    document.getElementById("priorityHouseholds").value = "53-12F\n53-13F";
+    document.getElementById("priorityParkings").value = "1\n2\n3\n4\n5\n6\n7\n8\n9\n10";
+    document.getElementById("parkings").value =
+      "13\n14\n15\n16\n17\n18\n19\n20\n"
+      + "21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n"
+      + "31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n"
+      + "41\n42\n43\n44\n45\n46\n47\n48\n49\n"
+      + "51\n52\n53\n54\n55\n56\n57\n58\n59\n60\n"
+      + "61\n62\n63";
+    autoResizeAll();
+  }
+
+  function clearInputs() {
+    document.getElementById('households').value = '';
+    document.getElementById('priorityHouseholds').value = '';
+    document.getElementById('parkings').value = '';
+    document.getElementById('priorityParkings').value = '';
+    autoResizeAll();
+  }
+
+  function getUTC8DateString(d) {
+    return d.toLocaleString("zh-TW", {
+      timeZone: "Asia/Taipei",
+      hour12: false,
+      year: "numeric", month: "2-digit", day: "2-digit",
+      hour: "2-digit", minute: "2-digit", second: "2-digit",
+      fractionalSecondDigits: 3
+    });
+  }
+
+  function init() {
+
+    document.querySelectorAll('textarea').forEach(t => {
+      autoResizeAll();
+      t.addEventListener('input', () => autoResizeAll());
+    });
+    const seedInput = document.getElementById("seed");
+    const dateDisplay = document.getElementById("date-display");
+
+    seedInput.addEventListener("input", () => {
+      const value = seedInput.value.trim();
+      if (!value) {
+        dateDisplay.innerText = "尚未輸入 seed";
+        return;
+      }
+
+      const seedNum = Number(value);
+      if (isNaN(seedNum)) {
+        dateDisplay.innerText = "⚠️ seed 必須是數字";
+        return;
+      }
+
+      const date = new Date(seedNum);
+      if (isNaN(date.getTime())) {
+        dateDisplay.innerText = "⚠️ 無效的日期";
+        return;
+      }
+
+      dateDisplay.innerText = getUTC8DateString(date);
+    });
+  }
+  init();
+
+
+
+  </script>
+</BaseLayout>
