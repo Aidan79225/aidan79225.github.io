@@ -102,7 +102,7 @@ toc_sticky: true
 
   <!-- ===== OVERVIEW ===== -->
   <section id="overview">
-    <h2>整體流程圖</h2>
+    <h2 id="h2-1">整體流程圖</h2>
     <p class="path">三項作業有先後順序：要開銷售單，產品必須先存在；要收帳，銷售單必須先開發票。建議依下圖順序操作。</p>
     <div class="flowstrip">
       <div class="node"><div class="n">①</div><b>建立產品</b><small>商品資料 / 售價</small></div>
@@ -121,7 +121,7 @@ toc_sticky: true
 
   <!-- ===== LOGIN ===== -->
   <section id="login">
-    <h2>登入系統</h2>
+    <h2 id="h2-2">登入系統</h2>
     <ol class="steps">
       <li><b>開啟瀏覽器</b><div class="desc">輸入農場網址（例如 <code>https://farm.你的網域</code>）。本系統透過 Cloudflare Tunnel 對外，沒有開放對外連接埠。</div></li>
       <li><b>輸入帳號密碼</b><div class="desc">使用管理員或操作員帳號登入。</div></li>
@@ -132,7 +132,7 @@ toc_sticky: true
 
   <!-- ===== 1. PRODUCT ===== -->
   <section id="product">
-    <h2><span class="chip">作業 ①</span>建立產品</h2>
+    <h2 id="h2-3"><span class="chip">作業 ①</span>建立產品</h2>
     <p class="path">路徑：<code>銷售</code> → <code>產品</code> → <code>產品</code> → <kbd>新增</kbd>　（或從 <code>庫存</code> App 進入，結果相同）</p>
 
     <ol class="steps">
@@ -146,7 +146,7 @@ toc_sticky: true
       <li><b>儲存</b><div class="desc">點上方 <span class="pill">☁ 儲存</span>（雲朵圖示）完成建立。產品即可在銷售單中被選用。</div></li>
     </ol>
 
-    <h3>必填 / 建議欄位一覽</h3>
+    <h3 id="h3-1">必填 / 建議欄位一覽</h3>
     <table>
       <tr><th>欄位</th><th>說明</th><th>必填</th></tr>
       <tr><td>產品名稱</td><td>顯示在銷售單、發票上的品名</td><td class="req">是</td></tr>
@@ -163,7 +163,7 @@ toc_sticky: true
 
   <!-- ===== 2. SALES ORDER ===== -->
   <section id="sale">
-    <h2><span class="chip">作業 ②</span>建立銷售單</h2>
+    <h2 id="h2-4"><span class="chip">作業 ②</span>建立銷售單</h2>
     <p class="path">路徑：<code>銷售</code> → <code>訂單</code> → <code>報價單</code> → <kbd>新增</kbd></p>
 
     <div class="flowstrip">
@@ -193,7 +193,7 @@ toc_sticky: true
 
   <!-- ===== 3. COLLECT ===== -->
   <section id="collect">
-    <h2><span class="chip">作業 ③</span>收帳（開發票 ＋ 收款）</h2>
+    <h2 id="h2-5"><span class="chip">作業 ③</span>收帳（開發票 ＋ 收款）</h2>
     <p class="path">路徑：<code>發票管理</code> → <code>客戶</code> → <code>發票</code>　（或直接從銷售單的「建立發票」進入）</p>
 
     <div class="flowstrip">
@@ -206,7 +206,7 @@ toc_sticky: true
       <div class="node"><div class="n">D</div><b>已付款</b><small><span class="status s-pay">收帳完成</span></small></div>
     </div>
 
-    <h3>步驟</h3>
+    <h3 id="h3-2">步驟</h3>
     <ol class="steps">
       <li><b>確認（過帳）發票</b><div class="desc">由銷售單「建立發票」進來後，發票為 <span class="status s-draft">草稿</span>。核對品項與金額後，點 <span class="pill">確認</span> 過帳，狀態變為 <span class="status s-go">已過帳</span>，付款狀態為「待付款」。系統自動產生發票號碼（INV/2026/…）。</div></li>
       <li><b>登記付款</b><div class="desc">在已過帳的發票上，點上方 <span class="pill">登記付款</span> 按鈕。</div></li>
@@ -222,13 +222,13 @@ toc_sticky: true
       <li><b>建立付款</b><div class="desc">點 <span class="pill">建立付款</span>。發票右上角即出現綠色 <span class="status s-pay">已付款</span> 戳記，收帳完成。</div></li>
     </ol>
 
-    <h3>部分收款 / 多筆對帳</h3>
+    <h3 id="h3-3">部分收款 / 多筆對帳</h3>
     <div class="note">
       <b>分次收款</b>
       步驟 3 把「金額」改成本次實收即可。發票會顯示 <span class="status s-go">部分付款</span>，剩餘金額待下次再次「登記付款」。全部收齊後自動轉為 <span class="status s-pay">已付款</span>。
     </div>
 
-    <h3>查詢未收款（應收帳款）</h3>
+    <h3 id="h3-4">查詢未收款（應收帳款）</h3>
     <ol class="steps">
       <li><b>看哪些還沒收</b><div class="desc">進 <span class="pill">發票管理 ▸ 客戶 ▸ 發票</span>，用篩選器選 <span class="pill">待付款</span>，即列出所有尚未收齊的發票。</div></li>
       <li><b>客戶對帳單</b><div class="desc">在客戶卡片可檢視該客戶的所有發票與付款紀錄，核對總應收金額。</div></li>
@@ -238,7 +238,7 @@ toc_sticky: true
 
   <!-- ===== STATUS ===== -->
   <section id="status">
-    <h2>單據狀態對照表</h2>
+    <h2 id="h2-6">單據狀態對照表</h2>
     <table>
       <tr><th>作業</th><th>狀態</th><th>意義</th><th>下一步</th></tr>
       <tr><td rowspan="2">銷售單</td><td><span class="status s-draft">報價單（草稿）</span></td><td>尚未成立交易</td><td>確認</td></tr>
@@ -251,16 +251,16 @@ toc_sticky: true
 
   <!-- ===== FAQ ===== -->
   <section id="faq">
-    <h2>常見問題</h2>
-    <h3>Q：銷售單上找不到我要的產品？</h3>
+    <h2 id="h2-7">常見問題</h2>
+    <h3 id="h3-5">Q：銷售單上找不到我要的產品？</h3>
     <p>請先完成<a href="#product">作業 ① 建立產品</a>並儲存。產品需存在才能被選用。</p>
-    <h3>Q：發票上沒有「登記付款」按鈕？</h3>
+    <h3 id="h3-6">Q：發票上沒有「登記付款」按鈕？</h3>
     <p>該發票還是「草稿」。先點 <span class="pill">確認</span> 過帳，按鈕才會出現。</p>
-    <h3>Q：客戶只先付訂金怎麼辦？</h3>
+    <h3 id="h3-7">Q：客戶只先付訂金怎麼辦？</h3>
     <p>照常「登記付款」，把金額改成訂金數額。發票會記為部分付款，尾款收齊後自動轉「已付款」。</p>
-    <h3>Q：開錯發票可以取消嗎？</h3>
+    <h3 id="h3-8">Q：開錯發票可以取消嗎？</h3>
     <p>已過帳的發票不可直接刪除。請使用 <span class="pill">退回 / 開立貸項通知單 (Credit Note)</span> 沖銷，以保留帳務軌跡。</p>
-    <h3>Q：社群版有「會計」App 嗎？</h3>
+    <h3 id="h3-9">Q：社群版有「會計」App 嗎？</h3>
     <p>沒有完整會計，但「發票管理」已涵蓋開立客戶發票、登記付款與應收查詢，足以應付日常收帳。</p>
   </section>
 
