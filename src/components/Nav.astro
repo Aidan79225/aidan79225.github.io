@@ -1,0 +1,17 @@
+---
+const items = [
+  { title: 'Home', url: '/' },
+  { title: 'About', url: '/about/' },
+  { title: 'Tech', url: '/tech/' },
+  { title: 'Food', url: '/food/' },
+  { title: 'Guides', url: '/guides/' },
+  { title: 'Tools', url: '/tools/' },
+];
+---
+<nav class="bg-surface border-b border-line">
+  <ul class="max-w-3xl mx-auto px-4 py-3 flex flex-wrap gap-4 list-none m-0">
+    {items.map((i) => (
+      <li><a href={i.url} class="text-ink hover:text-accent no-underline">{i.title}</a></li>
+    ))}
+  </ul>
+</nav>
