@@ -114,31 +114,35 @@ permalink: /lottery/
       return [...new Set(document.getElementById(id).value.split(/\n+/).map(s => s.trim()).filter(Boolean))];
     }
 
-
-    function shuffleArray(array, seed) {
-      const result = array.slice();
-
-      let s = seed >>> 0;
-      let randomFunc = () => {
-        s = (1664525 * s + 1013904223) >>> 0;
-        return s / 0x100000000;
-      };
-
-      for (let i = result.length - 1; i > 0; i--) {
-        const j = Math.floor(randomFunc() * (i + 1));
-        [result[i], result[j]] = [result[j], result[i]];
+    function xmur3(str) {
+      let h = 1779033703 ^ str.length;
+      for (let i = 0; i < str.length; i++) {
+        h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
+        h = (h << 13) | (h >>> 19);
       }
-
-      return result;
+      return (h ^= h >>> 16) >>> 0;
     }
 
-    function getSeedOffsetGenerator() {
-      let idx = 0
-      let offsets = [2 * 23, 3 * 29, 5 * 31, 8 * 37, 13 * 41, 17 * 43]
-      return () => {
-        idx = (idx + 1) % offsets.length;
-        return offsets[idx];
+    function mulberry32(a) {
+      return function () {
+        a |= 0; a = (a + 0x6D2B79F5) | 0;
+        let t = Math.imul(a ^ (a >>> 15), 1 | a);
+        t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
+        return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+      };
+    }
+
+    function makeRng(seed, label) {
+      return mulberry32(xmur3(`${seed}:${label}`));
+    }
+
+    function shuffleArray(array, rng) {
+      const result = array.slice();
+      for (let i = result.length - 1; i > 0; i--) {
+        const j = Math.floor(rng() * (i + 1));
+        [result[i], result[j]] = [result[j], result[i]];
       }
+      return result;
     }
 
     function getSeed() {
@@ -166,16 +170,15 @@ permalink: /lottery/
 
       households = households.filter(h => !priorityHouseholds.includes(h));
       parkings = parkings.filter(p => !priorityParkings.includes(p));
-      let offsets = getSeedOffsetGenerator();
-      households = shuffleArray(households, seed);
-      priorityHouseholds = shuffleArray(priorityHouseholds, seed + offsets());
-      parkings = shuffleArray(parkings, seed + offsets());
-      priorityParkings = shuffleArray(priorityParkings, seed + offsets());
+      households = shuffleArray(households, makeRng(seed, 'households'));
+      priorityHouseholds = shuffleArray(priorityHouseholds, makeRng(seed, 'priorityHouseholds'));
+      parkings = shuffleArray(parkings, makeRng(seed, 'parkings'));
+      priorityParkings = shuffleArray(priorityParkings, makeRng(seed, 'priorityParkings'));
 
       const totalHouseholds = [...priorityHouseholds, ...households];
       const totalParkings = [...priorityParkings, ...parkings];
 
-      const winners = shuffleArray([...totalHouseholds], seed + offsets()).slice(0, totalParkings.length);
+      const winners = shuffleArray([...totalHouseholds], makeRng(seed, 'winners')).slice(0, totalParkings.length);
 
       const result = {};
       const remainingPriorityHouseholds = winners.filter(w => priorityHouseholds.includes(w));
@@ -187,7 +190,7 @@ permalink: /lottery/
       });
 
       const remainingWinners = winners.filter(w => !Object.values(result).includes(w));
-      const remainingParkings = shuffleArray(totalParkings.filter(p => !Object.keys(result).includes(p)), seed + offsets());
+      const remainingParkings = shuffleArray(totalParkings.filter(p => !Object.keys(result).includes(p)), makeRng(seed, 'remainingParkings'));
       remainingParkings.forEach(p => {
         if (remainingWinners.length > 0) {
           result[p] = remainingWinners.shift();
