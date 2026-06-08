@@ -1,9 +1,12 @@
 ---
+interface Props { issueNumber?: number; }
+const { issueNumber } = Astro.props;
 ---
 <section class="mt-12 pt-6 border-t border-line">
   <script src="https://utteranc.es/client.js"
     repo="Aidan79225/aidan79225.github.io"
-    issue-term="pathname"
+    issue-number={issueNumber}
+    issue-term={issueNumber ? undefined : "pathname"}
     theme="github-dark"
     crossorigin="anonymous"
     async></script>

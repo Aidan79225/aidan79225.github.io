@@ -9,6 +9,7 @@ const blog = defineCollection({
     category: z.enum(['tech', 'food']),
     tags: z.array(z.string()).optional(),
     comments: z.boolean().default(true),
+    commentsIssue: z.number().optional(),
   }),
 });
 
