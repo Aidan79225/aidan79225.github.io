@@ -1,6 +1,8 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
+import AuthorCard from '../components/AuthorCard.astro';
+import Comments from '../components/Comments.astro';
 import 'katex/dist/katex.min.css';
 interface Props { post: CollectionEntry<'blog'>; }
 const { post } = Astro.props;
@@ -15,5 +17,7 @@ const { title, date, category, tags = [] } = post.data;
     <div class="prose prose-invert max-w-none">
       <slot />
     </div>
+    <AuthorCard />
+    {post.data.comments !== false && <Comments />}
   </article>
 </BaseLayout>
