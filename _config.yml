@@ -41,7 +41,11 @@ footer:
       url: "https://github.com/Aidan79225"
   content: "© 2025 Aidan's Blog"
 collections:
-  - staff_members
+  staff_members:
+    output: false
+  guides:
+    output: true
+    permalink: /guides/:name/
 
 categories:
   - tech

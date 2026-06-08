@@ -1,0 +1,271 @@
+---
+layout: single
+title: 家庭農場 ERP・Odoo 18 使用流程
+permalink: /odoo-usage-guide/
+description: 家庭農場 ERP・Odoo 18 操作流程手冊
+toc: true
+toc_label: 目錄
+toc_sticky: true
+---
+<style>
+  /* structural / component styles — all scoped to .tool-page */
+  .tool-page *{box-sizing:border-box;}
+  .tool-page{
+    font-family:"Microsoft JhengHei","PingFang TC","Noto Sans TC",-apple-system,"Segoe UI",sans-serif;
+    line-height:1.7; font-size:16px;
+  }
+  /* header */
+  .tool-page header.hero{margin-bottom:30px;}
+  .tool-page header.hero h1{font-size:30px; margin:0 0 8px;}
+  .tool-page header.hero p{margin:0; font-size:15px; color:#9aa4b2;}
+  .tool-page .badges{margin-top:14px; display:flex; gap:8px; flex-wrap:wrap;}
+  .tool-page .badge{background:#1e3a2a; color:#7fc183; border-radius:999px; padding:4px 12px; font-size:12.5px; font-weight:600;}
+  /* flow strip */
+  .tool-page .flowstrip{
+    display:flex; align-items:stretch; gap:0; margin:26px 0 36px; flex-wrap:wrap;
+    background:#1e2433; border:1px solid #3a4154; border-radius:12px; padding:18px;
+    box-shadow:0 1px 3px rgba(0,0,0,.18),0 4px 18px rgba(0,0,0,.12);
+  }
+  .tool-page .flowstrip .node{flex:1; min-width:150px; text-align:center; padding:6px 10px; position:relative;}
+  .tool-page .flowstrip .node .n{
+    width:34px; height:34px; border-radius:50%; background:#2e7d32; color:#fff; font-weight:700;
+    display:inline-flex; align-items:center; justify-content:center; margin-bottom:8px;
+  }
+  .tool-page .flowstrip .node b{display:block; font-size:14.5px;}
+  .tool-page .flowstrip .node small{color:#9aa4b2; font-size:12px;}
+  .tool-page .flowstrip .arr{align-self:center; color:#2e7d32; font-size:22px; padding:0 4px;}
+  /* sections */
+  .tool-page section{
+    background:#1e2433; border:1px solid #3a4154; border-radius:12px;
+    padding:30px 34px; margin-bottom:30px;
+    box-shadow:0 1px 3px rgba(0,0,0,.18),0 4px 18px rgba(0,0,0,.12);
+    scroll-margin-top:16px;
+  }
+  .tool-page section h2{
+    font-size:23px; margin:0 0 4px; display:flex; align-items:center; gap:10px;
+  }
+  .tool-page section h2 .chip{font-size:12px; background:#2e7d32; color:#fff; padding:3px 10px; border-radius:6px; font-weight:600;}
+  .tool-page section .path{color:#9aa4b2; font-size:13.5px; margin:0 0 22px;}
+  .tool-page section .path code{background:#2a3145; padding:2px 7px; border-radius:5px; font-size:13px;}
+  .tool-page h3{font-size:17px; margin:26px 0 10px;}
+  /* steps */
+  .tool-page ol.steps{list-style:none; counter-reset:step; padding:0; margin:0;}
+  .tool-page ol.steps>li{
+    counter-increment:step; position:relative; padding:0 0 20px 46px; margin:0;
+    border-left:2px solid #3a4154; margin-left:15px;
+  }
+  .tool-page ol.steps>li:last-child{border-left:2px solid transparent;}
+  .tool-page ol.steps>li::before{
+    content:counter(step); position:absolute; left:-16px; top:-2px;
+    width:30px; height:30px; border-radius:50%; background:#2e7d32; color:#fff;
+    font-weight:700; font-size:14px; display:flex; align-items:center; justify-content:center;
+  }
+  .tool-page ol.steps>li b{color:#7fc183;}
+  .tool-page ol.steps>li .desc{margin-top:3px;}
+  /* tables */
+  .tool-page table{width:100%; border-collapse:collapse; margin:14px 0; font-size:14px;}
+  .tool-page th,.tool-page td{text-align:left; padding:9px 12px; border-bottom:1px solid #3a4154; vertical-align:top;}
+  .tool-page th{background:#1b2e1c; color:#7fc183; font-weight:700; font-size:13px;}
+  .tool-page td code{background:#2a3145; padding:1px 6px; border-radius:4px; font-size:13px;}
+  .tool-page .req{color:#ef9a9a; font-weight:700;}
+  /* callouts */
+  .tool-page .note,.tool-page .tip,.tool-page .warn{
+    border-radius:10px; padding:12px 16px; margin:16px 0; font-size:14px; border-left:4px solid;
+  }
+  .tool-page .tip{background:#1a2d3d; border-color:#1565c0;}
+  .tool-page .note{background:#1b2e1c; border-color:#2e7d32;}
+  .tool-page .warn{background:#2d2714; border-color:#f59e0b;}
+  .tool-page .tip b,.tool-page .note b,.tool-page .warn b{display:block; margin-bottom:2px;}
+  .tool-page kbd{background:#2d3748; color:#fff; border-radius:5px; padding:2px 8px; font-size:12.5px; font-family:inherit;}
+  .tool-page .pill{display:inline-block; background:#2a3145; border-radius:6px; padding:1px 9px; font-size:13px; margin:0 1px;}
+  .tool-page .status{display:inline-block; border-radius:6px; padding:2px 10px; font-size:12.5px; font-weight:700;}
+  .tool-page .s-draft{background:#2e3a40; color:#90a4ae;}
+  .tool-page .s-go{background:#1b2e1c; color:#7fc183;}
+  .tool-page .s-pay{background:#1a2d3d; color:#64b5f6;}
+  .tool-page footer{color:#9aa4b2; font-size:13px; text-align:center; padding:24px 0 0;}
+  @media print{
+    .tool-page section{box-shadow:none; break-inside:avoid; border-color:#ccc;}
+  }
+</style>
+
+<div class="tool-page">
+
+  <header class="hero">
+    <h1>Odoo 18 操作流程手冊</h1>
+    <p>家庭農場 ERP — 三大日常作業：建立產品、開立銷售單、收帳收款。</p>
+    <div class="badges">
+      <span class="badge">Odoo 18 社群版 (CE)</span>
+      <span class="badge">繁體中文</span>
+      <span class="badge">適用：銷售 / 發票管理 / 庫存</span>
+    </div>
+  </header>
+
+  <!-- ===== OVERVIEW ===== -->
+  <section id="overview">
+    <h2 id="h2-1">整體流程圖</h2>
+    <p class="path">三項作業有先後順序：要開銷售單，產品必須先存在；要收帳，銷售單必須先開發票。建議依下圖順序操作。</p>
+    <div class="flowstrip">
+      <div class="node"><div class="n">①</div><b>建立產品</b><small>商品資料 / 售價</small></div>
+      <div class="arr">→</div>
+      <div class="node"><div class="n">②</div><b>建立銷售單</b><small>報價 → 確認 → 出貨</small></div>
+      <div class="arr">→</div>
+      <div class="node"><div class="n">②-b</div><b>開立發票</b><small>從銷售單產生</small></div>
+      <div class="arr">→</div>
+      <div class="node"><div class="n">③</div><b>收帳收款</b><small>登記付款 → 已付款</small></div>
+    </div>
+    <div class="note">
+      <b>名詞對照</b>
+      本手冊的「收帳」＝在 Odoo 中對客戶發票執行<span class="pill">登記付款</span>，使發票狀態變為「已付款」。社群版沒有完整「會計」模組，收款在<b>「發票管理（Invoicing）」</b>App 完成。
+    </div>
+  </section>
+
+  <!-- ===== LOGIN ===== -->
+  <section id="login">
+    <h2 id="h2-2">登入系統</h2>
+    <ol class="steps">
+      <li><b>開啟瀏覽器</b><div class="desc">輸入農場網址（例如 <code>https://farm.你的網域</code>）。本系統透過 Cloudflare Tunnel 對外，沒有開放對外連接埠。</div></li>
+      <li><b>輸入帳號密碼</b><div class="desc">使用管理員或操作員帳號登入。</div></li>
+      <li><b>進入主選單</b><div class="desc">登入後左上角點 <span class="pill">≣</span> 圖示可切換各 App（銷售、發票管理、庫存…）。</div></li>
+    </ol>
+    <div class="tip"><b>小撇步</b>找不到功能時，用畫面上方的搜尋列直接輸入關鍵字（如「產品」「報價」），可快速跳轉。</div>
+  </section>
+
+  <!-- ===== 1. PRODUCT ===== -->
+  <section id="product">
+    <h2 id="h2-3"><span class="chip">作業 ①</span>建立產品</h2>
+    <p class="path">路徑：<code>銷售</code> → <code>產品</code> → <code>產品</code> → <kbd>新增</kbd>　（或從 <code>庫存</code> App 進入，結果相同）</p>
+
+    <ol class="steps">
+      <li><b>進入產品清單</b><div class="desc">開啟 <span class="pill">銷售</span> App，上方選單點 <span class="pill">產品 ▸ 產品</span>。</div></li>
+      <li><b>按「新增」</b><div class="desc">點左上角 <kbd>新增</kbd> 開啟空白產品卡。</div></li>
+      <li><b>填寫產品名稱</b><div class="desc">最上方輸入品名，例如「有機高麗菜（每箱）」。</div></li>
+      <li><b>選擇產品類型</b><div class="desc">Odoo 18 的類型為 <span class="pill">商品 (Goods)</span> 或 <span class="pill">服務 (Service)</span>。實體農產品選「商品」。若要追蹤庫存數量，勾選 <span class="pill">追蹤庫存 / Track Inventory</span>。</div></li>
+      <li><b>設定售價與成本</b><div class="desc">在「一般資訊」分頁填 <b>銷售價格</b>（賣給客戶的價格）與 <b>成本</b>（進貨/生產成本）。</div></li>
+      <li><b>設定稅別與計量單位</b><div class="desc">確認「客戶稅別」與「計量單位（如 箱、公斤、件）」正確。</div></li>
+      <li><b>（建議）填內部參考編號</b><div class="desc">在「一般資訊」分頁的 <b>內部參考 (Internal Reference)</b> 填料號，方便日後搜尋與盤點。</div></li>
+      <li><b>儲存</b><div class="desc">點上方 <span class="pill">☁ 儲存</span>（雲朵圖示）完成建立。產品即可在銷售單中被選用。</div></li>
+    </ol>
+
+    <h3 id="h3-1">必填 / 建議欄位一覽</h3>
+    <table>
+      <tr><th>欄位</th><th>說明</th><th>必填</th></tr>
+      <tr><td>產品名稱</td><td>顯示在銷售單、發票上的品名</td><td class="req">是</td></tr>
+      <tr><td>產品類型</td><td>商品（實體）或服務</td><td class="req">是</td></tr>
+      <tr><td>銷售價格</td><td>開銷售單時的預設單價</td><td>建議</td></tr>
+      <tr><td>成本</td><td>用於毛利計算</td><td>建議</td></tr>
+      <tr><td>客戶稅別</td><td>開發票時自動帶入稅金</td><td>建議</td></tr>
+      <tr><td>計量單位</td><td>箱 / 公斤 / 件 等</td><td class="req">是</td></tr>
+      <tr><td>內部參考</td><td>料號，利於搜尋</td><td>選填</td></tr>
+      <tr><td>產品圖片</td><td>右上角可上傳照片</td><td>選填</td></tr>
+    </table>
+    <div class="tip"><b>小撇步</b>農產品常依規格分開建立（如「高麗菜-小箱」「高麗菜-大箱」），方便分別計價與統計。</div>
+  </section>
+
+  <!-- ===== 2. SALES ORDER ===== -->
+  <section id="sale">
+    <h2 id="h2-4"><span class="chip">作業 ②</span>建立銷售單</h2>
+    <p class="path">路徑：<code>銷售</code> → <code>訂單</code> → <code>報價單</code> → <kbd>新增</kbd></p>
+
+    <div class="flowstrip">
+      <div class="node"><div class="n">A</div><b>報價單</b><small><span class="status s-draft">草稿</span></small></div>
+      <div class="arr">→</div>
+      <div class="node"><div class="n">B</div><b>確認訂單</b><small><span class="status s-go">銷售訂單</span></small></div>
+      <div class="arr">→</div>
+      <div class="node"><div class="n">C</div><b>出貨</b><small>庫存交貨單</small></div>
+      <div class="arr">→</div>
+      <div class="node"><div class="n">D</div><b>建立發票</b><small>轉作業 ③</small></div>
+    </div>
+
+    <ol class="steps">
+      <li><b>新增報價單</b><div class="desc">開 <span class="pill">銷售</span> App → <span class="pill">訂單 ▸ 報價單</span> → <kbd>新增</kbd>。</div></li>
+      <li><b>選擇客戶</b><div class="desc">在「客戶」欄選現有客戶；新客戶可直接輸入名稱後點 <span class="pill">建立並編輯</span>。</div></li>
+      <li><b>加入訂單明細</b><div class="desc">在「訂單明細」分頁點 <span class="pill">新增一行</span>，選產品 → 系統自動帶出售價 → 輸入 <b>數量</b>。重複加入多項產品。</div></li>
+      <li><b>確認金額與稅</b><div class="desc">右下角會即時計算 未稅 / 稅金 / 含稅總計。必要時可改單價或加折扣。</div></li>
+      <li><b>送出報價（選用）</b><div class="desc">點 <span class="pill">以電子郵件傳送</span> 把報價寄給客戶確認；或直接進下一步。</div></li>
+      <li><b>確認訂單</b><div class="desc">客戶同意後點 <span class="pill">確認</span>，報價單即轉為正式 <span class="status s-go">銷售訂單</span>，產生訂單編號（SO0001…）。</div></li>
+      <li><b>出貨 / 交貨</b><div class="desc">若為實體商品，右上角會出現 <span class="pill">交貨</span> 按鈕，點入後按 <span class="pill">驗證</span> 完成出貨並扣庫存。</div></li>
+      <li><b>建立發票</b><div class="desc">點 <span class="pill">建立發票</span> → 選擇 <span class="pill">正常發票（全額）</span> → <span class="pill">建立並檢視發票</span>。接著進入<a href="#collect">作業 ③ 收帳</a>。</div></li>
+    </ol>
+
+    <div class="note"><b>狀態說明</b>報價單（草稿）尚未成立交易；按下「確認」後才成為銷售訂單，並計入銷售統計。</div>
+    <div class="tip"><b>小撇步</b>常態出貨給同一客戶時，可在客戶卡片設定預設付款條件，開單時自動帶入。</div>
+  </section>
+
+  <!-- ===== 3. COLLECT ===== -->
+  <section id="collect">
+    <h2 id="h2-5"><span class="chip">作業 ③</span>收帳（開發票 ＋ 收款）</h2>
+    <p class="path">路徑：<code>發票管理</code> → <code>客戶</code> → <code>發票</code>　（或直接從銷售單的「建立發票」進入）</p>
+
+    <div class="flowstrip">
+      <div class="node"><div class="n">A</div><b>發票草稿</b><small><span class="status s-draft">草稿</span></small></div>
+      <div class="arr">→</div>
+      <div class="node"><div class="n">B</div><b>確認 / 過帳</b><small><span class="status s-go">已過帳・待付</span></small></div>
+      <div class="arr">→</div>
+      <div class="node"><div class="n">C</div><b>登記付款</b><small>選銀行/現金</small></div>
+      <div class="arr">→</div>
+      <div class="node"><div class="n">D</div><b>已付款</b><small><span class="status s-pay">收帳完成</span></small></div>
+    </div>
+
+    <h3 id="h3-2">步驟</h3>
+    <ol class="steps">
+      <li><b>確認（過帳）發票</b><div class="desc">由銷售單「建立發票」進來後，發票為 <span class="status s-draft">草稿</span>。核對品項與金額後，點 <span class="pill">確認</span> 過帳，狀態變為 <span class="status s-go">已過帳</span>，付款狀態為「待付款」。系統自動產生發票號碼（INV/2026/…）。</div></li>
+      <li><b>登記付款</b><div class="desc">在已過帳的發票上，點上方 <span class="pill">登記付款</span> 按鈕。</div></li>
+      <li><b>填寫收款資訊</b><div class="desc">在彈出視窗選擇：
+        <table>
+          <tr><th>欄位</th><th>填法</th></tr>
+          <tr><td>日記帳 (Journal)</td><td>收到的方式：<span class="pill">銀行</span> 或 <span class="pill">現金</span></td></tr>
+          <tr><td>金額</td><td>預設帶全額；部分收款可改成實收金額</td></tr>
+          <tr><td>付款日期</td><td>實際收款日</td></tr>
+          <tr><td>備註 / 參考</td><td>選填，如匯款後五碼</td></tr>
+        </table>
+      </div></li>
+      <li><b>建立付款</b><div class="desc">點 <span class="pill">建立付款</span>。發票右上角即出現綠色 <span class="status s-pay">已付款</span> 戳記，收帳完成。</div></li>
+    </ol>
+
+    <h3 id="h3-3">部分收款 / 多筆對帳</h3>
+    <div class="note">
+      <b>分次收款</b>
+      步驟 3 把「金額」改成本次實收即可。發票會顯示 <span class="status s-go">部分付款</span>，剩餘金額待下次再次「登記付款」。全部收齊後自動轉為 <span class="status s-pay">已付款</span>。
+    </div>
+
+    <h3 id="h3-4">查詢未收款（應收帳款）</h3>
+    <ol class="steps">
+      <li><b>看哪些還沒收</b><div class="desc">進 <span class="pill">發票管理 ▸ 客戶 ▸ 發票</span>，用篩選器選 <span class="pill">待付款</span>，即列出所有尚未收齊的發票。</div></li>
+      <li><b>客戶對帳單</b><div class="desc">在客戶卡片可檢視該客戶的所有發票與付款紀錄，核對總應收金額。</div></li>
+    </ol>
+    <div class="warn"><b>注意</b>「登記付款」只在<b>已過帳</b>的發票上才會出現。若還是草稿，請先點「確認」。</div>
+  </section>
+
+  <!-- ===== STATUS ===== -->
+  <section id="status">
+    <h2 id="h2-6">單據狀態對照表</h2>
+    <table>
+      <tr><th>作業</th><th>狀態</th><th>意義</th><th>下一步</th></tr>
+      <tr><td rowspan="2">銷售單</td><td><span class="status s-draft">報價單（草稿）</span></td><td>尚未成立交易</td><td>確認</td></tr>
+      <tr><td><span class="status s-go">銷售訂單</span></td><td>客戶已確認</td><td>出貨 / 建立發票</td></tr>
+      <tr><td rowspan="3">發票（收帳）</td><td><span class="status s-draft">草稿</span></td><td>尚未過帳</td><td>確認</td></tr>
+      <tr><td><span class="status s-go">已過帳・待付款</span></td><td>已成立應收</td><td>登記付款</td></tr>
+      <tr><td><span class="status s-pay">已付款</span></td><td>款項收齊</td><td>完成</td></tr>
+    </table>
+  </section>
+
+  <!-- ===== FAQ ===== -->
+  <section id="faq">
+    <h2 id="h2-7">常見問題</h2>
+    <h3 id="h3-5">Q：銷售單上找不到我要的產品？</h3>
+    <p>請先完成<a href="#product">作業 ① 建立產品</a>並儲存。產品需存在才能被選用。</p>
+    <h3 id="h3-6">Q：發票上沒有「登記付款」按鈕？</h3>
+    <p>該發票還是「草稿」。先點 <span class="pill">確認</span> 過帳，按鈕才會出現。</p>
+    <h3 id="h3-7">Q：客戶只先付訂金怎麼辦？</h3>
+    <p>照常「登記付款」，把金額改成訂金數額。發票會記為部分付款，尾款收齊後自動轉「已付款」。</p>
+    <h3 id="h3-8">Q：開錯發票可以取消嗎？</h3>
+    <p>已過帳的發票不可直接刪除。請使用 <span class="pill">退回 / 開立貸項通知單 (Credit Note)</span> 沖銷，以保留帳務軌跡。</p>
+    <h3 id="h3-9">Q：社群版有「會計」App 嗎？</h3>
+    <p>沒有完整會計，但「發票管理」已涵蓋開立客戶發票、登記付款與應收查詢，足以應付日常收帳。</p>
+  </section>
+
+  <footer>
+    家庭農場 ERP・Odoo 18 社群版　|　操作流程手冊　|　更新日期：2026-05-30
+  </footer>
+
+</div>
