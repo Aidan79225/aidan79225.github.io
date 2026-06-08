@@ -181,4 +181,4 @@ shuffleArray(parkings, makeRng(seed, 'parkings'));
 2. 抽籤結果可以透過程式計算重現(保存輸入以及seed)，透過驗算避免人為調整結果
 3. seed為毫秒等級，避免人為操控在特定的seed達到特定的結果
 4. 公開程式碼並直播抽籤維持公開透明原則
-5. 抽籤程式：[原昕吾境機車車位抽籤]({% link parking_lottery.html %})
+5. 抽籤程式：[原昕吾境機車車位抽籤](/lottery/)
