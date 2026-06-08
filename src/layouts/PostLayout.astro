@@ -1,0 +1,17 @@
+---
+import BaseLayout from './BaseLayout.astro';
+import 'katex/dist/katex.min.css';
+const { post } = Astro.props;
+const { title, date, category, tags = [] } = post.data;
+---
+<BaseLayout title={title}>
+  <article>
+    <h1 class="text-3xl font-bold mb-2">{title}</h1>
+    <p class="text-muted text-sm mb-6">
+      <time datetime={date.toISOString()}>{date.toLocaleDateString('zh-TW')}</time> · {category}{tags.length ? ` · ${tags.join(', ')}` : ''}
+    </p>
+    <div class="prose prose-invert max-w-none">
+      <slot />
+    </div>
+  </article>
+</BaseLayout>
