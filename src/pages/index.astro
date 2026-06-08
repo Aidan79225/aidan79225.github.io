@@ -1,9 +1,24 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Counter from '../components/Counter.tsx';
+import { getCollection } from 'astro:content';
+const posts = (await getCollection('blog'))
+  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+  .slice(0, 5);
 ---
 <BaseLayout title="Aidan's Blog">
-  <h1 class="text-2xl font-bold mb-4">Aidan's Blog</h1>
-  <p class="text-muted mb-6">Astro 遷移地基(子專案 A)。</p>
-  <Counter client:load />
+  <h1 class="text-3xl font-bold mb-2">Aidan's Blog</h1>
+  <p class="text-muted mb-8">軟體開發筆記、技術整理與個人興趣。</p>
+  <h2 class="text-xl font-bold mb-3">最新文章</h2>
+  <ul class="space-y-2 list-none p-0 mb-8">
+    {posts.map((p) => (
+      <li>
+        <a href={`/blog/${p.id}/`} class="text-accent hover:underline">{p.data.title}</a>
+        <span class="text-muted text-sm"> · {p.data.date.toLocaleDateString('zh-TW')}</span>
+      </li>
+    ))}
+  </ul>
+  <p class="text-sm">
+    <a href="/tools/" class="text-accent hover:underline">Tools</a> ·
+    <a href="/guides/" class="text-accent hover:underline">Guides</a>
+  </p>
 </BaseLayout>
