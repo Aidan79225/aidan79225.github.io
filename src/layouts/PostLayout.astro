@@ -1,6 +1,8 @@
 ---
+import type { CollectionEntry } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
 import 'katex/dist/katex.min.css';
+interface Props { post: CollectionEntry<'blog'>; }
 const { post } = Astro.props;
 const { title, date, category, tags = [] } = post.data;
 ---
