@@ -2,41 +2,91 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 ---
 <BaseLayout title="About">
+  <header class="flex items-center gap-5 mb-10">
+    <img src="/assets/images/avatar.webp" alt="Aidan Wang" class="w-24 h-24 rounded-full flex-shrink-0" />
+    <div>
+      <h1 class="text-2xl font-bold mb-1">Aidan Wang</h1>
+      <p class="text-muted mb-2">Backend Lead · 全端 / 跨平台工程師</p>
+      <p class="text-sm flex flex-wrap gap-x-3 gap-y-1">
+        <a href="https://github.com/aidan79225" class="text-accent hover:underline">GitHub</a>
+        <a href="https://www.linkedin.com/in/aidan79225/" class="text-accent hover:underline">LinkedIn</a>
+        <a href="mailto:aidan79225@gmail.com" class="text-accent hover:underline">Email</a>
+        <a href="https://blog.aidan.tw" class="text-accent hover:underline">Blog</a>
+      </p>
+    </div>
+  </header>
+
   <div class="prose prose-invert max-w-none">
-    <h2>👋 Hi, 我是 Aidan</h2>
+    <h2>👋 簡介</h2>
     <p>
-      一名專注於 <strong>Kotlin Multiplatform、Python Django 後端</strong> 的軟體工程師。<br />
-      擁有 8 年 Android 開發經驗，近期轉職成為後端工程師，正在打造跨平台與高效能的系統。
+      我是 Aidan,一名軟體工程師。早期投入高效能運算(GPGPU、CUDA Fortran),之後做了近 8 年 Android 開發,歷經 Grindr、AirDroid、YowooTech 等團隊;近年轉向後端,目前在 <strong>Vannise</strong> 帶領後端團隊，從零打造多套電商系統。專注於可擴展、可維護的系統設計與工程團隊協作。
     </p>
 
-    <hr />
-
     <h2>📝 關於這個網站</h2>
-    <p>這裡主要分享：</p>
+    <p>這裡主要分享:</p>
     <ul>
-      <li>軟體開發筆記（Kotlin、Django、RabbitMQ、系統設計）</li>
+      <li>軟體開發筆記(Kotlin、Django、RabbitMQ、系統設計)</li>
       <li>技術文章整理</li>
       <li>個人興趣</li>
     </ul>
 
-    <hr />
+    <h2>🚀 經歷</h2>
 
-    <h2>🚀 經歷與專長</h2>
+    <h3>Vannise — Backend Lead(2024/11–現在)</h3>
+    <p><em>Python、Django、Django Ninja、PostgreSQL、Redis、Docker、GCP</em></p>
     <ul>
-      <li><strong>Android 開發</strong>：8 年商業應用經驗</li>
-      <li><strong>後端開發</strong>：Django + Celery + RabbitMQ</li>
-      <li><strong>系統設計</strong>：DDD、事件驅動架構</li>
+      <li>帶領三人後端團隊,從零打造多套電商系統:商品型錄、會員、物流、訂單管理,以及各事業單位的客製化分析報表。</li>
+      <li>設計後端架構,主導技術選型、coding standards 與開發流程,兼顧可擴展性與程式品質。</li>
+      <li>制定並落實 coding style、定期 code review、帶領 junior 工程師。</li>
+      <li>以 Docker + GCP 部署與維運 production,優化 CI/CD pipeline。</li>
+      <li>透過 Redis 快取、PostgreSQL 優化與非同步任務,提升效能與穩定度。</li>
     </ul>
 
-    <hr />
-
-    <h2>📬 聯絡我</h2>
+    <h3>AirDroid — Senior Software Engineer(2023/7–2024/11)</h3>
+    <p><em>Kotlin Multiplatform、Material Design 3、WebRTC、Koin</em></p>
     <ul>
-      <li>GitHub: <a href="https://github.com/aidan79225">github.com/aidan79225</a></li>
-      <li>LinkedIn: <a href="https://www.linkedin.com/in/aidan79225/">linkedin.com/in/aidan79225</a></li>
-      <li>Email: aidan79225@gmail.com</li>
+      <li>在跨部門的 lab team 主導架構強化與技術棧更新。</li>
+      <li>導入新技術:Jetpack Compose、DDD、KMP & CMP、Material Design。</li>
+      <li>重構計費流程、重新設計登入 / 註冊流程並加入反詐欺機制。</li>
+      <li>重新設計 WebRTC signaling 的 WebSocket 連線,啟動時間加快 25%。</li>
+      <li>開發效率工具:多語系匯入器、logger、加解密處理器。</li>
     </ul>
 
-    <hr />
+    <h3>Grindr — Senior Android Developer(2018/11–2023/6)</h3>
+    <p><em>Kotlin、Hilt、XMPP</em></p>
+    <ul>
+      <li><strong>Trust &amp; Safety(用戶資料保護)</strong>:資料可攜下載系統、照片退件說明、封禁警告、整合 Precog 反機器人、註冊年齡限制。</li>
+      <li><strong>Platform(聊天與基礎建設)</strong>:以 XMPP 實作訊息功能(刪除 / 收回 / 翻譯 / 輸入中 / 私訊視訊 / 回覆)、Grindr Lite(Litho 宣告式 UI)、導入 Jetpack Navigation 與 Dagger2 / Hilt DI;翻譯檔匯入器(省下 80% 時間)、Ktlint / Detekt + git hooks。</li>
+      <li><strong>Ads(廣告)</strong>:Banner / Interstitial / Reward Video / Native 廣告、GDPR / CCPA 合規控制器、Java bytecode injector 提升穩定度。</li>
+    </ul>
+
+    <h3>YowooTech — Android Engineering Manager(2016/01–2018/11)</h3>
+    <ul>
+      <li>開發類似 UberEats / Foodpanda 的外送 App;導入 OKR 制度促進團隊成長;以系統架構師身分規劃 Elasticsearch、訂單追蹤、警報系統等後端服務。</li>
+      <li>以 Elasticsearch 優化搜尋效能 57%;整合 IM 與表情貼圖;將原 App 拆分為 DeliveryApp 與 CommunityApp;進行重構與單元測試。</li>
+    </ul>
+
+    <h3>SCCS Lab — HPC Software Engineer(2014/01–2015/10)</h3>
+    <ul>
+      <li>以 GPGPU 加速運算,用 CUDA Fortran 將實驗室全部軟體改寫(歷時近兩年)。</li>
+      <li>實作 Maxwell 方程式與 Navier–Stokes 求解器;優化 UPML;以 shared-memory 技術優化 GPU 平行運算。</li>
+    </ul>
+
+    <h3>政府技術顧問</h3>
+    <ul>
+      <li>指導學生於 WorldSkills 國際技能競賽奪得金、銀牌;協助競賽與選拔的籌辦。</li>
+    </ul>
+
+    <h2>🎓 學歷</h2>
+    <ul>
+      <li><strong>國立臺灣大學</strong>(2013–2015)— 工程科學及海洋工程 碩士</li>
+      <li><strong>國立中正大學</strong>(2008–2013)— 資訊工程 學士</li>
+    </ul>
+
+    <h2>📄 研究</h2>
+    <ul>
+      <li>Simulation of Maxwell's Equations on GPU Using a High-Order Error-Minimized Scheme</li>
+      <li>Development of a DRE-preserving solver in CPU/GPU platform to simulate 3D waveguide propagation problem</li>
+    </ul>
   </div>
 </BaseLayout>
