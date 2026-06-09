@@ -1,22 +1,66 @@
 ---
 import type { CollectionEntry } from 'astro:content';
+import { getCollection } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
 import AuthorCard from '../components/AuthorCard.astro';
 import Comments from '../components/Comments.astro';
 import 'katex/dist/katex.min.css';
 interface Props { post: CollectionEntry<'blog'>; }
 const { post } = Astro.props;
-const { title, date, category, tags = [] } = post.data;
+const { title, date, category, tags = [], series } = post.data;
+
+let seriesPosts: CollectionEntry<'blog'>[] = [];
+let prevPost: CollectionEntry<'blog'> | null = null;
+let nextPost: CollectionEntry<'blog'> | null = null;
+if (series) {
+  seriesPosts = (await getCollection('blog'))
+    .filter((p) => p.data.series === series)
+    .sort((a, b) => (a.data.seriesOrder ?? 0) - (b.data.seriesOrder ?? 0));
+  const idx = seriesPosts.findIndex((p) => p.id === post.id);
+  prevPost = idx > 0 ? seriesPosts[idx - 1] : null;
+  nextPost = idx >= 0 && idx < seriesPosts.length - 1 ? seriesPosts[idx + 1] : null;
+}
 ---
 <BaseLayout title={title}>
   <article>
     <h1 class="text-3xl font-bold mb-2">{title}</h1>
-    <p class="text-muted text-sm mb-6">
-      <time datetime={date.toISOString()}>{date.toLocaleDateString('zh-TW')}</time> · {category}{tags.length ? ` · ${tags.join(', ')}` : ''}
+    <p class="text-muted text-sm mb-4">
+      <time datetime={date.toISOString()}>{date.toLocaleDateString('zh-TW')}</time> · {category}
     </p>
+    {tags.length > 0 && (
+      <p class="flex flex-wrap gap-2 mb-6">
+        {tags.map((t) => (
+          <a href={`/tags/${encodeURIComponent(t)}/`} class="text-xs bg-surface border border-line rounded px-2 py-1 text-accent hover:underline">#{t}</a>
+        ))}
+      </p>
+    )}
+
+    {series && (
+      <aside class="bg-surface border border-line rounded p-4 mb-6 text-sm">
+        <p class="font-bold mb-2">📚 系列:{series}</p>
+        <ol class="list-decimal list-inside space-y-1 m-0">
+          {seriesPosts.map((p) => (
+            <li>
+              {p.id === post.id
+                ? <span class="text-ink">{p.data.title}(本篇)</span>
+                : <a href={`/blog/${p.id}/`} class="text-accent hover:underline">{p.data.title}</a>}
+            </li>
+          ))}
+        </ol>
+      </aside>
+    )}
+
     <div class="prose prose-invert max-w-none">
       <slot />
     </div>
+
+    {series && (prevPost || nextPost) && (
+      <nav class="flex justify-between gap-4 mt-8 text-sm">
+        <span>{prevPost && <a href={`/blog/${prevPost.id}/`} class="text-accent hover:underline">← {prevPost.data.title}</a>}</span>
+        <span>{nextPost && <a href={`/blog/${nextPost.id}/`} class="text-accent hover:underline">{nextPost.data.title} →</a>}</span>
+      </nav>
+    )}
+
     <AuthorCard />
     {post.data.comments !== false && <Comments issueNumber={post.data.commentsIssue} />}
   </article>
