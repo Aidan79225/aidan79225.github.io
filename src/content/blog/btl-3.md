@@ -5,6 +5,8 @@ category: tech
 tags:
   - leadership
 comments: true
+series: "成為 Tech Leader 讀書筆記"
+seriesOrder: 3
 ---
 ## 成長模型
 
