@@ -42,7 +42,7 @@ if (series) {
           {seriesPosts.map((p) => (
             <li>
               {p.id === post.id
-                ? <span class="text-ink">{p.data.title}(本篇)</span>
+                ? <span class="text-ink">{p.data.title}（本篇）</span>
                 : <a href={`/blog/${p.id}/`} class="text-accent hover:underline">{p.data.title}</a>}
             </li>
           ))}
