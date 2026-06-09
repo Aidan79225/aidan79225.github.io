@@ -5,6 +5,8 @@ category: tech
 tags:
   - leadership
 comments: true
+series: "成為 Tech Leader 讀書筆記"
+seriesOrder: 2
 ---
 ## 領導方式模型
 領導方式模型就是透過幾項指標來描述一個環境，MOI模型就是其中一種描述方式
