@@ -1,0 +1,1145 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MBTI · 認識你自己</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Serif+TC:wght@300;400;500;600;700&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&display=swap" rel="stylesheet">
+<style is:global>
+  :root {
+    --bg: #f3ede1;
+    --ink: #1c1814;
+    --muted: #6b5f4e;
+    --accent: #8b2e2e;
+    --card: #faf5e9;
+    --border: #d9ccb4;
+    --shadow-tone: #b39c7d;
+    --serif: "Noto Serif TC", "Source Han Serif TC", "Songti TC", serif;
+    --display: "Cormorant Garamond", "Noto Serif TC", serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  html, body {
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--serif);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  body {
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    opacity: 0.3;
+    z-index: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.11 0 0 0 0 0.09 0 0 0 0 0.08 0 0 0 0.08 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  #app {
+    position: relative;
+    z-index: 1;
+    min-height: 100vh;
+  }
+
+  button {
+    border: none;
+    background: none;
+    cursor: pointer;
+    font-family: inherit;
+    color: inherit;
+  }
+
+  .hairline {
+    height: 1px;
+    background: var(--ink);
+    opacity: 0.3;
+  }
+
+  /* ─── 歡迎頁 ─── */
+  .welcome {
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 48px 24px;
+    background-image:
+      radial-gradient(ellipse at top, rgba(139, 46, 46, 0.04), transparent 60%),
+      radial-gradient(ellipse at bottom, rgba(28, 24, 20, 0.03), transparent 50%);
+  }
+  .welcome-inner {
+    max-width: 28rem;
+    width: 100%;
+    text-align: center;
+  }
+  .welcome-since {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 32px;
+  }
+  .welcome-since .line { width: 48px; }
+  .welcome-since .label {
+    margin: 0 12px;
+    font-family: var(--display);
+    font-style: italic;
+    color: var(--accent);
+    font-size: 12px;
+    letter-spacing: 0.2em;
+  }
+  .welcome-eyebrow {
+    font-size: 13px;
+    letter-spacing: 0.4em;
+    color: var(--muted);
+    font-family: var(--display);
+    margin-bottom: 16px;
+  }
+  .welcome-title {
+    font-size: 48px;
+    line-height: 1.15;
+    margin-bottom: 24px;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+  }
+  .welcome-title em {
+    color: var(--accent);
+    font-style: italic;
+    font-family: var(--display);
+    font-weight: 400;
+  }
+  .welcome-sub {
+    font-size: 16px;
+    line-height: 1.6;
+    color: var(--muted);
+    font-weight: 300;
+    margin-bottom: 4px;
+  }
+  .welcome-sub.small {
+    font-size: 14px;
+    margin-bottom: 48px;
+  }
+  .btn-primary {
+    padding: 16px 40px;
+    font-size: 13px;
+    letter-spacing: 0.3em;
+    background: var(--ink);
+    color: var(--bg);
+    font-family: var(--display);
+    transition: transform 0.2s, opacity 0.2s;
+  }
+  .btn-primary:active { transform: scale(0.95); }
+  .btn-primary:hover { opacity: 0.9; }
+  .welcome-dims {
+    margin-top: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-size: 11px;
+    color: var(--muted);
+    flex-wrap: wrap;
+  }
+  .welcome-dims em {
+    font-family: var(--display);
+    font-style: italic;
+  }
+  .welcome-disclaimer {
+    margin: 40px auto 0;
+    max-width: 22rem;
+    font-size: 11px;
+    line-height: 1.7;
+    color: var(--muted);
+    opacity: 0.75;
+  }
+
+  /* ─── 問題頁 ─── */
+  .quiz {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+  }
+  .quiz-top {
+    padding: 24px 24px 16px;
+  }
+  .quiz-top-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+  .back-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 12px;
+    color: var(--muted);
+    font-family: var(--display);
+    letter-spacing: 0.2em;
+    transition: opacity 0.2s;
+  }
+  .back-btn:disabled { opacity: 0.3; cursor: default; }
+  .back-btn svg { width: 14px; height: 14px; }
+  .quiz-meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+  }
+  .quiz-meta .dim {
+    font-family: var(--display);
+    color: var(--accent);
+    font-style: italic;
+    letter-spacing: 0.1em;
+  }
+  .quiz-meta .dot { color: var(--muted); }
+  .quiz-meta .count {
+    font-family: var(--display);
+    color: var(--muted);
+    letter-spacing: 0.1em;
+    font-variant-numeric: tabular-nums;
+  }
+  .progress {
+    height: 1px;
+    background: var(--border);
+    width: 100%;
+    position: relative;
+  }
+  .progress-fill {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    background: var(--ink);
+    transition: width 0.5s ease-out;
+  }
+  .quiz-body {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 32px 24px;
+  }
+  .quiz-content {
+    max-width: 28rem;
+    width: 100%;
+    margin: 0 auto;
+    animation: fadeIn 0.4s ease-out;
+  }
+  .quiz-eyebrow {
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    margin-bottom: 16px;
+    text-align: center;
+    color: var(--muted);
+    font-family: var(--display);
+  }
+  .quiz-question {
+    font-size: 24px;
+    line-height: 1.7;
+    text-align: center;
+    margin-bottom: 40px;
+    padding: 0 8px;
+    font-weight: 400;
+  }
+  .options {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .option {
+    width: 100%;
+    padding: 20px;
+    text-align: left;
+    background: var(--card);
+    border: 1px solid var(--border);
+    transition: transform 0.2s, box-shadow 0.2s;
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+  .option:active { transform: scale(0.98); }
+  .option:hover { box-shadow: 0 1px 4px rgba(0,0,0,0.04); }
+  .option-letter {
+    font-size: 20px;
+    font-family: var(--display);
+    color: var(--accent);
+    font-style: italic;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .option-text {
+    font-size: 16px;
+    line-height: 1.65;
+    font-weight: 400;
+  }
+  .quiz-foot {
+    text-align: center;
+    padding: 0 24px 24px;
+    font-size: 12px;
+    color: var(--muted);
+    font-style: italic;
+  }
+
+  /* ─── 結果頁 ─── */
+  .results {
+    padding: 40px 24px 56px;
+    background-image: radial-gradient(ellipse at top, rgba(139, 46, 46, 0.06), transparent 60%);
+    animation: fadeInUp 0.8s ease-out;
+  }
+  .results-inner {
+    max-width: 28rem;
+    margin: 0 auto;
+  }
+  .results-eyebrow {
+    text-align: center;
+    margin-bottom: 24px;
+  }
+  .results-eyebrow .label {
+    font-size: 12px;
+    letter-spacing: 0.4em;
+    color: var(--muted);
+    font-family: var(--display);
+    margin-bottom: 8px;
+  }
+  .results-eyebrow .row {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .results-eyebrow .row .line { width: 32px; }
+  .results-eyebrow .row .num {
+    font-size: 12px;
+    letter-spacing: 0.2em;
+    font-family: var(--display);
+    font-style: italic;
+    color: var(--accent);
+  }
+  .type-card {
+    text-align: center;
+    padding: 32px 24px;
+    margin-bottom: 24px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    position: relative;
+  }
+  .type-seal {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    letter-spacing: 0.15em;
+    border: 1.5px solid var(--accent);
+    color: var(--accent);
+    font-family: var(--display);
+    transform: rotate(3deg);
+  }
+  .type-code {
+    font-size: 64px;
+    margin-bottom: 4px;
+    letter-spacing: 0.05em;
+    font-family: var(--display);
+    font-weight: 500;
+    line-height: 1;
+  }
+  .type-suffix {
+    font-size: 14px;
+    color: var(--muted);
+    font-family: var(--display);
+    letter-spacing: 0.3em;
+    margin-bottom: 16px;
+    font-style: italic;
+  }
+  .type-name {
+    font-size: 30px;
+    font-weight: 500;
+    color: var(--accent);
+    margin-bottom: 12px;
+  }
+  .type-tagline {
+    font-size: 14px;
+    color: var(--muted);
+    font-family: var(--display);
+    font-style: italic;
+    padding: 0 24px;
+    line-height: 1.6;
+  }
+  .type-desc {
+    font-size: 16px;
+    line-height: 1.9;
+    margin-bottom: 32px;
+    padding: 0 8px;
+  }
+
+  /* 區段標題 */
+  .section-label {
+    font-size: 12px;
+    letter-spacing: 0.3em;
+    text-align: center;
+    color: var(--muted);
+    font-family: var(--display);
+    margin-bottom: 8px;
+  }
+  .section-zh {
+    font-size: 13px;
+    text-align: center;
+    color: var(--muted);
+    margin-bottom: 20px;
+    font-style: italic;
+    font-family: var(--display);
+  }
+  .section {
+    margin-bottom: 40px;
+  }
+
+  /* 條形圖 */
+  .breakdown-rows {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+  .dim-row {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+  .dim-labels {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+  }
+  .dim-labels .side {
+    display: flex;
+    align-items: baseline;
+    gap: 8px;
+    font-size: 13px;
+  }
+  .dim-letter {
+    font-size: 18px;
+    font-family: var(--display);
+    color: var(--muted);
+  }
+  .dim-letter.active {
+    font-weight: 600;
+    color: var(--accent);
+  }
+  .dim-name {
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .dim-name.active { color: var(--ink); }
+  .dim-pct {
+    font-size: 12px;
+    color: var(--muted);
+    font-family: var(--display);
+    font-variant-numeric: tabular-nums;
+  }
+  .dim-bar {
+    position: relative;
+    height: 2px;
+    background: var(--border);
+  }
+  .dim-fill-left {
+    position: absolute;
+    left: 0; top: 0; bottom: 0;
+    background: var(--accent);
+    transition: width 1s ease-out;
+  }
+  .dim-fill-right {
+    position: absolute;
+    right: 0; top: 0; bottom: 0;
+    background: var(--accent);
+    transition: width 1s ease-out;
+  }
+  .dim-center {
+    position: absolute;
+    top: -3px;
+    left: 50%;
+    width: 1px;
+    height: 8px;
+    background: var(--ink);
+    opacity: 0.4;
+    transform: translateX(-0.5px);
+  }
+
+  /* 身份維度區塊 (A/O, H/C) */
+  .identity-block {
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 20px 24px;
+    margin-bottom: 16px;
+  }
+  .identity-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+  .identity-name {
+    font-size: 13px;
+    color: var(--muted);
+    font-family: var(--display);
+    letter-spacing: 0.15em;
+  }
+  .identity-pct {
+    font-size: 13px;
+    color: var(--accent);
+    font-family: var(--display);
+    font-variant-numeric: tabular-nums;
+    font-style: italic;
+  }
+  .identity-title {
+    font-size: 18px;
+    color: var(--accent);
+    margin-bottom: 8px;
+    font-weight: 500;
+  }
+  .identity-desc {
+    font-size: 14px;
+    line-height: 1.85;
+    color: var(--ink);
+  }
+
+  /* 八維 */
+  .functions-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    background: var(--card);
+    border: 1px solid var(--border);
+  }
+  .func-row {
+    display: flex;
+    align-items: flex-start;
+    padding: 14px 18px;
+    border-bottom: 1px dashed var(--border);
+    gap: 14px;
+  }
+  .func-row:last-child { border-bottom: none; }
+  .func-row.shadow {
+    opacity: 0.55;
+  }
+  .func-rank {
+    flex-shrink: 0;
+    width: 24px;
+    text-align: center;
+    font-family: var(--display);
+    font-style: italic;
+    color: var(--muted);
+    font-size: 14px;
+    padding-top: 2px;
+  }
+  .func-code {
+    flex-shrink: 0;
+    width: 32px;
+    font-size: 22px;
+    font-family: var(--display);
+    font-weight: 600;
+    color: var(--accent);
+    line-height: 1.1;
+  }
+  .func-row.shadow .func-code { color: var(--muted); }
+  .func-body {
+    flex: 1;
+    min-width: 0;
+  }
+  .func-line {
+    display: flex;
+    align-items: baseline;
+    gap: 6px;
+    margin-bottom: 4px;
+  }
+  .func-name {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .func-pos {
+    font-size: 11px;
+    color: var(--muted);
+    font-family: var(--display);
+    font-style: italic;
+  }
+  .func-desc {
+    font-size: 12px;
+    color: var(--muted);
+    line-height: 1.6;
+  }
+  .func-divider {
+    padding: 8px 18px;
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    font-family: var(--display);
+    background: var(--bg);
+    border-top: 1px dashed var(--border);
+    border-bottom: 1px dashed var(--border);
+    text-align: center;
+    font-style: italic;
+  }
+
+  .restart-wrap { text-align: center; margin-top: 8px; }
+  .btn-secondary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 32px;
+    font-size: 12px;
+    border: 1px solid var(--ink);
+    color: var(--ink);
+    font-family: var(--display);
+    letter-spacing: 0.3em;
+    transition: transform 0.2s, background 0.2s, color 0.2s;
+  }
+  .btn-secondary:active { transform: scale(0.95); }
+  .btn-secondary:hover { background: var(--ink); color: var(--bg); }
+  .btn-secondary svg { width: 12px; height: 12px; }
+  .results-fin {
+    margin-top: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 12px;
+  }
+  .results-fin .line {
+    width: 40px;
+    opacity: 0.2;
+  }
+  .results-fin .label {
+    font-size: 10px;
+    letter-spacing: 0.3em;
+    color: var(--muted);
+    font-family: var(--display);
+    font-style: italic;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(8px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @media (min-width: 640px) {
+    .welcome-title { font-size: 56px; }
+    .quiz-question { font-size: 26px; }
+    .type-code { font-size: 76px; }
+  }
+</style>
+</head>
+<body>
+<div id="app"></div>
+
+<script is:inline>
+// ═══════════ 題目（96） ═══════════
+const questions = [
+  // ─── E / I (16) ───
+  { q: "參加大型聚會時，你比較像是⋯⋯", a: "主動走向陌生人搭話", b: "先觀察環境再決定互動", dim: 'EI', aL: 'E', bL: 'I' },
+  { q: "連續幾天的社交活動後，你會⋯⋯", a: "感覺精力充沛、想繼續", b: "需要一個人待著充電", dim: 'EI', aL: 'E', bL: 'I' },
+  { q: "遇到問題時，你傾向⋯⋯", a: "邊說邊想、討論出答案", b: "先在心裡想清楚再開口", dim: 'EI', aL: 'E', bL: 'I' },
+  { q: "理想的工作環境是⋯⋯", a: "開放、有人討論的空間", b: "安靜、能獨立專注的角落", dim: 'EI', aL: 'E', bL: 'I' },
+  { q: "剛認識的朋友，通常覺得你⋯⋯", a: "熱情、容易親近", b: "有點內斂、需要時間熟悉", dim: 'EI', aL: 'E', bL: 'I' },
+  { q: "空檔的週末，你更想⋯⋯", a: "約幾個朋友出去", b: "一個人在家做喜歡的事", dim: 'EI', aL: 'E', bL: 'I' },
+  { q: "會議/課堂中你通常⋯⋯", a: "會主動發言、提出想法", b: "聽到有把握的點才說", dim: 'EI', aL: 'E', bL: 'I' },
+  { q: "電話突然響起時，你的第一反應是⋯⋯", a: "直接接起來", b: "猶豫一下看要不要接", dim: 'EI', aL: 'E', bL: 'I' },
+  { q: "你的交友圈比較像⋯⋯", a: "廣泛、各領域都有", b: "少數幾個但很深", dim: 'EI', aL: 'E', bL: 'I' },
+  { q: "面對一整天的獨處，你會⋯⋯", a: "覺得有點悶，想找人", b: "感覺平靜、很享受", dim: 'EI', aL: 'E', bL: 'I' },
+  { q: "表達想法時，你通常⋯⋯", a: "一邊說一邊整理思路", b: "想清楚結構後才講出來", dim: 'EI', aL: 'E', bL: 'I' },
+  { q: "你的能量來源比較是⋯⋯", a: "和人互動、外部刺激", b: "獨處與內在沉澱", dim: 'EI', aL: 'E', bL: 'I' },
+  { q: "學習新東西時，你偏好⋯⋯", a: "找人一起討論、交流", b: "自己研究、慢慢鑽研", dim: 'EI', aL: 'E', bL: 'I' },
+  { q: "被介紹給一群新朋友，你⋯⋯", a: "自然地加入聊天", b: "先站旁邊觀察氣氛", dim: 'EI', aL: 'E', bL: 'I' },
+  { q: "面對一個機會時，你傾向⋯⋯", a: "先行動、邊做邊調整", b: "先想清楚再決定", dim: 'EI', aL: 'E', bL: 'I' },
+  { q: "你覺得自己比較⋯⋯", a: "外放、表達自如", b: "內向、心思細膩", dim: 'EI', aL: 'E', bL: 'I' },
+
+  // ─── S / N (16) ───
+  { q: "描述一件事情，你會⋯⋯", a: "講具體細節、時間地點", b: "講整體印象、意義感受", dim: 'SN', aL: 'S', bL: 'N' },
+  { q: "你比較相信⋯⋯", a: "親身經驗與事實", b: "直覺與可能性", dim: 'SN', aL: 'S', bL: 'N' },
+  { q: "閱讀時你偏好⋯⋯", a: "實用、具體的內容", b: "抽象、理論、想像力", dim: 'SN', aL: 'S', bL: 'N' },
+  { q: "面對新任務，你傾向⋯⋯", a: "參考現有做法", b: "想一套自己的新方法", dim: 'SN', aL: 'S', bL: 'N' },
+  { q: "你的注意力較常放在⋯⋯", a: "當下的實際狀況", b: "未來的可能與趨勢", dim: 'SN', aL: 'S', bL: 'N' },
+  { q: "欣賞藝術作品時，你喜歡⋯⋯", a: "寫實、細節精緻的", b: "抽象、富有象徵的", dim: 'SN', aL: 'S', bL: 'N' },
+  { q: "解決問題的方式比較像⋯⋯", a: "按部就班、依循步驟", b: "靈感閃現、跳躍連結", dim: 'SN', aL: 'S', bL: 'N' },
+  { q: "你記得最清楚的通常是⋯⋯", a: "實際發生的細節", b: "當下的氛圍與感覺", dim: 'SN', aL: 'S', bL: 'N' },
+  { q: "聊天時你更喜歡聊⋯⋯", a: "具體發生的事", b: "想法、理論、可能性", dim: 'SN', aL: 'S', bL: 'N' },
+  { q: "學習新技能，你偏好⋯⋯", a: "從範例和練習入手", b: "先理解原理和概念", dim: 'SN', aL: 'S', bL: 'N' },
+  { q: "做計劃時，你更在意⋯⋯", a: "實際可行性", b: "各種延伸的可能", dim: 'SN', aL: 'S', bL: 'N' },
+  { q: "你看電影偏好⋯⋯", a: "寫實、貼近生活", b: "奇幻、科幻、隱喻", dim: 'SN', aL: 'S', bL: 'N' },
+  { q: "面對變化，你⋯⋯", a: "偏好熟悉穩定", b: "喜歡新鮮與不確定", dim: 'SN', aL: 'S', bL: 'N' },
+  { q: "你的思考路徑是⋯⋯", a: "從細節累積到整體", b: "從整體感往下推細節", dim: 'SN', aL: 'S', bL: 'N' },
+  { q: "描述未來，你傾向⋯⋯", a: "根據現況合理推測", b: "想像各種可能場景", dim: 'SN', aL: 'S', bL: 'N' },
+  { q: "你更會被形容為⋯⋯", a: "腳踏實地、講實際", b: "想像豐富、看得遠", dim: 'SN', aL: 'S', bL: 'N' },
+
+  // ─── T / F (16) ───
+  { q: "做決定時，你優先考慮⋯⋯", a: "邏輯、合理性", b: "人的感受、和諧", dim: 'TF', aL: 'T', bL: 'F' },
+  { q: "收到批評時，你的第一反應⋯⋯", a: "評估它是否合理", b: "先感到情緒上的波動", dim: 'TF', aL: 'T', bL: 'F' },
+  { q: "你更看重的是⋯⋯", a: "公平與原則", b: "同理與關懷", dim: 'TF', aL: 'T', bL: 'F' },
+  { q: "爭論時你傾向⋯⋯", a: "堅持講得通的一方", b: "尋找讓大家都好的解法", dim: 'TF', aL: 'T', bL: 'F' },
+  { q: "評價一個人，你先看⋯⋯", a: "能力與表現", b: "品格與溫度", dim: 'TF', aL: 'T', bL: 'F' },
+  { q: "面對衝突，你會⋯⋯", a: "直接指出問題", b: "盡量避免傷到對方", dim: 'TF', aL: 'T', bL: 'F' },
+  { q: "你的說話風格比較像⋯⋯", a: "直接、坦率", b: "婉轉、體貼", dim: 'TF', aL: 'T', bL: 'F' },
+  { q: "看到別人情緒激動時，你會⋯⋯", a: "希望他冷靜下來理性討論", b: "先靠過去安撫他的感受", dim: 'TF', aL: 'T', bL: 'F' },
+  { q: "讀小說你比較投入的是⋯⋯", a: "情節結構與邏輯", b: "角色內心與情感", dim: 'TF', aL: 'T', bL: 'F' },
+  { q: "你欣賞的人通常是⋯⋯", a: "聰明、有能力", b: "溫暖、善良", dim: 'TF', aL: 'T', bL: 'F' },
+  { q: "工作上做判斷，你先考慮⋯⋯", a: "客觀分析", b: "團隊感受", dim: 'TF', aL: 'T', bL: 'F' },
+  { q: "幫助他人時，你傾向⋯⋯", a: "指出問題、提出建議", b: "先傾聽與陪伴", dim: 'TF', aL: 'T', bL: 'F' },
+  { q: "面對道德議題，你傾向⋯⋯", a: "尋找一致的原則", b: "考慮具體情境與人", dim: 'TF', aL: 'T', bL: 'F' },
+  { q: "你常被說是⋯⋯", a: "理性、冷靜", b: "溫暖、體貼", dim: 'TF', aL: 'T', bL: 'F' },
+  { q: "真相與感受之間，你會選⋯⋯", a: "真相優先", b: "以不傷人的方式表達", dim: 'TF', aL: 'T', bL: 'F' },
+  { q: "別人找你抒發情緒時，你會⋯⋯", a: "幫他釐清問題", b: "先讓他感覺被理解", dim: 'TF', aL: 'T', bL: 'F' },
+
+  // ─── J / P (16) ───
+  { q: "你的工作方式比較像⋯⋯", a: "按計劃一步步完成", b: "隨狀況彈性應對", dim: 'JP', aL: 'J', bL: 'P' },
+  { q: "你的生活空間通常⋯⋯", a: "整齊、有秩序", b: "隨意、有生活感", dim: 'JP', aL: 'J', bL: 'P' },
+  { q: "面對截止日，你習慣⋯⋯", a: "提早完成、留緩衝", b: "最後衝刺、壓線交出", dim: 'JP', aL: 'J', bL: 'P' },
+  { q: "做了決定之後，你⋯⋯", a: "堅持到底少改動", b: "會保留彈性隨時調整", dim: 'JP', aL: 'J', bL: 'P' },
+  { q: "你的行事曆比較⋯⋯", a: "提前規劃、排得滿滿", b: "隨時調整、很多留白", dim: 'JP', aL: 'J', bL: 'P' },
+  { q: "旅行時你偏好⋯⋯", a: "事先排好行程", b: "隨興走到哪算哪", dim: 'JP', aL: 'J', bL: 'P' },
+  { q: "你更喜歡⋯⋯", a: "有明確的結論", b: "保留開放的選項", dim: 'JP', aL: 'J', bL: 'P' },
+  { q: "面對規則，你⋯⋯", a: "傾向遵守、不輕易打破", b: "視情況靈活變通", dim: 'JP', aL: 'J', bL: 'P' },
+  { q: "列清單對你而言⋯⋯", a: "有幫助，讓事情在掌控中", b: "有點綁手綁腳", dim: 'JP', aL: 'J', bL: 'P' },
+  { q: "接到新任務，你的第一步是⋯⋯", a: "先規劃再動手", b: "先動手再邊做邊想", dim: 'JP', aL: 'J', bL: 'P' },
+  { q: "計劃突然要改，你⋯⋯", a: "會有點不舒服、需要時間適應", b: "完全沒問題、甚至有點期待", dim: 'JP', aL: 'J', bL: 'P' },
+  { q: "你傾向⋯⋯", a: "決定後就盡快執行", b: "保留多一點選擇空間", dim: 'JP', aL: 'J', bL: 'P' },
+  { q: "一天的節奏你喜歡⋯⋯", a: "有個大致的時間表", b: "順著當下的狀態走", dim: 'JP', aL: 'J', bL: 'P' },
+  { q: "還有未完成的事時，你⋯⋯", a: "無法放鬆、想快點做完", b: "可以先擱著去做別的", dim: 'JP', aL: 'J', bL: 'P' },
+  { q: "你的桌面比較像⋯⋯", a: "物品各有其位", b: "有點混亂但自有邏輯", dim: 'JP', aL: 'J', bL: 'P' },
+  { q: "你更重視⋯⋯", a: "結構與秩序", b: "自由與彈性", dim: 'JP', aL: 'J', bL: 'P' },
+
+  // ─── A / O 果斷 vs 擺盪 (16) ───
+  { q: "做完一個重要決定後，你⋯⋯", a: "不太回頭想", b: "會反覆推敲是不是有更好選擇", dim: 'AO', aL: 'A', bL: 'O' },
+  { q: "別人對你的批評，你⋯⋯", a: "評估後就放下", b: "會在心裡停留很久", dim: 'AO', aL: 'A', bL: 'O' },
+  { q: "在陌生場合裡，你⋯⋯", a: "大致自在", b: "容易擔心自己的表現", dim: 'AO', aL: 'A', bL: 'O' },
+  { q: "失敗或挫折之後，你⋯⋯", a: "整理一下就往前走", b: "會想很久那個錯誤", dim: 'AO', aL: 'A', bL: 'O' },
+  { q: "對自己的能力，你⋯⋯", a: "大致有信心", b: "常懷疑自己不夠好", dim: 'AO', aL: 'A', bL: 'O' },
+  { q: "半夜睡不著時，你⋯⋯", a: "很少有，睡得還行", b: "會反芻當天或未來的事", dim: 'AO', aL: 'A', bL: 'O' },
+  { q: "計劃突然出狀況，你⋯⋯", a: "平靜地調整", b: "焦慮上升、難以放鬆", dim: 'AO', aL: 'A', bL: 'O' },
+  { q: "對未來，你比較傾向⋯⋯", a: "覺得大致會 OK", b: "擔心很多可能變糟的事", dim: 'AO', aL: 'A', bL: 'O' },
+  { q: "重要訊息傳出去但對方還沒回，你⋯⋯", a: "先做別的事", b: "一直想對方在想什麼", dim: 'AO', aL: 'A', bL: 'O' },
+  { q: "完美主義對你來說⋯⋯", a: "不算大問題", b: "常常綁住自己", dim: 'AO', aL: 'A', bL: 'O' },
+  { q: "別人怎麼看你，你⋯⋯", a: "不太放在心上", b: "會在意很久", dim: 'AO', aL: 'A', bL: 'O' },
+  { q: "整體心情起伏，你⋯⋯", a: "大致穩定", b: "變化比較明顯", dim: 'AO', aL: 'A', bL: 'O' },
+  { q: "講錯話之後，你⋯⋯", a: "過了就過了", b: "反覆懊惱很久", dim: 'AO', aL: 'A', bL: 'O' },
+  { q: "重大改變來臨時，你⋯⋯", a: "多半能接住", b: "容易感到不安", dim: 'AO', aL: 'A', bL: 'O' },
+  { q: "比起別人，你覺得自己⋯⋯", a: "還算放鬆", b: "比較容易焦慮", dim: 'AO', aL: 'A', bL: 'O' },
+  { q: "看到自己過去的照片或文字，你⋯⋯", a: "還好，是過去的事", b: "會覺得尷尬到不行", dim: 'AO', aL: 'A', bL: 'O' },
+
+  // ─── H / C 和諧 vs 冷靜 (16) ───
+  { q: "群體裡有人不開心，你⋯⋯", a: "會自然地想去化解", b: "不一定要介入", dim: 'HC', aL: 'H', bL: 'C' },
+  { q: "跟別人意見不合時，你⋯⋯", a: "傾向找折衷點", b: "各自堅持也沒關係", dim: 'HC', aL: 'H', bL: 'C' },
+  { q: "別人的情緒會⋯⋯", a: "容易感染你", b: "跟你的情緒比較分開", dim: 'HC', aL: 'H', bL: 'C' },
+  { q: "拒絕別人的請求，你⋯⋯", a: "心裡會過意不去", b: "還算自在", dim: 'HC', aL: 'H', bL: 'C' },
+  { q: "在團體裡，你⋯⋯", a: "會留意大家舒不舒服", b: "比較注意自己的節奏", dim: 'HC', aL: 'H', bL: 'C' },
+  { q: "跟人衝突過後，你⋯⋯", a: "會想花時間修復", b: "給彼此空間就好", dim: 'HC', aL: 'H', bL: 'C' },
+  { q: "你比較重視的是⋯⋯", a: "「我們」的感覺", b: "「我自己」的感覺", dim: 'HC', aL: 'H', bL: 'C' },
+  { q: "群組訊息裡，你比較⋯⋯", a: "會關心誰沒被回應", b: "注意自己想說的事", dim: 'HC', aL: 'H', bL: 'C' },
+  { q: "別人不開心時，你⋯⋯", a: "會主動關心", b: "給對方獨自處理的空間", dim: 'HC', aL: 'H', bL: 'C' },
+  { q: "表達不同意見，你⋯⋯", a: "會想辦法溫和", b: "直接講就好", dim: 'HC', aL: 'H', bL: 'C' },
+  { q: "收到禮物或幫助，你⋯⋯", a: "會想回報、放在心上", b: "心領就好、不一定要回禮", dim: 'HC', aL: 'H', bL: 'C' },
+  { q: "被讚美時，你⋯⋯", a: "自然把功勞分給他人", b: "自在地接受", dim: 'HC', aL: 'H', bL: 'C' },
+  { q: "一起合作時，你比較常⋯⋯", a: "顧及大家的步調", b: "用自己的節奏推進", dim: 'HC', aL: 'H', bL: 'C' },
+  { q: "跟人保持距離，對你來說⋯⋯", a: "不太自在", b: "其實滿舒服的", dim: 'HC', aL: 'H', bL: 'C' },
+  { q: "你覺得自己⋯⋯", a: "容易為別人擔心", b: "比較少把別人的事放心上", dim: 'HC', aL: 'H', bL: 'C' },
+  { q: "別人說「沒事」時，你⋯⋯", a: "會察覺背後的情緒", b: "大致照字面理解", dim: 'HC', aL: 'H', bL: 'C' },
+];
+
+// ═══════════ 16 型描述 ═══════════
+const typeInfo = {
+  INTJ: { name: '建築師', tagline: '想像力豐富且具戰略思維的策劃者', desc: '你在思考上有深度，擅長看穿系統的底層邏輯，並且一旦認定目標就會獨立而堅定地走下去。對能力有高標準，對膚淺的東西沒耐心。' },
+  INTP: { name: '邏輯學家', tagline: '富有創意的思想家，對知識有無盡渴望', desc: '你喜歡在概念之間遊走，享受把事情想通的那一刻。對既有框架會反射性地質疑，偏好用第一原理重新推導。' },
+  ENTJ: { name: '指揮官', tagline: '大膽、富有想像力的領導者', desc: '你天生會看見可以變得更好的地方，並且有能力把它推動起來。講求效率、不怕做困難決策，對能一起把事情做成的人特別投入。' },
+  ENTP: { name: '辯論家', tagline: '聰明好奇、愛在想法之間激盪', desc: '你反應快、喜歡挑戰共識，能在看似無關的事物中找到連結。對你來說，有趣的對話就是最好的娛樂。' },
+  INFJ: { name: '提倡者', tagline: '安靜而堅定的理想主義者', desc: '你對人有細膩的理解，內在有一套清楚的價值羅盤。表面低調，但一旦認定了某件事就會投入很深。' },
+  INFP: { name: '調停者', tagline: '富有詩意、善良的利他主義者', desc: '你忠於自己的感受，在乎意義遠勝於地位。看似溫和，但對真正重要的事會格外堅持。' },
+  ENFJ: { name: '主人公', tagline: '充滿魅力、能鼓舞他人的領導者', desc: '你自然地把他人的成長放在心上，能在一群人中建立信任與方向感。說話有溫度，卻不失方向。' },
+  ENFP: { name: '競選者', tagline: '熱情、有創意、社交自如', desc: '你對新想法與新人都充滿好奇，能快速與人建立連結。當你被某件事點燃時，能量會很有感染力。' },
+  ISTJ: { name: '物流師', tagline: '務實、講求事實的可靠夥伴', desc: '你做事細心、說到做到，重視責任感與既有的做事方法。穩定是你最大的優點之一。' },
+  ISFJ: { name: '守衛者', tagline: '溫暖、盡責的守護者', desc: '你會默默把身邊的人照顧好，記得別人的細節與需求。忠誠、可靠，不愛張揚。' },
+  ESTJ: { name: '總經理', tagline: '出色的管理者、有組織能力', desc: '你喜歡把事情理順、把規則建立起來。務實、有執行力，對團隊來說是可靠的推進器。' },
+  ESFJ: { name: '執政官', tagline: '關懷他人、善於社交', desc: '你對群體的氣氛很敏感，會主動維繫關係與秩序。在你在場的場合，人與人之間會比較順。' },
+  ISTP: { name: '鑑賞家', tagline: '大膽務實的問題解決者', desc: '你冷靜、動手能力強，遇到問題會想辦法拆解它。不太被規則綁住，喜歡知道「它怎麼運作」。' },
+  ISFP: { name: '探險家', tagline: '靈活、有藝術氣質的感受者', desc: '你對美與細節敏感，活在當下、不強求。看起來隨和，但對自己在乎的價值會悄悄堅持。' },
+  ESTP: { name: '企業家', tagline: '聰明、精力充沛、敏於察覺', desc: '你在變動中反而更自在，喜歡直接面對問題、在過程中學習。行動派，討厭空談。' },
+  ESFP: { name: '表演者', tagline: '自發、熱情、樂於分享', desc: '你讓周圍的氣氛輕鬆起來，享受當下的體驗與連結。有種把平凡變有趣的本事。' },
+};
+
+// ═══════════ 維度標籤 ═══════════
+const dimensionLabels = {
+  EI: { left: 'E', leftName: '外向', right: 'I', rightName: '內向' },
+  SN: { left: 'S', leftName: '實感', right: 'N', rightName: '直覺' },
+  TF: { left: 'T', leftName: '理性', right: 'F', rightName: '情感' },
+  JP: { left: 'J', leftName: '判斷', right: 'P', rightName: '感知' },
+  AO: { left: 'A', leftName: '果斷', right: 'O', rightName: '擺盪' },
+  HC: { left: 'H', leftName: '和諧', right: 'C', rightName: '冷靜' },
+};
+
+// ═══════════ 身份維度（A/O、H/C）解讀 ═══════════
+const identityInsights = {
+  A: {
+    name: '果斷型 Assertive',
+    desc: '你大多時候能保持心理上的穩定，對自己的判斷有基本信心。挫折來臨時較少陷入長時間的反芻，能比較快回到節奏裡。',
+  },
+  O: {
+    name: '擺盪型 Oscillating',
+    desc: '你對自己有較高的標準，容易反覆檢視自己的選擇與表現，外部的變動會在內在停留比較久。這份敏感讓你做事細膩，但有時也會消耗自己。',
+  },
+  H: {
+    name: '和諧型 Harmony',
+    desc: '你在人際裡傾向找共識、顧及大家感受，對群體氣氛敏銳。會主動修復關係、化解張力，是大家在的時候氣氛比較順的那個人。',
+  },
+  C: {
+    name: '冷靜型 Calm',
+    desc: '你的情緒邊界清楚，不太被外部情緒拉走。能在他人混亂時保持自己的節奏，給人一種沉穩、不跟著起伏的依靠感。',
+  },
+};
+
+// ═══════════ 榮格八維 ═══════════
+// 每個 4 字母對應的功能堆疊（Beebe 模型，1-4 主要、5-8 陰影）
+const cognitiveStacks = {
+  INFP: ['Fi', 'Ne', 'Si', 'Te', 'Fe', 'Ni', 'Se', 'Ti'],
+  INFJ: ['Ni', 'Fe', 'Ti', 'Se', 'Ne', 'Fi', 'Te', 'Si'],
+  ENFP: ['Ne', 'Fi', 'Te', 'Si', 'Ni', 'Fe', 'Ti', 'Se'],
+  ENFJ: ['Fe', 'Ni', 'Se', 'Ti', 'Fi', 'Ne', 'Si', 'Te'],
+  INTP: ['Ti', 'Ne', 'Si', 'Fe', 'Te', 'Ni', 'Se', 'Fi'],
+  INTJ: ['Ni', 'Te', 'Fi', 'Se', 'Ne', 'Ti', 'Fe', 'Si'],
+  ENTP: ['Ne', 'Ti', 'Fe', 'Si', 'Ni', 'Te', 'Fi', 'Se'],
+  ENTJ: ['Te', 'Ni', 'Se', 'Fi', 'Ti', 'Ne', 'Si', 'Fe'],
+  ISFP: ['Fi', 'Se', 'Ni', 'Te', 'Fe', 'Si', 'Ne', 'Ti'],
+  ISFJ: ['Si', 'Fe', 'Ti', 'Ne', 'Se', 'Fi', 'Te', 'Ni'],
+  ESFP: ['Se', 'Fi', 'Te', 'Ni', 'Si', 'Fe', 'Ti', 'Ne'],
+  ESFJ: ['Fe', 'Si', 'Ne', 'Ti', 'Fi', 'Se', 'Ni', 'Te'],
+  ISTP: ['Ti', 'Se', 'Ni', 'Fe', 'Te', 'Si', 'Ne', 'Fi'],
+  ISTJ: ['Si', 'Te', 'Fi', 'Ne', 'Se', 'Ti', 'Fe', 'Ni'],
+  ESTP: ['Se', 'Ti', 'Fe', 'Ni', 'Si', 'Te', 'Fi', 'Ne'],
+  ESTJ: ['Te', 'Si', 'Ne', 'Fi', 'Ti', 'Se', 'Ni', 'Fe'],
+};
+
+const functionInfo = {
+  Ni: { name: '內傾直覺', desc: '從細節中洞察整體模式，預感事物的走向與深層意義' },
+  Ne: { name: '外傾直覺', desc: '在事物之間連結出可能性，發散、跳躍式的探索' },
+  Si: { name: '內傾感官', desc: '保留細節記憶，倚賴熟悉感與過去經驗' },
+  Se: { name: '外傾感官', desc: '對當下環境敏銳，反應快、活在現場' },
+  Ti: { name: '內傾思考', desc: '建立內部一致的邏輯體系，追求精確與分類' },
+  Te: { name: '外傾思考', desc: '以效率與成果組織世界，重視可衡量的標準' },
+  Fi: { name: '內傾情感', desc: '依據個人價值觀判斷意義與真假，忠於內在' },
+  Fe: { name: '外傾情感', desc: '感知群體情緒、維繫人際和諧，照顧氣氛' },
+};
+
+const positionLabels = [
+  '主導 · Hero',
+  '輔助 · Parent',
+  '第三 · Child',
+  '劣勢 · Anima',
+  '對立 · Opposing',
+  '批判 · Critic',
+  '騙子 · Trickster',
+  '惡魔 · Demon',
+];
+
+// ═══════════ 狀態 ═══════════
+const state = {
+  stage: 'welcome',
+  currentQ: 0,
+  answers: {},
+};
+
+const app = document.getElementById('app');
+
+function esc(s) {
+  return String(s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+
+const arrowLeftSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M19 12H5"/><path d="m12 19-7-7 7-7"/></svg>';
+const rotateSvg = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"/><path d="M3 3v5h5"/></svg>';
+
+// ═══════════ 渲染 ═══════════
+function render() {
+  if (state.stage === 'welcome') renderWelcome();
+  else if (state.stage === 'quiz') renderQuiz();
+  else renderResults();
+  window.scrollTo(0, 0);
+}
+
+function renderWelcome() {
+  app.innerHTML = `
+    <div class="welcome">
+      <div class="welcome-inner">
+        <div class="welcome-since">
+          <div class="hairline line"></div>
+          <div class="label">Jung · Myers · Briggs</div>
+          <div class="hairline line"></div>
+        </div>
+        <div class="welcome-eyebrow">MBTI · 96 QUESTIONS</div>
+        <h1 class="welcome-title">認識<br><em>你自己</em></h1>
+        <p class="welcome-sub">96 題人格測驗 · 含身份維度與榮格八維</p>
+        <p class="welcome-sub small">約需 12–15 分鐘 · 憑直覺回答最準</p>
+        <button class="btn-primary" id="start-btn">BEGIN · 開始</button>
+        <div class="welcome-dims">
+          <em>E/I</em><span>·</span>
+          <em>S/N</em><span>·</span>
+          <em>T/F</em><span>·</span>
+          <em>J/P</em><span>·</span>
+          <em>A/O</em><span>·</span>
+          <em>H/C</em>
+        </div>
+        <p class="welcome-disclaimer">本測驗為個人興趣製作，僅供自我反思之用，非 The Myers-Briggs Company 之官方 MBTI® 測驗，亦非任何專業心理評估。「MBTI」為 The Myers-Briggs Company 之註冊商標。</p>
+      </div>
+    </div>
+  `;
+  document.getElementById('start-btn').addEventListener('click', () => {
+    state.stage = 'quiz';
+    state.currentQ = 0;
+    state.answers = {};
+    render();
+  });
+}
+
+function renderQuiz() {
+  const i = state.currentQ;
+  const q = questions[i];
+  const progress = ((i + 1) / questions.length) * 100;
+  const dim = dimensionLabels[q.dim];
+
+  app.innerHTML = `
+    <div class="quiz">
+      <div class="quiz-top">
+        <div class="quiz-top-row">
+          <button class="back-btn" id="back-btn" ${i === 0 ? 'disabled' : ''}>
+            ${arrowLeftSvg}<span>BACK</span>
+          </button>
+          <div class="quiz-meta">
+            <span class="dim">${dim.left} / ${dim.right}</span>
+            <span class="dot">·</span>
+            <span class="count">${String(i + 1).padStart(2, '0')} / ${questions.length}</span>
+          </div>
+        </div>
+        <div class="progress">
+          <div class="progress-fill" style="width: ${progress}%"></div>
+        </div>
+      </div>
+
+      <div class="quiz-body">
+        <div class="quiz-content">
+          <div class="quiz-eyebrow">QUESTION ${String(i + 1).padStart(2, '0')}</div>
+          <h2 class="quiz-question">${esc(q.q)}</h2>
+          <div class="options">
+            <button class="option" data-letter="${q.aL}">
+              <span class="option-letter">A</span>
+              <span class="option-text">${esc(q.a)}</span>
+            </button>
+            <button class="option" data-letter="${q.bL}">
+              <span class="option-letter">B</span>
+              <span class="option-text">${esc(q.b)}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="quiz-foot">沒有對錯 · 選擇最接近你的那一個</div>
+    </div>
+  `;
+
+  document.querySelectorAll('.option').forEach(btn => {
+    btn.addEventListener('click', () => handleAnswer(btn.dataset.letter));
+  });
+  document.getElementById('back-btn').addEventListener('click', handleBack);
+}
+
+function handleAnswer(letter) {
+  state.answers[state.currentQ] = letter;
+  if (state.currentQ < questions.length - 1) {
+    state.currentQ++;
+    render();
+  } else {
+    state.stage = 'results';
+    render();
+  }
+}
+
+function handleBack() {
+  if (state.currentQ > 0) {
+    state.currentQ--;
+    render();
+  }
+}
+
+function calculateType() {
+  const counts = { E:0, I:0, S:0, N:0, T:0, F:0, J:0, P:0, A:0, O:0, H:0, C:0 };
+  Object.values(state.answers).forEach(l => { counts[l]++; });
+  const type =
+    (counts.E >= counts.I ? 'E' : 'I') +
+    (counts.S >= counts.N ? 'S' : 'N') +
+    (counts.T >= counts.F ? 'T' : 'F') +
+    (counts.J >= counts.P ? 'J' : 'P');
+  const ao = counts.A >= counts.O ? 'A' : 'O';
+  const hc = counts.H >= counts.C ? 'H' : 'C';
+  return { type, counts, ao, hc };
+}
+
+function renderResults() {
+  const { type, counts, ao, hc } = calculateType();
+  const info = typeInfo[type];
+  const stack = cognitiveStacks[type];
+
+  function pct(dim) {
+    const { left, right } = dimensionLabels[dim];
+    const total = counts[left] + counts[right];
+    const leftPct = total ? Math.round((counts[left] / total) * 100) : 50;
+    const rightPct = total ? 100 - leftPct : 50;
+    const dominant = counts[left] >= counts[right] ? left : right;
+    return { leftPct, rightPct, dominant };
+  }
+
+  // 4 主要維度的 row
+  const mainDimRows = ['EI','SN','TF','JP'].map(dim => {
+    const d = dimensionLabels[dim];
+    const p = pct(dim);
+    const leftActive = p.dominant === d.left;
+    const rightActive = p.dominant === d.right;
+    const fillHtml = leftActive
+      ? `<div class="dim-fill-left" style="width: ${p.leftPct}%"></div>`
+      : `<div class="dim-fill-right" style="width: ${p.rightPct}%"></div>`;
+    return `
+      <div class="dim-row">
+        <div class="dim-labels">
+          <div class="side">
+            <span class="dim-letter ${leftActive ? 'active' : ''}">${d.left}</span>
+            <span class="dim-name ${leftActive ? 'active' : ''}">${d.leftName}</span>
+            <span class="dim-pct">${p.leftPct}%</span>
+          </div>
+          <div class="side">
+            <span class="dim-pct">${p.rightPct}%</span>
+            <span class="dim-name ${rightActive ? 'active' : ''}">${d.rightName}</span>
+            <span class="dim-letter ${rightActive ? 'active' : ''}">${d.right}</span>
+          </div>
+        </div>
+        <div class="dim-bar">${fillHtml}<div class="dim-center"></div></div>
+      </div>
+    `;
+  }).join('');
+
+  // A/O、H/C 區塊
+  function identityBlock(dim, dominant) {
+    const d = dimensionLabels[dim];
+    const p = pct(dim);
+    const dominantPct = dominant === d.left ? p.leftPct : p.rightPct;
+    const insight = identityInsights[dominant];
+    return `
+      <div class="identity-block">
+        <div class="identity-head">
+          <span class="identity-name">${d.left} / ${d.right} · ${d.leftName} / ${d.rightName}</span>
+          <span class="identity-pct">${dominantPct}% ${dominant}</span>
+        </div>
+        <div class="identity-title">${esc(insight.name)}</div>
+        <div class="identity-desc">${esc(insight.desc)}</div>
+      </div>
+    `;
+  }
+
+  // 八維 list
+  const funcRowsHtml = stack.map((code, idx) => {
+    const fi = functionInfo[code];
+    const isShadow = idx >= 4;
+    const dividerHtml = idx === 4
+      ? `<div class="func-divider">SHADOW · 陰影面</div>`
+      : '';
+    return dividerHtml + `
+      <div class="func-row ${isShadow ? 'shadow' : ''}">
+        <div class="func-rank">${idx + 1}</div>
+        <div class="func-code">${code}</div>
+        <div class="func-body">
+          <div class="func-line">
+            <span class="func-name">${esc(fi.name)}</span>
+            <span class="func-pos">${esc(positionLabels[idx])}</span>
+          </div>
+          <div class="func-desc">${esc(fi.desc)}</div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  app.innerHTML = `
+    <div class="results">
+      <div class="results-inner">
+        <div class="results-eyebrow">
+          <div class="label">YOUR TYPE · 你的人格類型</div>
+          <div class="row">
+            <div class="hairline line"></div>
+            <div class="num">nº${type}</div>
+            <div class="hairline line"></div>
+          </div>
+        </div>
+
+        <div class="type-card">
+          <div class="type-seal">印</div>
+          <div class="type-code">${type}</div>
+          <div class="type-suffix">· ${ao} · ${hc} ·</div>
+          <div class="type-name">${esc(info.name)}</div>
+          <div class="type-tagline">${esc(info.tagline)}</div>
+        </div>
+
+        <p class="type-desc">${esc(info.desc)}</p>
+
+        <div class="section">
+          <div class="section-label">DIMENSION BREAKDOWN</div>
+          <div class="section-zh">四個主要維度</div>
+          <div class="breakdown-rows">${mainDimRows}</div>
+        </div>
+
+        <div class="section">
+          <div class="section-label">IDENTITY DIMENSIONS</div>
+          <div class="section-zh">身份維度</div>
+          ${identityBlock('AO', ao)}
+          ${identityBlock('HC', hc)}
+        </div>
+
+        <div class="section">
+          <div class="section-label">COGNITIVE FUNCTIONS</div>
+          <div class="section-zh">榮格八維 · 功能堆疊</div>
+          <div class="functions-grid">${funcRowsHtml}</div>
+        </div>
+
+        <div class="restart-wrap">
+          <button class="btn-secondary" id="restart-btn">
+            ${rotateSvg}<span>RETAKE · 再測一次</span>
+          </button>
+        </div>
+
+        <div class="results-fin">
+          <div class="hairline line"></div>
+          <span class="label">fin</span>
+          <div class="hairline line"></div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  document.getElementById('restart-btn').addEventListener('click', () => {
+    state.stage = 'welcome';
+    state.currentQ = 0;
+    state.answers = {};
+    render();
+  });
+}
+
+render();
+</script>
+</body>
+</html>
