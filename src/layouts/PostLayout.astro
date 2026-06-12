@@ -74,6 +74,10 @@ const backlinks = await getBacklinks(post.id);
       </aside>
     )}
 
+    <p class="mt-12 pt-6 border-t border-line text-muted text-xs">
+      本文「{title}」由 Aidan Wang 創作,採用 <a href="https://creativecommons.org/licenses/by/4.0/" rel="license" target="_blank" class="text-accent hover:underline">CC BY 4.0</a> 授權;轉載請標示作者與原文出處。
+    </p>
+
     <AuthorCard />
     {post.data.comments !== false && <Comments issueNumber={post.data.commentsIssue} />}
   </article>
