@@ -1,5 +1,6 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import PostCard from '../components/PostCard.astro';
 import { getCollection } from 'astro:content';
 const posts = (await getCollection('blog'))
   .filter((p) => p.data.category === 'tech')
@@ -7,12 +8,7 @@ const posts = (await getCollection('blog'))
 ---
 <BaseLayout title="Tech">
   <h1 class="text-2xl font-bold mb-4">Tech</h1>
-  <ul class="space-y-3 list-none p-0">
-    {posts.map((p) => (
-      <li>
-        <a href={`/blog/${p.id}/`} class="text-accent hover:underline">{p.data.title}</a>
-        <span class="text-muted text-sm"> · {p.data.date.toLocaleDateString('zh-TW')}</span>
-      </li>
-    ))}
-  </ul>
+  <div class="space-y-4">
+    {posts.map((p) => <PostCard post={p} />)}
+  </div>
 </BaseLayout>
