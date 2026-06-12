@@ -4,6 +4,7 @@ import { getCollection } from 'astro:content';
 import BaseLayout from './BaseLayout.astro';
 import AuthorCard from '../components/AuthorCard.astro';
 import Comments from '../components/Comments.astro';
+import { getBacklinks } from '../lib/backlinks';
 import 'katex/dist/katex.min.css';
 interface Props { post: CollectionEntry<'blog'>; }
 const { post } = Astro.props;
@@ -20,6 +21,7 @@ if (series) {
   prevPost = idx > 0 ? seriesPosts[idx - 1] : null;
   nextPost = idx >= 0 && idx < seriesPosts.length - 1 ? seriesPosts[idx + 1] : null;
 }
+const backlinks = await getBacklinks(post.id);
 ---
 <BaseLayout title={title}>
   <article>
@@ -59,6 +61,17 @@ if (series) {
         <span>{prevPost && <a href={`/blog/${prevPost.id}/`} class="text-accent hover:underline">← {prevPost.data.title}</a>}</span>
         <span>{nextPost && <a href={`/blog/${nextPost.id}/`} class="text-accent hover:underline">{nextPost.data.title} →</a>}</span>
       </nav>
+    )}
+
+    {backlinks.length > 0 && (
+      <aside class="mt-12 pt-6 border-t border-line text-sm">
+        <p class="font-bold mb-2">🔗 被引用於</p>
+        <ul class="list-none p-0 m-0 space-y-1">
+          {backlinks.map((b) => (
+            <li><a href={`/blog/${b.id}/`} class="text-accent hover:underline">{b.data.title}</a></li>
+          ))}
+        </ul>
+      </aside>
     )}
 
     <AuthorCard />
