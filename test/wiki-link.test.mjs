@@ -44,3 +44,15 @@ test('extractTargets returns slugs, ignoring labels', () => {
 test('extractTargets returns an empty array when there are no links', () => {
   assert.deepEqual(extractTargets('no links here'), []);
 });
+
+test('splitWikiLinks handles multiple links in one string', () => {
+  assert.deepEqual(splitWikiLinks('[[btl-3]] 和 [[btl-3|別名]]', MAP), [
+    { type: 'link', url: '/blog/btl-3/', children: [{ type: 'text', value: '領導力 - 成長模型' }] },
+    { type: 'text', value: ' 和 ' },
+    { type: 'link', url: '/blog/btl-3/', children: [{ type: 'text', value: '別名' }] },
+  ]);
+});
+
+test('splitWikiLinks returns an empty array for an empty string', () => {
+  assert.deepEqual(splitWikiLinks('', MAP), []);
+});
