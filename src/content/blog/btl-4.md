@@ -18,7 +18,7 @@ comments: true
 但好的 Leader 會理解：**團隊其實是一個系統**，由各個 Module 互相協作組成。每個成員都能獨立處理自己的 Task，即使少了 Leader，團隊仍然能繼續運作。把自己當成不可或缺的大腦，反而是一種執迷。
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 460 250" role="img" aria-label="迷思 vs 實際：團隊結構對比" style="width:100%;max-width:560px;height:auto;">
+  <svg viewBox="0 0 460 250" role="img" aria-label="迷思 vs 實際：團隊結構對比" style="width:100%;max-width:560px;height:auto;margin:0 auto;">
     <line x1="230" y1="30" x2="230" y2="205" stroke="#3a4154" stroke-width="1" stroke-dasharray="4 4"/>
     <text x="110" y="22" fill="#9aa4b2" font-size="13" text-anchor="middle" font-weight="bold">迷思</text>
     <text x="350" y="22" fill="#9aa4b2" font-size="13" text-anchor="middle" font-weight="bold">實際</text>

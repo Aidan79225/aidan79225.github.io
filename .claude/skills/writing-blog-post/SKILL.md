@@ -75,7 +75,7 @@ comments: true
 Optional inline diagram (whole block must have NO blank lines):
 ```html
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 360 170" role="img" aria-label="〈描述〉" style="width:100%;max-width:420px;height:auto;">
+  <svg viewBox="0 0 360 170" role="img" aria-label="〈描述〉" style="width:100%;max-width:420px;height:auto;margin:0 auto;">
     <line x1="40" y1="150" x2="350" y2="150" stroke="#3a4154" stroke-width="1.5"/>
   </svg>
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">〈圖說〉</figcaption>

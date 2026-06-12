@@ -16,7 +16,7 @@ seriesOrder: 3
 只要每天持續進步，把時間尺度拉得夠遠來看，技能的成長速度看起來就是一條穩定上升的**線性**直線——投入多少、就累積多少。
 
 <figure style="margin:1.25rem 0;text-align:center;">
-  <svg viewBox="0 0 360 170" role="img" aria-label="宏觀：線性上升" style="width:100%;max-width:420px;height:auto;">
+  <svg viewBox="0 0 360 170" role="img" aria-label="宏觀：線性上升" style="width:100%;max-width:420px;height:auto;margin:0 auto;">
     <line x1="40" y1="150" x2="350" y2="150" stroke="#3a4154" stroke-width="1.5"/>
     <line x1="40" y1="15" x2="40" y2="150" stroke="#3a4154" stroke-width="1.5"/>
     <line x1="40" y1="145" x2="345" y2="35" stroke="#4f6df5" stroke-width="2.5" stroke-linecap="round"/>
@@ -28,7 +28,7 @@ seriesOrder: 3
 但把時間尺度縮小、靠近一點觀察，就會發現成長並不平均：它由**高速成長期**與**低速成長期**交替組成。技能線因此不是平滑的斜線，而像一階一階往上的**階梯**。
 
 <figure style="margin:1.25rem 0;text-align:center;">
-  <svg viewBox="0 0 360 170" role="img" aria-label="拉近：階梯狀" style="width:100%;max-width:420px;height:auto;">
+  <svg viewBox="0 0 360 170" role="img" aria-label="拉近：階梯狀" style="width:100%;max-width:420px;height:auto;margin:0 auto;">
     <line x1="40" y1="150" x2="350" y2="150" stroke="#3a4154" stroke-width="1.5"/>
     <line x1="40" y1="15" x2="40" y2="150" stroke="#3a4154" stroke-width="1.5"/>
     <line x1="40" y1="145" x2="345" y2="35" stroke="#9aa4b2" stroke-width="1.5" stroke-dasharray="5 5"/>
@@ -43,7 +43,7 @@ seriesOrder: 3
 所以每一階往上跳之前，曲線會先**往下挖一角**：先退一步，再前進兩步。
 
 <figure style="margin:1.25rem 0;text-align:center;">
-  <svg viewBox="0 0 360 170" role="img" aria-label="階梯前先下滑再突破" style="width:100%;max-width:420px;height:auto;">
+  <svg viewBox="0 0 360 170" role="img" aria-label="階梯前先下滑再突破" style="width:100%;max-width:420px;height:auto;margin:0 auto;">
     <line x1="40" y1="150" x2="350" y2="150" stroke="#3a4154" stroke-width="1.5"/>
     <line x1="40" y1="15" x2="40" y2="150" stroke="#3a4154" stroke-width="1.5"/>
     <line x1="40" y1="145" x2="345" y2="35" stroke="#9aa4b2" stroke-width="1.5" stroke-dasharray="5 5"/>
@@ -56,7 +56,7 @@ seriesOrder: 3
 回到真實面，技能表現其實跟「**當下的狀態**」高度相關——用熟的工具就表現好，剛換新工具就表現差。因此把尺度縮到最小、貼著真實情況看，成長曲線是**高高低低的鋸齒狀**，而不是一條乾淨的線。
 
 <figure style="margin:1.25rem 0;text-align:center;">
-  <svg viewBox="0 0 360 170" role="img" aria-label="微觀：鋸齒狀" style="width:100%;max-width:420px;height:auto;">
+  <svg viewBox="0 0 360 170" role="img" aria-label="微觀：鋸齒狀" style="width:100%;max-width:420px;height:auto;margin:0 auto;">
     <line x1="40" y1="150" x2="350" y2="150" stroke="#3a4154" stroke-width="1.5"/>
     <line x1="40" y1="15" x2="40" y2="150" stroke="#3a4154" stroke-width="1.5"/>
     <line x1="40" y1="145" x2="345" y2="35" stroke="#9aa4b2" stroke-width="1.5" stroke-dasharray="5 5"/>
