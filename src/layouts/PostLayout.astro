@@ -23,7 +23,7 @@ if (series) {
 }
 const backlinks = await getBacklinks(post.id);
 ---
-<BaseLayout title={title}>
+<BaseLayout title={title} contentLicense>
   <article>
     <h1 class="text-3xl font-bold mb-2">{title}</h1>
     <p class="text-muted text-sm mb-4">
@@ -73,10 +73,6 @@ const backlinks = await getBacklinks(post.id);
         </ul>
       </aside>
     )}
-
-    <p class="mt-12 pt-6 border-t border-line text-muted text-xs">
-      本文「{title}」由 Aidan Wang 創作,採用 <a href="https://creativecommons.org/licenses/by/4.0/" rel="license" target="_blank" class="text-accent hover:underline">CC BY 4.0</a> 授權;轉載請標示作者與原文出處。
-    </p>
 
     <AuthorCard />
     {post.data.comments !== false && <Comments issueNumber={post.data.commentsIssue} />}

@@ -1,7 +1,7 @@
 ---
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
-const { title = "Aidan's Blog" } = Astro.props;
+const { title = "Aidan's Blog", contentLicense = false } = Astro.props;
 ---
 <!doctype html>
 <html lang="zh-Hant">
@@ -16,7 +16,9 @@ const { title = "Aidan's Blog" } = Astro.props;
       <slot />
     </main>
     <footer class="max-w-3xl mx-auto px-4 py-8 mt-12 border-t border-line text-muted text-sm">
-      © 2026 Aidan's Blog
+      © 2026 Aidan's Blog{contentLicense && (
+        <Fragment> · 本文採用 <a href="https://creativecommons.org/licenses/by/4.0/" rel="license" target="_blank" class="text-accent hover:underline">CC BY 4.0</a> 授權</Fragment>
+      )}
     </footer>
   </body>
 </html>
