@@ -20,7 +20,7 @@ function buildTitleMap() {
   return map;
 }
 
-let cachedMap = null;
+let cachedMap = null; // built once per process; restart `astro dev` after adding a post
 
 export default function remarkWikiLink() {
   if (!cachedMap) cachedMap = buildTitleMap();
@@ -31,7 +31,7 @@ export default function remarkWikiLink() {
     if (!Array.isArray(node.children)) return;
     const out = [];
     for (const child of node.children) {
-      if (child.type === 'link') {
+      if (child.type === 'link' || child.type === 'linkReference') {
         out.push(child); // do not recurse into existing links (avoid nested anchors)
       } else if (child.type === 'text' && child.value.includes('[[')) {
         out.push(...splitWikiLinks(child.value, titleMap, onMissing));
