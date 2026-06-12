@@ -95,3 +95,16 @@ in the project skill `.claude/skills/writing-blog-post/SKILL.md`. In short:
 
 Pushing to `master` triggers `.github/workflows/deploy.yml` (`withastro/action`
 on Node 22) → GitHub Pages. No manual step needed.
+
+## License
+
+This repository is **dual-licensed**:
+
+| Part | License |
+|---|---|
+| **Site source code** (everything except `src/content/`) | [MIT](./LICENSE) |
+| **Articles & guides** (`src/content/`) — text and original diagrams | [CC BY 4.0](./LICENSE-CONTENT.md) |
+
+Reuse the code freely under MIT; share or adapt the writing under CC BY 4.0 with
+attribution. Quoted book material, the MBTI questionnaire, and other third-party
+assets remain their owners' and are covered by neither license.
