@@ -5,10 +5,15 @@ export interface MdastNode {
   children?: MdastNode[];
 }
 
+export interface WikiLinkContext {
+  titleMap: Record<string, string>;
+  headingsMap?: Record<string, string[]>;
+  currentSlug?: string | null;
+  onWarn?: (message: string) => void;
+}
+
 export function wikiLinkRegex(): RegExp;
-export function splitWikiLinks(
-  value: string,
-  titleMap: Record<string, string>,
-  onMissing?: (slug: string) => void
-): MdastNode[];
+export function slugifyHeading(text: string): string;
+export function parseTarget(raw: string): { slug: string; section: string | undefined };
+export function splitWikiLinks(value: string, ctx: WikiLinkContext): MdastNode[];
 export function extractTargets(body: string): string[];
