@@ -9,6 +9,9 @@ const BLOG_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', 'content', 
 // Heading anchors for one post body, matching Astro's github-slugger ids.
 // Skips the front-matter block and fenced code blocks; one slugger per file
 // reproduces Astro's per-document de-duplication.
+// NOTE: headings are parsed from raw source, not the mdast tree, so a heading
+// containing inline markdown (links/images/HTML) would slug differently from
+// Astro's id. No current post does this; revisit if one ever does.
 function parseHeadings(raw) {
   const slugger = new GithubSlugger();
   const anchors = [];
@@ -16,17 +19,19 @@ function parseHeadings(raw) {
   let inFrontMatter = false;
   let inFence = false;
   let fenceChar = '';
+  let fenceLen = 0;
   for (let i = 0; i < lines.length; i++) {
     const line = lines[i];
     if (i === 0 && line.trim() === '---') { inFrontMatter = true; continue; }
     if (inFrontMatter) { if (line.trim() === '---') inFrontMatter = false; continue; }
-    const fence = line.match(/^(```+|~~~+)/);
-    if (fence) {
-      if (!inFence) { inFence = true; fenceChar = fence[1][0]; }
-      else if (line.trim().startsWith(fenceChar)) { inFence = false; }
+    if (inFence) {
+      // A closing fence is only fence chars (same char, length >= opener).
+      const close = line.match(/^(`{3,}|~{3,})\s*$/);
+      if (close && close[1][0] === fenceChar && close[1].length >= fenceLen) inFence = false;
       continue;
     }
-    if (inFence) continue;
+    const open = line.match(/^(`{3,}|~{3,})/);
+    if (open) { inFence = true; fenceChar = open[1][0]; fenceLen = open[1].length; continue; }
     const h = line.match(/^#{1,6}\s+(.+?)\s*#*\s*$/);
     if (h) anchors.push(slugger.slug(h[1]));
   }
