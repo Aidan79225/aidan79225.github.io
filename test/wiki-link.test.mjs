@@ -91,3 +91,13 @@ test('parseTarget splits slug and section', () => {
   assert.deepEqual(parseTarget('btl-5'), { slug: 'btl-5', section: undefined });
   assert.deepEqual(parseTarget('#反思'), { slug: '', section: '反思' });
 });
+
+test('extractTargets returns an empty array for an empty body', () => {
+  assert.deepEqual(extractTargets(''), []);
+});
+
+test('[[slug#]] with an empty section degrades to a whole-post link', () => {
+  assert.deepEqual(splitWikiLinks('[[btl-3#]]', ctx()), [
+    { type: 'link', url: '/blog/btl-3/', children: [{ type: 'text', value: '領導力 - 成長模型' }] },
+  ]);
+});
