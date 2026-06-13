@@ -1,13 +1,41 @@
 import { readdirSync, readFileSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
-import { dirname, join } from 'node:path';
+import { dirname, join, basename } from 'node:path';
+import GithubSlugger from 'github-slugger';
 import { splitWikiLinks } from './wiki-link.mjs';
 
 const BLOG_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', 'content', 'blog');
 
-// Read each post's front-matter title once, keyed by slug (filename without .md).
-function buildTitleMap() {
-  const map = {};
+// Heading anchors for one post body, matching Astro's github-slugger ids.
+// Skips the front-matter block and fenced code blocks; one slugger per file
+// reproduces Astro's per-document de-duplication.
+function parseHeadings(raw) {
+  const slugger = new GithubSlugger();
+  const anchors = [];
+  const lines = raw.split(/\r?\n/);
+  let inFrontMatter = false;
+  let inFence = false;
+  let fenceChar = '';
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i];
+    if (i === 0 && line.trim() === '---') { inFrontMatter = true; continue; }
+    if (inFrontMatter) { if (line.trim() === '---') inFrontMatter = false; continue; }
+    const fence = line.match(/^(```+|~~~+)/);
+    if (fence) {
+      if (!inFence) { inFence = true; fenceChar = fence[1][0]; }
+      else if (line.trim().startsWith(fenceChar)) { inFence = false; }
+      continue;
+    }
+    if (inFence) continue;
+    const h = line.match(/^#{1,6}\s+(.+?)\s*#*\s*$/);
+    if (h) anchors.push(slugger.slug(h[1]));
+  }
+  return anchors;
+}
+
+function buildMaps() {
+  const titleMap = {};
+  const headingsMap = {};
   for (const file of readdirSync(BLOG_DIR)) {
     if (!file.endsWith('.md')) continue;
     const slug = file.replace(/\.md$/, '');
@@ -15,33 +43,39 @@ function buildTitleMap() {
     const fm = raw.match(/^---\r?\n([\s\S]*?)\r?\n---/);
     const block = fm ? fm[1] : raw;
     const t = block.match(/^title:\s*["']?(.+?)["']?\s*$/m);
-    map[slug] = t ? t[1] : slug;
+    titleMap[slug] = t ? t[1] : slug;
+    headingsMap[slug] = parseHeadings(raw);
   }
-  return map;
+  return { titleMap, headingsMap };
 }
 
-let cachedMap = null; // built once per process; restart `astro dev` after adding a post
+let cachedMaps = null; // built once per process; restart `astro dev` after adding a post
 
 export default function remarkWikiLink() {
-  if (!cachedMap) cachedMap = buildTitleMap();
-  const titleMap = cachedMap;
-  const onMissing = (slug) => console.warn(`[wiki-link] unknown slug: [[${slug}]]`);
+  if (!cachedMaps) cachedMaps = buildMaps();
+  const { titleMap, headingsMap } = cachedMaps;
+  const onWarn = (msg) => console.warn(`[wiki-link] ${msg}`);
 
-  const walk = (node) => {
-    if (!Array.isArray(node.children)) return;
-    const out = [];
-    for (const child of node.children) {
-      if (child.type === 'link' || child.type === 'linkReference') {
-        out.push(child); // do not recurse into existing links (avoid nested anchors)
-      } else if (child.type === 'text' && child.value.includes('[[')) {
-        out.push(...splitWikiLinks(child.value, titleMap, onMissing));
-      } else {
-        walk(child);
-        out.push(child);
+  return (tree, file) => {
+    const path = file?.path || (file?.history && file.history[0]) || '';
+    const currentSlug = path ? basename(path).replace(/\.md$/, '') : null;
+    const ctx = { titleMap, headingsMap, currentSlug, onWarn };
+
+    const walk = (node) => {
+      if (!Array.isArray(node.children)) return;
+      const out = [];
+      for (const child of node.children) {
+        if (child.type === 'link' || child.type === 'linkReference') {
+          out.push(child); // do not recurse into existing links (avoid nested anchors)
+        } else if (child.type === 'text' && child.value.includes('[[')) {
+          out.push(...splitWikiLinks(child.value, ctx));
+        } else {
+          walk(child);
+          out.push(child);
+        }
       }
-    }
-    node.children = out;
+      node.children = out;
+    };
+    walk(tree);
   };
-
-  return (tree) => walk(tree);
 }
