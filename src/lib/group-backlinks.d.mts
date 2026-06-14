@@ -1,9 +1,7 @@
 import type { CollectionEntry } from 'astro:content';
+import type { BacklinkRef } from './backlinks';
 
-export interface BacklinkRef {
-  post: CollectionEntry<'blog'>;
-  anchor: string | null;
-}
+export type { BacklinkRef };
 
 export interface BacklinkGroup {
   label: string;
