@@ -85,7 +85,7 @@ export function extractLinks(body) {
   while ((m = re.exec(body ?? '')) !== null) {
     const { slug, section } = parseTarget(m[1].trim());
     if (slug === '') continue;
-    const sectionText = section !== undefined ? section.trim() : '';
+    const sectionText = section !== undefined ? section.trim() : undefined;
     links.push({ slug, anchor: sectionText ? slugifyHeading(sectionText) : null });
   }
   return links;

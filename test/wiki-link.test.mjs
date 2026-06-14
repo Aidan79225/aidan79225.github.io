@@ -116,3 +116,7 @@ test('extractLinks returns slug + anchor, ignoring same-page links', () => {
 test('extractLinks returns an empty array for an empty body', () => {
   assert.deepEqual(extractLinks(''), []);
 });
+
+test('extractLinks treats [[slug#]] (empty section) as a whole-post link', () => {
+  assert.deepEqual(extractLinks('[[btl-3#]]'), [{ slug: 'btl-3', anchor: null }]);
+});
