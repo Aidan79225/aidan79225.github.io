@@ -6,7 +6,7 @@ const LAYOUT_OPTS = { startDeg: 0, stepDeg: 18, radius: HOLE_R, cx: CX, cy: CY }
 
 export default function RotaryDial({ symbols, onDial }) {
   const svgRef = useRef(null);
-  const drag = useRef(null);                 // { grabDeg, maxRot, value }
+  const drag = useRef(null);                 // { grabDeg, maxRot, value, lastRotation }
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
 
@@ -14,32 +14,33 @@ export default function RotaryDial({ symbols, onDial }) {
 
   const svgAngle = (e) => {
     const rect = svgRef.current.getBoundingClientRect();
-    const scale = 320 / rect.width;
-    const px = (e.clientX - rect.left) * scale;
-    const py = (e.clientY - rect.top) * scale;
+    const px = (e.clientX - rect.left) * (320 / rect.width);
+    const py = (e.clientY - rect.top) * (320 / rect.height);
     return pointerAngle(CX, CY, px, py);
   };
 
   const onPointerDown = (e, sym, angleDeg) => {
     if (spinning) return;
     e.currentTarget.setPointerCapture(e.pointerId);
-    drag.current = { grabDeg: angleDeg, maxRot: holeMaxRotation(angleDeg, FINGER_STOP_DEG), value: sym.value };
+    drag.current = { grabDeg: angleDeg, maxRot: holeMaxRotation(angleDeg, FINGER_STOP_DEG), value: sym.value, lastRotation: 0 };
     setRotation(0);
   };
 
   const onPointerMove = (e) => {
     if (!drag.current) return;
     const { grabDeg, maxRot } = drag.current;
-    setRotation(rotationFor(grabDeg, svgAngle(e), maxRot));
+    const r = rotationFor(grabDeg, svgAngle(e), maxRot);
+    drag.current.lastRotation = r;
+    setRotation(r);
   };
 
   const onPointerUp = () => {
     if (!drag.current) return;
-    const { maxRot, value } = drag.current;
-    const registered = reachedStop(rotation, maxRot);
+    const { maxRot, value, lastRotation } = drag.current;
+    const registered = reachedStop(lastRotation, maxRot);
     drag.current = null;
-    if (rotation > 0) {                       // only animate (and arm onTransitionEnd) if we actually moved
-      setSpinning(true);                      // CSS transition animates rotation → 0
+    if (lastRotation > 0) {                   // only animate if we actually moved (else onTransitionEnd never fires)
+      setSpinning(true);
       setRotation(0);
     }
     if (registered) onDial(value);
@@ -58,7 +59,7 @@ export default function RotaryDial({ symbols, onDial }) {
       <g
         className={spinning ? 'rc-dial-rotor rc-spinning' : 'rc-dial-rotor'}
         style={{ transform: `rotate(${rotation}deg)`, transformOrigin: `${CX}px ${CY}px` }}
-        onTransitionEnd={() => setSpinning(false)}
+        onTransitionEnd={(e) => { if (e.target === e.currentTarget) setSpinning(false); }}
       >
         {holes.map((h, i) => (
           <g
