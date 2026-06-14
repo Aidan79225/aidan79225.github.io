@@ -58,3 +58,13 @@ test('a post linking both whole-post and a stale section appears once in 整篇�
     { label: '整篇文章', sources: [post('a', 'A')] },
   ]);
 });
+
+test('a post linking both a section and the whole post appears only under the section', () => {
+  const backlinks = [
+    { post: post('a', 'A'), anchor: '反思' },
+    { post: post('a', 'A'), anchor: null },
+  ];
+  assert.deepEqual(groupBySection(backlinks, headings), [
+    { label: '反思', sources: [post('a', 'A')] },
+  ]);
+});

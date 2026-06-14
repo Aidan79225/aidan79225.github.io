@@ -86,7 +86,7 @@ export function extractLinks(body) {
     const { slug, section } = parseTarget(m[1].trim());
     if (slug === '') continue;
     const sectionText = section !== undefined ? section.trim() : undefined;
-    links.push({ slug, anchor: sectionText ? slugifyHeading(sectionText) : null });
+    links.push({ slug, anchor: sectionText ? slugifyHeading(sectionText) || null : null });
   }
   return links;
 }
