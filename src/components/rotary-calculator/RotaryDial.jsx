@@ -1,8 +1,9 @@
 import { useRef, useState } from 'react';
 import { holeLayout, pointerAngle, holeMaxRotation, rotationFor, reachedStop } from '../../lib/dial-geometry.mjs';
+import { DIAL_GEOMETRY } from './dial-config.mjs';
 
-const CX = 160, CY = 160, HOLE_R = 122, FINGER_STOP_DEG = 330;
-const LAYOUT_OPTS = { startDeg: 0, stepDeg: 18, radius: HOLE_R, cx: CX, cy: CY };
+const { cx: CX, cy: CY, holeRadius: HOLE_R, stopRadius: STOP_R, startDeg, stepDeg, fingerStopDeg: FINGER_STOP_DEG } = DIAL_GEOMETRY;
+const LAYOUT_OPTS = { startDeg, stepDeg, radius: HOLE_R, cx: CX, cy: CY };
 
 export default function RotaryDial({ symbols, onDial }) {
   const svgRef = useRef(null);
@@ -11,6 +12,7 @@ export default function RotaryDial({ symbols, onDial }) {
   const [spinning, setSpinning] = useState(false);
 
   const holes = holeLayout(symbols.map((s) => s.label), LAYOUT_OPTS);
+  const stop = holeLayout(['stop'], { startDeg: FINGER_STOP_DEG, stepDeg: 0, radius: STOP_R, cx: CX, cy: CY })[0];
 
   const svgAngle = (e) => {
     const rect = svgRef.current.getBoundingClientRect();
@@ -22,7 +24,7 @@ export default function RotaryDial({ symbols, onDial }) {
   const onPointerDown = (e, sym, angleDeg) => {
     if (spinning) return;
     e.currentTarget.setPointerCapture(e.pointerId);
-    drag.current = { grabDeg: angleDeg, maxRot: holeMaxRotation(angleDeg, FINGER_STOP_DEG), value: sym.value, lastRotation: 0 };
+    drag.current = { grabDeg: angleDeg, maxRot: holeMaxRotation(angleDeg, FINGER_STOP_DEG), value: sym.value, lastRotation: 0, peak: 0 };
     setRotation(0);
   };
 
@@ -31,15 +33,16 @@ export default function RotaryDial({ symbols, onDial }) {
     const { grabDeg, maxRot } = drag.current;
     const r = rotationFor(grabDeg, svgAngle(e), maxRot);
     drag.current.lastRotation = r;
+    if (r > drag.current.peak) drag.current.peak = r;
     setRotation(r);
   };
 
   const onPointerUp = () => {
     if (!drag.current) return;
-    const { maxRot, value, lastRotation } = drag.current;
-    const registered = reachedStop(lastRotation, maxRot);
+    const { maxRot, value, peak } = drag.current;
+    const registered = reachedStop(peak, maxRot);
     drag.current = null;
-    if (lastRotation > 0) {                   // only animate if we actually moved (else onTransitionEnd never fires)
+    if (peak > 0) {                           // only animate if we actually moved (else onTransitionEnd never fires)
       setSpinning(true);
       setRotation(0);
     }
@@ -75,7 +78,7 @@ export default function RotaryDial({ symbols, onDial }) {
         ))}
       </g>
       <circle cx={CX} cy={CY} r="46" className="rc-dial-hub" />
-      <rect x={CX + 96} y={CY + 70} width="26" height="16" rx="3" className="rc-finger-stop" />
+      <circle cx={stop.x} cy={stop.y} r="11" className="rc-finger-stop" />
     </svg>
   );
 }
