@@ -34,3 +34,23 @@
   text-shadow: 0 0 4px #ff7a00; pointer-events: none;
 }
 .rc-finger-stop { fill: #c0392b; }
+
+.rc-phone { display: flex; flex-direction: column; align-items: center; }
+.rc-handset {
+  display: flex; align-items: center; width: 19rem; max-width: 88vw; height: 2.6rem;
+  margin-bottom: -0.8rem; z-index: 2;
+}
+.rc-earpiece {
+  width: 3.2rem; height: 2.6rem; border-radius: 1.3rem / 1.1rem;
+  background: linear-gradient(160deg, #2a2a30, #0c0c10);
+  border: 1px solid #3a3a42;
+}
+.rc-handle { flex: 1; height: 1.2rem; background: #0e0e12; border: 1px solid #3a3a42; border-radius: 0.6rem; }
+.rc-body {
+  background: radial-gradient(circle at 40% 25%, #26262c, #111114);
+  border: 2px solid #3a3a42; border-radius: 1.5rem 1.5rem 2rem 2rem;
+  padding: 1.6rem 1.4rem 2rem; display: flex; flex-direction: column;
+  align-items: center; gap: 1.1rem; box-shadow: 0 10px 28px rgba(0,0,0,.5);
+}
+.rc-display-strip { width: 100%; display: flex; justify-content: center; }
+.rc-dial-mount { display: flex; justify-content: center; }
