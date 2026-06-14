@@ -1,10 +1,12 @@
 .rc-stage {
   display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
   justify-content: center;
+  align-items: flex-start;
+  gap: 1.5rem;
   padding: 1.5rem 0;
 }
-
-.rc-stage { flex-direction: column; align-items: center; gap: 1rem; }
 
 .rc-nixie {
   background: #000;
@@ -36,16 +38,14 @@
 .rc-finger-stop { fill: #c0392b; }
 
 .rc-phone { display: flex; flex-direction: column; align-items: center; }
-.rc-handset {
-  display: flex; align-items: center; width: 19rem; max-width: 88vw; height: 2.6rem;
-  margin-bottom: -0.8rem; z-index: 2;
+.rc-handset { width: 17rem; max-width: 84vw; display: block; margin-bottom: -0.6rem; }
+.rc-handset-handle {
+  fill: none; stroke: #1a1a1f; stroke-width: 24; stroke-linecap: round;
 }
-.rc-earpiece {
-  width: 3.2rem; height: 2.6rem; border-radius: 1.3rem / 1.1rem;
-  background: linear-gradient(160deg, #2a2a30, #0c0c10);
-  border: 1px solid #3a3a42;
+.rc-handset-bulb {
+  fill: #1a1a1f; stroke: #3a3a42; stroke-width: 2;
 }
-.rc-handle { flex: 1; height: 1.2rem; background: #0e0e12; border: 1px solid #3a3a42; border-radius: 0.6rem; }
+.rc-cradle { fill: #0c0c10; stroke: #3a3a42; stroke-width: 1.5; }
 .rc-body {
   background: radial-gradient(circle at 40% 25%, #26262c, #111114);
   border: 2px solid #3a3a42; border-radius: 1.5rem 1.5rem 2rem 2rem;
@@ -54,3 +54,26 @@
 }
 .rc-display-strip { width: 100%; display: flex; justify-content: center; }
 .rc-dial-mount { display: flex; justify-content: center; }
+
+/* History log */
+.rc-history {
+  width: 15rem; max-width: 90vw;
+  background: #0c0b0a; border: 1px solid #2a2118; border-radius: 8px;
+  padding: 0.75rem 1rem; max-height: 30rem; overflow-y: auto;
+}
+.rc-history-title {
+  margin: 0 0 0.5rem; font-size: 0.8rem; letter-spacing: 0.25em;
+  text-transform: uppercase; color: #b5703a; font-weight: bold;
+}
+.rc-history-empty { margin: 0; color: #7a5a3a; font-size: 0.85rem; }
+.rc-history-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.45rem; }
+.rc-history-item {
+  display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.35rem;
+  font-family: 'Courier New', monospace; font-size: 0.95rem;
+  padding-bottom: 0.4rem; border-bottom: 1px dashed #2a2118;
+}
+.rc-history-expr { color: #c98a4a; word-break: break-all; }
+.rc-history-eq { color: #7a5a3a; }
+.rc-history-result {
+  margin-left: auto; color: #ff9a3c; font-weight: bold; text-shadow: 0 0 5px #ff7a00;
+}
