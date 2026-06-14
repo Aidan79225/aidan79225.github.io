@@ -1,15 +1,19 @@
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import { holeLayout, pointerAngle, holeMaxRotation, rotationFor, reachedStop } from '../../lib/dial-geometry.mjs';
 import { DIAL_GEOMETRY } from './dial-config.mjs';
 
 const { cx: CX, cy: CY, holeRadius: HOLE_R, stopRadius: STOP_R, startDeg, stepDeg, fingerStopDeg: FINGER_STOP_DEG } = DIAL_GEOMETRY;
 const LAYOUT_OPTS = { startDeg, stepDeg, radius: HOLE_R, cx: CX, cy: CY };
+const SPIN_MS = 500;                          // keep in sync with the CSS transition
 
 export default function RotaryDial({ symbols, onDial }) {
   const svgRef = useRef(null);
-  const drag = useRef(null);                 // { grabDeg, maxRot, value, lastRotation }
+  const drag = useRef(null);                 // { grabDeg, maxRot, value, lastRotation, peak }
+  const spinTimer = useRef(null);            // fallback that always clears `spinning`
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
+
+  useEffect(() => () => clearTimeout(spinTimer.current), []);
 
   const holes = holeLayout(symbols.map((s) => s.label), LAYOUT_OPTS);
   const stop = holeLayout(['stop'], { startDeg: FINGER_STOP_DEG, stepDeg: 0, radius: STOP_R, cx: CX, cy: CY })[0];
@@ -22,7 +26,10 @@ export default function RotaryDial({ symbols, onDial }) {
   };
 
   const onPointerDown = (e, sym, angleDeg) => {
-    if (spinning) return;
+    // Always responsive: a new grab cancels any in-progress spin-back so the
+    // dial can never get stuck waiting on a transition that didn't fire.
+    clearTimeout(spinTimer.current);
+    setSpinning(false);
     e.currentTarget.setPointerCapture(e.pointerId);
     drag.current = { grabDeg: angleDeg, maxRot: holeMaxRotation(angleDeg, FINGER_STOP_DEG), value: sym.value, lastRotation: 0, peak: 0 };
     setRotation(0);
@@ -42,9 +49,11 @@ export default function RotaryDial({ symbols, onDial }) {
     const { maxRot, value, peak } = drag.current;
     const registered = reachedStop(peak, maxRot);
     drag.current = null;
-    if (peak > 0) {                           // only animate if we actually moved (else onTransitionEnd never fires)
+    if (peak > 0) {                           // animate the spin-back from where we are
       setSpinning(true);
       setRotation(0);
+      clearTimeout(spinTimer.current);        // fallback in case onTransitionEnd never fires
+      spinTimer.current = setTimeout(() => setSpinning(false), SPIN_MS + 50);
     }
     if (registered) onDial(value);
   };
@@ -62,7 +71,7 @@ export default function RotaryDial({ symbols, onDial }) {
       <g
         className={spinning ? 'rc-dial-rotor rc-spinning' : 'rc-dial-rotor'}
         style={{ transform: `rotate(${rotation}deg)`, transformOrigin: `${CX}px ${CY}px` }}
-        onTransitionEnd={(e) => { if (e.target === e.currentTarget) setSpinning(false); }}
+        onTransitionEnd={(e) => { if (e.target === e.currentTarget) { clearTimeout(spinTimer.current); setSpinning(false); } }}
       >
         {holes.map((h, i) => (
           <g
