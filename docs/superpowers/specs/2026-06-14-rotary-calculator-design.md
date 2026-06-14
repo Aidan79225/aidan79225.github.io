@@ -15,7 +15,9 @@ and the dial.
 One dial carries **all 17 symbols** — `0 1 2 3 4 5 6 7 8 9 . + − × ÷ = C` — and is
 operated with **full skeuomorphic drag**: grab a hole, drag clockwise to the
 finger-stop, release; the dial spins itself back, and the symbol registers when
-the dial returns home. The calculator does **4-function math with decimals**.
+the dial returns home. The calculator does **4-function math with decimals**,
+building up the full expression and evaluating it **only on `=`** with standard
+operator precedence (`2 + 3 × 4 =` → `14`).
 
 This is the site's first React-island tool (existing tools are vanilla-JS
 `.astro` pages). React 19 + `@astrojs/react` are already configured.
@@ -30,7 +32,7 @@ This is the site's first React-island tool (existing tools are vanilla-JS
 | Aesthetic / display | **Dark retro-tech** with a glowing-orange **nixie** readout |
 | Form factor | **Whole desk telephone** — handset on cradle + dial on the body |
 | Display placement | **Nixie strip on the phone body, above the dial** |
-| Evaluation model | **Immediate-execution** (`2 + 3 × 4 =` → `20`, like a pocket calculator) |
+| Evaluation model | **Expression with precedence, evaluated on `=`** (`2 + 3 × 4 =` → `14`; `×` `÷` bind before `+` `−`) |
 
 ## Architecture
 
@@ -38,22 +40,32 @@ A small set of isolated units, each with one job:
 
 ### `src/lib/calculator.mjs` — pure math engine
 - No React, no DOM. The TDD target.
-- Immediate-execution 4-function state machine over single tokens.
+- Builds up a **full expression** as tokens are entered and only **evaluates on
+  `=`**, applying standard precedence (`×` `÷` before `+` `−`), left-to-right
+  within the same precedence level.
 - **API:** `initialState()` and `reduce(state, token) → state`, where
   `token ∈ { '0'…'9', '.', '+', '-', '×', '÷', '=', 'C' }`.
-- **State:** current entry string, accumulator, pending operator,
-  `display` string, `justEvaluated` flag, `error` flag.
+- **State:** the expression so far (list of numbers/operators), the
+  current entry string, a `display` string, a `justEvaluated` flag, and an
+  `error` flag.
 - **Semantics:**
   - Digits append to the current entry; leading-zero normalized.
   - `.` is ignored if the current entry already has one.
-  - An operator commits the current entry and stores the pending op; pressing a
-    second operator before entering a number **replaces** the pending op.
-  - `=` applies the pending op to (accumulator, current entry) and shows the result.
+  - An operator commits the current entry into the expression and appends the
+    operator; pressing a second operator before entering a number **replaces**
+    the trailing operator. **No arithmetic happens here** — the expression just
+    grows.
+  - `=` evaluates the **entire** expression with precedence and shows the result.
+    Evaluation happens *only* on `=`.
+  - After `=`: a digit starts a fresh expression; an operator continues from the
+    result.
   - `C` resets to `initialState()`.
-  - Divide-by-zero → `error` state, `display = "Error"`; cleared by `C` or by
-    starting a new number.
+  - Divide-by-zero (detected at `=`) → `error` state, `display = "Error"`;
+    cleared by `C` or by starting a new number.
   - Overlong results are truncated to the display width, falling back to
     exponential notation when they don't fit.
+- **Display while building:** the readout shows the expression as it grows
+  (e.g. `2+3×4`), then the result (`14`) after `=`.
 
 ### `src/lib/dial-geometry.mjs` — pure geometry helpers
 - No DOM. Unit-tested.
@@ -124,7 +136,9 @@ drag hole → release at finger-stop
 
 - **TDD (`node --test test/**/*.mjs`, the repo convention):**
   - `calculator.mjs`: digit & decimal entry, leading-zero normalization, each of
-    `+ − × ÷`, operator chaining under immediate-execution, `=`, `C`,
+    `+ − × ÷`, **precedence** (`2+3×4=` → `14`, `×`/`÷` before `+`/`−`),
+    left-to-right within a level, evaluation happening **only** on `=`,
+    continue-from-result vs. fresh-start after `=`, `C`,
     divide-by-zero → `Error`, double-`.` guard, operator replacement, overflow.
   - `dial-geometry.mjs`: hole layout angles, pointer→angle, clamped rotation,
     `reachedStop` threshold (reaches vs. falls short).
