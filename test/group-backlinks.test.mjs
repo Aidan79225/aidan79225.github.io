@@ -38,3 +38,23 @@ test('handles missing headings (everything folds into 整篇文章)', () => {
     { label: '整篇文章', sources: [post('a', 'A')] },
   ]);
 });
+
+test('multiple distinct posts under the same section are all listed', () => {
+  const backlinks = [
+    { post: post('a', 'A'), anchor: '反思' },
+    { post: post('b', 'B'), anchor: '反思' },
+  ];
+  assert.deepEqual(groupBySection(backlinks, headings), [
+    { label: '反思', sources: [post('a', 'A'), post('b', 'B')] },
+  ]);
+});
+
+test('a post linking both whole-post and a stale section appears once in 整篇文章', () => {
+  const backlinks = [
+    { post: post('a', 'A'), anchor: null },
+    { post: post('a', 'A'), anchor: '已刪除的段' },
+  ];
+  assert.deepEqual(groupBySection(backlinks, headings), [
+    { label: '整篇文章', sources: [post('a', 'A')] },
+  ]);
+});
