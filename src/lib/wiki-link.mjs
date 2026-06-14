@@ -76,14 +76,22 @@ export function splitWikiLinks(value, ctx) {
   return nodes;
 }
 
-// Collect referenced base slugs (section stripped; same-page links ignored).
-export function extractTargets(body) {
+// Collect referenced links as { slug, anchor }. anchor = slugified section, or
+// null for a whole-post link. Same-page links (empty slug) are ignored.
+export function extractLinks(body) {
   const re = wikiLinkRegex();
-  const targets = [];
+  const links = [];
   let m;
   while ((m = re.exec(body ?? '')) !== null) {
-    const { slug } = parseTarget(m[1].trim());
-    if (slug !== '') targets.push(slug);
+    const { slug, section } = parseTarget(m[1].trim());
+    if (slug === '') continue;
+    const sectionText = section !== undefined ? section.trim() : '';
+    links.push({ slug, anchor: sectionText ? slugifyHeading(sectionText) : null });
   }
-  return targets;
+  return links;
+}
+
+// Collect referenced base slugs (section stripped; same-page links ignored).
+export function extractTargets(body) {
+  return extractLinks(body).map((l) => l.slug);
 }

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { splitWikiLinks, extractTargets, slugifyHeading, parseTarget } from '../src/lib/wiki-link.mjs';
+import { splitWikiLinks, extractTargets, slugifyHeading, parseTarget, extractLinks } from '../src/lib/wiki-link.mjs';
 
 const titleMap = { 'btl-3': '領導力 - 成長模型', 'btl-5': '領導力 - 創新的三大障礙' };
 const headingsMap = { 'btl-5': ['障礙一看不到自己', '反思'], 'btl-6': ['用日記看見自己'] };
@@ -100,4 +100,19 @@ test('[[slug#]] with an empty section degrades to a whole-post link', () => {
   assert.deepEqual(splitWikiLinks('[[btl-3#]]', ctx()), [
     { type: 'link', url: '/blog/btl-3/', children: [{ type: 'text', value: '領導力 - 成長模型' }] },
   ]);
+});
+
+test('extractLinks returns slug + anchor, ignoring same-page links', () => {
+  assert.deepEqual(
+    extractLinks('[[btl-5]] [[btl-5#障礙一：看不到自己]] [[#反思]] [[btl-6|z]]'),
+    [
+      { slug: 'btl-5', anchor: null },
+      { slug: 'btl-5', anchor: '障礙一看不到自己' },
+      { slug: 'btl-6', anchor: null },
+    ]
+  );
+});
+
+test('extractLinks returns an empty array for an empty body', () => {
+  assert.deepEqual(extractLinks(''), []);
 });
