@@ -26,8 +26,8 @@ export function holeMaxRotation(holeAngleDeg, fingerStopDeg) {
 export function rotationFor(grabDeg, pointerDeg, maxRot, slack = 30) {
   const delta = (pointerDeg - grabDeg + 360) % 360;
   if (delta <= maxRot) return delta;
-  if (delta >= 360 - slack) return 0; // counterclockwise jitter
-  return maxRot;                       // dragged past the stop
+  if (maxRot < 360 - slack && delta >= 360 - slack) return 0; // CCW jitter only when windows don't overlap
+  return maxRot;                                              // dragged past the stop
 }
 
 export function reachedStop(rotation, maxRot, threshold = 0.9) {

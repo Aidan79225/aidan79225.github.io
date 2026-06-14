@@ -39,6 +39,15 @@ test('rotationFor treats counterclockwise jitter as 0', () => {
   assert.equal(rotationFor(0, 340, 300), 0);
 });
 
+test('rotationFor pins a past-stop drag even when maxRot is large', () => {
+  // maxRot=335 (> 360-slack=330): delta=340 is past the stop, must pin to 335, not 0
+  assert.equal(rotationFor(0, 340, 335), 335);
+});
+
+test('rotationFor still treats CCW jitter as 0 for normal-sized maxRot', () => {
+  assert.equal(rotationFor(0, 355, 300), 0);
+});
+
 test('reachedStop is true only near the max rotation', () => {
   assert.equal(reachedStop(300, 300), true);
   assert.equal(reachedStop(100, 300), false);
