@@ -32,6 +32,7 @@ This blog is **Aidan's personal brand / professional image** (a Backend Lead's t
 | `seriesOrder` | Order within the series (1, 2, 3…). |
 | `comments` | Default `true`. |
 | `commentsIssue` | Only to reuse an existing GitHub issue thread (e.g. `lottery` → 1). New posts omit it. |
+| `draft` | Default `false`. Set `draft: true` to keep a post out of the **built** site (listings, `/blog/<slug>/`, tags, RSS, backlinks) while still previewing it under `npm run dev`. Filtering lives in `src/lib/posts.ts` (`getPublishedPosts()`); flip to `false` (or remove) to publish. |
 
 The series box, tag chips, and prev/next are generated automatically by `src/layouts/PostLayout.astro` — just fill front matter correctly.
 

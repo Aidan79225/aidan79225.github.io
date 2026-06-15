@@ -1,6 +1,6 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { getCollection } from 'astro:content';
+import { getPublishedPosts } from '../lib/posts';
 import BaseLayout from './BaseLayout.astro';
 import AuthorCard from '../components/AuthorCard.astro';
 import Comments from '../components/Comments.astro';
@@ -16,7 +16,7 @@ let seriesPosts: CollectionEntry<'blog'>[] = [];
 let prevPost: CollectionEntry<'blog'> | null = null;
 let nextPost: CollectionEntry<'blog'> | null = null;
 if (series) {
-  seriesPosts = (await getCollection('blog'))
+  seriesPosts = (await getPublishedPosts())
     .filter((p) => p.data.series === series)
     .sort((a, b) => (a.data.seriesOrder ?? 0) - (b.data.seriesOrder ?? 0));
   const idx = seriesPosts.findIndex((p) => p.id === post.id);
