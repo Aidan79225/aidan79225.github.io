@@ -69,6 +69,8 @@ docker compose up -d
 
 (背後還有 Postgres 當 metadata DB、Redis 當 Celery 的 broker —— 這份官方 compose 用的是 CeleryExecutor,所以多了 worker 與 redis。)
 
+> **踩到 `env file … /.env not found`?** 多半是 `docker-compose.yaml`、`.env`、`dags/` 沒放在**同一層**。`docker compose` 在當前資料夾找不到 compose 檔時會**往上層找**,並把專案目錄設成上層,連帶去上層找 `.env`(於是錯誤裡的路徑會是你上一層的目錄)。解法:確保三者都在同一個資料夾,而且**從那個資料夾**執行 `docker compose`。另外,`FERNET_KEY … not set` 只是警告 —— 官方 compose 寫死空字串,本機學習可忽略。
+
 ## 寫你的第一個 DAG
 
 在剛剛建的 `./dags/` 裡新增 `hello_airflow.py`:
