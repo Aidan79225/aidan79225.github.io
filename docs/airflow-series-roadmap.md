@@ -9,8 +9,8 @@
 
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
-| 1 | `airflow-intro` | Apache Airflow 是什麼?從 cron 到工作流程編排 | 定位、為何不只是 cron、核心概念、架構、心智轉變 | ✅ 已寫(draft) |
-| 2 | `airflow-first-dag` | 跑起第一個 Airflow | `docker compose` 起本機環境、寫第一個 DAG、Web UI 操作 | ⬜ 待寫 |
+| 1 | `airflow-intro` | Apache Airflow 是什麼?從 cron 到工作流程編排 | 定位、為何不只是 cron、核心概念、架構、心智轉變 | ✅ 已發布 |
+| 2 | `airflow-first-dag` | 跑起第一個 Airflow:Docker 環境 + 你的第一個 DAG | `docker compose` 起本機環境、寫第一個 DAG、Web UI 操作 | ✅ 已發布 |
 | 3 | `airflow-scheduling` | Airflow 排程的真相 | `schedule` / `start_date` / `catchup` / data interval / backfill | ⬜ 待寫 |
 | 4 | `airflow-xcom` | 任務之間怎麼傳資料 | XCom、TaskFlow 進階、`params` | ⬜ 待寫 |
 | 5 | `airflow-providers` | 連接外部系統 | Operators / Sensors / Hooks / Providers(DB、S3、HTTP…) | ⬜ 待寫 |
