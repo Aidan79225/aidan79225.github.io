@@ -8,7 +8,7 @@ tags:
 series: "Airflow 學習筆記"
 seriesOrder: 2
 comments: true
-draft: true
+draft: false
 ---
 [[airflow-intro|上一篇]]把 Airflow 的概念與架構講清楚了;這篇動手把它**在本機跑起來**,寫出第一個 DAG,並在 Web UI 上看著它跑完。目標很單純:從零到「我親眼看到自己的 DAG 在介面上變綠」。
 
