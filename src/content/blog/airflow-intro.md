@@ -6,6 +6,8 @@ tags:
   - airflow
   - data-engineering
   - orchestration
+series: "Airflow 學習筆記"
+seriesOrder: 1
 comments: true
 draft: true
 ---
