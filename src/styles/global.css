@@ -9,3 +9,9 @@
   --color-accent: #4f6df5;
   --color-line: #3a4154;
 }
+
+/* Declare the site as dark so mobile browsers' "auto dark theme" don't
+   re-invert our already-dark colours (which turned diagram SVGs white). */
+:root {
+  color-scheme: dark;
+}
