@@ -45,7 +45,7 @@
   <!-- ============================ ENGLISH ============================ -->
   <section id="en">
     <h1>Privacy Policy — SportRecorder</h1>
-    <p class="meta">Last updated: 10 June 2026</p>
+    <p class="meta">Last updated: 19 June 2026</p>
 
     <p>
       This Privacy Policy describes how the <strong>SportRecorder</strong> mobile application
@@ -58,7 +58,7 @@
       <li><strong>Eating records</strong> — the date and time of each eat event.</li>
       <li><strong>Photos</strong> — pictures you choose to take and attach to an eat record (stored as compressed images).</li>
       <li><strong>Location (GPS)</strong> — if you grant location permission, the approximate coordinates at the moment you create an eat record, attached to that record.</li>
-      <li><strong>Fasting settings</strong> — your selected fasting/eating schedule.</li>
+      <li><strong>Fasting &amp; reminder settings</strong> — your selected fasting/eating schedule, and your reminder preferences (lead time, quiet hours, and which reminders are enabled).</li>
     </ul>
 
     <h2>2. How the App uses this data</h2>
@@ -83,7 +83,17 @@
         record is still saved without a location.</li>
       <li><strong>Camera</strong> — when you choose "Add photo", the App opens your device's camera so you
         can take a picture for the record.</li>
+      <li><strong>Notifications</strong> (<code>POST_NOTIFICATIONS</code>, Android 13+) — used to show the
+        fasting reminders you turn on. It is optional; if you deny it, the App simply shows no reminders.</li>
+      <li><strong>Exact alarms</strong> (<code>SCHEDULE_EXACT_ALARM</code>, Android 12+) — used to deliver
+        your reminders at the scheduled time.</li>
+      <li><strong>Run after restart</strong> (<code>RECEIVE_BOOT_COMPLETED</code>) — used to restore your
+        scheduled reminders after the device reboots.</li>
     </ul>
+    <p>
+      Reminders are generated and scheduled entirely on your device from records and settings you have
+      already entered. Enabling them sends no data off the device.
+    </p>
 
     <h2>5. Data retention</h2>
     <p>
@@ -122,7 +132,7 @@
   <!-- ============================ 繁體中文 ============================ -->
   <section id="zh" lang="zh-Hant">
     <h1>隱私權政策 — SportRecorder</h1>
-    <p class="meta">最後更新日期:2026 年 6 月 10 日</p>
+    <p class="meta">最後更新日期:2026 年 6 月 19 日</p>
 
     <p>
       本隱私權政策說明 <strong>SportRecorder</strong> 行動應用程式(以下稱「本應用程式」「我們」)
@@ -135,7 +145,7 @@
       <li><strong>進食紀錄</strong> — 每次進食的日期與時間。</li>
       <li><strong>照片</strong> — 您選擇拍攝並附加到進食紀錄的相片(以壓縮後的影像儲存)。</li>
       <li><strong>位置(GPS)</strong> — 若您授予定位權限,則在您建立進食紀錄當下的概略座標,並附加於該筆紀錄。</li>
-      <li><strong>斷食設定</strong> — 您選擇的斷食/進食時間方案。</li>
+      <li><strong>斷食與提醒設定</strong> — 您選擇的斷食/進食時間方案,以及您的提醒偏好設定(提前時間、勿擾時段,以及各項提醒的開關)。</li>
     </ul>
 
     <h2>2. 資料的用途</h2>
@@ -156,7 +166,16 @@
       <li><strong>位置</strong>(<code>ACCESS_FINE_LOCATION</code> / <code>ACCESS_COARSE_LOCATION</code>)—
         僅用於為進食紀錄標記建立地點。此權限為選用;若您拒絕,紀錄仍會在沒有位置的情況下儲存。</li>
       <li><strong>相機</strong> — 當您點選「新增照片」時,本應用程式會開啟裝置相機讓您為紀錄拍照。</li>
+      <li><strong>通知</strong>(<code>POST_NOTIFICATIONS</code>,Android 13 以上)—
+        用於顯示您開啟的斷食提醒。此權限為選用;若您拒絕,本應用程式將不會顯示提醒。</li>
+      <li><strong>精準鬧鐘</strong>(<code>SCHEDULE_EXACT_ALARM</code>,Android 12 以上)—
+        用於在預定時間準時送出您的提醒。</li>
+      <li><strong>開機後執行</strong>(<code>RECEIVE_BOOT_COMPLETED</code>)—
+        用於在裝置重新開機後,重新排定您的提醒。</li>
     </ul>
+    <p>
+      提醒完全由您裝置上既有的紀錄與設定在本機產生與排程,開啟提醒不會將任何資料傳送至裝置以外。
+    </p>
 
     <h2>5. 資料保留期間</h2>
     <p>
