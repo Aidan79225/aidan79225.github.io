@@ -8,7 +8,7 @@ tags:
 series: "Airflow 學習筆記"
 seriesOrder: 3
 comments: true
-draft: false
+draft: true
 ---
 [[airflow-first-dag|上一篇]]我們把 DAG 跑起來了,還特別把 `catchup` 設成 `False`「保平安」。這篇就來拆解 Airflow 最反直覺、也最多人卡住的部分:**排程到底怎麼運作**。搞懂這一段,你才真的會用 Airflow。
 
