@@ -8,7 +8,7 @@ tags:
 series: "Airflow 學習筆記"
 seriesOrder: 4
 comments: true
-draft: true
+draft: false
 ---
 [[airflow-scheduling|上一篇]]講完排程,這篇處理一個很實際的問題:**一個 task 算出來的東西,怎麼交給下一個 task?** Airflow 的答案是 XCom,而 TaskFlow 把它包得幾乎看不見。順帶也講 params —— 在觸發時把參數塞進整個 DAG run。
 
