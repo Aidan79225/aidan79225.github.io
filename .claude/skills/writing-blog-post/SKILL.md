@@ -36,6 +36,16 @@ This blog is **Aidan's personal brand / professional image** (a Backend Lead's t
 
 The series box, tag chips, and prev/next are generated automatically by `src/layouts/PostLayout.astro` — just fill front matter correctly.
 
+## 台灣用詞 & 口吻
+寫這個部落格的文章用**繁體中文、台灣用語**,而且要像作者本人(口吻範本:`btl-*` 的「## 反思」)。
+
+**高頻台灣用詞**(完整對照表 + 修正記錄見 `docs/zh-tw-style-guide.md`):
+代碼→程式碼、變量→變數、對象→物件、默認→預設、緩存→快取、返回→回傳、運行→執行、實現→實作、調用→呼叫、用戶→使用者、項目→專案、配置→設定、**文件(指 file)→檔案**(陷阱:台灣「文件」=document)。
+
+**口吻**:第一人稱有主張、用真實例子/數字佐證、轉折用破折號「——」、結尾收一句判斷;避免 AI 腔(首先/其次/綜上所述/值得一提的是)。
+
+**收稿前掃描**:完成 draft、回報前,拿上面(及 doc A 區)的「避免詞」grep 一遍內文,抓到就改 —— 但 `支持 / 通過 / 優化` 這類依語境的別無腦替換。
+
 ## Technical gotchas
 - **No blank lines inside inline `<svg>` / raw HTML.** A blank line ends the markdown HTML block; the indented lines after become a code block (broke `btl-4`). Keep the whole `<svg>` contiguous.
 - Math: `$...$` / `$$...$$` (KaTeX is configured).
