@@ -8,7 +8,7 @@ tags:
 series: "Spark 學習筆記"
 seriesOrder: 3
 comments: true
-draft: true
+draft: false
 ---
 [[spark-intro|第一篇]]和 [[spark-dataframe|上一篇]]都丟下同一句結論:**Spark 的效能本體就是 shuffle**。這篇把它講透 —— 為什麼 shuffle 貴、它怎麼把作業切成 stage,以及四個實際能少 shuffle、跑更快的手段。
 

@@ -10,7 +10,7 @@
 |---|---|---|---|---|
 | 1 | `spark-intro` | Apache Spark 是什麼?一篇搞懂分散式資料處理 | 定位、pandas vs Spark、核心概念、惰性求值、shuffle | ✅ 已發布 |
 | 2 | `spark-dataframe` | Spark DataFrame 實戰:讀取、轉換、寫出與 Spark SQL | DataFrame vs RDD、讀寫、常用轉換、Spark SQL、narrow/wide | ✅ 已發布 |
-| 3 | `spark-shuffle` | Spark 效能的本體:shuffle 與調校 | narrow/wide 複習、broadcast join、partition 數、AQE、cache/persist | ✅ 已寫(draft) |
+| 3 | `spark-shuffle` | Spark 效能的本體:shuffle 與調校 | narrow/wide 複習、broadcast join、partition 數、AQE、cache/persist | ✅ 已發布 |
 | 4 | `spark-running` | 把 Spark 跑起來與部署 | 本機 PySpark、`spark-submit`、cluster 模式、managed(Databricks/EMR/Glue) | ⬜ 待寫 |
 | 5 | `spark-streaming` | Structured Streaming 入門(選配) | 串流即「無界表」、watermark、輸出模式 | ⬜ 選配 |
 | 6 | `spark-pitfalls` | 常見坑與除錯(選配) | data skew、OOM、small files、broadcast 上限 | ⬜ 選配 |
