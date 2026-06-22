@@ -8,7 +8,7 @@ tags:
 series: "Spark 學習筆記"
 seriesOrder: 2
 comments: true
-draft: true
+draft: false
 ---
 [[spark-intro|上一篇]]把 Spark 的概念講完了:Driver / Executor、分區、惰性求值、shuffle。這篇動手用 **DataFrame** 實際轉一份資料 —— 讀進來、清洗、彙總、寫出去,並看看 **Spark SQL** 怎麼和 DataFrame API 殊途同歸。
 
