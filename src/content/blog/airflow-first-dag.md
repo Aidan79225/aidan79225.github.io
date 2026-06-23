@@ -4,6 +4,7 @@ date: 2026-06-16
 category: tech
 tags:
   - airflow
+  - data-engineering
   - docker
 series: "Airflow 學習筆記"
 seriesOrder: 2

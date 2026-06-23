@@ -4,6 +4,7 @@ date: 2026-06-19
 category: tech
 tags:
   - airflow
+  - data-engineering
   - scheduling
 series: "Airflow 學習筆記"
 seriesOrder: 3

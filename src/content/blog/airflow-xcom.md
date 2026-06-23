@@ -4,6 +4,7 @@ date: 2026-06-21
 category: tech
 tags:
   - airflow
+  - data-engineering
   - xcom
 series: "Airflow 學習筆記"
 seriesOrder: 4
