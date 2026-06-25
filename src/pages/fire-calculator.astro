@@ -6,159 +6,304 @@ import '../styles/tools.css';
   <div class="tool-page">
     <h2>🔥 FIRE / LeanFIRE 計算機</h2>
     <p class="intro">
-      依據「4% 法則」估算財務自由所需資產，並推算依目前資產與每月投入，需要幾年達成目標。
+      台灣版退休規劃試算。以<strong>逐年現金流</strong>模擬退休後的支出與被動收入，並處理「橋接期」──
+      提早退休後到勞保／勞退起領前，全靠自有資產撐的那段。所有金額皆以<strong>今日購買力</strong>計算。
     </p>
 
+    <h3>基本參數</h3>
     <div class="fire-grid">
-      <label>
-        每月生活支出 (FIRE)
-        <input type="number" id="monthlyExpense" value="50000" min="0" step="1000">
-      </label>
-      <label>
-        每月生活支出 (LeanFIRE)
-        <input type="number" id="leanMonthlyExpense" value="30000" min="0" step="1000">
-      </label>
-      <label>
-        安全提領率 (%)
-        <input type="number" id="withdrawalRate" value="4" min="0.1" step="0.1">
-      </label>
-      <label>
-        目前可投資資產
-        <input type="number" id="currentAssets" value="1000000" min="0" step="10000">
-      </label>
-      <label>
-        每月投入金額
-        <input type="number" id="monthlyContribution" value="20000" min="0" step="1000">
-      </label>
-      <label>
-        預期年化報酬率 (%)
-        <input type="number" id="annualReturn" value="6" min="0" step="0.1">
-      </label>
-      <label>
-        通膨率 (%)
-        <input type="number" id="inflationRate" value="2" min="0" step="0.1">
-      </label>
+      <label>目前年齡<input type="number" id="currentAge" value="35" min="0" step="1"></label>
+      <label>目標退休年齡<input type="number" id="retireAge" value="50" min="1" step="1"></label>
+      <label>規劃終老年齡<input type="number" id="planEndAge" value="90" min="1" step="1"></label>
+      <label>目前可投資資產<input type="number" id="currentAssets" value="1000000" min="0" step="10000"></label>
+      <label>每月投入金額<input type="number" id="monthlyContribution" value="30000" min="0" step="1000"></label>
+      <label>預期年化報酬率 (%)<input type="number" id="annualReturn" value="6" min="0" step="0.1"></label>
+      <label>通膨率 (%)<input type="number" id="inflationRate" value="2" min="0" step="0.1"></label>
+      <label>安全提領率 (%)<input type="number" id="withdrawalRate" value="4" min="0.1" step="0.1"></label>
+      <label>LeanFIRE 精簡比例 (%)<input type="number" id="leanRatio" value="65" min="1" max="100" step="1"></label>
     </div>
 
-    <div>
+    <h3>每月支出項目（退休後，今日幣值）</h3>
+    <p class="hint">「開始／結束年齡」留空＝退休起算／終身。房貸、子女教育等有期限的，填上結束年齡即可正確處理。</p>
+    <table class="fire-table" id="expenseTable">
+      <thead><tr><th>項目</th><th>每月金額</th><th>開始年齡</th><th>結束年齡</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <button class="add-btn" onclick="addExpenseRow()">＋ 新增支出</button>
+
+    <h3>未來被動收入／年金（今日幣值）</h3>
+    <p class="hint">勞保老年年金、勞退月領、租金、股息等。「開始年齡」即起領年齡（台灣勞保／勞退多為 65 歲）。</p>
+    <table class="fire-table" id="incomeTable">
+      <thead><tr><th>項目</th><th>每月金額</th><th>起領年齡</th><th>結束年齡</th><th></th></tr></thead>
+      <tbody></tbody>
+    </table>
+    <button class="add-btn" onclick="addIncomeRow()">＋ 新增收入</button>
+
+    <div class="calc-row">
       <button onclick="calculateFire()">計算</button>
+      <button class="ghost" onclick="resetDefaults()">回復預設</button>
     </div>
 
     <div class="result" id="result"></div>
 
     <p class="note">
-      ※ 本工具僅為粗略試算，未考慮稅務、報酬波動、生活型態變化等因素，請勿作為唯一投資決策依據。
+      ※ 採實質報酬率（年化報酬扣通膨）試算，假設每月投入維持今日購買力。未計入稅務、報酬波動、長照等風險，
+      僅供粗略規劃參考，請勿作為唯一投資決策依據。勞保／勞退實際給付請以官方試算為準。
     </p>
   </div>
 
   <style is:global>
-    .tool-page .intro { color: #b8c0d0; margin: 0.5rem 0 1.2rem; }
+    .tool-page .intro, .tool-page .hint { color: #b8c0d0; }
+    .tool-page .intro { margin: 0.5rem 0 1.2rem; }
+    .tool-page .hint { font-size: 0.82rem; margin: 0.2rem 0 0.6rem; }
+    .tool-page h3 { margin-top: 1.6rem; }
     .tool-page .fire-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 0.9rem;
-      max-width: 720px;
-      margin-bottom: 1rem;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 0.8rem;
+      max-width: 860px;
     }
     .tool-page .fire-grid label {
-      display: flex;
-      flex-direction: column;
-      gap: 0.35rem;
-      font-size: 0.9rem;
-      color: #cfd6e4;
+      display: flex; flex-direction: column; gap: 0.3rem;
+      font-size: 0.88rem; color: #cfd6e4;
     }
     .tool-page .fire-grid input { width: 100%; box-sizing: border-box; }
-    .tool-page .result { max-width: 720px; }
-    .tool-page .fire-card {
-      background: #1f2330;
-      border: 1px solid #3a4154;
-      border-radius: 10px;
-      padding: 1rem 1.2rem;
-      margin-bottom: 1rem;
+    .tool-page .fire-table {
+      width: 100%; max-width: 860px; border-collapse: collapse; margin-bottom: 0.5rem;
     }
-    .tool-page .fire-card h3 { margin: 0 0 0.6rem; }
+    .tool-page .fire-table th {
+      text-align: left; font-size: 0.8rem; color: #8a92a6; font-weight: 500;
+      padding: 0.3rem 0.4rem; border-bottom: 1px solid #2c3242;
+    }
+    .tool-page .fire-table td { padding: 0.25rem 0.4rem; }
+    .tool-page .fire-table input { width: 100%; box-sizing: border-box; }
+    .tool-page .fire-table .name-cell { min-width: 130px; }
+    .tool-page .fire-table .num-cell { width: 110px; }
+    .tool-page .fire-table .age-cell { width: 90px; }
+    .tool-page .fire-table .del-cell { width: 36px; text-align: center; }
+    .tool-page .del-btn {
+      background: transparent; color: #8a92a6; border: none; cursor: pointer;
+      font-size: 1.1rem; padding: 0 0.3rem; margin: 0;
+    }
+    .tool-page .del-btn:hover { color: #fca5a5; background: transparent; }
+    .tool-page .add-btn { background: #2c3242; }
+    .tool-page .add-btn:hover { background: #3a4154; }
+    .tool-page .calc-row { margin-top: 1.4rem; }
+    .tool-page button.ghost { background: transparent; border: 1px solid #3a4154; }
+    .tool-page button.ghost:hover { background: #2c3242; }
+    .tool-page .result { max-width: 860px; }
+    .tool-page .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
+    .tool-page .fire-card {
+      background: #1f2330; border: 1px solid #3a4154; border-radius: 10px; padding: 1rem 1.2rem;
+    }
+    .tool-page .fire-card h3 { margin: 0 0 0.7rem; }
     .tool-page .fire-card.lean h3 { color: #6ee7b7; }
     .tool-page .fire-card.full h3 { color: #fca5a5; }
     .tool-page .fire-row {
-      display: flex;
-      justify-content: space-between;
-      gap: 1rem;
-      padding: 0.25rem 0;
-      border-bottom: 1px dashed #2c3242;
+      display: flex; justify-content: space-between; gap: 1rem;
+      padding: 0.3rem 0; border-bottom: 1px dashed #2c3242; font-size: 0.92rem;
     }
     .tool-page .fire-row:last-child { border-bottom: none; }
-    .tool-page .fire-row .val { font-weight: 600; color: #fff; }
-    .tool-page .note { color: #8a92a6; font-size: 0.8rem; margin-top: 1rem; }
+    .tool-page .fire-row .val { font-weight: 600; color: #fff; text-align: right; }
+    .tool-page .fire-row .val.good { color: #6ee7b7; }
+    .tool-page .fire-row .val.bad { color: #fca5a5; }
+    .tool-page .proj { margin-top: 1.2rem; }
+    .tool-page .proj h3 { margin: 0 0 0.5rem; font-size: 1rem; }
+    .tool-page .proj table { width: 100%; max-width: 520px; border-collapse: collapse; font-size: 0.85rem; }
+    .tool-page .proj th, .tool-page .proj td { padding: 0.3rem 0.5rem; border-bottom: 1px solid #2c3242; text-align: right; }
+    .tool-page .proj th:first-child, .tool-page .proj td:first-child { text-align: left; }
+    .tool-page .note { color: #8a92a6; font-size: 0.78rem; margin-top: 1.2rem; line-height: 1.6; }
   </style>
 
   <script is:inline>
+    const DEFAULT_EXPENSES = [
+      { name: '飲食', amount: 15000, from: '', to: '' },
+      { name: '居住（房租/管理費）', amount: 8000, from: '', to: '' },
+      { name: '房貸', amount: 0, from: '', to: '' },
+      { name: '健保（退休自付）', amount: 1500, from: '', to: '' },
+      { name: '水電瓦斯通訊', amount: 4000, from: '', to: '' },
+      { name: '交通', amount: 4000, from: '', to: '' },
+      { name: '商業保險', amount: 3000, from: '', to: '' },
+      { name: '醫療預備', amount: 2000, from: '', to: '' },
+      { name: '娛樂旅遊', amount: 8000, from: '', to: '' },
+    ];
+    const DEFAULT_INCOMES = [
+      { name: '勞保老年年金', amount: 18000, from: 65, to: '' },
+      { name: '勞退月領（新制）', amount: 7000, from: 65, to: '' },
+      { name: '其他（租金/股息）', amount: 0, from: 65, to: '' },
+    ];
+
     function fmtMoney(n) {
       if (!isFinite(n)) return '—';
       return 'NT$ ' + Math.round(n).toLocaleString('en-US');
     }
-
-    function fmtYears(years) {
-      if (!isFinite(years) || years < 0) return '無法達成（投入或報酬不足）';
-      if (years === 0) return '已達成 🎉';
-      const y = Math.floor(years);
-      const m = Math.round((years - y) * 12);
-      if (m === 0) return `約 ${y} 年`;
-      if (m === 12) return `約 ${y + 1} 年`;
-      return `約 ${y} 年 ${m} 個月`;
+    function numOrNull(v) {
+      const s = String(v).trim();
+      if (s === '') return null;
+      const n = parseFloat(s);
+      return isFinite(n) ? n : null;
     }
 
-    // 以每月複利估算達成目標所需年數
-    function yearsToTarget(target, current, monthly, annualReturnPct) {
-      if (current >= target) return 0;
-      const r = annualReturnPct / 100 / 12; // 月報酬率
-      if (monthly <= 0 && r <= 0) return Infinity;
+    function rowHtml(d, kind) {
+      const ageLabel = kind === 'income' ? '起領年齡' : '開始年齡';
+      return `
+        <td class="name-cell"><input type="text" class="r-name" value="${d.name}"></td>
+        <td class="num-cell"><input type="number" class="r-amount" value="${d.amount}" min="0" step="500"></td>
+        <td class="age-cell"><input type="number" class="r-from" value="${d.from}" min="0" step="1" placeholder="${ageLabel}"></td>
+        <td class="age-cell"><input type="number" class="r-to" value="${d.to}" min="0" step="1" placeholder="終身"></td>
+        <td class="del-cell"><button class="del-btn" title="刪除" onclick="this.closest('tr').remove()">✕</button></td>`;
+    }
+    function addRow(tableId, d, kind) {
+      const tr = document.createElement('tr');
+      tr.innerHTML = rowHtml(d, kind);
+      document.querySelector(`#${tableId} tbody`).appendChild(tr);
+    }
+    function addExpenseRow() { addRow('expenseTable', { name: '', amount: 0, from: '', to: '' }, 'expense'); }
+    function addIncomeRow() { addRow('incomeTable', { name: '', amount: 0, from: 65, to: '' }, 'income'); }
 
-      let balance = current;
-      let months = 0;
-      const maxMonths = 100 * 12; // 上限 100 年
-      while (balance < target && months < maxMonths) {
-        balance = balance * (1 + r) + monthly;
-        months++;
+    function readRows(tableId) {
+      return [...document.querySelectorAll(`#${tableId} tbody tr`)].map(tr => ({
+        name: tr.querySelector('.r-name').value,
+        amount: parseFloat(tr.querySelector('.r-amount').value) || 0,
+        from: numOrNull(tr.querySelector('.r-from').value),
+        to: numOrNull(tr.querySelector('.r-to').value),
+      }));
+    }
+
+    // 某年齡時，清單中所有「啟用中」項目的年支出/收入合計（今日幣值）
+    function activeAnnual(list, age, defaultFrom) {
+      let sum = 0;
+      for (const it of list) {
+        const from = it.from != null ? it.from : defaultFrom;
+        const to = it.to != null ? it.to : Infinity;
+        if (age >= from && age < to) sum += it.amount * 12;
       }
-      if (months >= maxMonths) return Infinity;
-      return months / 12;
+      return sum;
     }
 
-    function buildCard(cls, title, monthlyExpense, rate, current, monthly, annualReturn) {
-      const annualExpense = monthlyExpense * 12;
-      const target = rate > 0 ? annualExpense / (rate / 100) : Infinity;
-      const years = yearsToTarget(target, current, monthly, annualReturn);
-      const gap = Math.max(0, target - current);
+    // 退休當下所需資產 = 退休後每年「淨支出」以實質報酬率折現之總和（規劃至終老年齡耗盡）
+    function requiredCapital(expenses, incomes, scale, retireAge, planEnd, rReal) {
+      let pv = 0;
+      for (let age = retireAge; age < planEnd; age++) {
+        const exp = scale * activeAnnual(expenses, age, retireAge);
+        const inc = activeAnnual(incomes, age, 65);
+        const net = exp - inc;
+        pv += net / Math.pow(1 + rReal, age - retireAge);
+      }
+      return Math.max(0, pv);
+    }
+
+    // 從現在累積到某年齡的預估資產（每月投入 + 實質複利）
+    function assetsAtAge(targetAge, currentAge, currentAssets, monthly, rReal) {
+      if (targetAge <= currentAge) return currentAssets;
+      const mr = Math.pow(1 + rReal, 1 / 12) - 1;
+      let bal = currentAssets;
+      const months = Math.round((targetAge - currentAge) * 12);
+      for (let i = 0; i < months; i++) bal = bal * (1 + mr) + monthly;
+      return bal;
+    }
+
+    // 最早可退休年齡：資產足以支應從該年齡退休到終老的第一個年齡
+    function earliestRetireAge(expenses, incomes, scale, currentAge, planEnd, currentAssets, monthly, rReal) {
+      for (let cand = currentAge; cand <= planEnd; cand++) {
+        const need = requiredCapital(expenses, incomes, scale, cand, planEnd, rReal);
+        const have = assetsAtAge(cand, currentAge, currentAssets, monthly, rReal);
+        if (have >= need) return cand;
+      }
+      return null;
+    }
+
+    // 退休後資產走勢（每年成長後扣淨支出），回傳每 5 年的餘額
+    function projection(startCapital, expenses, incomes, scale, retireAge, planEnd, rReal) {
+      const rows = [];
+      let bal = startCapital;
+      for (let age = retireAge; age <= planEnd; age++) {
+        if ((age - retireAge) % 5 === 0 || age === planEnd) rows.push({ age, bal });
+        const exp = scale * activeAnnual(expenses, age, retireAge);
+        const inc = activeAnnual(incomes, age, 65);
+        bal = bal * (1 + rReal) - (exp - inc);
+      }
+      return rows;
+    }
+
+    function buildCard(cls, title, expenses, incomes, scale, p) {
+      const retExp = scale * activeAnnual(expenses, p.retireAge, p.retireAge);
+      const retInc = activeAnnual(incomes, p.retireAge, 65);
+      const retNet = retExp - retInc;
+
+      const needDeplete = requiredCapital(expenses, incomes, scale, p.retireAge, p.planEnd, p.rReal);
+      const needPerpetual = p.rate > 0 ? Math.max(0, retNet) / (p.rate / 100) : Infinity;
+      const haveAtRetire = assetsAtAge(p.retireAge, p.currentAge, p.currentAssets, p.monthly, p.rReal);
+      const gap = haveAtRetire - needDeplete;
+      const earliest = earliestRetireAge(expenses, incomes, scale, p.currentAge, p.planEnd, p.currentAssets, p.monthly, p.rReal);
+
+      const gapCls = gap >= 0 ? 'good' : 'bad';
+      const gapTxt = (gap >= 0 ? '盈餘 ' : '缺口 ') + fmtMoney(Math.abs(gap));
+      const earliestTxt = earliest == null ? `${p.planEnd} 歲前難達成`
+        : (earliest <= p.retireAge ? `${earliest} 歲 ✅` : `${earliest} 歲`);
 
       return `
         <div class="fire-card ${cls}">
           <h3>${title}</h3>
-          <div class="fire-row"><span>年度支出</span><span class="val">${fmtMoney(annualExpense)}</span></div>
-          <div class="fire-row"><span>目標資產（${rate}% 提領）</span><span class="val">${fmtMoney(target)}</span></div>
-          <div class="fire-row"><span>尚需累積</span><span class="val">${fmtMoney(gap)}</span></div>
-          <div class="fire-row"><span>預估達成時間</span><span class="val">${fmtYears(years)}</span></div>
+          <div class="fire-row"><span>退休首年月支出</span><span class="val">${fmtMoney(retExp / 12)}</span></div>
+          <div class="fire-row"><span>退休首年淨支出（扣年金）</span><span class="val">${fmtMoney(retNet / 12)} / 月</span></div>
+          <div class="fire-row"><span>所需資產（規劃至 ${p.planEnd} 歲）</span><span class="val">${fmtMoney(needDeplete)}</span></div>
+          <div class="fire-row"><span>所需資產（永續 ${p.rate}% 參考）</span><span class="val">${fmtMoney(needPerpetual)}</span></div>
+          <div class="fire-row"><span>${p.retireAge} 歲時預估資產</span><span class="val">${fmtMoney(haveAtRetire)}</span></div>
+          <div class="fire-row"><span>${p.retireAge} 歲退休</span><span class="val ${gapCls}">${gapTxt}</span></div>
+          <div class="fire-row"><span>最早可退休年齡</span><span class="val">${earliestTxt}</span></div>
         </div>`;
     }
 
     function calculateFire() {
-      const monthlyExpense = parseFloat(document.getElementById('monthlyExpense').value) || 0;
-      const leanExpense = parseFloat(document.getElementById('leanMonthlyExpense').value) || 0;
-      const rate = parseFloat(document.getElementById('withdrawalRate').value) || 0;
-      const current = parseFloat(document.getElementById('currentAssets').value) || 0;
-      const monthly = parseFloat(document.getElementById('monthlyContribution').value) || 0;
-      const annualReturn = parseFloat(document.getElementById('annualReturn').value) || 0;
-      const inflation = parseFloat(document.getElementById('inflationRate').value) || 0;
-
-      // 以實質報酬率（扣除通膨）估算，使目標以今日購買力計
-      const realReturn = ((1 + annualReturn / 100) / (1 + inflation / 100) - 1) * 100;
+      const p = {
+        currentAge: parseFloat(document.getElementById('currentAge').value) || 0,
+        retireAge: parseFloat(document.getElementById('retireAge').value) || 0,
+        planEnd: parseFloat(document.getElementById('planEndAge').value) || 0,
+        currentAssets: parseFloat(document.getElementById('currentAssets').value) || 0,
+        monthly: parseFloat(document.getElementById('monthlyContribution').value) || 0,
+        annualReturn: parseFloat(document.getElementById('annualReturn').value) || 0,
+        inflation: parseFloat(document.getElementById('inflationRate').value) || 0,
+        rate: parseFloat(document.getElementById('withdrawalRate').value) || 0,
+        leanRatio: (parseFloat(document.getElementById('leanRatio').value) || 0) / 100,
+      };
+      p.rReal = (1 + p.annualReturn / 100) / (1 + p.inflation / 100) - 1;
 
       const resultDiv = document.getElementById('result');
-      resultDiv.innerHTML =
-        buildCard('lean', '🌿 LeanFIRE', leanExpense, rate, current, monthly, realReturn) +
-        buildCard('full', '🔥 FIRE', monthlyExpense, rate, current, monthly, realReturn) +
-        `<p class="note">採用實質報酬率 ${realReturn.toFixed(2)}%（年化報酬 ${annualReturn}% 扣除通膨 ${inflation}%）估算達成時間，目標金額以今日購買力計算。</p>`;
+      if (p.retireAge <= p.currentAge || p.planEnd <= p.retireAge) {
+        resultDiv.innerHTML = `<p class="note bad" style="color:#fca5a5">請確認年齡設定：需滿足「目前年齡 &lt; 退休年齡 &lt; 終老年齡」。</p>`;
+        return;
+      }
+
+      const expenses = readRows('expenseTable');
+      const incomes = readRows('incomeTable');
+
+      const fullCard = buildCard('full', '🔥 FIRE', expenses, incomes, 1, p);
+      const leanCard = buildCard('lean', `🌿 LeanFIRE（支出 ${Math.round(p.leanRatio * 100)}%）`, expenses, incomes, p.leanRatio, p);
+
+      // FIRE 規劃版的退休資產走勢，展示橋接期
+      const fireNeed = requiredCapital(expenses, incomes, 1, p.retireAge, p.planEnd, p.rReal);
+      const proj = projection(fireNeed, expenses, incomes, 1, p.retireAge, p.planEnd, p.rReal);
+      const projRows = proj.map(r => `<tr><td>${r.age} 歲</td><td>${fmtMoney(r.bal)}</td></tr>`).join('');
+
+      resultDiv.innerHTML = `
+        <div class="cards">${leanCard}${fullCard}</div>
+        <div class="proj">
+          <h3>🔥 FIRE 退休後資產走勢（剛好夠用至 ${p.planEnd} 歲）</h3>
+          <table><thead><tr><th>年齡</th><th>資產餘額</th></tr></thead><tbody>${projRows}</tbody></table>
+          <p class="note">實質報酬率 ${(p.rReal * 100).toFixed(2)}%（年化 ${p.annualReturn}% 扣通膨 ${p.inflation}%）。
+          可看出勞保／勞退起領前，資產消耗最快（橋接期）；起領後淨支出下降、餘額趨穩。</p>
+        </div>`;
     }
 
-    calculateFire();
+    function resetDefaults() {
+      document.querySelector('#expenseTable tbody').innerHTML = '';
+      document.querySelector('#incomeTable tbody').innerHTML = '';
+      DEFAULT_EXPENSES.forEach(d => addRow('expenseTable', d, 'expense'));
+      DEFAULT_INCOMES.forEach(d => addRow('incomeTable', d, 'income'));
+      calculateFire();
+    }
+
+    resetDefaults();
   </script>
 </BaseLayout>
