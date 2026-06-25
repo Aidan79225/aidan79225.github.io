@@ -13,7 +13,7 @@
 | 2 | `airflow-first-dag` | 跑起第一個 Airflow:Docker 環境 + 你的第一個 DAG | `docker compose` 起本機環境、寫第一個 DAG、Web UI 操作 | ✅ 已發布 |
 | 3 | `airflow-scheduling` | Airflow 排程的真相:data interval、catchup 與 backfill | `schedule` / `start_date` / `catchup` / data interval / backfill | ✅ 已發布 |
 | 4 | `airflow-xcom` | Airflow 任務間怎麼傳資料:XCom、TaskFlow 進階與 params | XCom、TaskFlow 進階、`params` | ✅ 已發布 |
-| 5 | `airflow-providers` | 連接外部系統 | Operators / Sensors / Hooks / Providers(DB、S3、HTTP…) | ⬜ 待寫 |
+| 5 | `airflow-providers` | Airflow 怎麼連外部系統:Provider、Operator、Hook、Sensor | Provider / Operator / Hook / Sensor / Connection、poke vs reschedule | ✅ 已發布 |
 | 6 | `airflow-control-flow` | 複雜流程控制 | branching、trigger rules、TaskGroup、dynamic task mapping | ⬜ 待寫 |
 | 7 | `airflow-reliability` | 可靠性實戰 | retries、SLA、告警、冪等寫法(呼應 #1) | ⬜ 待寫 |
 | 8 | `airflow-testing-deploy` | 測試與部署 | DAG 單元測試、CI、managed(MWAA / Astronomer)、最佳實務 | ⬜ 待寫 |
