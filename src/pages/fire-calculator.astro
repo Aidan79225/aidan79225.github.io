@@ -6,8 +6,9 @@ import '../styles/tools.css';
   <div class="tool-page">
     <h2>🔥 FIRE / LeanFIRE 計算機</h2>
     <p class="intro">
-      台灣版退休規劃試算。以<strong>逐年現金流</strong>模擬退休後的支出與被動收入，並處理「橋接期」──
-      提早退休後到勞保／勞退起領前，全靠自有資產撐的那段。所有金額皆以<strong>今日購買力</strong>計算。
+      台灣版退休規劃試算。以<strong>逐年現金流</strong>模擬退休後的支出與被動收入，內建<strong>房貸攤還</strong>與
+      <strong>勞保年金</strong>估算，並處理「橋接期」──提早退休後到勞保／勞退起領前，全靠自有資產撐的那段。
+      所有金額皆以<strong>今日購買力</strong>計算。
     </p>
 
     <h3>基本參數</h3>
@@ -15,7 +16,7 @@ import '../styles/tools.css';
       <label>目前年齡<input type="number" id="currentAge" value="35" min="0" step="1"></label>
       <label>目標退休年齡<input type="number" id="retireAge" value="50" min="1" step="1"></label>
       <label>規劃終老年齡<input type="number" id="planEndAge" value="90" min="1" step="1"></label>
-      <label>目前可投資資產<input type="number" id="currentAssets" value="1000000" min="0" step="10000"></label>
+      <label>目前可投資資產<small>（不含自住房）</small><input type="number" id="currentAssets" value="1000000" min="0" step="10000"></label>
       <label>每月投入金額<input type="number" id="monthlyContribution" value="30000" min="0" step="1000"></label>
       <label>預期年化報酬率 (%)<input type="number" id="annualReturn" value="6" min="0" step="0.1"></label>
       <label>通膨率 (%)<input type="number" id="inflationRate" value="2" min="0" step="0.1"></label>
@@ -23,16 +24,41 @@ import '../styles/tools.css';
       <label>LeanFIRE 精簡比例 (%)<input type="number" id="leanRatio" value="65" min="1" max="100" step="1"></label>
     </div>
 
+    <h3>🏠 自住房 / 房貸</h3>
+    <p class="hint">填剩餘本金即自動以等額本息算月付金與還清年齡。自住房本身<strong>不列入可投資資產</strong>（無法變現支應生活）。持有成本（房屋稅、地價稅、管理費、維修）請另計於下方支出。</p>
+    <div class="fire-grid panel">
+      <label>房貸剩餘本金<input type="number" id="mortgageBalance" value="5000000" min="0" step="100000" oninput="updateMortgageInfo()"></label>
+      <label>房貸年利率 (%)<input type="number" id="mortgageRate" value="2.1" min="0" step="0.05" oninput="updateMortgageInfo()"></label>
+      <label>剩餘年數<input type="number" id="mortgageYears" value="20" min="0" step="1" oninput="updateMortgageInfo()"></label>
+    </div>
+    <p class="hint" id="mortgageInfo"></p>
+
     <h3>每月支出項目（退休後，今日幣值）</h3>
-    <p class="hint">「開始／結束年齡」留空＝退休起算／終身。房貸、子女教育等有期限的，填上結束年齡即可正確處理。</p>
+    <p class="hint">「開始／結束年齡」留空＝退休起算／終身。子女教育等有期限的，填上結束年齡即可正確處理。房貸由上方模組自動帶入，不需在此重複。</p>
     <table class="fire-table" id="expenseTable">
       <thead><tr><th>項目</th><th>每月金額</th><th>開始年齡</th><th>結束年齡</th><th></th></tr></thead>
       <tbody></tbody>
     </table>
     <button class="add-btn" onclick="addExpenseRow()">＋ 新增支出</button>
 
-    <h3>未來被動收入／年金（今日幣值）</h3>
-    <p class="hint">勞保老年年金、勞退月領、租金、股息等。「開始年齡」即起領年齡（台灣勞保／勞退多為 65 歲）。</p>
+    <h3>💼 勞保老年年金</h3>
+    <p class="hint">可由投保薪資自動估算（平均月投保薪資 × 保險年資 × 1.55%，薪資上限 45,800），或直接輸入月領金額。</p>
+    <div class="fire-grid panel">
+      <label>估算方式
+        <select id="laoBaoMode" onchange="updateLaoBaoInfo()">
+          <option value="auto">由投保薪資估算</option>
+          <option value="manual">直接輸入月領</option>
+        </select>
+      </label>
+      <label>平均月投保薪資<input type="number" id="laoBaoSalary" value="45800" min="0" step="100" oninput="updateLaoBaoInfo()"></label>
+      <label>保險年資<input type="number" id="laoBaoYears" value="30" min="0" step="1" oninput="updateLaoBaoInfo()"></label>
+      <label>直接輸入月領<input type="number" id="laoBaoManual" value="20000" min="0" step="500" oninput="updateLaoBaoInfo()"></label>
+      <label>起領年齡<input type="number" id="laoBaoStartAge" value="65" min="0" step="1" oninput="updateLaoBaoInfo()"></label>
+    </div>
+    <p class="hint" id="laoBaoInfo"></p>
+
+    <h3>其他被動收入／年金（今日幣值）</h3>
+    <p class="hint">勞退月領、租金、股息等。「起領年齡」即開始入帳年齡（勞退新制多為 60～65 歲）。</p>
     <table class="fire-table" id="incomeTable">
       <thead><tr><th>項目</th><th>每月金額</th><th>起領年齡</th><th>結束年齡</th><th></th></tr></thead>
       <tbody></tbody>
@@ -47,8 +73,9 @@ import '../styles/tools.css';
     <div class="result" id="result"></div>
 
     <p class="note">
-      ※ 採實質報酬率（年化報酬扣通膨）試算，假設每月投入維持今日購買力。未計入稅務、報酬波動、長照等風險，
-      僅供粗略規劃參考，請勿作為唯一投資決策依據。勞保／勞退實際給付請以官方試算為準。
+      ※ 採實質報酬率（年化報酬扣通膨）試算，假設每月投入維持今日購買力、房貸月付以今日幣值近似。
+      未計入稅務、報酬波動、長照等風險，僅供粗略規劃參考。勞保／勞退實際給付請以官方試算為準
+      （勞保另有 0.775%＋3000 方案與展延／減給，本工具採 1.55% 標準式估算）。
     </p>
   </div>
 
@@ -63,11 +90,15 @@ import '../styles/tools.css';
       gap: 0.8rem;
       max-width: 860px;
     }
+    .tool-page .fire-grid.panel {
+      background: #1b1f2b; border: 1px solid #2c3242; border-radius: 10px; padding: 0.9rem; max-width: 860px;
+    }
     .tool-page .fire-grid label {
       display: flex; flex-direction: column; gap: 0.3rem;
       font-size: 0.88rem; color: #cfd6e4;
     }
-    .tool-page .fire-grid input { width: 100%; box-sizing: border-box; }
+    .tool-page .fire-grid label small { color: #8a92a6; font-weight: normal; }
+    .tool-page .fire-grid input, .tool-page .fire-grid select { width: 100%; box-sizing: border-box; }
     .tool-page .fire-table {
       width: 100%; max-width: 860px; border-collapse: collapse; margin-bottom: 0.5rem;
     }
@@ -118,8 +149,7 @@ import '../styles/tools.css';
   <script is:inline>
     const DEFAULT_EXPENSES = [
       { name: '飲食', amount: 15000, from: '', to: '' },
-      { name: '居住（房租/管理費）', amount: 8000, from: '', to: '' },
-      { name: '房貸', amount: 0, from: '', to: '' },
+      { name: '居住持有成本（稅/管理/維修）', amount: 6000, from: '', to: '' },
       { name: '健保（退休自付）', amount: 1500, from: '', to: '' },
       { name: '水電瓦斯通訊', amount: 4000, from: '', to: '' },
       { name: '交通', amount: 4000, from: '', to: '' },
@@ -128,10 +158,11 @@ import '../styles/tools.css';
       { name: '娛樂旅遊', amount: 8000, from: '', to: '' },
     ];
     const DEFAULT_INCOMES = [
-      { name: '勞保老年年金', amount: 18000, from: 65, to: '' },
       { name: '勞退月領（新制）', amount: 7000, from: 65, to: '' },
       { name: '其他（租金/股息）', amount: 0, from: 65, to: '' },
     ];
+    const LAOBAO_RATE = 0.0155;     // 勞保老年年金標準式給付率
+    const LAOBAO_SALARY_CAP = 45800; // 投保薪資上限
 
     function fmtMoney(n) {
       if (!isFinite(n)) return '—';
@@ -142,6 +173,40 @@ import '../styles/tools.css';
       if (s === '') return null;
       const n = parseFloat(s);
       return isFinite(n) ? n : null;
+    }
+    function num(id) { return parseFloat(document.getElementById(id).value) || 0; }
+
+    // ── 房貸：等額本息月付金 ─────────────────────────────
+    function mortgageMonthly(balance, annualRatePct, years) {
+      if (balance <= 0 || years <= 0) return 0;
+      const i = annualRatePct / 100 / 12;
+      const n = years * 12;
+      if (i === 0) return balance / n;
+      return balance * i * Math.pow(1 + i, n) / (Math.pow(1 + i, n) - 1);
+    }
+    function updateMortgageInfo() {
+      const bal = num('mortgageBalance'), rate = num('mortgageRate'), yrs = num('mortgageYears');
+      const info = document.getElementById('mortgageInfo');
+      if (bal <= 0 || yrs <= 0) { info.textContent = '（目前無房貸）'; return; }
+      const pmt = mortgageMonthly(bal, rate, yrs);
+      const payoffAge = num('currentAge') + yrs;
+      info.innerHTML = `估算月付金 <strong>${fmtMoney(pmt)}</strong>　·　預計 <strong>${payoffAge} 歲</strong>還清`;
+    }
+
+    // ── 勞保老年年金月領 ─────────────────────────────────
+    function laoBaoMonthly() {
+      if (document.getElementById('laoBaoMode').value === 'manual') return num('laoBaoManual');
+      const salary = Math.min(num('laoBaoSalary'), LAOBAO_SALARY_CAP);
+      return salary * num('laoBaoYears') * LAOBAO_RATE;
+    }
+    function updateLaoBaoInfo() {
+      const auto = document.getElementById('laoBaoMode').value === 'auto';
+      document.getElementById('laoBaoSalary').disabled = !auto;
+      document.getElementById('laoBaoYears').disabled = !auto;
+      document.getElementById('laoBaoManual').disabled = auto;
+      const m = laoBaoMonthly();
+      document.getElementById('laoBaoInfo').innerHTML =
+        `預估勞保老年年金 <strong>${fmtMoney(m)}</strong> / 月，自 <strong>${num('laoBaoStartAge')} 歲</strong>起領`;
     }
 
     function rowHtml(d, kind) {
@@ -170,6 +235,25 @@ import '../styles/tools.css';
       }));
     }
 
+    // 把房貸、勞保等模組產生的項目併入支出／收入清單
+    function collectExpenses() {
+      const list = readRows('expenseTable');
+      const bal = num('mortgageBalance'), yrs = num('mortgageYears');
+      if (bal > 0 && yrs > 0) {
+        list.push({
+          name: '房貸', amount: mortgageMonthly(bal, num('mortgageRate'), yrs),
+          from: null, to: num('currentAge') + yrs, // 還清年齡後不再計入
+        });
+      }
+      return list;
+    }
+    function collectIncomes() {
+      const list = readRows('incomeTable');
+      const m = laoBaoMonthly();
+      if (m > 0) list.push({ name: '勞保老年年金', amount: m, from: num('laoBaoStartAge'), to: null });
+      return list;
+    }
+
     // 某年齡時，清單中所有「啟用中」項目的年支出/收入合計（今日幣值）
     function activeAnnual(list, age, defaultFrom) {
       let sum = 0;
@@ -187,8 +271,7 @@ import '../styles/tools.css';
       for (let age = retireAge; age < planEnd; age++) {
         const exp = scale * activeAnnual(expenses, age, retireAge);
         const inc = activeAnnual(incomes, age, 65);
-        const net = exp - inc;
-        pv += net / Math.pow(1 + rReal, age - retireAge);
+        pv += (exp - inc) / Math.pow(1 + rReal, age - retireAge);
       }
       return Math.max(0, pv);
     }
@@ -257,31 +340,25 @@ import '../styles/tools.css';
 
     function calculateFire() {
       const p = {
-        currentAge: parseFloat(document.getElementById('currentAge').value) || 0,
-        retireAge: parseFloat(document.getElementById('retireAge').value) || 0,
-        planEnd: parseFloat(document.getElementById('planEndAge').value) || 0,
-        currentAssets: parseFloat(document.getElementById('currentAssets').value) || 0,
-        monthly: parseFloat(document.getElementById('monthlyContribution').value) || 0,
-        annualReturn: parseFloat(document.getElementById('annualReturn').value) || 0,
-        inflation: parseFloat(document.getElementById('inflationRate').value) || 0,
-        rate: parseFloat(document.getElementById('withdrawalRate').value) || 0,
-        leanRatio: (parseFloat(document.getElementById('leanRatio').value) || 0) / 100,
+        currentAge: num('currentAge'), retireAge: num('retireAge'), planEnd: num('planEndAge'),
+        currentAssets: num('currentAssets'), monthly: num('monthlyContribution'),
+        annualReturn: num('annualReturn'), inflation: num('inflationRate'),
+        rate: num('withdrawalRate'), leanRatio: num('leanRatio') / 100,
       };
       p.rReal = (1 + p.annualReturn / 100) / (1 + p.inflation / 100) - 1;
 
       const resultDiv = document.getElementById('result');
       if (p.retireAge <= p.currentAge || p.planEnd <= p.retireAge) {
-        resultDiv.innerHTML = `<p class="note bad" style="color:#fca5a5">請確認年齡設定：需滿足「目前年齡 &lt; 退休年齡 &lt; 終老年齡」。</p>`;
+        resultDiv.innerHTML = `<p class="note" style="color:#fca5a5">請確認年齡設定：需滿足「目前年齡 &lt; 退休年齡 &lt; 終老年齡」。</p>`;
         return;
       }
 
-      const expenses = readRows('expenseTable');
-      const incomes = readRows('incomeTable');
+      const expenses = collectExpenses();
+      const incomes = collectIncomes();
 
       const fullCard = buildCard('full', '🔥 FIRE', expenses, incomes, 1, p);
       const leanCard = buildCard('lean', `🌿 LeanFIRE（支出 ${Math.round(p.leanRatio * 100)}%）`, expenses, incomes, p.leanRatio, p);
 
-      // FIRE 規劃版的退休資產走勢，展示橋接期
       const fireNeed = requiredCapital(expenses, incomes, 1, p.retireAge, p.planEnd, p.rReal);
       const proj = projection(fireNeed, expenses, incomes, 1, p.retireAge, p.planEnd, p.rReal);
       const projRows = proj.map(r => `<tr><td>${r.age} 歲</td><td>${fmtMoney(r.bal)}</td></tr>`).join('');
@@ -292,7 +369,7 @@ import '../styles/tools.css';
           <h3>🔥 FIRE 退休後資產走勢（剛好夠用至 ${p.planEnd} 歲）</h3>
           <table><thead><tr><th>年齡</th><th>資產餘額</th></tr></thead><tbody>${projRows}</tbody></table>
           <p class="note">實質報酬率 ${(p.rReal * 100).toFixed(2)}%（年化 ${p.annualReturn}% 扣通膨 ${p.inflation}%）。
-          可看出勞保／勞退起領前，資產消耗最快（橋接期）；起領後淨支出下降、餘額趨穩。</p>
+          可看出房貸還清前、勞保／勞退起領前，資產消耗最快（橋接期）；之後淨支出下降、餘額趨穩。</p>
         </div>`;
     }
 
@@ -301,6 +378,8 @@ import '../styles/tools.css';
       document.querySelector('#incomeTable tbody').innerHTML = '';
       DEFAULT_EXPENSES.forEach(d => addRow('expenseTable', d, 'expense'));
       DEFAULT_INCOMES.forEach(d => addRow('incomeTable', d, 'income'));
+      updateMortgageInfo();
+      updateLaoBaoInfo();
       calculateFire();
     }
 
