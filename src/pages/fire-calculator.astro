@@ -1,0 +1,164 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/tools.css';
+---
+<BaseLayout title="FIRE 計算機">
+  <div class="tool-page">
+    <h2>🔥 FIRE / LeanFIRE 計算機</h2>
+    <p class="intro">
+      依據「4% 法則」估算財務自由所需資產，並推算依目前資產與每月投入，需要幾年達成目標。
+    </p>
+
+    <div class="fire-grid">
+      <label>
+        每月生活支出 (FIRE)
+        <input type="number" id="monthlyExpense" value="50000" min="0" step="1000">
+      </label>
+      <label>
+        每月生活支出 (LeanFIRE)
+        <input type="number" id="leanMonthlyExpense" value="30000" min="0" step="1000">
+      </label>
+      <label>
+        安全提領率 (%)
+        <input type="number" id="withdrawalRate" value="4" min="0.1" step="0.1">
+      </label>
+      <label>
+        目前可投資資產
+        <input type="number" id="currentAssets" value="1000000" min="0" step="10000">
+      </label>
+      <label>
+        每月投入金額
+        <input type="number" id="monthlyContribution" value="20000" min="0" step="1000">
+      </label>
+      <label>
+        預期年化報酬率 (%)
+        <input type="number" id="annualReturn" value="6" min="0" step="0.1">
+      </label>
+      <label>
+        通膨率 (%)
+        <input type="number" id="inflationRate" value="2" min="0" step="0.1">
+      </label>
+    </div>
+
+    <div>
+      <button onclick="calculateFire()">計算</button>
+    </div>
+
+    <div class="result" id="result"></div>
+
+    <p class="note">
+      ※ 本工具僅為粗略試算，未考慮稅務、報酬波動、生活型態變化等因素，請勿作為唯一投資決策依據。
+    </p>
+  </div>
+
+  <style is:global>
+    .tool-page .intro { color: #b8c0d0; margin: 0.5rem 0 1.2rem; }
+    .tool-page .fire-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 0.9rem;
+      max-width: 720px;
+      margin-bottom: 1rem;
+    }
+    .tool-page .fire-grid label {
+      display: flex;
+      flex-direction: column;
+      gap: 0.35rem;
+      font-size: 0.9rem;
+      color: #cfd6e4;
+    }
+    .tool-page .fire-grid input { width: 100%; box-sizing: border-box; }
+    .tool-page .result { max-width: 720px; }
+    .tool-page .fire-card {
+      background: #1f2330;
+      border: 1px solid #3a4154;
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      margin-bottom: 1rem;
+    }
+    .tool-page .fire-card h3 { margin: 0 0 0.6rem; }
+    .tool-page .fire-card.lean h3 { color: #6ee7b7; }
+    .tool-page .fire-card.full h3 { color: #fca5a5; }
+    .tool-page .fire-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+      padding: 0.25rem 0;
+      border-bottom: 1px dashed #2c3242;
+    }
+    .tool-page .fire-row:last-child { border-bottom: none; }
+    .tool-page .fire-row .val { font-weight: 600; color: #fff; }
+    .tool-page .note { color: #8a92a6; font-size: 0.8rem; margin-top: 1rem; }
+  </style>
+
+  <script is:inline>
+    function fmtMoney(n) {
+      if (!isFinite(n)) return '—';
+      return 'NT$ ' + Math.round(n).toLocaleString('en-US');
+    }
+
+    function fmtYears(years) {
+      if (!isFinite(years) || years < 0) return '無法達成（投入或報酬不足）';
+      if (years === 0) return '已達成 🎉';
+      const y = Math.floor(years);
+      const m = Math.round((years - y) * 12);
+      if (m === 0) return `約 ${y} 年`;
+      if (m === 12) return `約 ${y + 1} 年`;
+      return `約 ${y} 年 ${m} 個月`;
+    }
+
+    // 以每月複利估算達成目標所需年數
+    function yearsToTarget(target, current, monthly, annualReturnPct) {
+      if (current >= target) return 0;
+      const r = annualReturnPct / 100 / 12; // 月報酬率
+      if (monthly <= 0 && r <= 0) return Infinity;
+
+      let balance = current;
+      let months = 0;
+      const maxMonths = 100 * 12; // 上限 100 年
+      while (balance < target && months < maxMonths) {
+        balance = balance * (1 + r) + monthly;
+        months++;
+      }
+      if (months >= maxMonths) return Infinity;
+      return months / 12;
+    }
+
+    function buildCard(cls, title, monthlyExpense, rate, current, monthly, annualReturn) {
+      const annualExpense = monthlyExpense * 12;
+      const target = rate > 0 ? annualExpense / (rate / 100) : Infinity;
+      const years = yearsToTarget(target, current, monthly, annualReturn);
+      const gap = Math.max(0, target - current);
+
+      return `
+        <div class="fire-card ${cls}">
+          <h3>${title}</h3>
+          <div class="fire-row"><span>年度支出</span><span class="val">${fmtMoney(annualExpense)}</span></div>
+          <div class="fire-row"><span>目標資產（${rate}% 提領）</span><span class="val">${fmtMoney(target)}</span></div>
+          <div class="fire-row"><span>尚需累積</span><span class="val">${fmtMoney(gap)}</span></div>
+          <div class="fire-row"><span>預估達成時間</span><span class="val">${fmtYears(years)}</span></div>
+        </div>`;
+    }
+
+    function calculateFire() {
+      const monthlyExpense = parseFloat(document.getElementById('monthlyExpense').value) || 0;
+      const leanExpense = parseFloat(document.getElementById('leanMonthlyExpense').value) || 0;
+      const rate = parseFloat(document.getElementById('withdrawalRate').value) || 0;
+      const current = parseFloat(document.getElementById('currentAssets').value) || 0;
+      const monthly = parseFloat(document.getElementById('monthlyContribution').value) || 0;
+      const annualReturn = parseFloat(document.getElementById('annualReturn').value) || 0;
+      const inflation = parseFloat(document.getElementById('inflationRate').value) || 0;
+
+      // 以實質報酬率（扣除通膨）估算，使目標以今日購買力計
+      const realReturn = ((1 + annualReturn / 100) / (1 + inflation / 100) - 1) * 100;
+
+      const resultDiv = document.getElementById('result');
+      resultDiv.innerHTML =
+        buildCard('lean', '🌿 LeanFIRE', leanExpense, rate, current, monthly, realReturn) +
+        buildCard('full', '🔥 FIRE', monthlyExpense, rate, current, monthly, realReturn) +
+        `<p class="note">採用實質報酬率 ${realReturn.toFixed(2)}%（年化報酬 ${annualReturn}% 扣除通膨 ${inflation}%）估算達成時間，目標金額以今日購買力計算。</p>`;
+    }
+
+    calculateFire();
+  </script>
+</BaseLayout>
