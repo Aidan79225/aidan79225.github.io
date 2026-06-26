@@ -1,5 +1,5 @@
 import type { CollectionEntry } from 'astro:content';
-import { getPublishedPosts } from './posts';
+import { getPublishedPosts, byDateDesc } from './posts';
 import { extractLinks } from './wiki-link.mjs';
 
 export interface BacklinkRef {
@@ -12,7 +12,7 @@ export interface BacklinkRef {
 export async function getBacklinks(targetSlug: string): Promise<BacklinkRef[]> {
   const posts = (await getPublishedPosts())
     .filter((p) => p.id !== targetSlug)
-    .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+    .sort(byDateDesc);
   const refs: BacklinkRef[] = [];
   const seen = new Set<string>();
   for (const post of posts) {

@@ -1,10 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PostCard from '../components/PostCard.astro';
-import { getPublishedPosts } from '../lib/posts';
+import { getPublishedPosts, byDateDesc } from '../lib/posts';
 const posts = (await getPublishedPosts())
   .filter((p) => p.data.category === 'food')
-  .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf());
+  .sort(byDateDesc);
 ---
 <BaseLayout title="Food">
   <h1 class="text-2xl font-bold mb-4">Food</h1>

@@ -1,5 +1,5 @@
 import rss from '@astrojs/rss';
-import { getPublishedPosts } from '../lib/posts';
+import { getPublishedPosts, byDateDesc } from '../lib/posts';
 
 export async function GET(context) {
   const posts = await getPublishedPosts();
@@ -8,7 +8,7 @@ export async function GET(context) {
     description: 'Aidan 的部落格',
     site: context.site,
     items: posts
-      .sort((a, b) => b.data.date.valueOf() - a.data.date.valueOf())
+      .sort(byDateDesc)
       .map((post) => ({
         title: post.data.title,
         pubDate: post.data.date,
