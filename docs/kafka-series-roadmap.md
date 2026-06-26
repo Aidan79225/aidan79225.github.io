@@ -12,7 +12,7 @@
 | 2 | `kafka-topics` | Kafka 的核心模型:Topic、Partition、Offset、Consumer Group | topic/partition、offset、producer key 分區、consumer group 與 rebalance、順序保證 | ✅ 已發布 |
 | 3 | `kafka-delivery` | Kafka 的投遞保證:acks、ISR 與 at-least-once / exactly-once | ack、retry、冪等 producer、transaction、replication/ISR、保證等級取捨 | ✅ 已發布 |
 | 4 | `kafka-ecosystem` | Kafka 生態系:Connect、Schema Registry 與 Streams | Kafka Connect(source/sink)、Schema Registry、Kafka Streams vs Spark Streaming | ✅ 已發布 |
-| 5 | `kafka-ops` | Kafka 維運與部署 | KRaft(取代 ZooKeeper)、retention/compaction、監控、容量規劃 | ⬜ 選配 |
+| 5 | `kafka-ops` | Kafka 維運與部署:KRaft、retention/compaction 與監控 | KRaft(取代 ZooKeeper)、retention/compaction、監控、容量規劃 | ✅ 已發布 |
 
 ## 寫每篇時的慣例
 - front matter:`series: "Kafka 學習筆記"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
