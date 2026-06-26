@@ -11,7 +11,7 @@
 | 1 | `kafka-intro` | Apache Kafka 是什麼?從訊息佇列到事件串流 | 定位、為什麼需要、可重播的 log vs queue、跟 DB/MQ 對比、擅長/不擅長 | ✅ 已發布 |
 | 2 | `kafka-topics` | Kafka 的核心模型:Topic、Partition、Offset、Consumer Group | topic/partition、offset、producer key 分區、consumer group 與 rebalance、順序保證 | ✅ 已發布 |
 | 3 | `kafka-delivery` | Kafka 的投遞保證:acks、ISR 與 at-least-once / exactly-once | ack、retry、冪等 producer、transaction、replication/ISR、保證等級取捨 | ✅ 已發布 |
-| 4 | `kafka-ecosystem` | Kafka 生態系:Connect、Schema Registry、Streams | Kafka Connect(source/sink)、Schema Registry、Kafka Streams vs Spark Streaming | ⬜ 選配 |
+| 4 | `kafka-ecosystem` | Kafka 生態系:Connect、Schema Registry 與 Streams | Kafka Connect(source/sink)、Schema Registry、Kafka Streams vs Spark Streaming | ✅ 已發布 |
 | 5 | `kafka-ops` | Kafka 維運與部署 | KRaft(取代 ZooKeeper)、retention/compaction、監控、容量規劃 | ⬜ 選配 |
 
 ## 寫每篇時的慣例
