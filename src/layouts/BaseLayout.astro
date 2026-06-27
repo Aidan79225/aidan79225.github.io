@@ -2,6 +2,10 @@
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 const { title = "Aidan's Blog", contentLicense = false } = Astro.props;
+// Cloudflare Web Analytics beacon token (from the CF dashboard). Public by
+// design — it only identifies which site to attribute pageviews to. Set it
+// here or via the PUBLIC_CF_BEACON_TOKEN env var; empty = no beacon emitted.
+const CF_BEACON_TOKEN = import.meta.env.PUBLIC_CF_BEACON_TOKEN ?? '';
 ---
 <!doctype html>
 <html lang="zh-Hant">
@@ -20,5 +24,13 @@ const { title = "Aidan's Blog", contentLicense = false } = Astro.props;
         <Fragment> · 本文採用 <a href="https://creativecommons.org/licenses/by/4.0/" rel="license" target="_blank" class="text-accent hover:underline">CC BY 4.0</a> 授權</Fragment>
       )}
     </footer>
+    {CF_BEACON_TOKEN && (
+      <script
+        is:inline
+        defer
+        src="https://static.cloudflareinsights.com/beacon.min.js"
+        data-cf-beacon={JSON.stringify({ token: CF_BEACON_TOKEN })}
+      ></script>
+    )}
   </body>
 </html>

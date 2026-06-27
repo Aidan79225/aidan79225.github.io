@@ -24,6 +24,11 @@ jobs:
         uses: withastro/action@v3
         with:
           node-version: 22
+        env:
+          # Cloudflare Web Analytics beacon token. Set as a repo Actions
+          # *variable* (Settings → Secrets and variables → Actions → Variables).
+          # Not a secret — it ships in client JS — but kept out of source.
+          PUBLIC_CF_BEACON_TOKEN: ${{ vars.PUBLIC_CF_BEACON_TOKEN }}
   deploy:
     needs: build
     runs-on: ubuntu-latest
