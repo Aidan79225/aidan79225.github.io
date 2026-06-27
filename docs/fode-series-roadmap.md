@@ -10,7 +10,7 @@
 | # | slug | 章 | 主題 | 狀態 |
 |---|---|---|---|---|
 | 1 | `fode-1` | Ch1 Data Engineering Described | 定義、DE 角色、A 型/B 型工程師、資料成熟度、需求金字塔 | ✅ 已發布 |
-| 2 | `fode-2` | Ch2 The Data Engineering Lifecycle | 五階段(生成→儲存→攝取→轉換→服務)+ 六條 undercurrents | ⬜ 待寫 |
+| 2 | `fode-2` | Ch2 The Data Engineering Lifecycle | 五階段(生成→儲存→攝取→轉換→服務)+ 六條 undercurrents | ✅ 已發布 |
 | 3 | `fode-3` | Ch3 Designing Good Data Architecture | 架構原則、權衡、可逆決策 | ⬜ 待寫 |
 | 4 | `fode-4` | Ch4 Choosing Technologies | build vs buy、OSS vs managed、成本/FinOps、位置 | ⬜ 待寫 |
 | 5 | `fode-5` | Ch5 Data Generation in Source Systems | 來源系統、DB、CDC、訊息佇列與串流 | ⬜ 待寫 |
