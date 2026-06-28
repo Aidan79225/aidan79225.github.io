@@ -3,6 +3,7 @@ import react from '@astrojs/react';
 import tailwindcss from '@tailwindcss/vite';
 import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
+import remarkCjkFriendly from 'remark-cjk-friendly';
 import remarkWikiLink from './src/lib/remark-wiki-link.mjs';
 
 export default defineConfig({
@@ -10,7 +11,7 @@ export default defineConfig({
   base: '/',
   integrations: [react()],
   markdown: {
-    remarkPlugins: [remarkMath, remarkWikiLink],
+    remarkPlugins: [remarkCjkFriendly, remarkMath, remarkWikiLink],
     rehypePlugins: [rehypeKatex],
   },
   vite: {
