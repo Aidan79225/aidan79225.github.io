@@ -14,6 +14,21 @@ seriesOrder: 2
 
 ### MOI
 MOI 模型包含三個構面：Motivation（激勵）、Organization（組織）、Innovation（創新）。每個構面都代表領導者塑造環境的方式。
+
+<figure style="margin:1.5rem 0;text-align:center;">
+  <svg viewBox="0 0 560 210" role="img" aria-label="MOI 模型:領導者透過 Motivation 激勵、Organization 組織、Innovation 創新三個構面塑造團隊環境" style="width:100%;max-width:600px;height:auto;margin:0 auto;">
+    <defs><marker id="moi1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
+    <rect x="220" y="12" width="120" height="34" rx="8" fill="#262b3a" stroke="#4f6df5" stroke-width="1.6"/><text x="280" y="34" fill="#e6e6e6" font-size="12" text-anchor="middle">領導者</text>
+    <line x1="252" y1="46" x2="105" y2="80" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#moi1)"/>
+    <line x1="280" y1="46" x2="280" y2="80" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#moi1)"/>
+    <line x1="308" y1="46" x2="455" y2="80" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#moi1)"/>
+    <rect x="24" y="82" width="152" height="72" rx="9" fill="#262b3a" stroke="#d4af37" stroke-width="1.5"/><text x="100" y="105" fill="#e6e6e6" font-size="12.5" text-anchor="middle">M · Motivation</text><text x="100" y="124" fill="#9aa4b2" font-size="10.5" text-anchor="middle">激勵</text><text x="100" y="142" fill="#9aa4b2" font-size="9.5" text-anchor="middle">讓人願意動起來</text>
+    <rect x="204" y="82" width="152" height="72" rx="9" fill="#262b3a" stroke="#d4af37" stroke-width="1.5"/><text x="280" y="105" fill="#e6e6e6" font-size="12.5" text-anchor="middle">O · Organization</text><text x="280" y="124" fill="#9aa4b2" font-size="10.5" text-anchor="middle">組織</text><text x="280" y="142" fill="#9aa4b2" font-size="9.5" text-anchor="middle">讓人有效率有秩序</text>
+    <rect x="384" y="82" width="152" height="72" rx="9" fill="#262b3a" stroke="#d4af37" stroke-width="1.5"/><text x="460" y="105" fill="#e6e6e6" font-size="12.5" text-anchor="middle">I · Innovation</text><text x="460" y="124" fill="#9aa4b2" font-size="10.5" text-anchor="middle">創新</text><text x="460" y="142" fill="#9aa4b2" font-size="9.5" text-anchor="middle">讓人敢提不同想法</text>
+    <rect x="24" y="174" width="512" height="28" rx="8" fill="none" stroke="#3a4154" stroke-width="1.4" stroke-dasharray="5 4"/><text x="280" y="192" fill="#9aa4b2" font-size="11" text-anchor="middle">三者合起來 = 領導者塑造的團隊環境</text>
+  </svg>
+  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">MOI:領導者不是直接控制人,而是調這三個槓桿來塑造環境 —— 願意動、有秩序、敢創新</figcaption>
+</figure>
 1. Motivation 激勵 - Motivation 指的是激勵行為，包含「獎勵」與「懲罰」。
 常見形式包含：
 - 清楚表揚與獎賞

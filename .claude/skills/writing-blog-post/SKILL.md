@@ -6,18 +6,20 @@ description: Use when writing, drafting, or polishing a blog post for this Astro
 # Writing a Blog Post (this site)
 
 ## Overview
-This blog is **Aidan's personal brand / professional image** (a Backend Lead's thinking and depth). The value of a post = **a summary clearer than the source** + **a concrete, opinionated personal reflection**.
+This blog is **Aidan's personal brand / professional image** (a Backend Lead's thinking and depth). Its essence — **用圖像加精簡的文字,把複雜的東西解釋清楚**. The value of a post = **a diagram that makes a hard idea click** + **a summary clearer than the source** + **a concrete, opinionated personal reflection**.
 
-- The summary is NOT a commodity: source books are often verbose and most people don't read them. A 5-minute distillation that surfaces what the source buries is itself a service — and shows the ability to read deeply and condense.
+- The **visual is the signature of this blog, not a garnish**: most concept posts lead with a diagram that carries the core mental model (the unbounded-table for streaming, the three failure points for delivery, partition-as-the-real-log). Reach for the picture *first*, then let the text stay lean around it.
+- The summary is NOT a commodity: sources are often verbose and most people don't read them. A 5-minute distillation that surfaces what the source buries is itself a service — and shows the ability to read deeply and condense.
 - The reflection is the differentiator: it proves you actually applied the idea and have a view nobody can copy.
 
 ## Structure
-1. **Summary** (`##` / `###`): distill the source into clear **models, lists, contrasts** — aim for "clearer and more salient than the original," not paragraph-by-paragraph retelling.
-2. **`## 反思`**: personal experience + opinion proving real use. Sub-divide with `###` when there are distinct angles (e.g. `btl-4`'s 心態 / 技術能力).
-3. **Diagram (optional)**: only when it genuinely aids understanding (growth curve, brain-vs-nodes contrast). Don't force one.
+1. **Diagram(s)** (inline `<svg>`): for any post explaining a non-trivial concept, a diagram is **expected, not optional** — it should carry the central model so a reader who only looks at the picture already gets the gist. Add more than one when there are distinct ideas (e.g. `kafka-topics` has partition + consumer-group; `kafka-delivery` has the journey + per-key compaction). The only posts that legitimately skip it are pure reflection/reading-notes with no spatial structure to show (some `btl-*`) and food photo posts. **If a concept is complex and you can't picture it, that's a signal you haven't distilled it enough yet — not a reason to ship text-only.**
+2. **Summary** (`##` / `###`): distill the source into clear **models, lists, contrasts** — aim for "clearer and more salient than the original," not paragraph-by-paragraph retelling. The prose orbits the diagram; keep it lean.
+3. **`## 反思`**: personal experience + opinion proving real use. Sub-divide with `###` when there are distinct angles (e.g. `btl-4`'s 心態 / 技術能力).
 
 ## Quality checklist (before publishing)
-- Summary: surfaces points the source left unclear? A non-reader gets the gist in 5 min? Distilled into structure (not copied)?
+- **Visual: does a concept post have a diagram carrying the core model? Could a reader who only looks at the picture get the gist? Is the diagram clearer than the equivalent paragraph would be? (the blog's essence — don't ship a complex concept text-only)**
+- Summary: surfaces points the source left unclear? A non-reader gets the gist in 5 min? Distilled into structure (not copied)? Does the prose stay lean around the diagram instead of repeating it?
 - Reflection: specific (real examples, numbers, situations)? Has your own judgment, not neutral restatement?
 - Overall: summary and reflection echo each other? Reflection not rushed (it's the selling point)?
 
@@ -75,7 +77,7 @@ comments: true
 （提煉成清楚的說明 / 條列 / 對照，比原書更好懂。）
 
 ### 〈子概念二〉
-（需要時放一張圖 —— 注意 SVG 內不可有空行。）
+（複雜概念就放一張圖把核心模型畫出來 —— 這是本站精髓,別只給文字。注意 SVG 內不可有空行。）
 
 ## 反思
 
@@ -83,7 +85,7 @@ comments: true
 （具體的個人經驗 + 觀點，證明你真的用過。）
 ```
 
-Optional inline diagram (whole block must have NO blank lines):
+Inline diagram — for concept posts this is expected, not optional (whole block must have NO blank lines):
 ```html
 <figure style="margin:1.5rem 0;text-align:center;">
   <svg viewBox="0 0 360 170" role="img" aria-label="〈描述〉" style="width:100%;max-width:420px;height:auto;margin:0 auto;">
@@ -94,6 +96,8 @@ Optional inline diagram (whole block must have NO blank lines):
 ```
 
 ## Common mistakes
+- Explaining a complex concept in text only → the blog's essence is visual; lead with a diagram that carries the model.
+- A diagram that just decorates (a logo, a vague box) instead of explaining → it must encode the actual mental model (flow, contrast, structure), or it's noise.
 - Reflection too short or generic → it's the selling point; go deeper with real specifics.
 - Summary just paraphrases the source → restructure it to be clearer than the original.
 - CJK / spaced tag slugs → use ASCII slugs.

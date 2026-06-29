@@ -13,6 +13,19 @@ comments: true
 
 創新不是少數天才的靈光，而是一種「環境允許你提出不同想法」的能力（呼應 MOI 裡的 Innovation）。但有三種心態會在源頭就把創新擋下來——而且它們往往是**無意識**的。
 
+<figure style="margin:1.5rem 0;text-align:center;">
+  <svg viewBox="0 0 560 200" role="img" aria-label="想法要變成創新,中間隔著三道無意識的心態牆:看不到自己、沒問題綜合症、相信只有一個正解" style="width:100%;max-width:600px;height:auto;margin:0 auto;">
+    <defs><marker id="bar1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
+    <rect x="12" y="74" width="92" height="48" rx="9" fill="#262b3a" stroke="#4f6df5" stroke-width="1.6"/><text x="58" y="95" fill="#e6e6e6" font-size="11.5" text-anchor="middle">想法</text><text x="58" y="111" fill="#9aa4b2" font-size="9.5" text-anchor="middle">新觀點</text>
+    <line x1="104" y1="98" x2="150" y2="98" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#bar1)"/>
+    <rect x="156" y="40" width="30" height="116" rx="4" fill="#262b3a" stroke="#d4af37" stroke-width="1.6"/><text x="171" y="30" fill="#fca5a5" font-size="13" text-anchor="middle">✕</text><text x="171" y="176" fill="#9aa4b2" font-size="9.5" text-anchor="middle">① 看不到自己</text>
+    <rect x="276" y="40" width="30" height="116" rx="4" fill="#262b3a" stroke="#d4af37" stroke-width="1.6"/><text x="291" y="30" fill="#fca5a5" font-size="13" text-anchor="middle">✕</text><text x="291" y="176" fill="#9aa4b2" font-size="9.5" text-anchor="middle">② 沒問題綜合症</text>
+    <rect x="396" y="40" width="30" height="116" rx="4" fill="#262b3a" stroke="#d4af37" stroke-width="1.6"/><text x="411" y="30" fill="#fca5a5" font-size="13" text-anchor="middle">✕</text><text x="411" y="176" fill="#9aa4b2" font-size="9.5" text-anchor="middle">③ 只有一個正解</text>
+    <rect x="468" y="74" width="80" height="48" rx="9" fill="none" stroke="#3a4154" stroke-width="1.5" stroke-dasharray="5 4"/><text x="508" y="95" fill="#9aa4b2" font-size="11.5" text-anchor="middle">創新</text><text x="508" y="111" fill="#9aa4b2" font-size="9.5" text-anchor="middle">被擋住</text>
+  </svg>
+  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">三道牆任一道都能在源頭擋掉創新 —— 而且它們常是無意識的;先看見牆,才談得上跨過</figcaption>
+</figure>
+
 ### 障礙一：看不到自己
 第一道牆是**看不清自己的行為**。如果你意識不到自己現在是怎麼做事的、有哪些習慣與盲點，就**沒有任何改進的施力點**——你無法改掉一個你根本沒看見的東西。創新的前提，是先能誠實地觀察自己——而[[btl-6|寫日記]]正是逼自己看見自己的好方法。
 
