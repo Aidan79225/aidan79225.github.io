@@ -25,8 +25,8 @@ draft: false
 ## 一張圖看懂:誰是 pod、各自落在哪個 node
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 600 380" role="img" aria-label="K8s 叢集裡,control plane scheduler 把不同 pod 排到不同 node:Node 1 是 on-demand 池跑 Airflow 常駐 pod 與掛 PersistentVolume 的 Metadata DB,Node 2、Node 3 是 spot 池跑 Spark driver 與 executor pod" style="width:100%;max-width:660px;height:auto;margin:0 auto;">
-    <defs><marker id="kp1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker><marker id="kp2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#54b890"/></marker></defs>
+  <svg viewBox="0 0 600 450" role="img" aria-label="K8s 叢集裡,control plane scheduler 把不同 pod 排到不同 node:Node 1 是 on-demand 池跑 Airflow 常駐 pod 與掛 PersistentVolume 的 Metadata DB,Node 2、Node 3 是 spot 池跑 Spark driver 與 executor pod,executor 再去叢集外的 Business DB 讀寫營運資料" style="width:100%;max-width:660px;height:auto;margin:0 auto;">
+    <defs><marker id="kp1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker><marker id="kp2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#54b890"/></marker><marker id="kp3" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto-start-reverse"><path d="M0,0 L0,6 L8,3 z" fill="#a679d6"/></marker></defs>
     <rect x="180" y="10" width="240" height="44" rx="8" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.4" stroke-dasharray="5 4"/>
     <text x="300" y="30" fill="#e6e6e6" font-size="12" text-anchor="middle">K8s Control Plane · Scheduler</text>
     <text x="300" y="45" fill="#9aa4b2" font-size="8.5" text-anchor="middle">依 resource request / affinity 決定 pod 落哪個 node</text>
@@ -53,12 +53,16 @@ draft: false
     <rect x="423" y="230" width="144" height="32" rx="5" fill="#262b3a" stroke="#54b890" stroke-width="1.5"/><text x="495" y="250" fill="#e6e6e6" font-size="10.5" text-anchor="middle">Spark Executor</text>
     <path d="M372 200 C 398 230, 400 175, 421 168" fill="none" stroke="#54b890" stroke-width="1.3" stroke-dasharray="3 3" marker-end="url(#kp2)"/>
     <text x="300" y="300" fill="#9aa4b2" font-size="8.5" text-anchor="middle">Driver 申請的 executor 由 Scheduler 散到各 node</text>
-    <rect x="40" y="345" width="15" height="12" rx="2" fill="#262b3a" stroke="#4f6df5" stroke-width="1.4"/><text x="60" y="355" fill="#9aa4b2" font-size="9" text-anchor="start">Airflow pod</text>
-    <rect x="172" y="345" width="15" height="12" rx="2" fill="#2e4a40" stroke="#54b890" stroke-width="1.4"/><text x="192" y="355" fill="#9aa4b2" font-size="9" text-anchor="start">Spark Driver</text>
-    <rect x="312" y="345" width="15" height="12" rx="2" fill="#262b3a" stroke="#54b890" stroke-width="1.4"/><text x="332" y="355" fill="#9aa4b2" font-size="9" text-anchor="start">Spark Executor</text>
-    <rect x="468" y="345" width="15" height="12" rx="2" fill="#262b3a" stroke="#d6a45c" stroke-width="1.4"/><text x="488" y="355" fill="#9aa4b2" font-size="9" text-anchor="start">Metadata DB</text>
+    <path d="M470 324 C 430 344, 384 348, 356 352" fill="none" stroke="#a679d6" stroke-width="1.4" marker-start="url(#kp3)" marker-end="url(#kp3)"/>
+    <text x="300" y="340" fill="#9aa4b2" font-size="8.5" text-anchor="middle">Executor 讀取來源 / 寫回結果</text>
+    <path d="M222 356 v30 a78 8 0 0 0 156 0 v-30" fill="#262b3a" stroke="#a679d6" stroke-width="1.5"/><ellipse cx="300" cy="356" rx="78" ry="8" fill="#262b3a" stroke="#a679d6" stroke-width="1.5"/><text x="300" y="375" fill="#e6e6e6" font-size="11" text-anchor="middle">Business DB</text><text x="300" y="390" fill="#9aa4b2" font-size="8" text-anchor="middle">叢集外的營運資料源 / 輸出</text>
+    <rect x="30" y="420" width="15" height="12" rx="2" fill="#262b3a" stroke="#4f6df5" stroke-width="1.4"/><text x="50" y="430" fill="#9aa4b2" font-size="8.5" text-anchor="start">Airflow pod</text>
+    <rect x="150" y="420" width="15" height="12" rx="2" fill="#2e4a40" stroke="#54b890" stroke-width="1.4"/><text x="170" y="430" fill="#9aa4b2" font-size="8.5" text-anchor="start">Spark Driver</text>
+    <rect x="278" y="420" width="15" height="12" rx="2" fill="#262b3a" stroke="#54b890" stroke-width="1.4"/><text x="298" y="430" fill="#9aa4b2" font-size="8.5" text-anchor="start">Spark Executor</text>
+    <rect x="412" y="420" width="15" height="12" rx="2" fill="#262b3a" stroke="#d6a45c" stroke-width="1.4"/><text x="432" y="430" fill="#9aa4b2" font-size="8.5" text-anchor="start">Metadata DB</text>
+    <rect x="520" y="420" width="15" height="12" rx="2" fill="#262b3a" stroke="#a679d6" stroke-width="1.4"/><text x="540" y="430" fill="#9aa4b2" font-size="8.5" text-anchor="start">Business DB</text>
   </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">同一個叢集,Scheduler 把 Airflow 常駐 pod(含掛著 PersistentVolume 的 Metadata DB)放在穩定的 on-demand node、把可重來的 Spark executor 散到便宜的 spot node</figcaption>
+  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">同一個叢集,Scheduler 把 Airflow 常駐 pod(含掛著 PersistentVolume 的 Metadata DB)放在穩定的 on-demand node、把可重來的 Spark executor 散到便宜的 spot node;executor 再去叢集外的 Business DB 讀寫真正的營運資料</figcaption>
 </figure>
 
 這張圖就是整篇的心智模型:**叢集是一池 node,Airflow 與 Spark 都只是「會生出 pod 的應用」,真正決定誰跑在哪台機器的是 Scheduler。** 接下來兩節,分別看 Airflow 與 Spark 各自會生出哪些 pod。
@@ -107,6 +111,15 @@ spark-submit \
 4. 作業跑完,**所有 Spark pod 被刪掉,node 留著等下一個作業**。
 
 所以同一個 Spark 作業的 pod,**本來就會橫跨好幾個 node** —— 這正是它能水平擴展的原因。Executor 多到一台塞不下,就自然攤到別台去。
+
+還有一件容易忽略的事:**Spark 要算的「資料」不在叢集裡。** Executor 起來後,會去外部的 **Business DB / 資料源**(營運用的 Postgres、MySQL、數倉或物件儲存)把資料撈進來算、再把結果寫回去(圖一最下方那顆)。它跟前面 Airflow 的 Metadata DB 是**完全不同的兩顆 DB**,別搞混:
+
+| | **Metadata DB** | **Business DB** |
+|---|---|---|
+| 存什麼 | Airflow 的 DAG / task 排程狀態 | 真正要被處理的業務資料 |
+| 誰在用 | Airflow Scheduler | Spark Executor 讀取 / 寫回 |
+| 位置 | 叢集內(StatefulSet)或外接 managed | 幾乎都在叢集外,由資料團隊 / 雲商維運 |
+| 一句話 | 記住「排程跑到哪」 | 記住「業務發生了什麼」 |
 
 ## 合起來:一次 DAG run 的 pod 生命週期
 
