@@ -123,7 +123,25 @@ spark-submit \
 
 ## 合起來:一次 DAG run 的 pod 生命週期
 
-把 Airflow 觸發 Spark 串起來,實務上常用 **`SparkKubernetesOperator`**:Airflow 的一個 task 去 K8s 建一個 Spark 作業,接著 Spark Driver 再去生 Executor。畫成時間軸,最能看出「**誰常駐、誰用完即丟**」:
+把 Airflow 觸發 Spark 串起來,實務上常用 **`SparkKubernetesOperator`**:Airflow 的一個 task 去 K8s 提交 Spark 作業,Driver 起來後再生 Executor,Executor 最後把算完的結果寫進 **Business DB**。整條鏈長這樣:
+
+<figure style="margin:1.5rem 0;text-align:center;">
+  <svg viewBox="0 0 604 140" role="img" aria-label="流程圖:Airflow task pod 提交 Spark 作業,建立 Spark Driver pod,Driver 申請 Executor pod,Executor 讀寫叢集外的 Business DB" style="width:100%;max-width:660px;height:auto;margin:0 auto;">
+    <defs><marker id="kf1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
+    <rect x="8" y="70" width="78" height="42" rx="7" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/><text x="47" y="88" fill="#e6e6e6" font-size="11" text-anchor="middle">Airflow</text><text x="47" y="102" fill="#9aa4b2" font-size="7.5" text-anchor="middle">task pod</text>
+    <rect x="134" y="70" width="78" height="42" rx="7" fill="#262b3a" stroke="#54b890" stroke-width="1.5" stroke-dasharray="4 3"/><text x="173" y="88" fill="#e6e6e6" font-size="11" text-anchor="middle">Spark</text><text x="173" y="102" fill="#9aa4b2" font-size="7.5" text-anchor="middle">spark-submit</text>
+    <rect x="260" y="70" width="78" height="42" rx="7" fill="#2e4a40" stroke="#54b890" stroke-width="1.6"/><text x="299" y="88" fill="#e6e6e6" font-size="11" text-anchor="middle">Driver</text><text x="299" y="102" fill="#9aa4b2" font-size="7.5" text-anchor="middle">Spark pod</text>
+    <rect x="386" y="70" width="78" height="42" rx="7" fill="#262b3a" stroke="#54b890" stroke-width="1.5"/><text x="425" y="88" fill="#e6e6e6" font-size="10.5" text-anchor="middle">Executor</text><text x="425" y="102" fill="#9aa4b2" font-size="7.5" text-anchor="middle">×N pod</text>
+    <path d="M516 76 v30 a35 6 0 0 0 70 0 v-30" fill="#262b3a" stroke="#d6a45c" stroke-width="1.5"/><ellipse cx="551" cy="76" rx="35" ry="6" fill="#262b3a" stroke="#d6a45c" stroke-width="1.5"/><text x="551" y="97" fill="#e6e6e6" font-size="9.5" text-anchor="middle">Business DB</text>
+    <line x1="88" y1="91" x2="132" y2="91" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#kf1)"/><text x="110" y="84" fill="#9aa4b2" font-size="7.5" text-anchor="middle">提交作業</text>
+    <line x1="214" y1="91" x2="258" y2="91" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#kf1)"/><text x="236" y="84" fill="#9aa4b2" font-size="7.5" text-anchor="middle">建 Driver</text>
+    <line x1="340" y1="91" x2="384" y2="91" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#kf1)"/><text x="362" y="84" fill="#9aa4b2" font-size="7.5" text-anchor="middle">要 Executor</text>
+    <line x1="466" y1="91" x2="510" y2="91" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#kf1)"/><text x="488" y="84" fill="#9aa4b2" font-size="7.5" text-anchor="middle">讀寫資料</text>
+  </svg>
+  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">一條作業的資料流:Airflow 觸發 → 提交 Spark 作業 → 建 Driver pod → Driver 開 Executor → Executor 讀寫 Business DB。中間每一格都是一個(或一群)pod,只有最右邊的 Business DB 在叢集外</figcaption>
+</figure>
+
+鏈上每一格(除了最右邊叢集外的 Business DB)都是一個或一群 pod。換個角度,把同一條鏈攤在時間軸上,最能看出「**誰常駐、誰用完即丟**」:
 
 <figure style="margin:1.5rem 0;text-align:center;">
   <svg viewBox="0 0 600 250" role="img" aria-label="pod 生命週期時間軸:Airflow Scheduler、Webserver、Triggerer 全程常駐;task pod、Spark Driver、Executor 只在作業期間存在,跑完就消失" style="width:100%;max-width:660px;height:auto;margin:0 auto;">
