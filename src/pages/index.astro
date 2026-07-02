@@ -6,7 +6,7 @@ const posts = (await getPublishedPosts())
   .sort(byDateDesc)
   .slice(0, 5);
 ---
-<BaseLayout title="Aidan's Blog">
+<BaseLayout title="Aidan's Blog" description="Aidan 的部落格 —— 用圖像加精簡的文字,把資料工程與技術領導講清楚。涵蓋 Airflow、Spark、Kafka、dbt 與資料架構筆記。">
   <h1 class="text-3xl font-bold mb-2">Aidan's Blog</h1>
   <p class="text-muted mb-8">軟體開發筆記、技術整理與個人興趣。</p>
   <h2 class="text-xl font-bold mb-3">最新文章</h2>

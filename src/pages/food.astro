@@ -6,7 +6,7 @@ const posts = (await getPublishedPosts())
   .filter((p) => p.data.category === 'food')
   .sort(byDateDesc);
 ---
-<BaseLayout title="Food">
+<BaseLayout title="Food" description="美食筆記 —— Aidan 會回訪的口袋名單與心得。">
   <h1 class="text-2xl font-bold mb-4">Food</h1>
   <div class="space-y-4">
     {posts.map((p) => <PostCard post={p} />)}

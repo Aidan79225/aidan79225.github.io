@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://aidan79225.github.io/sitemap-index.xml

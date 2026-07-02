@@ -1,11 +1,28 @@
 ---
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
-const { title = "Aidan's Blog", contentLicense = false } = Astro.props;
+import Seo from '../components/Seo.astro';
+const {
+  title = "Aidan's Blog",
+  description,
+  image,
+  type = 'website',
+  publishedTime,
+  tags = [],
+  contentLicense = false,
+} = Astro.props;
 // Cloudflare Web Analytics beacon token (from the CF dashboard). Public by
 // design — it only identifies which site to attribute pageviews to. Set it
 // here or via the PUBLIC_CF_BEACON_TOKEN env var; empty = no beacon emitted.
 const CF_BEACON_TOKEN = import.meta.env.PUBLIC_CF_BEACON_TOKEN ?? '';
+
+const SITE_NAME = "Aidan's Blog";
+const DEFAULT_DESCRIPTION =
+  'Aidan 的部落格 —— 用圖像加精簡的文字,把資料工程與技術領導講清楚。';
+const canonical = new URL(Astro.url.pathname, Astro.site).href;
+const desc = description ?? DEFAULT_DESCRIPTION;
+const ogImage = new URL(image ?? '/og/default.png', Astro.site).href;
+const fullTitle = title === SITE_NAME ? SITE_NAME : `${title} · ${SITE_NAME}`;
 ---
 <!doctype html>
 <html lang="zh-Hant">
@@ -15,7 +32,18 @@ const CF_BEACON_TOKEN = import.meta.env.PUBLIC_CF_BEACON_TOKEN ?? '';
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <meta name="theme-color" content="#1f2330" />
-    <title>{title}</title>
+    <title>{fullTitle}</title>
+    <Seo
+      title={title}
+      description={desc}
+      canonical={canonical}
+      image={ogImage}
+      type={type}
+      siteName={SITE_NAME}
+      publishedTime={publishedTime}
+      tags={tags}
+    />
+    <link rel="alternate" type="application/rss+xml" title={SITE_NAME} href={new URL('/rss.xml', Astro.site).href} />
   </head>
   <body class="bg-base text-ink min-h-screen">
     <Nav />

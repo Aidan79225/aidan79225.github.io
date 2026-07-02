@@ -6,11 +6,13 @@ import AuthorCard from '../components/AuthorCard.astro';
 import Comments from '../components/Comments.astro';
 import { getBacklinks } from '../lib/backlinks';
 import { groupBySection } from '../lib/group-backlinks.mjs';
+import { excerpt } from '../lib/excerpt';
 import type { MarkdownHeading } from 'astro';
 import 'katex/dist/katex.min.css';
 interface Props { post: CollectionEntry<'blog'>; headings?: MarkdownHeading[]; }
 const { post, headings = [] } = Astro.props;
-const { title, date, category, tags = [], series } = post.data;
+const { title, date, category, tags = [], series, description } = post.data;
+const metaDescription = description ?? excerpt(post.body ?? '');
 
 let seriesPosts: CollectionEntry<'blog'>[] = [];
 let prevPost: CollectionEntry<'blog'> | null = null;
@@ -25,7 +27,15 @@ if (series) {
 }
 const backlinkGroups = groupBySection(await getBacklinks(post.id), headings);
 ---
-<BaseLayout title={title} contentLicense>
+<BaseLayout
+  title={title}
+  description={metaDescription}
+  type="article"
+  publishedTime={date.toISOString()}
+  tags={tags}
+  image={new URL(`/og/${post.id}.png`, Astro.site).href}
+  contentLicense
+>
   <article>
     <h1 class="text-3xl font-bold mb-2">{title}</h1>
     <p class="text-muted text-sm mb-4">

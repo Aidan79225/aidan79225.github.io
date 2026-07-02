@@ -8,7 +8,7 @@ for (const p of posts) {
 }
 const tags = [...counts.entries()].sort((a, b) => b[1] - a[1]);
 ---
-<BaseLayout title="Tags">
+<BaseLayout title="Tags" description="依主題瀏覽 Aidan 的部落格文章標籤。">
   <h1 class="text-2xl font-bold mb-4">Tags</h1>
   <ul class="flex flex-wrap gap-2 list-none p-0">
     {tags.map(([tag, count]) => (
