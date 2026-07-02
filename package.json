@@ -8,6 +8,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "og": "node scripts/gen-og.mjs",
     "test": "node --test test/**/*.mjs"
   },
   "dependencies": {
