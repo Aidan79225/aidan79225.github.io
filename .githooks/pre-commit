@@ -1,0 +1,20 @@
+#!/bin/sh
+# Regenerate Open Graph share images when blog posts (or the generator/template)
+# change, and stage them so each post's OG image ships in the same commit.
+# Wired via `git config core.hooksPath .githooks`, set by the package.json
+# "prepare" script on `npm install`. See scripts/gen-og.mjs.
+
+changed=$(git diff --cached --name-only --diff-filter=ACMR \
+  | grep -E '^(src/content/blog/.*\.md|scripts/gen-og\.mjs)$' || true)
+
+if [ -n "$changed" ]; then
+  echo "pre-commit: blog changed → regenerating OG images (npm run og)…"
+  if npm run og --silent; then
+    git add public/og
+  else
+    echo "pre-commit: ⚠ OG generation failed (a CJK font via fontconfig is required)." >&2
+    echo "pre-commit:   Committing without updated OG images — run 'npm run og' manually." >&2
+  fi
+fi
+
+exit 0
