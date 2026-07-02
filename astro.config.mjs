@@ -8,7 +8,7 @@ import remarkCjkFriendly from 'remark-cjk-friendly';
 import remarkWikiLink from './src/lib/remark-wiki-link.mjs';
 
 export default defineConfig({
-  site: 'https://aidan79225.github.io',
+  site: 'https://blog.aidan.tw',
   base: '/',
   integrations: [react(), sitemap()],
   markdown: {
