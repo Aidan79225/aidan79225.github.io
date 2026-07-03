@@ -88,7 +88,7 @@ export default function Search() {
   };
 
   return (
-    <div ref={boxRef} className="relative">
+    <div ref={boxRef} className="relative w-full sm:w-auto">
       <input
         ref={inputRef}
         type="search"
@@ -101,10 +101,10 @@ export default function Search() {
         }}
         onFocus={() => setOpen(true)}
         onKeyDown={onKeyDown}
-        className="w-36 sm:w-52 bg-base border border-line rounded px-3 py-1 text-sm text-ink placeholder:text-muted focus:outline-none focus:border-accent"
+        className="w-full sm:w-52 bg-base border border-line rounded px-3 py-1 text-sm text-ink placeholder:text-muted focus:outline-none focus:border-accent"
       />
       {open && q.trim() && (
-        <ul className="absolute right-0 mt-1 w-72 max-h-80 overflow-auto bg-surface border border-line rounded shadow-lg z-50 list-none m-0 p-1">
+        <ul className="absolute right-0 mt-1 w-full sm:w-72 max-h-80 overflow-auto bg-surface border border-line rounded shadow-lg z-50 list-none m-0 p-1">
           {results.length === 0 ? (
             <li className="px-3 py-2 text-sm text-muted">找不到「{q.trim()}」</li>
           ) : (
