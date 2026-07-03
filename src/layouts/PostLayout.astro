@@ -6,13 +6,13 @@ import AuthorCard from '../components/AuthorCard.astro';
 import Comments from '../components/Comments.astro';
 import { getBacklinks } from '../lib/backlinks';
 import { groupBySection } from '../lib/group-backlinks.mjs';
-import { excerpt } from '../lib/excerpt';
+import { excerpt } from '../lib/post';
 import type { MarkdownHeading } from 'astro';
 import 'katex/dist/katex.min.css';
 interface Props { post: CollectionEntry<'blog'>; headings?: MarkdownHeading[]; }
 const { post, headings = [] } = Astro.props;
 const { title, date, category, tags = [], series, description } = post.data;
-const metaDescription = description ?? excerpt(post.body ?? '');
+const metaDescription = description ?? excerpt(post.body ?? '', 140);
 
 let seriesPosts: CollectionEntry<'blog'>[] = [];
 let prevPost: CollectionEntry<'blog'> | null = null;

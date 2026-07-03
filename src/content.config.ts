@@ -8,7 +8,7 @@ const blog = defineCollection({
     date: z.coerce.date(),
     category: z.enum(['tech', 'food']),
     // Optional hand-written SEO/social description. When omitted, an excerpt is
-    // derived from the post body (see src/lib/excerpt.ts).
+    // derived from the post body (see excerpt() in src/lib/post.ts).
     description: z.string().optional(),
     tags: z.array(z.string()).optional(),
     comments: z.boolean().default(true),

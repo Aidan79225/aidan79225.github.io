@@ -4,7 +4,7 @@
 // payload stays a few KB; substring matching over these covers "find the post
 // about X" without a full-text engine.
 import { getPublishedPosts, byDateDesc } from '../lib/posts';
-import { excerpt } from '../lib/excerpt';
+import { excerpt } from '../lib/post';
 
 export async function GET() {
   const posts = (await getPublishedPosts()).sort(byDateDesc);

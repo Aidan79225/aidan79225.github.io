@@ -1,6 +1,6 @@
 import rss from '@astrojs/rss';
 import { getPublishedPosts, byDateDesc } from '../lib/posts';
-import { excerpt } from '../lib/excerpt';
+import { excerpt } from '../lib/post';
 
 export async function GET(context) {
   const posts = await getPublishedPosts();
@@ -14,7 +14,7 @@ export async function GET(context) {
         title: post.data.title,
         pubDate: post.data.date,
         link: `/blog/${post.id}/`,
-        description: post.data.description ?? excerpt(post.body ?? ''),
+        description: post.data.description ?? excerpt(post.body ?? '', 140),
         categories: post.data.tags ?? [],
       })),
     customData: '<language>zh-Hant</language>',
