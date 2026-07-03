@@ -1,0 +1,95 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getPublishedPosts } from '../lib/posts';
+
+const all = await getPublishedPosts();
+const byId = new Map(all.map((p) => [p.id, p]));
+const bySeries = (name: string) =>
+  all
+    .filter((p) => p.data.series === name)
+    .sort((a, b) => (a.data.seriesOrder ?? 0) - (b.data.seriesOrder ?? 0));
+
+// Curated learning paths. Series-based blocks stay fresh automatically as new
+// entries are added; the "精選單篇" block is a hand-picked ordered list.
+const series = {
+  fode: 'Fundamentals of Data Engineering 讀書筆記',
+  spark: 'Spark 學習筆記',
+  kafka: 'Kafka 學習筆記',
+  airflow: 'Airflow 學習筆記',
+  btl: '成為 Tech Leader 讀書筆記',
+};
+
+const paths = [
+  {
+    title: '① 先建立資料工程的觀念地基',
+    blurb:
+      '不確定從哪開始?先讀這個系列。它從「資料工程是什麼」一路帶到生命週期、架構、選型、源頭、儲存、擷取、建模 —— 有了這張心智地圖,再看工具就不會迷路。',
+    groups: [{ heading: series.fode, posts: bySeries(series.fode) }],
+  },
+  {
+    title: '② 三大工具,動手學',
+    blurb: '觀念之後就是實作。這三個是資料工程最核心的工具,各自一條龍從「是什麼」到「上生產」。',
+    groups: [
+      { heading: '分散式運算 · ' + series.spark, posts: bySeries(series.spark) },
+      { heading: '事件串流 · ' + series.kafka, posts: bySeries(series.kafka) },
+      { heading: '工作流程編排 · ' + series.airflow, posts: bySeries(series.airflow) },
+    ],
+  },
+  {
+    title: '③ 轉換與架構:精選單篇',
+    blurb: '把原始資料煉成可用模型、以及幾個我認為最該懂的架構觀念。',
+    groups: [
+      {
+        heading: null,
+        posts: ['dbt-intro', 'medallion-architecture', 'airflow-spark-on-k8s', 'pain-before-power']
+          .map((id) => byId.get(id))
+          .filter(Boolean),
+      },
+    ],
+  },
+  {
+    title: '④ 想帶人、想成長:技術領導',
+    blurb: '技術之外的另一條線 —— 讀《成為 Tech Leader》的筆記與反思,寫給正在或即將帶人的工程師。',
+    groups: [{ heading: series.btl, posts: bySeries(series.btl) }],
+  },
+];
+---
+<BaseLayout
+  title="Start Here"
+  description="從這裡開始 —— 這個部落格的推薦閱讀路徑:資料工程觀念地基、Spark/Kafka/Airflow 三大工具、轉換與架構精選,以及技術領導筆記。"
+>
+  <h1 class="text-3xl font-bold mb-2">從這裡開始</h1>
+  <p class="text-muted mb-8">
+    這裡的文章多半用一張圖 + 精簡的文字,把資料工程與技術領導裡複雜的東西講清楚。如果你是第一次來,照著下面的路徑走,比亂點省力。
+  </p>
+
+  <div class="space-y-6">
+    {paths.map((path) => (
+      <section class="bg-surface border border-line rounded-lg p-5">
+        <h2 class="text-xl font-bold mb-1">{path.title}</h2>
+        <p class="text-muted text-sm mb-4">{path.blurb}</p>
+        <div class="space-y-4">
+          {path.groups.map((g) => (
+            <div>
+              {g.heading && <p class="text-xs text-muted mb-2">📚 {g.heading}</p>}
+              <ol class="list-none m-0 p-0 space-y-1.5">
+                {g.posts.map((p, i) => (
+                  <li class="flex gap-3">
+                    <span class="text-accent text-sm font-mono shrink-0 w-5 text-right">{i + 1}</span>
+                    <a href={`/blog/${p.id}/`} class="text-ink hover:text-accent no-underline text-sm leading-relaxed">
+                      {p.data.title}
+                    </a>
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+
+  <p class="text-muted text-sm mt-8">
+    想找特定主題?用右上角的搜尋,或到 <a href="/tags/" class="text-accent hover:underline">標籤頁</a> 依主題瀏覽。
+  </p>
+</BaseLayout>
