@@ -1,13 +1,14 @@
 ---
 title: "dbt 是什麼?用寫程式的方式做資料轉換"
-date: 2026-06-14
+date: 2026-07-03
 category: tech
+description: "dbt 是什麼?一篇搞懂它如何用一堆 SQL SELECT,把倉儲裡的原始資料轉成乾淨可信的模型,並把版控、測試、血緣、文件這套工程紀律帶進 ELT 的 T。"
 tags:
   - dbt
   - data-engineering
   - analytics-engineering
 comments: true
-draft: true
+draft: false
 ---
 ## dbt 是什麼
 
@@ -42,6 +43,8 @@ draft: true
   </svg>
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">先把原始資料載進倉儲(EL),dbt 再在倉儲「內部」用 SQL 把它轉成建模層</figcaption>
 </figure>
+
+這正是 [[fode-8|ELT 裡的那個 T]] 在工具上的落地,也是 [[medallion-architecture|Medallion]] 那套 Bronze → Silver → Gold 分層實際的建法 —— 一層 model 疊一層 model,把原始資料逐步煉成可用的模型。
 
 ### 核心概念
 
