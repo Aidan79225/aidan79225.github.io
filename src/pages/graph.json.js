@@ -36,6 +36,7 @@ export async function GET() {
     url: `/blog/${p.id}/`,
     series: p.data.series ?? null,
     category: p.data.category,
+    tags: p.data.tags ?? [],
     degree: degree[p.id] || 0,
   }));
 

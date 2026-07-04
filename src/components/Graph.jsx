@@ -16,8 +16,19 @@ const colorFor = (n) => (n.series && COLOR[n.series]) || OTHER;
 export default function Graph() {
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
-  const S = useRef({ nodes: [], edges: [], adj: new Map(), view: { x: 0, y: 0, scale: 1 }, hoverId: null });
+  const S = useRef({ nodes: [], edges: [], adj: new Map(), view: { x: 0, y: 0, scale: 1 }, hoverId: null, activeTag: null });
   const [ready, setReady] = useState(false);
+  const [tags, setTags] = useState([]);
+  const [activeTag, setActiveTag] = useState(null);
+
+  // Tags filter (don't change edge meaning): highlight posts with the tag, dim
+  // the rest. Selection lives on both React state (chip styling) and the ref
+  // (read by the canvas draw loop).
+  const pick = (t) => {
+    const next = S.current.activeTag === t ? null : t;
+    S.current.activeTag = next;
+    setActiveTag(next);
+  };
 
   useEffect(() => {
     let raf, canceled = false;
@@ -26,6 +37,14 @@ export default function Graph() {
       .then((data) => {
         if (canceled) return;
         init(data);
+        const freq = {};
+        for (const nd of data.nodes) for (const t of nd.tags || []) freq[t] = (freq[t] || 0) + 1;
+        setTags(
+          Object.entries(freq)
+            .filter(([, c]) => c >= 2)
+            .sort((a, b) => b[1] - a[1])
+            .map(([t]) => t),
+        );
         setReady(true);
       })
       .catch(() => {});
@@ -129,26 +148,37 @@ export default function Graph() {
         ctx.clearRect(0, 0, W, H);
         const hoverId = st.hoverId;
         const nb = hoverId ? st.adj.get(hoverId) : null;
+        const at = st.activeTag;
+        const matches = at ? new Set(st.nodes.filter((n) => (n.tags || []).includes(at)).map((n) => n.id)) : null;
+        const anyFocus = hoverId || matches;
+        const inFocus = (nd) => (hoverId ? nd.id === hoverId || (nb && nb.has(nd.id)) : matches ? matches.has(nd.id) : true);
         ctx.save();
         ctx.translate(st.view.x, st.view.y);
         ctx.scale(st.view.scale, st.view.scale);
         ctx.lineWidth = 1 / st.view.scale;
         for (const e of st.edges) {
           const a = st.nodes[e.s], b = st.nodes[e.t];
-          const on = hoverId && (a.id === hoverId || b.id === hoverId);
-          ctx.strokeStyle = on ? 'rgba(230,230,230,0.55)' : 'rgba(120,130,150,0.16)';
+          const on = hoverId ? a.id === hoverId || b.id === hoverId : matches ? matches.has(a.id) && matches.has(b.id) : false;
+          ctx.strokeStyle = on ? 'rgba(230,230,230,0.5)' : anyFocus ? 'rgba(120,130,150,0.07)' : 'rgba(120,130,150,0.16)';
           ctx.beginPath();
           ctx.moveTo(a.x, a.y);
           ctx.lineTo(b.x, b.y);
           ctx.stroke();
         }
         for (const nd of st.nodes) {
-          const dim = hoverId && nd.id !== hoverId && !(nb && nb.has(nd.id));
+          const dim = anyFocus && !inFocus(nd);
           ctx.globalAlpha = dim ? 0.2 : 1;
           ctx.fillStyle = colorFor(nd);
           ctx.beginPath();
           ctx.arc(nd.x, nd.y, radius(nd), 0, Math.PI * 2);
           ctx.fill();
+          if (matches && matches.has(nd.id)) {
+            ctx.strokeStyle = '#e6e6e6';
+            ctx.lineWidth = 2 / st.view.scale;
+            ctx.beginPath();
+            ctx.arc(nd.x, nd.y, radius(nd) + 3 / st.view.scale, 0, Math.PI * 2);
+            ctx.stroke();
+          }
           ctx.globalAlpha = 1;
         }
         ctx.restore();
@@ -156,7 +186,7 @@ export default function Graph() {
         ctx.font = '12px system-ui, sans-serif';
         ctx.textBaseline = 'middle';
         for (const nd of st.nodes) {
-          const show = hoverId ? nd.id === hoverId || (nb && nb.has(nd.id)) : nd.degree >= 13;
+          const show = hoverId ? nd.id === hoverId || (nb && nb.has(nd.id)) : matches ? matches.has(nd.id) : nd.degree >= 13;
           if (!show) continue;
           const p = toScreen(nd);
           const label = nd.title.length > 16 ? nd.title.slice(0, 16) + '…' : nd.title;
@@ -258,22 +288,47 @@ export default function Graph() {
   }, []);
 
   return (
-    <div ref={wrapRef} className="relative w-full h-[72vh] min-h-[420px] bg-base border border-line rounded-lg overflow-hidden touch-none">
-      <canvas ref={canvasRef} className="block" style={{ cursor: 'grab' }} />
-      <div className="absolute top-3 left-3 flex flex-col gap-1 text-xs bg-surface/80 border border-line rounded p-2 backdrop-blur">
-        {SERIES.map(([s, c, label]) => (
-          <span key={s} className="flex items-center gap-2 text-muted">
-            <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: c }} />
-            {label}
+    <div>
+      {tags.length > 0 && (
+        <div className="flex flex-wrap items-center gap-1.5 mb-3">
+          <span className="text-xs text-muted mr-1">依標籤篩選:</span>
+          {tags.map((t) => (
+            <button
+              key={t}
+              onClick={() => pick(t)}
+              className={`text-xs rounded px-2 py-0.5 border transition-colors ${
+                activeTag === t
+                  ? 'bg-accent text-white border-accent'
+                  : 'bg-surface text-muted border-line hover:text-accent'
+              }`}
+            >
+              #{t}
+            </button>
+          ))}
+          {activeTag && (
+            <button onClick={() => pick(activeTag)} className="text-xs rounded px-2 py-0.5 text-muted hover:text-accent">
+              ✕ 清除
+            </button>
+          )}
+        </div>
+      )}
+      <div ref={wrapRef} className="relative w-full h-[72vh] min-h-[420px] bg-base border border-line rounded-lg overflow-hidden touch-none">
+        <canvas ref={canvasRef} className="block" style={{ cursor: 'grab' }} />
+        <div className="absolute top-3 left-3 flex flex-col gap-1 text-xs bg-surface/80 border border-line rounded p-2 backdrop-blur">
+          {SERIES.map(([s, c, label]) => (
+            <span key={s} className="flex items-center gap-2 text-muted">
+              <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: c }} />
+              {label}
+            </span>
+          ))}
+          <span className="flex items-center gap-2 text-muted">
+            <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: OTHER }} />
+            單篇
           </span>
-        ))}
-        <span className="flex items-center gap-2 text-muted">
-          <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: OTHER }} />
-          單篇
-        </span>
+        </div>
+        {!ready && <p className="absolute inset-0 flex items-center justify-center text-muted text-sm">載入關係圖…</p>}
+        <p className="absolute bottom-2 right-3 text-[11px] text-muted">拖曳移動 · 滾輪縮放 · 點節點看文章</p>
       </div>
-      {!ready && <p className="absolute inset-0 flex items-center justify-center text-muted text-sm">載入關係圖…</p>}
-      <p className="absolute bottom-2 right-3 text-[11px] text-muted">拖曳移動 · 滾輪縮放 · 點節點看文章</p>
     </div>
   );
 }
