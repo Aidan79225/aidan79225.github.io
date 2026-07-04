@@ -3,6 +3,8 @@ export function toPlainText(body: string): string {
     .replace(/```[\s\S]*?```/g, ' ')           // code fences
     .replace(/<figure[\s\S]*?<\/figure>/gi, ' ') // figures (inline SVG)
     .replace(/<[^>]+>/g, ' ')                   // remaining HTML tags
+    .replace(/\[\[[^\]|]+\|([^\]]+)\]\]/g, '$1') // [[slug|label]] -> label
+    .replace(/\[\[([^\]]+)\]\]/g, '$1')          // [[slug]] -> slug
     .replace(/!\[[^\]]*\]\([^)]*\)/g, ' ')      // markdown images
     .replace(/\[([^\]]*)\]\([^)]*\)/g, '$1')    // markdown links -> text
     .replace(/^#{1,6}\s+.*$/gm, '')             // strip heading lines entirely
