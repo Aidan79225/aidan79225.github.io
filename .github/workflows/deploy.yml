@@ -34,8 +34,26 @@ jobs:
     runs-on: ubuntu-latest
     environment:
       name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
+      url: https://blog.aidan.tw/
     steps:
-      - name: Deploy to GitHub Pages
-        id: deployment
+      # GitHub Pages custom-domain deploys intermittently return
+      # "Deployment failed, try again later." (a backend/cert-provisioning
+      # flake, not a build error) — so retry a couple of times before failing.
+      - name: Deploy to GitHub Pages (attempt 1)
+        id: a1
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+      - name: Wait before retry
+        if: steps.a1.outcome == 'failure'
+        run: sleep 30
+      - name: Deploy to GitHub Pages (attempt 2)
+        id: a2
+        if: steps.a1.outcome == 'failure'
+        uses: actions/deploy-pages@v4
+        continue-on-error: true
+      - name: Wait before final retry
+        if: steps.a1.outcome == 'failure' && steps.a2.outcome == 'failure'
+        run: sleep 45
+      - name: Deploy to GitHub Pages (final attempt)
+        if: steps.a1.outcome == 'failure' && steps.a2.outcome == 'failure'
         uses: actions/deploy-pages@v4
