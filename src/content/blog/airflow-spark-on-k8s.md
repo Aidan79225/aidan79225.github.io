@@ -7,6 +7,8 @@ tags:
   - airflow
   - spark
   - data-engineering
+series: "Kubernetes 學習筆記"
+seriesOrder: 8
 comments: true
 draft: false
 ---
