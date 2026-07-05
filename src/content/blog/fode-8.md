@@ -22,7 +22,7 @@ draft: false
 |---|---|
 | 全表掃描 | 用分區 / 索引 / 欄式,只讀要的 |
 | `SELECT *` | 只取需要的欄(欄式倉儲尤其有感) |
-| 亂 join 一堆大表 | join 是最貴的一步(見 [[spark-shuffle|shuffle]]),先過濾再 join |
+| 亂 join 一堆大表 | join 是最貴的一步(見 [[spark-shuffle\|shuffle]]),先過濾再 join |
 | 在 where 對欄位包函式 | 讓條件能被 **predicate pushdown** 推到最底層 |
 
 一句話:**SQL 是宣告式的,但效能不是自動的** —— 你要給優化器一個好發揮的環境。

@@ -82,7 +82,12 @@ export function extractLinks(body) {
   const re = wikiLinkRegex();
   const links = [];
   let m;
-  while ((m = re.exec(body ?? '')) !== null) {
+  // A '|' inside a Markdown table cell must be escaped as '\|' so it isn't read
+  // as a column separator. The rendered mdast unescapes it, but this runs on the
+  // raw source — normalise '\|' -> '|' first, or the slug captures a trailing
+  // backslash (e.g. "fode-7\") and the backlink/graph edge is lost.
+  const src = (body ?? '').replace(/\\\|/g, '|');
+  while ((m = re.exec(src)) !== null) {
     const { slug, section } = parseTarget(m[1].trim());
     if (slug === '') continue;
     const sectionText = section !== undefined ? section.trim() : undefined;

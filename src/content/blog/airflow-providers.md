@@ -75,7 +75,7 @@ refresh = SQLExecuteQueryOperator(
 
 ## Hook:需要自訂邏輯時,直接用底層 client
 
-現成 Operator 太死板、或要把好幾步組起來時,就在 [[airflow-xcom|`@task`]] 裡直接用 Hook —— 它就是 Operator 內部那個連線 client,只是換你親自操刀:
+現成 Operator 太死板、或要把好幾步組起來時,就在 [[airflow-xcom|@task]] 裡直接用 Hook —— 它就是 Operator 內部那個連線 client,只是換你親自操刀:
 
 ```python
 from airflow.decorators import task
