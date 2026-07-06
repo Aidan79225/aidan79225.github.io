@@ -1,6 +1,6 @@
 ---
 title: "Kubernetes 是什麼:從「跑容器」到「宣告你要的狀態」"
-date: 2026-07-07
+date: 2026-07-06
 category: tech
 description: "K8s 難學,常常是因為先背 API 再學觀念。這篇從頭講:它到底解決什麼問題,以及讓一切都串起來的那一個核心觀念——宣告式的期望狀態 + reconcile loop。這是整個系列的地基。"
 tags:
