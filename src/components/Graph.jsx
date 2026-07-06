@@ -105,6 +105,7 @@ export default function Graph() {
       window.addEventListener('resize', resize);
 
       const K = 95; // ideal edge length
+      const MAXV = 26; // per-node velocity cap — the hard guard against blow-up
       let alpha = 1;
       const step = () => {
         const N = st.nodes;
@@ -113,9 +114,17 @@ export default function Graph() {
           for (let j = i + 1; j < N.length; j++) {
             const b = N[j];
             let dx = a.x - b.x, dy = a.y - b.y;
-            let d = Math.sqrt(dx * dx + dy * dy) || 0.01;
-            if (d > 200) continue; // local repulsion only — keeps the graph compact
-            const rep = (K * K) / d / d * K * 0.2;
+            let d = Math.sqrt(dx * dx + dy * dy);
+            if (d < 0.01) { // exact overlap: nudge apart along a deterministic axis so they don't lock together
+              const ang = (i * 12.9898 + j * 78.233);
+              dx = Math.cos(ang) * 0.5; dy = Math.sin(ang) * 0.5; d = 0.5;
+            }
+            if (d > 240) continue; // local repulsion only — keeps the graph compact
+            // Clamp the distance used for the force so two nodes that pile up
+            // (d → 0) can't produce an exploding 1/d push. Inverse-linear and
+            // bounded — the old (K*K)/d² term blew up when nodes overlapped.
+            const dc = Math.max(d, 24);
+            const rep = (K * K) / dc * 0.3;
             const fx = (dx / d) * rep, fy = (dy / d) * rep;
             a.vx += fx; a.vy += fy; b.vx -= fx; b.vy -= fy;
           }
@@ -124,20 +133,24 @@ export default function Graph() {
           const a = N[e.s], b = N[e.t];
           let dx = b.x - a.x, dy = b.y - a.y;
           let d = Math.sqrt(dx * dx + dy * dy) || 0.01;
-          const f = (d - K) * 0.08;
+          const f = (d - K) * 0.06;
           const fx = (dx / d) * f, fy = (dy / d) * f;
           a.vx += fx; a.vy += fy; b.vx -= fx; b.vy -= fy;
         }
         for (const nd of N) {
-          nd.vx += -nd.x * 0.06;
-          nd.vy += -nd.y * 0.06;
-          nd.vx *= 0.82;
-          nd.vy *= 0.82;
+          nd.vx += -nd.x * 0.012; // gentle centering (was 0.06 — too strong, piled nodes up)
+          nd.vy += -nd.y * 0.012;
+          nd.vx *= 0.85;
+          nd.vy *= 0.85;
+          // Cap speed so no single step can fling a node off-screen, even if
+          // forces momentarily spike. This is what makes the sim can't-explode.
+          const sp = Math.sqrt(nd.vx * nd.vx + nd.vy * nd.vy);
+          if (sp > MAXV) { nd.vx = (nd.vx / sp) * MAXV; nd.vy = (nd.vy / sp) * MAXV; }
           if (st.dragNode === nd) continue;
           nd.x += nd.vx * alpha;
           nd.y += nd.vy * alpha;
         }
-        alpha *= 0.985; // cool toward a frozen layout; drag reheats it
+        if (alpha > 0.04) alpha *= 0.99; // cool toward a settled layout (with a floor); drag reheats it
       };
 
       const toScreen = (nd) => ({ x: st.view.x + nd.x * st.view.scale, y: st.view.y + nd.y * st.view.scale });
