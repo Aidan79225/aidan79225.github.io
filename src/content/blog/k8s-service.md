@@ -1,6 +1,6 @@
 ---
 title: "Service:擋在短命 Pod 前面的固定門牌"
-date: 2026-07-06
+date: 2026-07-07
 category: tech
 description: "Pod 隨時會被換掉、IP 會變,那別的服務怎麼穩定找到它?答案是 Service——一個固定的 IP 與 DNS 名字,擋在一群生生死死的 Pod 前面,並自動把流量分到健康的那些。這篇把 Service、背後的 Endpoints 名單、以及對外的幾種類型講清楚。"
 tags:
