@@ -7,6 +7,7 @@ const SERIES = [
   ['Spark 學習筆記', '#e0733a', 'Spark'],
   ['Kafka 學習筆記', '#9b6ff0', 'Kafka'],
   ['Airflow 學習筆記', '#54b890', 'Airflow'],
+  ['Kubernetes 學習筆記', '#d6a45c', 'K8s'],
   ['成為 Tech Leader 讀書筆記', '#e05a7d', 'Tech Leader'],
 ];
 const COLOR = Object.fromEntries(SERIES.map(([s, c]) => [s, c]));

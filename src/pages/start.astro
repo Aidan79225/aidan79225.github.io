@@ -16,6 +16,7 @@ const series = {
   spark: 'Spark 學習筆記',
   kafka: 'Kafka 學習筆記',
   airflow: 'Airflow 學習筆記',
+  k8s: 'Kubernetes 學習筆記',
   btl: '成為 Tech Leader 讀書筆記',
 };
 
@@ -41,14 +42,20 @@ const paths = [
     groups: [
       {
         heading: null,
-        posts: ['dbt-intro', 'medallion-architecture', 'airflow-spark-on-k8s', 'pain-before-power']
+        posts: ['dbt-intro', 'medallion-architecture', 'pain-before-power']
           .map((id) => byId.get(id))
           .filter(Boolean),
       },
     ],
   },
   {
-    title: '④ 想帶人、想成長:技術領導',
+    title: '④ 工具跑在哪:Kubernetes',
+    blurb:
+      '前面的 Spark、Airflow 最後都要有個地方跑。這個系列從 reconcile loop 的靈魂講起,一路到 Pod、排程、自我修復,最後用「Airflow + Spark 跑在 K8s」把整條資料管線收在同一個平台上。',
+    groups: [{ heading: series.k8s, posts: bySeries(series.k8s) }],
+  },
+  {
+    title: '⑤ 想帶人、想成長:技術領導',
     blurb: '技術之外的另一條線 —— 讀《成為 Tech Leader》的筆記與反思,寫給正在或即將帶人的工程師。',
     groups: [{ heading: series.btl, posts: bySeries(series.btl) }],
   },
