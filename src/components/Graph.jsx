@@ -201,7 +201,10 @@ export default function Graph() {
 
       const loop = () => {
         step();
-        if (!st.userMoved && st.ticks < 240) fit(); // keep it framed while it settles
+        // Keep the whole graph framed at all times, unless the user has taken
+        // manual control (pan/zoom). Pause only while actively dragging a node,
+        // so the view doesn't jump under the cursor; it reframes on release.
+        if (!st.userMoved && !st.dragNode) fit();
         st.ticks++;
         draw();
         raf = requestAnimationFrame(loop);
@@ -237,10 +240,11 @@ export default function Graph() {
         const w = worldAt(ev);
         if (down) {
           const dist = Math.hypot(w.sx - down.sx, w.sy - down.sy);
-          if (dist > 4) { down.moved = true; st.userMoved = true; }
+          if (dist > 4) down.moved = true;
           if (st.dragNode) {
             st.dragNode.x = w.x; st.dragNode.y = w.y; st.dragNode.vx = 0; st.dragNode.vy = 0;
-          } else {
+          } else if (down.moved) {
+            st.userMoved = true; // only a background pan hands control to the user
             st.view.x += ev.movementX; st.view.y += ev.movementY;
           }
         } else {
