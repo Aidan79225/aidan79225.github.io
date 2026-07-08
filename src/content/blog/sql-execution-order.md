@@ -102,7 +102,7 @@ SELECT * FROM (
 WHERE rn = 1;
 ```
 
-那個「為什麼 window 一定要包一層子查詢」的千古疑問,答案就是這張圖:它算得比 `WHERE` 晚。(window function 是這個系列後面會專講的主角,這裡先知道它的位置。)
+那個「為什麼 window 一定要包一層子查詢」的千古疑問,答案就是這張圖:它算得比 `WHERE` 晚。(window function 是[[sql-window|系列第 5 篇]]的主角,這裡先知道它的位置。)
 
 ## WHERE 篩「列」,HAVING 篩「組」
 

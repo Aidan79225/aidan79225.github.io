@@ -18,7 +18,7 @@
 | 2 | `sql-joins` | JOIN 的真相:先算笛卡爾積,再過濾 | INNER/LEFT/FULL/CROSS 的列配對格子圖;`LEFT JOIN` 又在 `WHERE` 篩右表=偷偷變 INNER;fan-out | ✅ 已發布 |
 | 3 | `sql-null` | NULL 不是值,是「不知道」 | 三值邏輯 TRUE/FALSE/UNKNOWN;`=NULL` 永遠不成立、`NOT IN (含NULL)` 回空、`COUNT(col)` 跳過 NULL、COALESCE/NULLIF/IS DISTINCT FROM | ✅ 已發布 |
 | 4 | `sql-group-by` | GROUP BY:把多列收合成一列 | rows→groups 收合;為何不能選沒 group 的欄;聚合忽略 NULL;`HAVING` vs `WHERE`;`ROLLUP`/`CUBE`/`GROUPING SETS` 帶過 | ✅ 已發布 |
-| 5 | `sql-window` | Window function:不收合的聚合 | frame 滑動窗(`PARTITION BY`→`ORDER BY`→`ROWS BETWEEN`);`ROW_NUMBER`/`RANK`/`LAG`/累計加總 | ⬜ ★ 壓箱寶 |
+| 5 | `sql-window` | Window Function:不收合的聚合 | GROUP BY vs OVER 對比;frame 滑動窗(`PARTITION BY`→`ORDER BY`→`ROWS BETWEEN`)+ 預設 frame 坑;`ROW_NUMBER`/`RANK`/`LAG`/累計;每組前 N 名 | ✅ 已發布 |
 
 ## 第二幕 — DE 日常 pattern(analytical SQL)
 
