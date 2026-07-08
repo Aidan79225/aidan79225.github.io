@@ -106,7 +106,7 @@ WHERE NOT EXISTS (
 
 同一個「NULL = 不知道」的原則,還延伸出一串你遲早會撞到的行為:
 
-- **`COUNT(*)` 數所有列,`COUNT(col)` 只數非 NULL 的**——兩者差幾筆,就是那欄有幾個 NULL。
+- **`COUNT(*)` 數所有列,`COUNT(col)` 只數非 NULL 的**——兩者差幾筆,就是那欄有幾個 NULL。更精確地說,`COUNT(x)` 的定義是「數 `x` 不為 NULL 的列數」,所以 `COUNT(<常數>)` 只看那個常數是不是 NULL:`COUNT(1)` = 每列都算 = `COUNT(*)`;而 `COUNT(NULL)` **恆為 0**(常數 NULL 對每列都是 NULL,一列都數不到)。順帶破除迷思:`COUNT(1)` 不會比 `COUNT(*)` 快,優化器當同一件事處理,`COUNT(*)` 語義最清楚。
 - **`SUM` / `AVG` / `MAX` 忽略 NULL**。注意 `AVG`:它的分母是「非 NULL 的筆數」,不是把 NULL 當 0 算——你以為的平均,可能不是你算的那個。
 - **`GROUP BY` 把所有 NULL 併成同一組**(這裡 SQL 反而當它們「相等」,是個例外)。
 - **`ORDER BY`**:PostgreSQL 預設 `ASC` 時 NULL 排**最後**,可用 `NULLS FIRST` / `NULLS LAST` 明講。
