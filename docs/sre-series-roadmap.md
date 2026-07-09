@@ -16,7 +16,7 @@
 | # | slug | 對應章 | 主題 | 狀態 |
 |---|---|---|---|---|
 | 1 | `sre-intro` | Ch 1, 3 (Ch 2 當背景) | SRE 是什麼、用軟體工程做維運;擁抱風險;100% 不是目標;**Error Budget** 把「快 vs 穩」變成數學 | ✅ 已發布 |
-| 2 | `sre-slo` | Ch 4 | SLI / SLO / SLA 的骨架;error budget = 1 − SLO;巢狀關係與預算燃燒 | ⬜ ★ |
+| 2 | `sre-slo` | Ch 4 | SLI / SLO / SLA 的骨架;error budget = 1 − SLO;SLA<SLO≤SLI 與安全 buffer;好的 SLI = 好事件/有效事件 | ✅ 已發布 |
 | 3 | `sre-toil` | Ch 5 | 什麼算 toil(手動、重複、可自動化、無長期價值)、為何自動化掉、50% 上限 | ⬜ |
 | 4 | `sre-monitoring` | Ch 6 | 監控:四個黃金訊號(latency / traffic / errors / saturation) | ⬜ ★ |
 | 5 | `sre-alerting-oncall` | Ch 10, 11 | 對「症狀」告警而非「原因」;只在需人動手時 page;告警疲勞;on-call 健康 | ⬜ |
