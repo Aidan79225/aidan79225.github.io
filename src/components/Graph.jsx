@@ -4,10 +4,12 @@ import { useEffect, useRef, useState } from 'react';
 // single source of truth — the legend below reads the same map.
 const SERIES = [
   ['Fundamentals of Data Engineering 讀書筆記', '#4f6df5', 'FoDE'],
+  ['SQL 我以為我懂', '#2fb6c0', 'SQL'],
   ['Spark 學習筆記', '#e0733a', 'Spark'],
   ['Kafka 學習筆記', '#9b6ff0', 'Kafka'],
   ['Airflow 學習筆記', '#54b890', 'Airflow'],
   ['Kubernetes 學習筆記', '#d6a45c', 'K8s'],
+  ['Google SRE 讀書筆記', '#d95757', 'SRE'],
   ['成為 Tech Leader 讀書筆記', '#e05a7d', 'Tech Leader'],
 ];
 const COLOR = Object.fromEntries(SERIES.map(([s, c]) => [s, c]));

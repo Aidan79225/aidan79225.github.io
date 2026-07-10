@@ -13,10 +13,12 @@ const bySeries = (name: string) =>
 // entries are added; the "精選單篇" block is a hand-picked ordered list.
 const series = {
   fode: 'Fundamentals of Data Engineering 讀書筆記',
+  sql: 'SQL 我以為我懂',
   spark: 'Spark 學習筆記',
   kafka: 'Kafka 學習筆記',
   airflow: 'Airflow 學習筆記',
   k8s: 'Kubernetes 學習筆記',
+  sre: 'Google SRE 讀書筆記',
   btl: '成為 Tech Leader 讀書筆記',
 };
 
@@ -28,7 +30,13 @@ const paths = [
     groups: [{ heading: series.fode, posts: bySeries(series.fode) }],
   },
   {
-    title: '② 三大工具,動手學',
+    title: '② 練好每天都要用的 SQL',
+    blurb:
+      'SQL 是資料工程每天都在用的語言,但多數人只停在「能跑」。這個系列專打那些你以為懂、其實模型是糊的地方 —— 執行順序、JOIN、NULL、window function、去重、gaps-and-islands —— 把 SQL 從「能用」練到「真懂」。',
+    groups: [{ heading: series.sql, posts: bySeries(series.sql) }],
+  },
+  {
+    title: '③ 三大工具,動手學',
     blurb: '觀念之後就是實作。這三個是資料工程最核心的工具,各自一條龍從「是什麼」到「上生產」。',
     groups: [
       { heading: '分散式運算 · ' + series.spark, posts: bySeries(series.spark) },
@@ -37,7 +45,7 @@ const paths = [
     ],
   },
   {
-    title: '③ 轉換與架構:精選單篇',
+    title: '④ 轉換與架構:精選單篇',
     blurb: '把原始資料煉成可用模型、以及幾個我認為最該懂的架構觀念。',
     groups: [
       {
@@ -49,13 +57,19 @@ const paths = [
     ],
   },
   {
-    title: '④ 工具跑在哪:Kubernetes',
+    title: '⑤ 工具跑在哪:Kubernetes',
     blurb:
       '前面的 Spark、Airflow 最後都要有個地方跑。這個系列從 reconcile loop 的靈魂講起,一路到 Pod、排程、自我修復,最後用「Airflow + Spark 跑在 K8s」把整條資料管線收在同一個平台上。',
     groups: [{ heading: series.k8s, posts: bySeries(series.k8s) }],
   },
   {
-    title: '⑤ 想帶人、想成長:技術領導',
+    title: '⑥ 讓系統跑得穩:SRE',
+    blurb:
+      '跑得起來只是開始,跑得穩才是難的。讀 Google《Site Reliability Engineering》的筆記 —— error budget、SLO、四個黃金訊號、消除 toil、blameless postmortem —— 把維運從救火英雄主義,變成有指標、可工程化的學科。',
+    groups: [{ heading: series.sre, posts: bySeries(series.sre) }],
+  },
+  {
+    title: '⑦ 想帶人、想成長:技術領導',
     blurb: '技術之外的另一條線 —— 讀《成為 Tech Leader》的筆記與反思,寫給正在或即將帶人的工程師。',
     groups: [{ heading: series.btl, posts: bySeries(series.btl) }],
   },
@@ -63,7 +77,7 @@ const paths = [
 ---
 <BaseLayout
   title="Start Here"
-  description="從這裡開始 —— 這個部落格的推薦閱讀路徑:資料工程觀念地基、Spark/Kafka/Airflow 三大工具、轉換與架構精選,以及技術領導筆記。"
+  description="從這裡開始 —— 這個部落格的推薦閱讀路徑:資料工程觀念地基、SQL、Spark/Kafka/Airflow 三大工具、轉換與架構、Kubernetes、Google SRE,以及技術領導筆記。"
 >
   <h1 class="text-3xl font-bold mb-2">從這裡開始</h1>
   <p class="text-muted mb-8">
