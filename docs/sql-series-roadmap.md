@@ -25,7 +25,7 @@
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
 | 6 | `sql-dedup` | 去重的正確姿勢:DISTINCT 不是唯一解 | 兩種重複;`DISTINCT`(整列/組合)vs `GROUP BY` vs `ROW_NUMBER`;`DISTINCT ON`;抓「每組最新一筆」 | ✅ 已發布 |
-| 7 | `sql-gaps-islands` | Gaps and Islands:連續區間怎麼抓 | 斷點偵測、連續登入天數、把連續區間收成一段;window function 最漂亮的實戰 | ⬜ ★ |
+| 7 | `sql-gaps-islands` | Gaps and Islands:把連續區間抓出來 | value − ROW_NUMBER 差值法;LAG 抓斷點 + 累計加總(通用);連續登入天數、收成區間 | ✅ 已發布 |
 | 8 | `sql-time-scd` | 時間序列與 SCD | `date_trunc`/`generate_series` 補洞分桶;slowly changing dimension type 2 的區間表 | ⬜ |
 
 ## 第三幕 — 引擎與效能(為什麼慢)
