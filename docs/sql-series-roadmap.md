@@ -40,9 +40,21 @@
 
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
-| 12 | `sql-mpp` | 當 SQL 跑在 MPP 上:Greenplum 與 Cloudberry | coordinator + segment;distribution key、skew;Motion(Redistribute/Broadcast/Gather)= MPP 版 shuffle;co-located join;扣回 `[[spark-shuffle]]`、`[[fode-6]]` | ✅ 已發布(系列完結) |
+| 12 | `sql-mpp` | 當 SQL 跑在 MPP 上:Greenplum 與 Cloudberry | coordinator + segment;distribution key、skew;Motion(Redistribute/Broadcast/Gather)= MPP 版 shuffle;co-located join;扣回 `[[spark-shuffle]]`、`[[fode-6]]` | ✅ 已發布(主幹完結) |
 
-★ = 投報率最高的四篇(5、7、9、10)。第一幕五篇是地基,優先寫;二三四幕可依興趣調順序。
+## 第五幕 — 進階 / 番外(主幹 12 篇後加碼,可當獨立單篇)
+
+主幹已收完整;這幕是「還很值得寫、但缺了不影響完整性」的進階題,依興趣挑寫。★ = 缺口大、aha 強、圖好畫。
+
+| # | slug | 標題(暫定) | 主題 | 狀態 |
+|---|---|---|---|---|
+| 13 | `sql-recursive-cte` | 遞迴 CTE:用 SQL 走樹與圖 | `WITH RECURSIVE` 展開;組織圖/分類樹/BOM/找路徑;anchor + recursive 兩段;CTE 物化 vs inline(PG12 fence) | ⬜ ★ 先寫 |
+| 14 | `sql-keyset-pagination` | 分頁的正確姿勢:別用 OFFSET | OFFSET 為何越後面越慢;keyset / seek 分頁(`WHERE id > 上頁最後一筆`)+ 複合排序鍵;呼應站上 paging 討論 | ⬜ ★ |
+| 15 | `sql-skip-locked` | 用 SQL 做工作佇列:FOR UPDATE SKIP LOCKED | 資料庫當任務佇列;`SELECT … FOR UPDATE SKIP LOCKED` 讓多 worker 各搶各的;接第 11 篇鎖/交易 | ⬜ ★ |
+| 16 | `sql-jsonb` | PostgreSQL 的 JSONB:半結構化也能查得快 | `->`/`->>`/`@>` operators;GIN 索引;何時該用、何時別用;接第 9 篇索引 | ⬜ |
+| 17 | `sql-upsert` | Upsert:ON CONFLICT 與冪等寫入 | `INSERT … ON CONFLICT DO UPDATE`;一句話做到「有就更新、沒有就插入」;接資料 pipeline 冪等 | ⬜ |
+
+★(主幹)= 投報率最高的四篇(5、7、9、10)。第一幕五篇是地基,優先寫;二三四幕可依興趣調順序。第五幕是加碼,13/14/15 三篇最值得先寫。
 
 ## 寫每篇時的慣例
 - front matter:`series: "SQL 我以為我懂"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
