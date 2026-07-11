@@ -12,14 +12,14 @@
 | 1 | `fode-1` | Ch1 Data Engineering Described | 定義、DE 角色、A 型/B 型工程師、資料成熟度、需求金字塔 | ✅ 已發布 |
 | 2 | `fode-2` | Ch2 The Data Engineering Lifecycle | 五階段(生成→儲存→攝取→轉換→服務)+ 六條 undercurrents | ✅ 已發布 |
 | 3 | `fode-3` | Ch3 Designing Good Data Architecture | 架構原則、權衡、可逆決策、鬆耦合、棕地/綠地 | ✅ 已發布 |
-| 4 | `fode-4` | Ch4 Choosing Technologies | build vs buy、OSS vs managed、成本/FinOps、位置 | ⬜ 待寫 |
-| 5 | `fode-5` | Ch5 Data Generation in Source Systems | 來源系統、DB、CDC、訊息佇列與串流 | ⬜ 待寫 |
-| 6 | `fode-6` | Ch6 Storage | 儲存抽象、warehouse / lake / lakehouse | ⬜ 待寫 |
-| 7 | `fode-7` | Ch7 Ingestion | batch vs streaming、push vs pull、ETL vs ELT | ⬜ 待寫 |
-| 8 | `fode-8` | Ch8 Queries, Modeling, and Transformation | SQL、建模(Kimball/Inmon/Data Vault)、轉換 | ⬜ 待寫 |
-| 9 | `fode-9` | Ch9 Serving Data | BI/分析、ML、reverse ETL | ⬜ 待寫 |
-| 10 | `fode-10` | Ch10 Security and Privacy | 原則、人/流程/技術、最小權限 | ⬜ 待寫 |
-| 11 | `fode-11` | Ch11 The Future of Data Engineering | 趨勢、live data stack、工具收斂 | ⬜ 待寫 |
+| 4 | `fode-4` | Ch4 Choosing Technologies | build vs buy、OSS vs managed、成本/FinOps、位置 | ✅ 已發布 |
+| 5 | `fode-5` | Ch5 Data Generation in Source Systems | 來源系統、DB、CDC、訊息佇列與串流 | ✅ 已發布 |
+| 6 | `fode-6` | Ch6 Storage | 儲存抽象、warehouse / lake / lakehouse、運算與儲存分離 | ✅ 已發布 |
+| 7 | `fode-7` | Ch7 Ingestion | batch vs streaming、push vs pull、ETL vs ELT | ✅ 已發布 |
+| 8 | `fode-8` | Ch8 Queries, Modeling, and Transformation | SQL、建模(Kimball/Inmon/Data Vault)、轉換 | ✅ 已發布 |
+| 9 | `fode-9` | Ch9 Serving Data | BI/分析、ML、reverse ETL | ✅ 已發布 |
+| 10 | `fode-10` | Ch10 Security and Privacy | 原則、人/流程/技術、最小權限 | ✅ 已發布 |
+| 11 | `fode-11` | Ch11 The Future of Data Engineering | 趨勢、live data stack、工具收斂(系列完結) | ✅ 已發布 |
 
 ## 寫每篇時的慣例
 - front matter:`series: "Fundamentals of Data Engineering 讀書筆記"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
