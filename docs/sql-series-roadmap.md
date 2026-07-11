@@ -34,7 +34,7 @@
 |---|---|---|---|---|
 | 9 | `sql-index` | 索引為什麼快 —— 也為什麼會失效 | Seq Scan vs B-tree(O(n) vs O(log n));空間換時間、拖慢寫入;複合索引最左前綴;失效情境(func/前導%/型別/低選擇性);covering index | ✅ 已發布 |
 | 10 | `sql-explain` | 讀懂 EXPLAIN:優化器怎麼跑你的 query | EXPLAIN vs EXPLAIN ANALYZE;掃描方式;nested loop / hash / merge join(cross-link `[[spark-explain]]`);cost 估計 vs actual、統計過時 | ✅ 已發布 |
-| 11 | `sql-transactions` | 交易與隔離層級 | 兩條 transaction 時間軸圖;MVCC、dirty/non-repeatable/phantom read、deadlock | ⬜ |
+| 11 | `sql-transactions` | 交易與隔離層級:併發不打架的分級 | ACID(重點 I);dirty/non-repeatable/phantom 時間軸;四級對照表;MVCC 讀不擋寫;deadlock 固定順序 | ✅ 已發布 |
 
 ## 第四幕 — 從單機到 MPP(Greenplum / Apache Cloudberry)
 
