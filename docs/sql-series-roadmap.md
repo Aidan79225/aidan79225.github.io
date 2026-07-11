@@ -32,7 +32,7 @@
 
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
-| 9 | `sql-index` | 索引為什麼快 —— 也為什麼失效 | B-tree 查找路徑(有 vs 無 index);複合索引「最左欄」、covering index;`WHERE func(col)` 讓索引失效 | ⬜ ★ |
+| 9 | `sql-index` | 索引為什麼快 —— 也為什麼會失效 | Seq Scan vs B-tree(O(n) vs O(log n));空間換時間、拖慢寫入;複合索引最左前綴;失效情境(func/前導%/型別/低選擇性);covering index | ✅ 已發布 |
 | 10 | `sql-explain` | 讀懂 EXPLAIN 與 JOIN 演算法 | nested loop / hash / merge join(**cross-link `[[spark-explain]]`**);seq scan vs index scan;怎麼讀 plan | ⬜ ★ |
 | 11 | `sql-transactions` | 交易與隔離層級 | 兩條 transaction 時間軸圖;MVCC、dirty/non-repeatable/phantom read、deadlock | ⬜ |
 
