@@ -40,7 +40,7 @@
 
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
-| 12 | `sql-mpp` | 當 SQL 跑在 MPP 上 | segment、distribution key;分佈鍵選錯 = 資料傾斜 + 跨節點 motion(重分配);把 JOIN/GROUP BY 在分散式下重講,扣回 `[[spark-shuffle]]`、`[[fode-6]]` | ⬜ 壓軸 |
+| 12 | `sql-mpp` | 當 SQL 跑在 MPP 上:Greenplum 與 Cloudberry | coordinator + segment;distribution key、skew;Motion(Redistribute/Broadcast/Gather)= MPP 版 shuffle;co-located join;扣回 `[[spark-shuffle]]`、`[[fode-6]]` | ✅ 已發布(系列完結) |
 
 ★ = 投報率最高的四篇(5、7、9、10)。第一幕五篇是地基,優先寫;二三四幕可依興趣調順序。
 
