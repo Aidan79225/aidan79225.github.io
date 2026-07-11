@@ -67,6 +67,15 @@ export default function Graph() {
         vx: 0,
         vy: 0,
       }));
+      // At rest, label only a handful of top hubs — enough to orient without
+      // cluttering; every other node labels on hover / tag filter. A fixed
+      // degree threshold got noisy as the graph grew, so cap by count instead.
+      st.hubIds = new Set(
+        [...st.nodes]
+          .sort((a, b) => (b.degree || 0) - (a.degree || 0))
+          .slice(0, 6)
+          .map((nd) => nd.id),
+      );
       const idx = new Map(st.nodes.map((nd, i) => [nd.id, i]));
       st.edges = data.edges
         .map((e) => ({ s: idx.get(e.source), t: idx.get(e.target) }))
@@ -202,7 +211,7 @@ export default function Graph() {
         ctx.font = '12px system-ui, sans-serif';
         ctx.textBaseline = 'middle';
         for (const nd of st.nodes) {
-          const show = hoverId ? nd.id === hoverId || (nb && nb.has(nd.id)) : matches ? matches.has(nd.id) : nd.degree >= 13;
+          const show = hoverId ? nd.id === hoverId || (nb && nb.has(nd.id)) : matches ? matches.has(nd.id) : st.hubIds.has(nd.id);
           if (!show) continue;
           const p = toScreen(nd);
           const label = nd.title.length > 16 ? nd.title.slice(0, 16) + '…' : nd.title;
