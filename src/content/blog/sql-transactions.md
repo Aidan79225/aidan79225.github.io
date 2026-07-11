@@ -89,7 +89,56 @@ draft: false
 
 ## MVCC:PostgreSQL 怎麼做到「讀不擋寫」
 
-你可能會問:要防這些異常,不就是加鎖、讓大家排隊?那併發不就慘了?PostgreSQL 的答案是 **MVCC(多版本併發控制)**:**每次 `UPDATE` 不是就地改,而是產生一個新版本的列**;而每個交易讀取時,看到的是**它開始那一刻的快照**。於是「讀」永遠讀得到一個一致的舊版本,不必等「寫」放鎖——**讀不擋寫、寫不擋讀**,併發大幅提升。這也是為什麼 PG 的 Repeatable Read 能順便擋掉幻讀:整個交易都看同一個快照。(MVCC 背後那套「保留多版本」的儲存機制,正是 [[ddia-reliable-scalable|DDIA]] 儲存與交易那幾章會深入的。)
+你可能會問:要防這些異常,不就是加鎖、讓大家排隊?那併發不就慘了?PostgreSQL 的答案是 **MVCC(多版本併發控制)**,核心一句話:**同一列可以同時存在多個版本,每個交易讀取時,看到的是「它的快照」該看到的那一版。**
+
+具體怎麼運作?每一列都藏著兩個系統欄位:**xmin**(這個版本由哪個交易建立)和 **xmax**(這個版本被哪個交易作廢)。於是:
+
+- **`UPDATE` 不是就地改**,而是**新增一個新版本**(新 xmin),同時把舊版本標上 xmax(代表「這個交易之後就失效」)。
+- **`DELETE` 也不是真的刪**,只是把該版本標上 xmax。
+- **讀取**時,交易拿自己的快照去比對每個版本的 xmin / xmax,挑出「對我可見」的那一版。
+
+<figure style="margin:1.5rem 0;text-align:center;">
+  <svg viewBox="0 0 580 210" role="img" aria-label="MVCC 多版本示意:同一列餘額有兩個版本,v1 餘額 100 被 T2 取代,v2 餘額 200 由 T2 建立且仍有效,中間是 T2 提交的時間點。讀者 A 的快照在 T2 提交前,看到 v1 的 100;讀者 B 的快照在 T2 提交後,看到 v2 的 200。UPDATE 是新增 v2 加上標記 v1 作廢,讀者照自己的快照挑版本,所以讀不擋寫" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
+    <defs><marker id="mv" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#9aa4b2"/></marker></defs>
+    <line x1="300" y1="40" x2="300" y2="152" stroke="#d6a45c" stroke-width="1.2" stroke-dasharray="4 3"/>
+    <text x="300" y="32" fill="#d6a45c" font-size="8.5" text-anchor="middle">T2 提交</text>
+    <rect x="50" y="48" width="250" height="38" rx="5" fill="#223528" stroke="#54b890" stroke-width="1.4"/>
+    <text x="175" y="66" fill="#e6e6e6" font-size="9.5" text-anchor="middle">v1 · 餘額 100</text>
+    <text x="175" y="79" fill="#9aa4b2" font-size="7.5" text-anchor="middle">被 T2 取代(標上 xmax)</text>
+    <rect x="300" y="48" width="232" height="38" rx="5" fill="#1e2a40" stroke="#4f6df5" stroke-width="1.4"/>
+    <text x="416" y="66" fill="#e6e6e6" font-size="9.5" text-anchor="middle">v2 · 餘額 200</text>
+    <text x="416" y="79" fill="#9aa4b2" font-size="7.5" text-anchor="middle">T2 建立,仍有效</text>
+    <rect x="108" y="118" width="134" height="34" rx="5" fill="#262b3a" stroke="#54b890" stroke-width="1.2"/>
+    <text x="175" y="133" fill="#e6e6e6" font-size="9" text-anchor="middle">讀者 A</text>
+    <text x="175" y="146" fill="#9aa4b2" font-size="7.5" text-anchor="middle">快照:T2 提交前</text>
+    <line x1="175" y1="118" x2="175" y2="88" stroke="#54b890" stroke-width="1.3" marker-end="url(#mv)"/>
+    <text x="175" y="170" fill="#54b890" font-size="8.5" text-anchor="middle">→ 看到 100</text>
+    <rect x="356" y="118" width="134" height="34" rx="5" fill="#262b3a" stroke="#4f6df5" stroke-width="1.2"/>
+    <text x="423" y="133" fill="#e6e6e6" font-size="9" text-anchor="middle">讀者 B</text>
+    <text x="423" y="146" fill="#9aa4b2" font-size="7.5" text-anchor="middle">快照:T2 提交後</text>
+    <line x1="423" y1="118" x2="423" y2="88" stroke="#4f6df5" stroke-width="1.3" marker-end="url(#mv)"/>
+    <text x="423" y="170" fill="#4f6df5" font-size="8.5" text-anchor="middle">→ 看到 200</text>
+    <text x="290" y="196" fill="#9aa4b2" font-size="8" text-anchor="middle">UPDATE = 新增 v2 + 標記 v1 作廢;每個讀者照自己的快照挑版本 → 讀不擋寫</text>
+  </svg>
+  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">同一列的兩個版本並存,讀者依自己快照的時點,各自看到該看的那一版。「讀」永遠讀得到一個一致的舊版本,不必等「寫」放鎖——這就是<b>讀不擋寫、寫不擋讀</b></figcaption>
+</figure>
+
+### 隔離層級,其實就是「快照的時機」
+
+MVCC 讓前面那張隔離層級表變得很好懂——差別只在**你多久拿一次新快照**:
+
+- **Read Committed(PG 預設)**:**每一句 SQL** 都拿一個新快照。所以你讀得到「已提交」的最新資料,但同一交易內前後兩句看到的可能不同 → 於是會有不可重複讀。
+- **Repeatable Read**:**整個交易只在開頭拿一次快照**,全程沿用。所以同一列讀幾次都一樣(擋掉不可重複讀),連「符合條件的範圍」也凍結在那一刻(PG 順便擋掉幻讀)。
+
+一句話:**Read Committed 看「當下的世界」,Repeatable Read 看「交易開始那一刻的世界」。**
+
+### 讀不擋寫,但「寫還是會擋寫」
+
+要注意 MVCC 解的是「讀 vs 寫」的衝突,不是萬能。**兩個交易同時要改同一列,還是會互相擋**——後到的那個得等前一個 commit 或 rollback(在 Repeatable Read / Serializable 下甚至可能直接被判定衝突而 abort,要你重試)。所以「熱點列」(大家搶改同一列,例如全站共用的計數器、秒殺的庫存)在 MVCC 下依然是效能與衝突的痛點,得靠別的招數(拆分、佇列、樂觀鎖重試)化解。
+
+### 代價:舊版本會堆積,要靠 VACUUM 清
+
+多版本不是免費的。被作廢的舊版本(dead tuples)不會立刻消失,會留在表裡佔空間,直到 PostgreSQL 的 **`VACUUM`**(通常是背景的 autovacuum)來回收。如果更新很兇、VACUUM 又跟不上,表會**膨脹(bloat)**、掃描變慢。這是 MVCC 的隱形帳單——它用「保留多版本」換來高併發,代價是你得讓 VACUUM 追得上寫入。這套「不覆蓋、而是保留多版本」的思路,跟 [[ddia-reliable-scalable|DDIA]] 儲存那章的 append-only、跟 [[sql-time-scd|SCD Type 2]] 那種「新增版本而非覆蓋」是同一個家族。
 
 ## 死鎖 Deadlock:循環等待
 
