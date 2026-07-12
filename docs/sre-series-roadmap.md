@@ -20,7 +20,7 @@
 | 3 | `sre-toil` | Ch 5 | toil 六特徵;隨規模線性成長的陷阱與惡性循環;50% 護欄;自動化 ROI(不是全砍) | ✅ 已發布 |
 | 4 | `sre-monitoring` | Ch 6 | 四個黃金訊號(latency / traffic / errors / saturation);別看平均看 p99;症狀 vs 原因、黑箱 vs 白箱 | ✅ 已發布 |
 | 5 | `sre-alerting-oncall` | Ch 10, 11 | 告警三級 Page/Ticket/Log;症狀 vs 原因;error budget burn rate 告警;on-call 止血優先、runbook、自我改善迴圈 | ✅ 已發布 |
-| 6 | `sre-troubleshooting` | Ch 12 | 系統化除錯流程(而非亂猜):假設→縮小→驗證 | ⬜ |
+| 6 | `sre-troubleshooting` | Ch 12 | 反模式(換零件);Triage→Examine→Diagnose→Treat;分而治之/二分定位;一次改一個變因、相信資料別猜 | ✅ 已發布 |
 | 7 | `sre-postmortem` | Ch 15 | Blameless postmortem:對事不對人,把失敗變學習——文化基石 | ⬜ ★ |
 
 ## 第二批 — 事件與可靠度實務
