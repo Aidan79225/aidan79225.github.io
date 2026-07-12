@@ -14,7 +14,7 @@
 | # | slug | 章 | 主題 | 狀態 |
 |---|---|---|---|---|
 | 1 | `ddia-reliable-scalable` | Ch1 Reliable, Scalable, Maintainable | 三個系統目標;fault≠failure、Chaos;load parameter 與 Twitter fan-out;percentile;意外複雜度 | ✅ 已發布 |
-| 2 | `ddia-data-models` | Ch2 Data Models & Query Languages | relational / document / graph;宣告式 vs 命令式;多對多的取捨 | ⬜ |
+| 2 | `ddia-data-models` | Ch2 Data Models & Query Languages | relational / document / graph;一對多 vs 多對多;schema-on-read/write;關聯式為何贏(宣告式)、文件為何回來 | ✅ 已發布 |
 | 3 | `ddia-storage-engines` | Ch3 Storage and Retrieval | B-tree vs LSM-tree;WAL;OLTP vs OLAP、欄式儲存 —— 接 `[[sql-index]]` | ⬜ ★ |
 | 4 | `ddia-encoding` | Ch4 Encoding and Evolution | schema evolution、Avro/Protobuf/Thrift、向前/向後相容 —— 接 `[[kafka-intro]]` | ⬜ |
 
