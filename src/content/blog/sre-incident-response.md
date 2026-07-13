@@ -11,7 +11,7 @@ seriesOrder: 8
 comments: true
 draft: false
 ---
-第二批開始。前面你學會了 [[sre-alerting-oncall|on-call 止血]]、也學會了[[sre-troubleshooting|系統化除錯]]——但那是「一個人對付一個問題」。當一場**大事故**爆發(多人捲入、影響大、時間壓力高),你會發現最大的敵人往往不是技術問題本身,而是**混亂**。
+前面你學會了 [[sre-alerting-oncall|on-call 止血]]、也學會了[[sre-troubleshooting|系統化除錯]]——但那是「一個人對付一個問題」。當一場**大事故**爆發(多人捲入、影響大、時間壓力高),你會發現最大的敵人往往不是技術問題本身,而是**混亂**。
 
 ## 大事故真正的敵人是「混亂」
 

@@ -11,7 +11,7 @@ seriesOrder: 11
 comments: true
 draft: false
 ---
-第三幕的最後一篇。前面講的都是「一個查詢怎麼跑得快」([[sql-index|索引]]、[[sql-explain|EXPLAIN]]),這篇換個維度:**很多交易同時跑,怎麼不互相打架?** 這就是交易與隔離層級。(這裡講**單機 PostgreSQL** 的實務;分散式交易與一致性,交給姊妹作 [[ddia-reliable-scalable|DDIA 系列]]往下深入,兩邊不重複。)
+前面講的都是「一個查詢怎麼跑得快」([[sql-index|索引]]、[[sql-explain|EXPLAIN]]),這篇換個維度:**很多交易同時跑,怎麼不互相打架?** 這就是交易與隔離層級。(這裡講**單機 PostgreSQL** 的實務;分散式交易與一致性,交給姊妹作 [[ddia-reliable-scalable|DDIA 系列]]往下深入,兩邊不重複。)
 
 ## ACID:重點其實是 I(隔離)
 

@@ -11,7 +11,7 @@ seriesOrder: 7
 comments: true
 draft: false
 ---
-第一批地基的最後一篇。[[sre-troubleshooting|上一篇]]講怎麼找到 root cause——但找到之後呢?**Postmortem(事後檢討)** 就是把一次昂貴的故障,轉化成整個組織的學習:記錄發生什麼、影響多大、時間軸、真因、怎麼修的、怎麼防止再發生。而它的靈魂,是一個看似簡單卻極難做到的詞:**blameless(對事不對人)。**
+[[sre-troubleshooting|上一篇]]講怎麼找到 root cause——但找到之後呢?**Postmortem(事後檢討)** 就是把一次昂貴的故障,轉化成整個組織的學習:記錄發生什麼、影響多大、時間軸、真因、怎麼修的、怎麼防止再發生。而它的靈魂,是一個看似簡單卻極難做到的詞:**blameless(對事不對人)。**
 
 ## 靈魂是 blameless:對事不對人
 
