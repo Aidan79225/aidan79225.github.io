@@ -27,7 +27,7 @@
 
 | # | slug | 對應章 | 主題 | 狀態 |
 |---|---|---|---|---|
-| 8 | `sre-incident-response` | Ch 13, 14, 16 | 緊急應變、事件指揮(角色分工)、追蹤 outage | ⬜ |
+| 8 | `sre-incident-response` | Ch 13, 14, 16 | 敵人是混亂;ICS 角色(IC/Ops/Comms/Scribe)、IC 不動手;早宣告、共同管道、handoff、演練、追蹤 outage | ✅ 已發布 |
 | 9 | `sre-testing` | Ch 17 | 為可靠度測試:單元/整合/壓測/災難演練、canary | ⬜ |
 | 10 | `sre-cascading-failures` | Ch 21, 22 | 過載處理、連鎖失效:retry storm、thundering herd、load shedding、graceful degradation、backpressure | ⬜ ★ |
 | 11 | `sre-data-pipelines` | Ch 25, 26 | 資料處理管線可靠度、資料完整性(「有備份」≠「能還原」)——收回 DE 系列 | ⬜ ★ 壓軸候選 |
