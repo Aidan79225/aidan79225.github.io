@@ -16,6 +16,7 @@
 | # | slug | 對應章 | 主題 | 狀態 |
 |---|---|---|---|---|
 | 1 | `sre-intro` | Ch 1, 3 (Ch 2 當背景) | SRE 是什麼、用軟體工程做維運;擁抱風險;100% 不是目標;**Error Budget** 把「快 vs 穩」變成數學 | ✅ 已發布 |
+| 1.5 | `sre-vs-devops` | 補充(非章節) | DevOps vs SRE:class SRE implements interface DevOps;介面(原則)vs 實作(做法);原則→做法對照;假對立 | ✅ 已發布 |
 | 2 | `sre-slo` | Ch 4 | SLI / SLO / SLA 的骨架;error budget = 1 − SLO;SLA<SLO≤SLI 與安全 buffer;好的 SLI = 好事件/有效事件 | ✅ 已發布 |
 | 3 | `sre-toil` | Ch 5 | toil 六特徵;隨規模線性成長的陷阱與惡性循環;50% 護欄;自動化 ROI(不是全砍) | ✅ 已發布 |
 | 4 | `sre-monitoring` | Ch 6 | 四個黃金訊號(latency / traffic / errors / saturation);別看平均看 p99;症狀 vs 原因、黑箱 vs 白箱 | ✅ 已發布 |
