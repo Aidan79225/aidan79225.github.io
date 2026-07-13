@@ -11,7 +11,7 @@ seriesOrder: 1
 comments: true
 draft: false
 ---
-開一個新系列:讀 Martin Kleppmann 的 *Designing Data-Intensive Applications*(簡稱 DDIA)。它跟 [[fode-1|FoDE]] 互補——FoDE 是資料工程的實務地圖,DDIA 是「分散式資料系統為什麼長這樣」的原理。而全書的骨架,就是第一章問的一個根本問題:**一個好的資料系統,到底該追求什麼?** 答案是三個目標:可靠、可擴展、可維護。這篇是系列脊椎,也剛好是我正在寫的 [[sre-intro|SRE]] 那條可靠度線的原理源頭。
+開一個新系列:讀 Martin Kleppmann 的 *Designing Data-Intensive Applications*(簡稱 DDIA)。它跟 [[fode-1|FoDE]] 互補——FoDE 是資料工程的實務地圖,DDIA 是「分散式資料系統為什麼長這樣」的原理。而全書的骨架,就是第一章問的一個根本問題:**一個好的資料系統,到底該追求什麼?** 答案是三個目標:可靠、可擴展、可維護。這篇也剛好是我正在寫的 [[sre-intro|SRE]] 那條可靠度線的原理源頭。
 
 ## 現代系統拚的是「資料」,不是「算力」
 

@@ -2,7 +2,7 @@
 title: "你寫的 SQL 不是照你寫的順序跑"
 date: 2026-07-07
 category: tech
-description: "大家寫 SQL 都是 SELECT 開頭,於是以為它從 SELECT 開始跑——但其實 SELECT 幾乎最後才執行。搞懂真正的邏輯執行順序 FROM→WHERE→GROUP BY→HAVING→SELECT→ORDER BY→LIMIT,一票「為什麼這樣寫會錯」的謎題會一次解開。這是整個系列的脊椎。"
+description: "大家寫 SQL 都是 SELECT 開頭,於是以為它從 SELECT 開始跑——但其實 SELECT 幾乎最後才執行。搞懂真正的邏輯執行順序 FROM→WHERE→GROUP BY→HAVING→SELECT→ORDER BY→LIMIT,一票「為什麼這樣寫會錯」的謎題會一次解開。"
 tags:
   - sql
   - concept
@@ -11,7 +11,7 @@ seriesOrder: 1
 comments: true
 draft: false
 ---
-你寫 SQL,幾乎都是 `SELECT` 開頭。寫久了很自然會以為:它就是**從 `SELECT` 開始跑**的。但不是——SQL 是宣告式的,你寫的是「要什麼」,引擎自己決定「怎麼跑、照什麼順序跑」,而**它跑的順序跟你寫的順序差很多**。這篇是整個系列的脊椎:把這個順序刻進腦子,後面一票「為什麼這樣寫會錯」的謎題,會一次全解開。
+你寫 SQL,幾乎都是 `SELECT` 開頭。寫久了很自然會以為:它就是**從 `SELECT` 開始跑**的。但不是——SQL 是宣告式的,你寫的是「要什麼」,引擎自己決定「怎麼跑、照什麼順序跑」,而**它跑的順序跟你寫的順序差很多**。這篇就把這個順序刻進腦子,後面一票「為什麼這樣寫會錯」的謎題,會一次全解開。
 
 ## 你這樣寫,它不這樣跑
 
