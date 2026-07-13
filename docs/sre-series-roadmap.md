@@ -31,7 +31,7 @@
 | 8 | `sre-incident-response` | Ch 13, 14, 16 | 敵人是混亂;ICS 角色(IC/Ops/Comms/Scribe)、IC 不動手;早宣告、共同管道、handoff、演練、追蹤 outage | ✅ 已發布 |
 | 9 | `sre-testing` | Ch 17 | 測試金字塔(底多上少)、倒金字塔反模式;綠燈≠生產健康 → canary 用真實流量;設定/災難演練;flaky test = 狼來了 | ✅ 已發布 |
 | 10 | `sre-cascading-failures` | Ch 21, 22 | 連鎖失效骨牌 + retry storm 正回饋、thundering herd;過載主動保護:load shedding/degradation/backpressure、circuit breaker;扣回 Kafka 背壓 | ✅ 已發布 |
-| 11 | `sre-data-pipelines` | Ch 25, 26 | 資料處理管線可靠度、資料完整性(「有備份」≠「能還原」)——收回 DE 系列 | ⬜ ★ 壓軸候選 |
+| 11 | `sre-data-pipelines` | Ch 25, 26 | 週期性管線的積壓陷阱、資料新鮮度 SLA、冪等可重跑;資料完整性深度防禦(軟刪除/備份+還原演練/早期偵測);「有備份」≠「能還原」= 薛丁格的備份——收回 DE 系列 | ✅ 已發布 |
 
 ## 第三批 — 進階 / 深水區(後面再寫)
 
