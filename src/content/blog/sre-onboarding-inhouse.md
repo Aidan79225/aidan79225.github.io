@@ -1,11 +1,13 @@
 ---
 title: "SRE 空降一間『什麼都自建』的公司,前 90 天怎麼站穩"
-date: 2026-07-13
+date: 2026-07-14
 category: tech
 description: "換工作最刺激的一種,是加入一間幾乎全自建的公司——沒有現成雲服務、連 Stack Overflow 都幫不了你,因為這裡的工具全世界只有這家在用。這篇講一個 SRE 怎麼用三個角度快速啃下一套陌生系統:由外而內跟著一個真實請求走完全程、由上而下用 Grafana LGTM 全家桶(Loki/Grafana/Tempo/Mimir)看它活著的樣子、由零把整個環境重建起來逼出所有隱藏依賴,最後用前 90 天的節奏收尾。核心心法:別急著證明自己,先把系統地圖畫進腦子,先理解,後動手。"
 tags:
   - sre
   - career
+series: "Google SRE 讀書筆記"
+seriesOrder: 14.5
 comments: true
 draft: false
 ---
