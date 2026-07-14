@@ -38,7 +38,7 @@
 | # | slug | 對應章 | 主題 | 狀態 |
 |---|---|---|---|---|
 | 12 | `sre-automation-release` | Ch 7, 8, 9 | 自動化演進階梯(終點=把人從迴圈拿掉)、blast radius 的兩面刃;發布工程四原則、hermetic build 可重現;簡單性=可靠度來源、「每行程式都是負債」 | ✅ 已發布 |
-| 13 | `sre-load-balancing` | Ch 19, 20 | 前端與資料中心的負載平衡 | ⬜ |
+| 13 | `sre-load-balancing` | Ch 19, 20 | 兩層負載平衡(前端選機房 DNS/Anycast/VIP、機房內選機器);Round Robin 三個錯假設、平均分配≠平均負載;failure attracts traffic 陷阱;subsetting、lame duck 優雅退場 | ✅ 已發布 |
 | 14 | `sre-consensus` | Ch 23 | 管理關鍵狀態:分散式共識(Paxos/Raft 概念、為何需要) | ⬜ |
 | 15 | `sre-cron` | Ch 24 | 分散式定時排程(可靠的 cron)——可跨連 `[[airflow-scheduling]]` | ⬜ |
 | 16 | `sre-swe-launches` | Ch 18, 27 | SRE 裡的軟體工程、可靠的產品發表(launch checklist) | ⬜ |
