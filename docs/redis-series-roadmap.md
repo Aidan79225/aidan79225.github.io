@@ -10,7 +10,7 @@
 
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
-| 1 | `redis-intro` | Redis 是什麼:不只是快取,是記憶體資料結構伺服器 | 定位(打破「只是 cache」);為什麼快=記憶體 + 單執行緒免鎖 + I/O 多工(epoll);擅長/不擅長、什麼時候別用 | ⬜ ★ |
+| 1 | `redis-intro` | Redis 是什麼:不只是快取,是記憶體資料結構伺服器 | 定位(打破「只是 cache」);value 是資料結構(vs memcached blob);為什麼快=記憶體 + 單執行緒免鎖 + I/O 多工(epoll);擅長/不擅長、熱資料層非主 DB | ✅ 已發布 |
 | 2 | `redis-data-structures` | Redis 的靈魂:五大資料結構 + 進階武器 | String/List/Hash/Set/ZSet 各自的招牌場景(排行榜=ZSet、限流、佇列);進階:Bitmap/HyperLogLog/Geo/Stream | ⬜ ★ |
 | 3 | `redis-single-thread` | 單執行緒為什麼還這麼快?——以及 O(N) 命令的地雷 | event loop + epoll;單執行緒免鎖、免 context switch;Redis 6 多執行緒 I/O(只多網路、命令仍單執行緒);`KEYS`/大集合阻塞全服務的坑 | ⬜ ★ |
 | 4 | `redis-persistence` | 持久化:RDB 快照 vs AOF 日誌,資料到底會不會丟 | RDB(fork + copy-on-write 快照)vs AOF(append-only、fsync 策略)+ 混合模式;「記憶體=資料一定丟」的迷思;取捨 | ⬜ |
