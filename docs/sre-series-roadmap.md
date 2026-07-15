@@ -39,7 +39,7 @@
 |---|---|---|---|---|
 | 12 | `sre-automation-release` | Ch 7, 8, 9 | 自動化演進階梯(終點=把人從迴圈拿掉)、blast radius 的兩面刃;發布工程四原則、hermetic build 可重現;簡單性=可靠度來源、「每行程式都是負債」 | ✅ 已發布 |
 | 13 | `sre-load-balancing` | Ch 19, 20 | 兩層負載平衡(前端選機房 DNS/Anycast/VIP、機房內選機器);Round Robin 三個錯假設、平均分配≠平均負載;failure attracts traffic 陷阱;subsetting、lame duck 優雅退場 | ✅ 已發布 |
-| 14 | `sre-consensus` | Ch 23 | 管理關鍵狀態:split brain(土砲選 leader 的死法)、多數決 quorum(任兩過半必重疊、2f+1 容忍 f、奇數)、safety vs liveness、replicated log;別自己造輪子(etcd/ZooKeeper/KRaft) | ✅ 已發布 |
+| 14 | `sre-consensus` | Ch 23 | 管理關鍵狀態:split brain(土砲選 leader 的死法)、多數決 quorum(任兩過半必重疊、2f+1 容忍 f、奇數)、safety vs liveness、replicated log;三種實作對照 Paxos/Raft/Zab(領導模型 × 好不好懂);別自己造輪子(etcd/ZooKeeper/KRaft) | ✅ 已發布 |
 | 14.5 | `sre-onboarding-inhouse` | 補充(非章節,實戰) | SRE 空降「全自建」公司前 90 天:trace 一個請求走完全程、Grafana LGTM 全家桶看可觀測性、從零重建環境逼出隱藏依賴、先理解後動手的節奏 | ✅ 已發布 |
 | 15 | `sre-cron` | Ch 24 | 可靠的 cron:單機=SPOF、分散式難在「跑過沒」的狀態要靠共識(Paxos)存;崩潰空窗 → 跳過 vs 重複無 exactly-once、冪等是逃生門;午夜 thundering herd 加 jitter——接 `[[airflow-scheduling]]`、`[[sre-consensus]]` | ✅ 已發布 |
 | 16 | `sre-swe-launches` | Ch 18, 27 | SRE 裡的軟體工程、可靠的產品發表(launch checklist) | ⬜ |

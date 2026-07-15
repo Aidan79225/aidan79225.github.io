@@ -62,6 +62,49 @@ draft: false
 
 有了多數決,共識系統能給出兩個關鍵保證:**安全性(safety)——永遠不會有兩個矛盾的決定,這條在任何情況下都成立**;以及**活性(liveness)——只要過半節點活著且能通訊,最終一定能有結論**。注意安全性是無條件的:就算網路爛到只剩一半能通,系統寧可停下來(不可用)也**絕不給出錯誤的答案**——這正是 CAP 裡「分割時選一致性」的體現。
 
+## 同一個問題的三種實作:Paxos、Raft、Zab
+
+「多數決」是原理,但把它變成一個真的能跑、又不會出錯的演算法,細節多到嚇人。共識不是單一演算法,而是一整族;最常聽到的三個名字——**Paxos、Raft、Zab**——解的是同一題(用過半同意,湊出一份有序的日誌),但個性差很多:
+
+<figure style="margin:1.5rem 0;text-align:center;">
+  <svg viewBox="0 0 580 214" role="img" aria-label="共識的三種實作對照。Paxos:1989 年 Lamport 提出的理論鼻祖,對稱式沒有強制 leader,正確但惡名昭彰地難懂難實作,Chubby 與 Spanner 在用。Raft:2014 年 Stanford 提出,強 leader,log 只從 leader 單向流向 follower,為好懂而生,etcd、Consul、KRaft、CockroachDB 在用。Zab:ZooKeeper 內建,強 leader,用 zxid 給狀態變更定序,主打原子廣播全序、為協調服務優化,ZooKeeper 進而撐起舊版 Kafka 與 HBase。三者都解同一題,差別在領導模型與好不好懂,現代新系統多半選 Raft。" style="width:100%;max-width:600px;height:auto;margin:0 auto;">
+    <text x="290" y="20" fill="#e6e6e6" font-size="10.5" text-anchor="middle" font-weight="bold">同一題,三種實作</text>
+    <rect x="12" y="34" width="180" height="140" rx="8" fill="#26324a" stroke="#4f6df5" stroke-width="1.5"/>
+    <text x="102" y="56" fill="#4f6df5" font-size="11" text-anchor="middle" font-weight="bold">Paxos</text>
+    <text x="26" y="82" fill="#e6e6e6" font-size="8" text-anchor="start">· 1989・Lamport,理論鼻祖</text>
+    <text x="26" y="104" fill="#e6e6e6" font-size="8" text-anchor="start">· 對稱式,無強制 leader</text>
+    <text x="26" y="126" fill="#e6e6e6" font-size="8" text-anchor="start">· 正確,但惡名昭彰地難實作</text>
+    <text x="26" y="156" fill="#9aa4b2" font-size="7.8" text-anchor="start">用:Chubby、Spanner</text>
+    <rect x="200" y="34" width="180" height="140" rx="8" fill="#223528" stroke="#54b890" stroke-width="1.5"/>
+    <text x="290" y="56" fill="#54b890" font-size="11" text-anchor="middle" font-weight="bold">Raft</text>
+    <text x="214" y="82" fill="#e6e6e6" font-size="8" text-anchor="start">· 2014・Stanford</text>
+    <text x="214" y="104" fill="#e6e6e6" font-size="8" text-anchor="start">· 強 leader,log 單向流</text>
+    <text x="214" y="126" fill="#e6e6e6" font-size="8" text-anchor="start">· 為「好懂」而生</text>
+    <text x="214" y="156" fill="#9aa4b2" font-size="7.8" text-anchor="start">用:etcd、Consul、KRaft</text>
+    <rect x="388" y="34" width="180" height="140" rx="8" fill="#2b2540" stroke="#9b6ff0" stroke-width="1.5"/>
+    <text x="478" y="56" fill="#9b6ff0" font-size="11" text-anchor="middle" font-weight="bold">Zab</text>
+    <text x="402" y="82" fill="#e6e6e6" font-size="8" text-anchor="start">· ZooKeeper 內建</text>
+    <text x="402" y="104" fill="#e6e6e6" font-size="8" text-anchor="start">· 強 leader,zxid 定序</text>
+    <text x="402" y="126" fill="#e6e6e6" font-size="8" text-anchor="start">· 主打原子廣播(全序)</text>
+    <text x="402" y="156" fill="#9aa4b2" font-size="7.8" text-anchor="start">用:ZooKeeper→舊版 Kafka</text>
+    <text x="290" y="196" fill="#9aa4b2" font-size="8.3" text-anchor="middle">三者都解同一題(過半 → 一份有序日誌);差別在「領導模型」與「好不好懂」</text>
+    <text x="290" y="210" fill="#d6a45c" font-size="8" text-anchor="middle">現代新系統多半選 Raft——因為你真的實作得出來、而且不容易錯</text>
+  </svg>
+  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">三者殊途同歸:都靠過半同意,湊出一份所有副本都認可、順序一致的日誌。真正的差異在<b>領導模型</b>(Paxos 經典版是對稱的,Raft 與 Zab 都是強 leader)和<b>好不好懂</b>——而「好不好懂」聽起來很軟,卻是 Raft 能後來居上、成為現代預設的關鍵:一個你實作得對的演算法,勝過一個理論更漂亮卻處處是坑的</figcaption>
+</figure>
+
+### Paxos:理論鼻祖,正確但難搞
+
+Leslie Lamport 在 1989 年提出,是分散式共識的理論源頭,數學上證明過正確。但它**惡名昭彰地難懂**:原始論文只講「對單一個值達成共識」(basic Paxos),真實系統要的卻是對「一連串值」(一份 log)達成共識的 **Multi-Paxos**,而這部分論文語焉不詳,於是每家實作長得都不一樣、細節裡全是坑。Google 那篇〈Paxos Made Live〉整篇就在講「從論文到能上線的產品,中間有多少沒寫出來的血淚」。用它的是 Google 的 Chubby、Spanner 這類重量級系統。
+
+### Raft:為了「讓人看得懂」而生
+
+2014 年 Stanford 提出,動機直接寫在論文標題:〈In Search of an Understandable Consensus Algorithm〉——它就是受不了 Paxos 太難,**刻意設計成好懂**。做法是**強 leader** 模型:所有變更只從 leader 流向 follower(單向),再把問題拆成三塊好啃的子題——leader 選舉、log 複製、安全性。它還有一個很優雅的小招:**隨機化的選舉逾時**,自然避免大家同時搶著當 leader 的分票僵局。Raft 給的保證跟 Multi-Paxos 一樣,但你真的實作得出來、又不容易錯,所以成了現代預設——etcd、Consul、TiKV、CockroachDB、Kafka 的 [[kafka-ops|KRaft]] 都用它。
+
+### Zab:ZooKeeper 的專用引擎
+
+Zab(ZooKeeper Atomic Broadcast)是 Apache ZooKeeper 背後的協定,比 Raft 更早、風格也神似(同樣強 leader)。它為「協調服務」這個特定場景量身打造,主打**原子廣播(atomic broadcast)**——保證所有狀態變更在每台機器上都以**完全相同的順序**套用;leader 用單調遞增的 **zxid** 幫每筆變更編號定序,並圍繞「primary 崩潰後怎麼乾淨地恢復」做設計。你可能沒直接用過它,但八成間接依賴過——ZooKeeper 撐起了舊版 Kafka、HBase、Hadoop 一大票系統。
+
 ## 共識拿來做什麼:一份大家都同意的日誌
 
 共識最常見的用法,是產出一份**所有副本都同意、順序一致的操作日誌**(replicated log)。每個副本照同樣的順序套用同樣的操作,狀態自然就一致了——這就是 replicated state machine。在這之上,可以蓋出一堆關鍵設施:
