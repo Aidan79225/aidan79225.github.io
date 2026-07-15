@@ -8,89 +8,127 @@ const bySeries = (name: string) =>
   all
     .filter((p) => p.data.series === name)
     .sort((a, b) => (a.data.seriesOrder ?? 0) - (b.data.seriesOrder ?? 0));
+const pick = (ids: string[]) => ids.map((id) => byId.get(id)).filter(Boolean);
 
-// Curated learning paths. Series-based blocks stay fresh automatically as new
-// entries are added; the "精選單篇" block is a hand-picked ordered list.
+// Series keys. Series-based blocks stay fresh automatically as new entries land.
 const series = {
   fode: 'Fundamentals of Data Engineering 讀書筆記',
   sql: 'SQL 我以為我懂',
+  ddia: 'Designing Data-Intensive Applications 讀書筆記',
   spark: 'Spark 學習筆記',
   kafka: 'Kafka 學習筆記',
   airflow: 'Airflow 學習筆記',
+  redis: 'Redis 學習筆記',
   k8s: 'Kubernetes 學習筆記',
   sre: 'Google SRE 讀書筆記',
   btl: '成為 Tech Leader 讀書筆記',
 };
 
-const paths = [
+// Organised like Clean Architecture: inner layers (概念) are stable & portable,
+// outer layers (工具) are concrete & replaceable. Dependencies point inward.
+const layers = [
   {
-    title: '① 先建立資料工程的觀念地基',
+    tag: '核心 · Domain',
+    color: '#54b890',
+    title: '核心觀念:最穩、最能遷移的一層',
     blurb:
-      '不確定從哪開始?先讀這個系列。它從「資料工程是什麼」一路帶到生命週期、架構、選型、源頭、儲存、擷取、建模 —— 有了這張心智地圖,再看工具就不會迷路。',
-    groups: [{ heading: series.fode, posts: bySeries(series.fode) }],
-  },
-  {
-    title: '② 練好每天都要用的 SQL',
-    blurb:
-      'SQL 是資料工程每天都在用的語言,但多數人只停在「能跑」。這個系列專打那些你以為懂、其實模型是糊的地方 —— 執行順序、JOIN、NULL、window function、去重、gaps-and-islands —— 把 SQL 從「能用」練到「真懂」。',
-    groups: [{ heading: series.sql, posts: bySeries(series.sql) }],
-  },
-  {
-    title: '③ 三大工具,動手學',
-    blurb: '觀念之後就是實作。這三個是資料工程最核心的工具,各自一條龍從「是什麼」到「上生產」。',
+      '這一層是換幾份工作都還在用的東西——查詢語言、資料工程的心智地圖、資料密集系統的原理。工具會被替換,這些不會。先把這裡打牢,再往外走。',
     groups: [
-      { heading: '分散式運算 · ' + series.spark, posts: bySeries(series.spark) },
+      { heading: series.fode, posts: bySeries(series.fode) },
+      { heading: series.sql, posts: bySeries(series.sql) },
+      { heading: series.ddia, posts: bySeries(series.ddia) },
+    ],
+  },
+  {
+    tag: '應用與架構 · Application',
+    color: '#4f6df5',
+    title: '轉換與架構:把觀念組織成系統',
+    blurb:
+      '介於觀念與工具之間的一層——怎麼把原始資料煉成可用模型、怎麼安排轉換與分層,以及幾個我認為最該懂的架構觀念。',
+    groups: [
+      { heading: null, posts: pick(['dbt-intro', 'medallion-architecture', 'pain-before-power']) },
+    ],
+  },
+  {
+    tag: '基礎設施 · Infrastructure',
+    color: '#d6a45c',
+    title: '基礎設施:落地觀念的具體工具',
+    blurb:
+      '最外層、最具體、也最會被替換的一層。這些工具各自把上面的觀念變成能跑的東西——但它們是「手段」,核心觀念才是「目的」。看工具時,常回頭想它在實作哪個觀念。',
+    groups: [
+      { heading: '記憶體資料結構 · ' + series.redis, posts: bySeries(series.redis) },
       { heading: '事件串流 · ' + series.kafka, posts: bySeries(series.kafka) },
+      { heading: '分散式運算 · ' + series.spark, posts: bySeries(series.spark) },
       { heading: '工作流程編排 · ' + series.airflow, posts: bySeries(series.airflow) },
+      { heading: '容器編排 · ' + series.k8s, posts: bySeries(series.k8s) },
+      { heading: '分散式協調 · 單篇', posts: pick(['zookeeper']) },
     ],
   },
   {
-    title: '④ 轉換與架構:精選單篇',
-    blurb: '把原始資料煉成可用模型、以及幾個我認為最該懂的架構觀念。',
-    groups: [
-      {
-        heading: null,
-        posts: ['dbt-intro', 'medallion-architecture', 'pain-before-power']
-          .map((id) => byId.get(id))
-          .filter(Boolean),
-      },
-    ],
-  },
-  {
-    title: '⑤ 工具跑在哪:Kubernetes',
+    tag: '橫切 · Cross-cutting',
+    color: '#e05a7d',
+    title: '可靠度:貫穿每一層的 SRE',
     blurb:
-      '前面的 Spark、Airflow 最後都要有個地方跑。這個系列從 reconcile loop 的靈魂講起,一路到 Pod、排程、自我修復,最後用「Airflow + Spark 跑在 K8s」把整條資料管線收在同一個平台上。',
-    groups: [{ heading: series.k8s, posts: bySeries(series.k8s) }],
-  },
-  {
-    title: '⑥ 讓系統跑得穩:SRE',
-    blurb:
-      '跑得起來只是開始,跑得穩才是難的。讀 Google《Site Reliability Engineering》的筆記 —— error budget、SLO、四個黃金訊號、消除 toil、blameless postmortem —— 把維運從救火英雄主義,變成有指標、可工程化的學科。',
+      '可靠度不屬於某一層,它橫切全部——資料要正確、服務要不掛、變更要安全。讀 Google《Site Reliability Engineering》的筆記,把「維運」從救火英雄主義,變成有指標、可工程化的學科。',
     groups: [{ heading: series.sre, posts: bySeries(series.sre) }],
   },
   {
-    title: '⑦ 想帶人、想成長:技術領導',
-    blurb: '技術之外的另一條線 —— 讀《成為 Tech Leader》的筆記與反思,寫給正在或即將帶人的工程師。',
+    tag: '技術之外 · Beyond',
+    color: '#9aa4b2',
+    title: '人與成長:技術領導',
+    blurb: '技術之外的另一條線——讀《成為 Tech Leader》的筆記與反思,寫給正在或即將帶人的工程師。',
     groups: [{ heading: series.btl, posts: bySeries(series.btl) }],
   },
 ];
 ---
 <BaseLayout
   title="Start Here"
-  description="從這裡開始 —— 這個部落格的推薦閱讀路徑:資料工程觀念地基、SQL、Spark/Kafka/Airflow 三大工具、轉換與架構、Kubernetes、Google SRE,以及技術領導筆記。"
+  description="從這裡開始 —— 借用 Clean Architecture 的分層來組織這個部落格:核心觀念(SQL、資料工程、DDIA)在內、最穩定;基礎設施工具(Redis、Kafka、Spark、Airflow、Kubernetes)在外、最具體;SRE 可靠度橫切每一層,技術領導在技術之外。"
 >
   <h1 class="text-3xl font-bold mb-2">從這裡開始</h1>
-  <p class="text-muted mb-8">
-    這裡的文章多半用一張圖 + 精簡的文字,把資料工程與技術領導裡複雜的東西講清楚。如果你是第一次來,照著下面的路徑走,比亂點省力。
+  <p class="text-muted mb-6">
+    這裡的文章多半用一張圖 + 精簡的文字,把複雜的東西講清楚。我把它們借用 <strong class="text-ink">Clean Architecture</strong> 的分層來組織——<strong class="text-ink">越靠核心越穩定、越能遷移(觀念);越往外越具體、越會被替換(工具)</strong>。依賴指向核心、學習也一樣:先把內圈的觀念打牢,再往外學會被換掉的工具。
   </p>
 
+  <figure class="my-6 flex justify-center">
+    <svg viewBox="0 0 600 350" role="img" aria-label="用 Clean Architecture 的同心圓組織這個部落格。最內圈是核心觀念 Domain,含 SQL、資料工程、DDIA,最穩定最能遷移。中間圈是應用與架構 Application,如 dbt、Medallion。最外圈是基礎設施 Infrastructure,含 Redis、Kafka、Spark、Airflow、Kubernetes,最具體最會被替換。依賴方向由外指向內,外層依賴內層、內層不依賴外層;外層工具會被替換,內層觀念要穩定。學習順序先核心觀念再具體工具。SRE 可靠度橫切每一層,Tech Leader 在技術之外。" style="width:100%;max-width:600px;height:auto;">
+      <circle cx="180" cy="168" r="150" fill="#1f2330" stroke="#d6a45c" stroke-width="1.6"/>
+      <circle cx="180" cy="168" r="100" fill="#232838" stroke="#4f6df5" stroke-width="1.6"/>
+      <circle cx="180" cy="168" r="50" fill="#223528" stroke="#54b890" stroke-width="1.8"/>
+      <text x="180" y="40" fill="#d6a45c" font-size="12" text-anchor="middle" font-weight="bold">基礎設施</text>
+      <text x="180" y="54" fill="#9aa4b2" font-size="8" text-anchor="middle">Infrastructure</text>
+      <text x="180" y="92" fill="#4f6df5" font-size="11" text-anchor="middle" font-weight="bold">應用與架構</text>
+      <text x="180" y="105" fill="#9aa4b2" font-size="7.6" text-anchor="middle">Application</text>
+      <text x="180" y="164" fill="#54b890" font-size="11" text-anchor="middle" font-weight="bold">核心觀念</text>
+      <text x="180" y="178" fill="#9aa4b2" font-size="7.6" text-anchor="middle">Domain</text>
+      <text x="180" y="300" fill="#9aa4b2" font-size="7.8" text-anchor="middle">Redis · Kafka · Spark · Airflow · K8s</text>
+      <defs><marker id="dep" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
+      <line x1="575" y1="70" x2="392" y2="70" stroke="#9aa4b2" stroke-width="1.4" marker-end="url(#dep)"/>
+      <text x="483" y="62" fill="#e6e6e6" font-size="9" text-anchor="middle" font-weight="bold">依賴方向:外 → 內</text>
+      <text x="392" y="112" fill="#9aa4b2" font-size="8.6" text-anchor="start">外層依賴內層,</text>
+      <text x="392" y="127" fill="#9aa4b2" font-size="8.6" text-anchor="start">內層不依賴外層。</text>
+      <text x="392" y="152" fill="#9aa4b2" font-size="8.6" text-anchor="start">外層(工具)會被替換,</text>
+      <text x="392" y="167" fill="#9aa4b2" font-size="8.6" text-anchor="start">內層(觀念)要穩定。</text>
+      <text x="392" y="196" fill="#54b890" font-size="8.8" text-anchor="start" font-weight="bold">學習順序:</text>
+      <text x="392" y="210" fill="#54b890" font-size="8.8" text-anchor="start" font-weight="bold">先核心觀念,再具體工具</text>
+      <rect x="392" y="232" width="185" height="30" rx="6" fill="#3a2632" stroke="#e05a7d" stroke-width="1.3"/>
+      <text x="404" y="251" fill="#e05a7d" font-size="8.6" text-anchor="start" font-weight="bold">SRE — 可靠度橫切每一層</text>
+      <rect x="392" y="268" width="185" height="30" rx="6" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.2"/>
+      <text x="404" y="287" fill="#e6e6e6" font-size="8.6" text-anchor="start">Tech Leader — 技術之外</text>
+    </svg>
+  </figure>
+
   <div class="space-y-6">
-    {paths.map((path) => (
-      <section class="bg-surface border border-line rounded-lg p-5">
-        <h2 class="text-xl font-bold mb-1">{path.title}</h2>
-        <p class="text-muted text-sm mb-4">{path.blurb}</p>
+    {layers.map((layer) => (
+      <section class="bg-surface border border-line rounded-lg p-5" style={`border-left:3px solid ${layer.color}`}>
+        <span
+          class="inline-block text-[11px] font-mono font-bold mb-2 px-2 py-0.5 rounded"
+          style={`color:${layer.color};border:1px solid ${layer.color}`}
+        >{layer.tag}</span>
+        <h2 class="text-xl font-bold mb-1">{layer.title}</h2>
+        <p class="text-muted text-sm mb-4">{layer.blurb}</p>
         <div class="space-y-4">
-          {path.groups.map((g) => (
+          {layer.groups.map((g) => (
             <div>
               {g.heading && <p class="text-xs text-muted mb-2">📚 {g.heading}</p>}
               <ol class="list-none m-0 p-0 space-y-1.5">
