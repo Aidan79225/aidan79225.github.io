@@ -13,7 +13,7 @@
 | 1 | `redis-intro` | Redis 是什麼:不只是快取,是記憶體資料結構伺服器 | 定位(打破「只是 cache」);value 是資料結構(vs memcached blob);為什麼快=記憶體 + 單執行緒免鎖 + I/O 多工(epoll);擅長/不擅長、熱資料層非主 DB | ✅ 已發布 |
 | 2 | `redis-data-structures` | Redis 的靈魂:五大資料結構 + 進階武器 | String/List/Hash/Set/ZSet 招牌場景(ZSet 皇冠:排行榜/延遲佇列 score=時間);進階 Bitmap/HLL(12KB 估上億 UV)/Geo/Stream;心法=先看操作再選結構 | ✅ 已發布 |
 | 3 | `redis-single-thread` | 單執行緒為什麼還這麼快?——以及 O(N) 命令的地雷 | 瓶頸非 CPU 是記憶體/網路;event loop + epoll、無鎖無 race 天生原子;Redis 6 多執行緒只在網路 I/O、執行仍單執行緒;KEYS*/大 HGETALL 卡全場 → SCAN 分批、UNLINK、SLOWLOG、看複雜度 | ✅ 已發布 |
-| 4 | `redis-persistence` | 持久化:RDB 快照 vs AOF 日誌,資料到底會不會丟 | RDB(fork + copy-on-write 快照)vs AOF(append-only、fsync 策略)+ 混合模式;「記憶體=資料一定丟」的迷思;取捨 | ⬜ |
+| 4 | `redis-persistence` | 持久化:RDB 快照 vs AOF 日誌,資料到底會不會丟 | RDB 快照(小/載入快/會丟)vs AOF 日誌(fsync always/everysec/no 光譜);混合模式;fork + COW 與記憶體暴增坑;持久性↔效能↔重啟三角;誠實結論:非金融級、是加速層非真相來源 | ✅ 已發布 |
 
 ## 第二批 — 快取實戰(後端最實用)
 
