@@ -43,7 +43,7 @@ draft: false
 AOF 有個關鍵設定:寫進 log 之後,**多久真的 `fsync` 刷到磁碟一次**?這個選擇,直接決定了你「最多會丟多少」。把所有選項排在一條光譜上,你會發現持久化其實沒有「對的答案」,只有「你要在安全和效能之間站哪裡」:
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 580 196" role="img" aria-label="持久化的持久性與效能光譜。從左到右:AOF always 每個命令刷盤丟零筆但最慢,AOF everysec 每秒刷是預設最多丟一秒,混合 RDB 加 AOF 最多丟一秒且載入快,RDB 定時快照丟幾分鐘,關閉持久化崩了全沒但最快。左端持久性高較慢,右端效能高丟較多。你選機制與 fsync,就是在持久性、效能、重啟速度的三角上選一個位置。" style="width:100%;max-width:600px;height:auto;margin:0 auto;">
+  <svg viewBox="0 0 580 196" role="img" aria-label="持久化的持久性與效能光譜。從左到右:AOF always 每個命令刷盤丟零筆但最慢,AOF everysec 每秒刷是預設最多丟一秒,混合 RDB 加 AOF 最多丟一秒且載入快,RDB 定時快照丟幾分鐘,關閉持久化崩了全沒但最快。左端持久性高較慢,右端效能高丟較多。越往左越不丟但越慢,越往右越快但丟越多,持久化沒有最好的設定,只有最適合這份資料的位置。" style="width:100%;max-width:600px;height:auto;margin:0 auto;">
     <defs><linearGradient id="pg" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#54b890"/><stop offset="1" stop-color="#e0733a"/></linearGradient></defs>
     <text x="290" y="20" fill="#e6e6e6" font-size="10.5" text-anchor="middle" font-weight="bold">持久化沒有標準答案,只有「你站哪」</text>
     <text x="40" y="46" fill="#54b890" font-size="8.2" text-anchor="start" font-weight="bold">◀ 持久性高 · 較慢</text><text x="540" y="46" fill="#e0733a" font-size="8.2" text-anchor="end" font-weight="bold">效能高 · 丟較多 ▶</text>
@@ -55,8 +55,8 @@ AOF 有個關鍵設定:寫進 log 之後,**多久真的 `fsync` 刷到磁碟一�
     <text x="410" y="90" fill="#e6e6e6" font-size="8" text-anchor="middle" font-weight="bold">RDB 定時</text><text x="410" y="104" fill="#9aa4b2" font-size="7.4" text-anchor="middle">丟幾分鐘</text>
     <text x="500" y="90" fill="#e6e6e6" font-size="8" text-anchor="middle" font-weight="bold">不持久化</text><text x="500" y="104" fill="#9aa4b2" font-size="7.4" text-anchor="middle">崩了全沒</text>
     <rect x="60" y="130" width="460" height="48" rx="8" fill="#1f2330" stroke="#3a4154" stroke-width="1.2"/>
-    <text x="290" y="150" fill="#e6e6e6" font-size="8.6" text-anchor="middle">你選的機制 + fsync 策略,就是在這個三角上選一個點:</text>
-    <text x="290" y="168" fill="#d6a45c" font-size="8.6" text-anchor="middle" font-weight="bold">持久性 ↔ 寫入效能 ↔ 重啟速度 —— 三者無法同時拉滿</text>
+    <text x="290" y="150" fill="#e6e6e6" font-size="8.6" text-anchor="middle">持久化沒有「最好」的設定,只有「最適合這份資料」的位置:</text>
+    <text x="290" y="168" fill="#d6a45c" font-size="8.6" text-anchor="middle" font-weight="bold">越往左越不丟、但越慢;越往右越快、但丟越多</text>
   </svg>
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">AOF 的 <code>fsync</code> 三選一:<b>always</b>(每個寫命令都刷盤,丟 0 但最慢)、<b>everysec</b>(每秒刷一次,預設,最多丟 1 秒——絕大多數場景的甜蜜點)、<b>no</b>(交給作業系統決定,最快但最不安全)。再加上 RDB 與混合模式,你會發現持久化不是「開或不開」的開關,而是一條光譜。選在哪,取決於你這份資料丟一秒、丟一分鐘、還是一筆都不能丟</figcaption>
 </figure>
