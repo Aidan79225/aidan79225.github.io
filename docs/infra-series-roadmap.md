@@ -21,7 +21,7 @@
 |---|---|---|---|---|
 | 3 | `infra-kafka` | Kafka:磁碟為王的有狀態叢集 | 狀態在磁碟(partition=append log + replication/ISR)、磁碟為王(sequential+page cache+zero-copy);有狀態的代價=擴縮要搬 partition、partition 數難減;k8s 上 StatefulSet+PV;監控 lag/URP/磁碟——接 `[[kafka-ops]]`、`[[infra-k8s]]` | ✅ 已發布 |
 | 4 | `infra-redis` | Redis:記憶體為界的有狀態服務 | 記憶體為界(maxmemory 硬牆、fork headroom、對照 Kafka 磁碟為王);拓撲階梯 單機/主從/Sentinel/Cluster(各解什麼、別跳級上 Cluster);容量/監控/k8s memory limit 要留 headroom——接 `[[redis-persistence]]`、`[[infra-kafka]]` | ✅ 已發布 |
-| 5 | `infra-rabbitmq` | RabbitMQ:訊息 broker 的叢集與流控 | 純 infra 角度:clustering、quorum queue vs mirrored、memory/disk alarm 與 flow control、跟 Kafka 的取捨(queue vs log)——不補原理背景 | ⬜ |
+| 5 | `infra-rabbitmq` | RabbitMQ:訊息 broker 的叢集與流控 | log vs queue(留著 vs 拿走)撐開兩套 infra;招牌坑=queue 堆積撞 memory/disk watermark → alarm → block publisher 背壓;HA quorum queue(Raft)取代 mirrored;監控 queue depth;k8s StatefulSet——接 `[[infra-kafka]]`、`[[sre-cascading-failures]]` | ✅ 已發布 |
 
 ## 第三批 — 無狀態的運算/連接器(stateless:好水平擴)
 
