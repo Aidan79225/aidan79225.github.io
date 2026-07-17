@@ -13,7 +13,7 @@
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
 | 1 | `infra-intro` | 從 Infra 角度看一個工具,要問哪些問題 | 「Infra 體檢表」8 題(拓撲/狀態★樞紐/擴展/HA/容量/監控/調校/故障);核心軸 stateful↔stateless(把 7 工具擺上光譜、決定在 k8s 上 StatefulSet+PV vs Deployment+autoscale、混血認出狀態核心) | ✅ 已發布 |
-| 2 | `infra-k8s` | Kubernetes:所有東西跑的底座 | control plane HA + etcd、requests/limits 與 QoS、HPA/VPA/Cluster Autoscaler、儲存(PV/CSI/StatefulSet)、網路;為什麼它是 infra 的地基——接 `[[k8s-intro]]` | ⬜ ★ |
+| 2 | `infra-k8s` | Kubernetes:所有東西跑的底座 | 底座解剖(control plane 偏 stateless + etcd 是命門/Raft/失明);requests/limits/QoS(OOMKill vs throttle、誰先死);HPA/VPA/Cluster Autoscaler 三層;stateless→Deployment、stateful→StatefulSet+PV——接 `[[k8s-intro]]`、`[[sre-consensus]]` | ✅ 已發布 |
 
 ## 第二批 — 有狀態的重量級(stateful:難擴難搬)
 
