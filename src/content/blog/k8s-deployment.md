@@ -97,6 +97,8 @@ kubectl scale deploy/web --replicas=5        # 改份數 → loop 幫你補到 5
 
 注意:你從頭到尾**沒有下過一個「開容器」「停容器」的指令** —— 你只是不斷更新那份「期望」,reconcile loop 把現實收斂過去。
 
+> **一個常見的坑:改了 ConfigMap / Secret,Pod 會自動換嗎?不會。** reconcile loop 盯的是 Deployment 的 **Pod 樣板**;你去 `kubectl edit` 一份被引用的 [[k8s-config-secret|ConfigMap/Secret]],樣板本身沒變,Deployment 就**不會觸發滾動更新**。用 env 注入的 Pod 會**繼續拿舊值**,直到你手動 `kubectl rollout restart deploy/web`(或在樣板加一個內容 hash 的 annotation,讓值一改樣板就跟著變、自動滾動)。用 volume 掛載的檔案雖然會被 kubelet 更新,但**應用程式得自己重讀**才會生效。一句話:**滾動更新只認「樣板變了沒」,不認「樣板指到的東西變了沒」。**
+
 ## 反思
 
 ### 「自我修復」不是魔法,是那個迴圈一直在跑
