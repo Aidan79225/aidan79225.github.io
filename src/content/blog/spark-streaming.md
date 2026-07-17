@@ -3,9 +3,9 @@ title: "Structured Streaming 入門:把串流當成一張無界的表"
 date: 2026-06-29
 category: tech
 tags:
-  - spark
-  - data-engineering
-  - stream-processing
+ - spark
+ - data-engineering
+ - stream-processing
 series: "Spark 學習筆記"
 seriesOrder: 5
 comments: true
@@ -22,22 +22,22 @@ draft: false
 於是你對它做的查詢,跟對一張靜態 DataFrame 做的**一模一樣** —— `select`、`filter`、`groupBy`、`join`。Spark 在背後把這個查詢，變成「每次有新資料就增量重算、更新結果」的連續作業。**你寫的是批次查詢,Spark 幫你變成串流。**
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 520 210" role="img" aria-label="串流被建模成一張會在尾端不斷 append 新資料的無界表,同一個查詢套在上面持續產出結果表" style="width:100%;max-width:560px;height:auto;margin:0 auto;">
-    <defs><marker id="ss1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
-    <text x="90" y="22" fill="#9aa4b2" font-size="11" text-anchor="middle">無界輸入表</text>
-    <rect x="30" y="32" width="120" height="26" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="90" y="49" fill="#9aa4b2" font-size="10" text-anchor="middle">t1 一批</text>
-    <rect x="30" y="62" width="120" height="26" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="90" y="79" fill="#9aa4b2" font-size="10" text-anchor="middle">t2 一批</text>
-    <rect x="30" y="92" width="120" height="26" rx="4" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/><text x="90" y="109" fill="#e6e6e6" font-size="10" text-anchor="middle">t3 新到</text>
-    <rect x="30" y="122" width="120" height="26" rx="4" fill="none" stroke="#3a4154" stroke-width="1.1" stroke-dasharray="3 3"/><text x="90" y="139" fill="#9aa4b2" font-size="10" text-anchor="middle">…持續 append</text>
-    <line x1="90" y1="152" x2="90" y2="186" stroke="#9aa4b2" stroke-width="1.2" marker-end="url(#ss1)"/><text x="90" y="200" fill="#9aa4b2" font-size="9.5" text-anchor="middle">表一直長高</text>
-    <rect x="210" y="70" width="104" height="44" rx="8" fill="#262b3a" stroke="#d4af37" stroke-width="1.5"/><text x="262" y="89" fill="#e6e6e6" font-size="11" text-anchor="middle">同一個查詢</text><text x="262" y="104" fill="#9aa4b2" font-size="9" text-anchor="middle">groupBy/agg…</text>
-    <line x1="150" y1="92" x2="208" y2="92" stroke="#9aa4b2" stroke-width="1.4" marker-end="url(#ss1)"/>
-    <text x="430" y="22" fill="#9aa4b2" font-size="11" text-anchor="middle">結果表(持續更新)</text>
-    <rect x="370" y="62" width="120" height="26" rx="4" fill="#262b3a" stroke="#4f6df5" stroke-width="1.4"/><text x="430" y="79" fill="#e6e6e6" font-size="10" text-anchor="middle">aggregate</text>
-    <rect x="370" y="92" width="120" height="26" rx="4" fill="#262b3a" stroke="#4f6df5" stroke-width="1.4"/><text x="430" y="109" fill="#e6e6e6" font-size="10" text-anchor="middle">result</text>
-    <line x1="314" y1="92" x2="368" y2="92" stroke="#9aa4b2" stroke-width="1.4" marker-end="url(#ss1)"/>
-  </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">串流 = 一張不斷在尾端 append 的無界表;同一個批次查詢套上去,Spark 增量重算、持續更新結果</figcaption>
+ <svg viewBox="0 0 520 210" role="img" aria-label="串流被建模成一張會在尾端不斷 append 新資料的無界表,同一個查詢套在上面持續產出結果表" style="width:100%;max-width:560px;height:auto;margin:0 auto;">
+ <defs><marker id="ss1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
+ <text x="90" y="22" fill="#9aa4b2" font-size="11" text-anchor="middle">無界輸入表</text>
+ <rect x="30" y="32" width="120" height="26" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="90" y="49" fill="#9aa4b2" font-size="10" text-anchor="middle">t1 一批</text>
+ <rect x="30" y="62" width="120" height="26" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="90" y="79" fill="#9aa4b2" font-size="10" text-anchor="middle">t2 一批</text>
+ <rect x="30" y="92" width="120" height="26" rx="4" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/><text x="90" y="109" fill="#e6e6e6" font-size="10" text-anchor="middle">t3 新到</text>
+ <rect x="30" y="122" width="120" height="26" rx="4" fill="none" stroke="#3a4154" stroke-width="1.1" stroke-dasharray="3 3"/><text x="90" y="139" fill="#9aa4b2" font-size="10" text-anchor="middle">…持續 append</text>
+ <line x1="90" y1="152" x2="90" y2="186" stroke="#9aa4b2" stroke-width="1.2" marker-end="url(#ss1)"/><text x="90" y="200" fill="#9aa4b2" font-size="9.5" text-anchor="middle">表一直長高</text>
+ <rect x="210" y="70" width="104" height="44" rx="8" fill="#262b3a" stroke="#d4af37" stroke-width="1.5"/><text x="262" y="89" fill="#e6e6e6" font-size="11" text-anchor="middle">同一個查詢</text><text x="262" y="104" fill="#9aa4b2" font-size="9" text-anchor="middle">groupBy/agg…</text>
+ <line x1="150" y1="92" x2="208" y2="92" stroke="#9aa4b2" stroke-width="1.4" marker-end="url(#ss1)"/>
+ <text x="430" y="22" fill="#9aa4b2" font-size="11" text-anchor="middle">結果表(持續更新)</text>
+ <rect x="370" y="62" width="120" height="26" rx="4" fill="#262b3a" stroke="#4f6df5" stroke-width="1.4"/><text x="430" y="79" fill="#e6e6e6" font-size="10" text-anchor="middle">aggregate</text>
+ <rect x="370" y="92" width="120" height="26" rx="4" fill="#262b3a" stroke="#4f6df5" stroke-width="1.4"/><text x="430" y="109" fill="#e6e6e6" font-size="10" text-anchor="middle">result</text>
+ <line x1="314" y1="92" x2="368" y2="92" stroke="#9aa4b2" stroke-width="1.4" marker-end="url(#ss1)"/>
+ </svg>
+ <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">串流 = 一張不斷在尾端 append 的無界表;同一個批次查詢套上去,Spark 增量重算、持續更新結果</figcaption>
 </figure>
 
 ## 一段最小的串流程式,長得跟批次幾乎一樣
@@ -54,7 +54,7 @@ counts.write.format("console").save()
 
 ```python
 df = spark.readStream.format("kafka").option(...).load()
-counts = df.groupBy("user_id").count()          # 完全相同的轉換
+counts = df.groupBy("user_id").count() # 完全相同的轉換
 query = counts.writeStream.outputMode("complete").format("console").start()
 query.awaitTermination()
 ```
@@ -92,7 +92,7 @@ query.awaitTermination()
 
 要破除一個誤解:Structured Streaming 預設**不是逐筆處理**,而是 **micro-batch** —— 把持續流入的資料切成很小的批(預設一有資料就觸發),一批批用 Spark 引擎跑。所以它復用了整套批次的最佳化(Catalyst、Tungsten、AQE),代價是延遲落在**百毫秒到秒級**,而非真正的逐筆毫秒級。
 
-這正是它和 [[kafka-ecosystem|上一個系列]]提的 **Kafka Streams** 最大的分野:Kafka Streams 嵌在 app 裡、逐筆、毫秒級;Spark Structured Streaming 是叢集級的 micro-batch,**換來的是「同一套 DataFrame 程式碼,批次串流通用」與超大吞吐**。(Spark 另有低延遲的 Continuous Processing 模式,但功能受限、實務少用。)
+這正是它和 [[kafka-ecosystem|上一個系列]]提的 **Kafka Streams** 最大的分野:Kafka Streams 嵌在 app 裡、逐筆、毫秒級;Spark Structured Streaming 是叢集級的 micro-batch,**換來的是「同一套 DataFrame 程式碼,批次串流通用」與超大 throughput**。(Spark 另有低延遲的 Continuous Processing 模式,但功能受限、實務少用。)
 
 ## 反思
 
@@ -106,4 +106,4 @@ query.awaitTermination()
 
 ### 不是所有「即時」都需要串流
 
-串流很迷人,但它是長命作業 —— checkpoint、狀態、監控、重啟,維運成本比批次高一截。我的判斷是:**先問延遲需求是「秒」還是「分鐘」**。很多自稱要「即時」的需求,其實每 5 分鐘跑一次批次([[airflow-scheduling|用 Airflow 排]])就完全夠用,還更好維護、更好除錯。真要壓到秒級、又是持續高吞吐,才值得付串流的維運稅。**先確認你真的需要串流,再上串流** —— 這跟整個系列「工具是放大產出、不是增加負債」的調子一致。
+串流很迷人,但它是長命作業 —— checkpoint、狀態、監控、重啟,維運成本比批次高一截。我的判斷是:**先問延遲需求是「秒」還是「分鐘」**。很多自稱要「即時」的需求,其實每 5 分鐘跑一次批次([[airflow-scheduling|用 Airflow 排]])就完全夠用,還更好維護、更好除錯。真要壓到秒級、又是持續 High-throughput ,才值得付串流的維運稅。**先確認你真的需要串流,再上串流** —— 這跟整個系列「工具是放大產出、不是增加負債」的調子一致。

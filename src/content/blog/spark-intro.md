@@ -3,9 +3,9 @@ title: "Apache Spark 是什麼?一篇搞懂分散式資料處理"
 date: 2026-06-14
 category: tech
 tags:
-  - spark
-  - data-engineering
-  - pyspark
+ - spark
+ - data-engineering
+ - pyspark
 series: "Spark 學習筆記"
 seriesOrder: 1
 comments: true
@@ -46,30 +46,30 @@ draft: false
 ### 架構:程式跑起來誰在動
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 540 230" role="img" aria-label="Spark 架構:Driver 透過 Cluster Manager 調度多個 Executor" style="width:100%;max-width:600px;height:auto;margin:0 auto;">
-    <defs><marker id="sp" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
-    <line x1="186" y1="46" x2="336" y2="46" stroke="#9aa4b2" stroke-width="1.5" marker-end="url(#sp)"/>
-    <line x1="96" y1="70" x2="92" y2="158" stroke="#9aa4b2" stroke-width="1.5" marker-end="url(#sp)"/>
-    <line x1="120" y1="70" x2="262" y2="158" stroke="#9aa4b2" stroke-width="1.5" marker-end="url(#sp)"/>
-    <line x1="140" y1="70" x2="432" y2="158" stroke="#9aa4b2" stroke-width="1.5" marker-end="url(#sp)"/>
-    <rect x="28" y="24" width="158" height="46" rx="8" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/>
-    <text x="107" y="44" fill="#e6e6e6" font-size="13" text-anchor="middle">Driver</text>
-    <text x="107" y="60" fill="#9aa4b2" font-size="10" text-anchor="middle">SparkSession · DAG</text>
-    <rect x="338" y="24" width="174" height="46" rx="8" fill="#262b3a" stroke="#3a4154" stroke-width="1.5"/>
-    <text x="425" y="44" fill="#e6e6e6" font-size="12.5" text-anchor="middle">Cluster Manager</text>
-    <text x="425" y="60" fill="#9aa4b2" font-size="10" text-anchor="middle">YARN / K8s</text>
-    <rect x="30" y="160" width="124" height="50" rx="8" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/>
-    <text x="92" y="181" fill="#e6e6e6" font-size="12.5" text-anchor="middle">Executor</text>
-    <text x="92" y="197" fill="#9aa4b2" font-size="10" text-anchor="middle">tasks + 分區</text>
-    <rect x="200" y="160" width="124" height="50" rx="8" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/>
-    <text x="262" y="181" fill="#e6e6e6" font-size="12.5" text-anchor="middle">Executor</text>
-    <text x="262" y="197" fill="#9aa4b2" font-size="10" text-anchor="middle">tasks + 分區</text>
-    <rect x="370" y="160" width="124" height="50" rx="8" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/>
-    <text x="432" y="181" fill="#e6e6e6" font-size="12.5" text-anchor="middle">Executor</text>
-    <text x="432" y="197" fill="#9aa4b2" font-size="10" text-anchor="middle">tasks + 分區</text>
-    <text x="261" y="38" fill="#9aa4b2" font-size="9.5" text-anchor="middle">申請資源</text>
-  </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">Driver 把計畫拆成 task,透過 Cluster Manager 取得資源,分派給各 Executor 按分區平行執行</figcaption>
+ <svg viewBox="0 0 540 230" role="img" aria-label="Spark 架構:Driver 透過 Cluster Manager 調度多個 Executor" style="width:100%;max-width:600px;height:auto;margin:0 auto;">
+ <defs><marker id="sp" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
+ <line x1="186" y1="46" x2="336" y2="46" stroke="#9aa4b2" stroke-width="1.5" marker-end="url(#sp)"/>
+ <line x1="96" y1="70" x2="92" y2="158" stroke="#9aa4b2" stroke-width="1.5" marker-end="url(#sp)"/>
+ <line x1="120" y1="70" x2="262" y2="158" stroke="#9aa4b2" stroke-width="1.5" marker-end="url(#sp)"/>
+ <line x1="140" y1="70" x2="432" y2="158" stroke="#9aa4b2" stroke-width="1.5" marker-end="url(#sp)"/>
+ <rect x="28" y="24" width="158" height="46" rx="8" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/>
+ <text x="107" y="44" fill="#e6e6e6" font-size="13" text-anchor="middle">Driver</text>
+ <text x="107" y="60" fill="#9aa4b2" font-size="10" text-anchor="middle">SparkSession · DAG</text>
+ <rect x="338" y="24" width="174" height="46" rx="8" fill="#262b3a" stroke="#3a4154" stroke-width="1.5"/>
+ <text x="425" y="44" fill="#e6e6e6" font-size="12.5" text-anchor="middle">Cluster Manager</text>
+ <text x="425" y="60" fill="#9aa4b2" font-size="10" text-anchor="middle">YARN / K8s</text>
+ <rect x="30" y="160" width="124" height="50" rx="8" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/>
+ <text x="92" y="181" fill="#e6e6e6" font-size="12.5" text-anchor="middle">Executor</text>
+ <text x="92" y="197" fill="#9aa4b2" font-size="10" text-anchor="middle">tasks + 分區</text>
+ <rect x="200" y="160" width="124" height="50" rx="8" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/>
+ <text x="262" y="181" fill="#e6e6e6" font-size="12.5" text-anchor="middle">Executor</text>
+ <text x="262" y="197" fill="#9aa4b2" font-size="10" text-anchor="middle">tasks + 分區</text>
+ <rect x="370" y="160" width="124" height="50" rx="8" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/>
+ <text x="432" y="181" fill="#e6e6e6" font-size="12.5" text-anchor="middle">Executor</text>
+ <text x="432" y="197" fill="#9aa4b2" font-size="10" text-anchor="middle">tasks + 分區</text>
+ <text x="261" y="38" fill="#9aa4b2" font-size="9.5" text-anchor="middle">申請資源</text>
+ </svg>
+ <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">Driver 把計畫拆成 task,透過 Cluster Manager 取得資源,分派給各 Executor 按分區平行執行</figcaption>
 </figure>
 
 ### 惰性求值:transformation vs action
@@ -77,25 +77,25 @@ draft: false
 Spark 最關鍵的心智模型:**你寫的一連串 transformation 不會馬上執行**,它只是在累積一張「要怎麼算」的計畫(DAG);直到你呼叫一個 **action**,Spark 才把整張計畫最佳化後丟到叢集上跑。
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 540 150" role="img" aria-label="Spark 惰性求值:前面都是 transformation,到 action 才執行" style="width:100%;max-width:600px;height:auto;margin:0 auto;">
-    <defs><marker id="sl" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
-    <line x1="116" y1="52" x2="148" y2="52" stroke="#9aa4b2" stroke-width="1.5" marker-end="url(#sl)"/>
-    <line x1="248" y1="52" x2="280" y2="52" stroke="#9aa4b2" stroke-width="1.5" marker-end="url(#sl)"/>
-    <line x1="394" y1="52" x2="426" y2="52" stroke="#9aa4b2" stroke-width="1.5" marker-end="url(#sl)"/>
-    <rect x="18" y="30" width="98" height="44" rx="8" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/>
-    <text x="67" y="57" fill="#e6e6e6" font-size="13" text-anchor="middle">read</text>
-    <rect x="150" y="30" width="98" height="44" rx="8" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/>
-    <text x="199" y="57" fill="#e6e6e6" font-size="13" text-anchor="middle">filter</text>
-    <rect x="282" y="30" width="112" height="44" rx="8" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/>
-    <text x="338" y="57" fill="#e6e6e6" font-size="13" text-anchor="middle">groupBy</text>
-    <rect x="428" y="30" width="104" height="44" rx="8" fill="#4f6df5" stroke="#4f6df5" stroke-width="1.5"/>
-    <text x="480" y="57" fill="#ffffff" font-size="13" text-anchor="middle">count</text>
-    <text x="199" y="96" fill="#9aa4b2" font-size="10" text-anchor="middle">transformation(惰性)</text>
-    <text x="338" y="110" fill="#9aa4b2" font-size="10" text-anchor="middle">transformation</text>
-    <text x="338" y="22" fill="#9aa4b2" font-size="9.5" text-anchor="middle">shuffle</text>
-    <text x="480" y="96" fill="#4f6df5" font-size="10" text-anchor="middle">action 觸發執行</text>
-  </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">read → filter → groupBy 都只是建計畫;呼叫 count(action)才真正跑;groupBy 之間要 shuffle(跨分區搬資料)</figcaption>
+ <svg viewBox="0 0 540 150" role="img" aria-label="Spark 惰性求值:前面都是 transformation,到 action 才執行" style="width:100%;max-width:600px;height:auto;margin:0 auto;">
+ <defs><marker id="sl" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
+ <line x1="116" y1="52" x2="148" y2="52" stroke="#9aa4b2" stroke-width="1.5" marker-end="url(#sl)"/>
+ <line x1="248" y1="52" x2="280" y2="52" stroke="#9aa4b2" stroke-width="1.5" marker-end="url(#sl)"/>
+ <line x1="394" y1="52" x2="426" y2="52" stroke="#9aa4b2" stroke-width="1.5" marker-end="url(#sl)"/>
+ <rect x="18" y="30" width="98" height="44" rx="8" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/>
+ <text x="67" y="57" fill="#e6e6e6" font-size="13" text-anchor="middle">read</text>
+ <rect x="150" y="30" width="98" height="44" rx="8" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/>
+ <text x="199" y="57" fill="#e6e6e6" font-size="13" text-anchor="middle">filter</text>
+ <rect x="282" y="30" width="112" height="44" rx="8" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/>
+ <text x="338" y="57" fill="#e6e6e6" font-size="13" text-anchor="middle">groupBy</text>
+ <rect x="428" y="30" width="104" height="44" rx="8" fill="#4f6df5" stroke="#4f6df5" stroke-width="1.5"/>
+ <text x="480" y="57" fill="#ffffff" font-size="13" text-anchor="middle">count</text>
+ <text x="199" y="96" fill="#9aa4b2" font-size="10" text-anchor="middle">transformation(惰性)</text>
+ <text x="338" y="110" fill="#9aa4b2" font-size="10" text-anchor="middle">transformation</text>
+ <text x="338" y="22" fill="#9aa4b2" font-size="9.5" text-anchor="middle">shuffle</text>
+ <text x="480" y="96" fill="#4f6df5" font-size="10" text-anchor="middle">action 觸發執行</text>
+ </svg>
+ <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">read → filter → groupBy 都只是建計畫;呼叫 count(action)才真正跑;groupBy 之間要 shuffle(跨分區搬資料)</figcaption>
 </figure>
 
 ## Python(PySpark)範例
@@ -113,10 +113,10 @@ df = spark.read.csv("orders.csv", header=True, inferSchema=True)
 
 # 一連串 transformation —— 全是惰性的,只是在累積「計畫」
 daily = (
-    df.filter(F.col("status") == "paid")
-      .groupBy("date")
-      .agg(F.sum("amount").alias("revenue"))
-      .orderBy("date")
+ df.filter(F.col("status") == "paid")
+ .groupBy("date")
+ .agg(F.sum("amount").alias("revenue"))
+ .orderBy("date")
 )
 
 # action —— 到這一行才真正觸發整條 pipeline 在叢集上跑
@@ -134,7 +134,7 @@ rdd = spark.sparkContext.parallelize([1, 2, 3, 4, 5])
 doubled = rdd.map(lambda x: x * 2).filter(lambda x: x > 4)
 
 # action(到這裡才觸發,把結果收回 Driver)
-print(doubled.collect())   # [6, 8, 10]
+print(doubled.collect()) # [6, 8, 10]
 ```
 
 `map` / `filter` 回傳的是「新的 RDD 計畫」而不是資料;`collect()` 才會真的執行,並把結果**收回 Driver**(所以 `collect()` 在大資料上很危險 —— 可能把整個叢集的資料灌爆單台 Driver 記憶體)。
@@ -143,7 +143,7 @@ print(doubled.collect())   # [6, 8, 10]
 
 ### 大部分人的「大數據」其實沒那麼大
 
-我看過最常見的誤用,是資料才幾百 MB、幾 GB 就搬出 Spark。分散式不是免費的:JVM 啟動、叢集調度、序列化、shuffle 過網路 —— 這些固定成本,在資料塞得進一台機器時遠大於它省下的時間。**塞得進單機就用 pandas / Polars / DuckDB / SQL**,又快又好 debug;只有當資料真的超過單機、或要橫向擴展吞吐時,Spark 才開始划算。先確認「資料真的大到一台裝不下」這個前提,再決定要不要扛這份複雜度 —— 跟我看 Airflow、看任何基礎設施的態度一樣。
+我看過最常見的誤用,是資料才幾百 MB、幾 GB 就搬出 Spark。分散式不是免費的:JVM 啟動、叢集調度、序列化、shuffle 過網路 —— 這些固定成本,在資料塞得進一台機器時遠大於它省下的時間。**塞得進單機就用 pandas / Polars / DuckDB / SQL**,又快又好 debug;只有當資料真的超過單機、或要橫向擴展 throughput 時,Spark 才開始划算。先確認「資料真的大到一台裝不下」這個前提,再決定要不要扛這份複雜度 —— 跟我看 Airflow、看任何基礎設施的態度一樣。
 
 ### 真正要對付的成本是 shuffle
 

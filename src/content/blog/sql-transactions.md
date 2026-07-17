@@ -4,8 +4,8 @@ date: 2026-07-11
 category: tech
 description: "前面幾篇講一個查詢怎麼跑得快,這篇講『很多交易同時跑』怎麼不打架。ACID 裡真正有趣的是 I(隔離):併發會冒出髒讀、不可重複讀、幻讀三種怪事,而四個隔離層級就是一條讓你在『安全 vs 效能』之間選點的光譜。順帶看 PostgreSQL 怎麼用 MVCC 做到讀不擋寫,以及死鎖怎麼來、怎麼躲。"
 tags:
-  - sql
-  - concept
+ - sql
+ - concept
 series: "SQL 我以為我懂"
 seriesOrder: 11
 comments: true
@@ -22,36 +22,36 @@ draft: false
 兩個交易同時跑,如果隔離不夠,會出現三種經典的讀取異常。用一個具體場景就很有感——你(T1)在查一個帳戶餘額,而另一個人(T2)同時在操作它:
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 580 260" role="img" aria-label="三種讀取異常的時間軸,以查帳戶餘額與訂單為例。髒讀:T2 把餘額改成 200 但尚未提交,T1 就讀到 200,而 T2 隨後 ROLLBACK,T1 讀到的是從未存在的假數字。不可重複讀:T1 先讀餘額 100,T2 把餘額改成 200 並提交,T1 同一交易內再讀變成 200。幻讀:T1 查到 3 筆訂單,T2 插入一筆符合條件的訂單並提交,T1 再查變 4 筆。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
-    <text x="20" y="34" fill="#e6e6e6" font-size="10" text-anchor="start" font-weight="bold">① Dirty Read 髒讀</text>
-    <line x1="56" y1="52" x2="560" y2="52" stroke="#2a3040" stroke-width="1"/>
-    <line x1="56" y1="74" x2="560" y2="74" stroke="#2a3040" stroke-width="1"/>
-    <text x="34" y="55" fill="#9aa4b2" font-size="8" text-anchor="middle">T1</text>
-    <text x="34" y="77" fill="#9aa4b2" font-size="8" text-anchor="middle">T2</text>
-    <rect x="72" y="64" width="120" height="20" rx="4" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.1"/><text x="132" y="78" fill="#e6e6e6" font-size="7.6" text-anchor="middle">餘額改 200(未提交)</text>
-    <rect x="250" y="42" width="96" height="20" rx="4" fill="#3a2626" stroke="#e0733a" stroke-width="1.2"/><text x="298" y="56" fill="#e0733a" font-size="7.6" text-anchor="middle">讀到餘額 200 ❌</text>
-    <rect x="400" y="64" width="80" height="20" rx="4" fill="#3a2626" stroke="#e0733a" stroke-width="1.2"/><text x="440" y="78" fill="#e0733a" font-size="7.6" text-anchor="middle">ROLLBACK</text>
-    <text x="20" y="110" fill="#e6e6e6" font-size="10" text-anchor="start" font-weight="bold">② Non-repeatable Read 不可重複讀</text>
-    <line x1="56" y1="130" x2="560" y2="130" stroke="#2a3040" stroke-width="1"/>
-    <line x1="56" y1="152" x2="560" y2="152" stroke="#2a3040" stroke-width="1"/>
-    <text x="34" y="133" fill="#9aa4b2" font-size="8" text-anchor="middle">T1</text>
-    <text x="34" y="155" fill="#9aa4b2" font-size="8" text-anchor="middle">T2</text>
-    <rect x="72" y="120" width="80" height="20" rx="4" fill="#262b3a" stroke="#4f6df5" stroke-width="1.1"/><text x="112" y="134" fill="#e6e6e6" font-size="7.6" text-anchor="middle">讀餘額 100</text>
-    <rect x="210" y="142" width="122" height="20" rx="4" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.1"/><text x="271" y="156" fill="#e6e6e6" font-size="7.6" text-anchor="middle">餘額改 200 並提交</text>
-    <rect x="360" y="120" width="110" height="20" rx="4" fill="#3a2626" stroke="#e0733a" stroke-width="1.2"/><text x="415" y="134" fill="#e0733a" font-size="7.6" text-anchor="middle">又讀餘額 200 ❌</text>
-    <line x1="345" y1="122" x2="345" y2="160" stroke="#d6a45c" stroke-width="1" stroke-dasharray="3 2"/>
-    <text x="20" y="188" fill="#e6e6e6" font-size="10" text-anchor="start" font-weight="bold">③ Phantom Read 幻讀</text>
-    <line x1="56" y1="206" x2="560" y2="206" stroke="#2a3040" stroke-width="1"/>
-    <line x1="56" y1="228" x2="560" y2="228" stroke="#2a3040" stroke-width="1"/>
-    <text x="34" y="209" fill="#9aa4b2" font-size="8" text-anchor="middle">T1</text>
-    <text x="34" y="231" fill="#9aa4b2" font-size="8" text-anchor="middle">T2</text>
-    <rect x="72" y="196" width="80" height="20" rx="4" fill="#262b3a" stroke="#4f6df5" stroke-width="1.1"/><text x="112" y="210" fill="#e6e6e6" font-size="7.6" text-anchor="middle">查到 3 筆訂單</text>
-    <rect x="200" y="218" width="142" height="20" rx="4" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.1"/><text x="271" y="232" fill="#e6e6e6" font-size="7.6" text-anchor="middle">插入 1 筆符合訂單並提交</text>
-    <rect x="360" y="196" width="110" height="20" rx="4" fill="#3a2626" stroke="#e0733a" stroke-width="1.2"/><text x="415" y="210" fill="#e0733a" font-size="7.6" text-anchor="middle">又查到 4 筆 ❌</text>
-    <line x1="345" y1="198" x2="345" y2="236" stroke="#d6a45c" stroke-width="1" stroke-dasharray="3 2"/>
-    <text x="558" y="252" fill="#9aa4b2" font-size="7.5" text-anchor="end">時間 →</text>
-  </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;"><b style="color:#e0733a">髒讀</b>:讀到別人還沒 commit(還可能 rollback)的值;<b style="color:#e0733a">不可重複讀</b>:同一列讀兩次、值被別人改了;<b style="color:#e0733a">幻讀</b>:同一查詢兩次、列數被別人 insert 改了。三者嚴重度遞增</figcaption>
+ <svg viewBox="0 0 580 260" role="img" aria-label="三種讀取異常的時間軸,以查帳戶餘額與訂單為例。髒讀:T2 把餘額改成 200 但尚未提交,T1 就讀到 200,而 T2 隨後 ROLLBACK,T1 讀到的是從未存在的假數字。不可重複讀:T1 先讀餘額 100,T2 把餘額改成 200 並提交,T1 同一交易內再讀變成 200。幻讀:T1 查到 3 筆訂單,T2 插入一筆符合條件的訂單並提交,T1 再查變 4 筆。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
+ <text x="20" y="34" fill="#e6e6e6" font-size="10" text-anchor="start" font-weight="bold">① Dirty Read 髒讀</text>
+ <line x1="56" y1="52" x2="560" y2="52" stroke="#2a3040" stroke-width="1"/>
+ <line x1="56" y1="74" x2="560" y2="74" stroke="#2a3040" stroke-width="1"/>
+ <text x="34" y="55" fill="#9aa4b2" font-size="8" text-anchor="middle">T1</text>
+ <text x="34" y="77" fill="#9aa4b2" font-size="8" text-anchor="middle">T2</text>
+ <rect x="72" y="64" width="120" height="20" rx="4" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.1"/><text x="132" y="78" fill="#e6e6e6" font-size="7.6" text-anchor="middle">餘額改 200(未提交)</text>
+ <rect x="250" y="42" width="96" height="20" rx="4" fill="#3a2626" stroke="#e0733a" stroke-width="1.2"/><text x="298" y="56" fill="#e0733a" font-size="7.6" text-anchor="middle">讀到餘額 200 ❌</text>
+ <rect x="400" y="64" width="80" height="20" rx="4" fill="#3a2626" stroke="#e0733a" stroke-width="1.2"/><text x="440" y="78" fill="#e0733a" font-size="7.6" text-anchor="middle">ROLLBACK</text>
+ <text x="20" y="110" fill="#e6e6e6" font-size="10" text-anchor="start" font-weight="bold">② Non-repeatable Read 不可重複讀</text>
+ <line x1="56" y1="130" x2="560" y2="130" stroke="#2a3040" stroke-width="1"/>
+ <line x1="56" y1="152" x2="560" y2="152" stroke="#2a3040" stroke-width="1"/>
+ <text x="34" y="133" fill="#9aa4b2" font-size="8" text-anchor="middle">T1</text>
+ <text x="34" y="155" fill="#9aa4b2" font-size="8" text-anchor="middle">T2</text>
+ <rect x="72" y="120" width="80" height="20" rx="4" fill="#262b3a" stroke="#4f6df5" stroke-width="1.1"/><text x="112" y="134" fill="#e6e6e6" font-size="7.6" text-anchor="middle">讀餘額 100</text>
+ <rect x="210" y="142" width="122" height="20" rx="4" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.1"/><text x="271" y="156" fill="#e6e6e6" font-size="7.6" text-anchor="middle">餘額改 200 並提交</text>
+ <rect x="360" y="120" width="110" height="20" rx="4" fill="#3a2626" stroke="#e0733a" stroke-width="1.2"/><text x="415" y="134" fill="#e0733a" font-size="7.6" text-anchor="middle">又讀餘額 200 ❌</text>
+ <line x1="345" y1="122" x2="345" y2="160" stroke="#d6a45c" stroke-width="1" stroke-dasharray="3 2"/>
+ <text x="20" y="188" fill="#e6e6e6" font-size="10" text-anchor="start" font-weight="bold">③ Phantom Read 幻讀</text>
+ <line x1="56" y1="206" x2="560" y2="206" stroke="#2a3040" stroke-width="1"/>
+ <line x1="56" y1="228" x2="560" y2="228" stroke="#2a3040" stroke-width="1"/>
+ <text x="34" y="209" fill="#9aa4b2" font-size="8" text-anchor="middle">T1</text>
+ <text x="34" y="231" fill="#9aa4b2" font-size="8" text-anchor="middle">T2</text>
+ <rect x="72" y="196" width="80" height="20" rx="4" fill="#262b3a" stroke="#4f6df5" stroke-width="1.1"/><text x="112" y="210" fill="#e6e6e6" font-size="7.6" text-anchor="middle">查到 3 筆訂單</text>
+ <rect x="200" y="218" width="142" height="20" rx="4" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.1"/><text x="271" y="232" fill="#e6e6e6" font-size="7.6" text-anchor="middle">插入 1 筆符合訂單並提交</text>
+ <rect x="360" y="196" width="110" height="20" rx="4" fill="#3a2626" stroke="#e0733a" stroke-width="1.2"/><text x="415" y="210" fill="#e0733a" font-size="7.6" text-anchor="middle">又查到 4 筆 ❌</text>
+ <line x1="345" y1="198" x2="345" y2="236" stroke="#d6a45c" stroke-width="1" stroke-dasharray="3 2"/>
+ <text x="558" y="252" fill="#9aa4b2" font-size="7.5" text-anchor="end">時間 →</text>
+ </svg>
+ <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;"><b style="color:#e0733a">髒讀</b>:讀到別人還沒 commit(還可能 rollback)的值;<b style="color:#e0733a">不可重複讀</b>:同一列讀兩次、值被別人改了;<b style="color:#e0733a">幻讀</b>:同一查詢兩次、列數被別人 insert 改了。三者嚴重度遞增</figcaption>
 </figure>
 
 三個放進場景就一目了然:
@@ -65,26 +65,26 @@ draft: false
 隔離層級,就是「我願意容忍上面哪幾種怪事,換取多少併發效能」的分級。越嚴越安全,但併發能力越低:
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 580 208" role="img" aria-label="隔離層級對照表。Read Uncommitted:髒讀、不可重複讀、幻讀都可能。Read Committed(PG 預設):防髒讀,不可重複讀與幻讀仍可能。Repeatable Read:三者都防(PostgreSQL 用 MVCC 連幻讀也擋)。Serializable:全防。越往下越安全,但併發效能越低。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
-    <text x="105" y="38" fill="#9aa4b2" font-size="8.5" text-anchor="middle" font-weight="bold">隔離層級</text>
-    <text x="250" y="38" fill="#9aa4b2" font-size="8.5" text-anchor="middle" font-weight="bold">髒讀</text>
-    <text x="350" y="38" fill="#9aa4b2" font-size="8.5" text-anchor="middle" font-weight="bold">不可重複讀</text>
-    <text x="460" y="38" fill="#9aa4b2" font-size="8.5" text-anchor="middle" font-weight="bold">幻讀</text>
-    <rect x="24" y="46" width="500" height="30" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1"/>
-    <text x="105" y="65" fill="#e6e6e6" font-size="8.7" text-anchor="middle">Read Uncommitted</text>
-    <text x="250" y="65" fill="#e0733a" font-size="8.5" text-anchor="middle">可能</text><text x="350" y="65" fill="#e0733a" font-size="8.5" text-anchor="middle">可能</text><text x="460" y="65" fill="#e0733a" font-size="8.5" text-anchor="middle">可能</text>
-    <rect x="24" y="80" width="500" height="30" rx="4" fill="#262b3a" stroke="#4f6df5" stroke-width="1.3"/>
-    <text x="105" y="99" fill="#e6e6e6" font-size="8.7" text-anchor="middle">Read Committed(PG 預設)</text>
-    <text x="250" y="99" fill="#54b890" font-size="8.5" text-anchor="middle">防止</text><text x="350" y="99" fill="#e0733a" font-size="8.5" text-anchor="middle">可能</text><text x="460" y="99" fill="#e0733a" font-size="8.5" text-anchor="middle">可能</text>
-    <rect x="24" y="114" width="500" height="30" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1"/>
-    <text x="105" y="133" fill="#e6e6e6" font-size="8.7" text-anchor="middle">Repeatable Read</text>
-    <text x="250" y="133" fill="#54b890" font-size="8.5" text-anchor="middle">防止</text><text x="350" y="133" fill="#54b890" font-size="8.5" text-anchor="middle">防止</text><text x="460" y="133" fill="#54b890" font-size="8.5" text-anchor="middle">防止*</text>
-    <rect x="24" y="148" width="500" height="30" rx="4" fill="#223528" stroke="#54b890" stroke-width="1.3"/>
-    <text x="105" y="167" fill="#e6e6e6" font-size="8.7" text-anchor="middle">Serializable</text>
-    <text x="250" y="167" fill="#54b890" font-size="8.5" text-anchor="middle">防止</text><text x="350" y="167" fill="#54b890" font-size="8.5" text-anchor="middle">防止</text><text x="460" y="167" fill="#54b890" font-size="8.5" text-anchor="middle">防止</text>
-    <text x="290" y="197" fill="#9aa4b2" font-size="8" text-anchor="middle">↓ 越往下越安全,但併發效能越低。* PG 的 Repeatable Read 用 MVCC 連幻讀也擋掉(標準只要求擋前兩個)</text>
-  </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">四級由鬆到嚴。PostgreSQL 最低就是 <code>Read Committed</code>(不提供 Read Uncommitted)、也是預設;多數 OLTP 用它就夠,真的需要一致性的地方(轉帳、扣庫存)再升到 Repeatable Read 或 Serializable</figcaption>
+ <svg viewBox="0 0 580 208" role="img" aria-label="隔離層級對照表。Read Uncommitted:髒讀、不可重複讀、幻讀都可能。Read Committed(PG 預設):防髒讀,不可重複讀與幻讀仍可能。Repeatable Read:三者都防(PostgreSQL 用 MVCC 連幻讀也擋)。Serializable:全防。越往下越安全,但併發效能越低。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
+ <text x="105" y="38" fill="#9aa4b2" font-size="8.5" text-anchor="middle" font-weight="bold">隔離層級</text>
+ <text x="250" y="38" fill="#9aa4b2" font-size="8.5" text-anchor="middle" font-weight="bold">髒讀</text>
+ <text x="350" y="38" fill="#9aa4b2" font-size="8.5" text-anchor="middle" font-weight="bold">不可重複讀</text>
+ <text x="460" y="38" fill="#9aa4b2" font-size="8.5" text-anchor="middle" font-weight="bold">幻讀</text>
+ <rect x="24" y="46" width="500" height="30" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1"/>
+ <text x="105" y="65" fill="#e6e6e6" font-size="8.7" text-anchor="middle">Read Uncommitted</text>
+ <text x="250" y="65" fill="#e0733a" font-size="8.5" text-anchor="middle">可能</text><text x="350" y="65" fill="#e0733a" font-size="8.5" text-anchor="middle">可能</text><text x="460" y="65" fill="#e0733a" font-size="8.5" text-anchor="middle">可能</text>
+ <rect x="24" y="80" width="500" height="30" rx="4" fill="#262b3a" stroke="#4f6df5" stroke-width="1.3"/>
+ <text x="105" y="99" fill="#e6e6e6" font-size="8.7" text-anchor="middle">Read Committed(PG 預設)</text>
+ <text x="250" y="99" fill="#54b890" font-size="8.5" text-anchor="middle">防止</text><text x="350" y="99" fill="#e0733a" font-size="8.5" text-anchor="middle">可能</text><text x="460" y="99" fill="#e0733a" font-size="8.5" text-anchor="middle">可能</text>
+ <rect x="24" y="114" width="500" height="30" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1"/>
+ <text x="105" y="133" fill="#e6e6e6" font-size="8.7" text-anchor="middle">Repeatable Read</text>
+ <text x="250" y="133" fill="#54b890" font-size="8.5" text-anchor="middle">防止</text><text x="350" y="133" fill="#54b890" font-size="8.5" text-anchor="middle">防止</text><text x="460" y="133" fill="#54b890" font-size="8.5" text-anchor="middle">防止*</text>
+ <rect x="24" y="148" width="500" height="30" rx="4" fill="#223528" stroke="#54b890" stroke-width="1.3"/>
+ <text x="105" y="167" fill="#e6e6e6" font-size="8.7" text-anchor="middle">Serializable</text>
+ <text x="250" y="167" fill="#54b890" font-size="8.5" text-anchor="middle">防止</text><text x="350" y="167" fill="#54b890" font-size="8.5" text-anchor="middle">防止</text><text x="460" y="167" fill="#54b890" font-size="8.5" text-anchor="middle">防止</text>
+ <text x="290" y="197" fill="#9aa4b2" font-size="8" text-anchor="middle">↓ 越往下越安全,但併發效能越低。* PG 的 Repeatable Read 用 MVCC 連幻讀也擋掉(標準只要求擋前兩個)</text>
+ </svg>
+ <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">四級由鬆到嚴。PostgreSQL 最低就是 <code>Read Committed</code>(不提供 Read Uncommitted)、也是預設;多數 OLTP 用它就夠,真的需要一致性的地方(轉帳、扣庫存)再升到 Repeatable Read 或 Serializable</figcaption>
 </figure>
 
 ## MVCC:PostgreSQL 怎麼做到「讀不擋寫」
@@ -98,29 +98,29 @@ draft: false
 - **讀取**時,交易拿自己的快照去比對每個版本的 xmin / xmax,挑出「對我可見」的那一版。
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 580 210" role="img" aria-label="MVCC 多版本示意:同一列餘額有兩個版本,v1 餘額 100 被 T2 取代,v2 餘額 200 由 T2 建立且仍有效,中間是 T2 提交的時間點。讀者 A 的快照在 T2 提交前,看到 v1 的 100;讀者 B 的快照在 T2 提交後,看到 v2 的 200。UPDATE 是新增 v2 加上標記 v1 作廢,讀者照自己的快照挑版本,所以讀不擋寫" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
-    <defs><marker id="mv" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#9aa4b2"/></marker></defs>
-    <line x1="300" y1="40" x2="300" y2="152" stroke="#d6a45c" stroke-width="1.2" stroke-dasharray="4 3"/>
-    <text x="300" y="32" fill="#d6a45c" font-size="8.5" text-anchor="middle">T2 提交</text>
-    <rect x="50" y="48" width="250" height="38" rx="5" fill="#223528" stroke="#54b890" stroke-width="1.4"/>
-    <text x="175" y="66" fill="#e6e6e6" font-size="9.5" text-anchor="middle">v1 · 餘額 100</text>
-    <text x="175" y="79" fill="#9aa4b2" font-size="7.5" text-anchor="middle">被 T2 取代(標上 xmax)</text>
-    <rect x="300" y="48" width="232" height="38" rx="5" fill="#1e2a40" stroke="#4f6df5" stroke-width="1.4"/>
-    <text x="416" y="66" fill="#e6e6e6" font-size="9.5" text-anchor="middle">v2 · 餘額 200</text>
-    <text x="416" y="79" fill="#9aa4b2" font-size="7.5" text-anchor="middle">T2 建立,仍有效</text>
-    <rect x="108" y="118" width="134" height="34" rx="5" fill="#262b3a" stroke="#54b890" stroke-width="1.2"/>
-    <text x="175" y="133" fill="#e6e6e6" font-size="9" text-anchor="middle">讀者 A</text>
-    <text x="175" y="146" fill="#9aa4b2" font-size="7.5" text-anchor="middle">快照:T2 提交前</text>
-    <line x1="175" y1="118" x2="175" y2="88" stroke="#54b890" stroke-width="1.3" marker-end="url(#mv)"/>
-    <text x="175" y="170" fill="#54b890" font-size="8.5" text-anchor="middle">→ 看到 100</text>
-    <rect x="356" y="118" width="134" height="34" rx="5" fill="#262b3a" stroke="#4f6df5" stroke-width="1.2"/>
-    <text x="423" y="133" fill="#e6e6e6" font-size="9" text-anchor="middle">讀者 B</text>
-    <text x="423" y="146" fill="#9aa4b2" font-size="7.5" text-anchor="middle">快照:T2 提交後</text>
-    <line x1="423" y1="118" x2="423" y2="88" stroke="#4f6df5" stroke-width="1.3" marker-end="url(#mv)"/>
-    <text x="423" y="170" fill="#4f6df5" font-size="8.5" text-anchor="middle">→ 看到 200</text>
-    <text x="290" y="196" fill="#9aa4b2" font-size="8" text-anchor="middle">UPDATE = 新增 v2 + 標記 v1 作廢;每個讀者照自己的快照挑版本 → 讀不擋寫</text>
-  </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">同一列的兩個版本並存,讀者依自己快照的時點,各自看到該看的那一版。「讀」永遠讀得到一個一致的舊版本,不必等「寫」放鎖——這就是<b>讀不擋寫、寫不擋讀</b></figcaption>
+ <svg viewBox="0 0 580 210" role="img" aria-label="MVCC 多版本示意:同一列餘額有兩個版本,v1 餘額 100 被 T2 取代,v2 餘額 200 由 T2 建立且仍有效,中間是 T2 提交的時間點。讀者 A 的快照在 T2 提交前,看到 v1 的 100;讀者 B 的快照在 T2 提交後,看到 v2 的 200。UPDATE 是新增 v2 加上標記 v1 作廢,讀者照自己的快照挑版本,所以讀不擋寫" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
+ <defs><marker id="mv" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#9aa4b2"/></marker></defs>
+ <line x1="300" y1="40" x2="300" y2="152" stroke="#d6a45c" stroke-width="1.2" stroke-dasharray="4 3"/>
+ <text x="300" y="32" fill="#d6a45c" font-size="8.5" text-anchor="middle">T2 提交</text>
+ <rect x="50" y="48" width="250" height="38" rx="5" fill="#223528" stroke="#54b890" stroke-width="1.4"/>
+ <text x="175" y="66" fill="#e6e6e6" font-size="9.5" text-anchor="middle">v1 · 餘額 100</text>
+ <text x="175" y="79" fill="#9aa4b2" font-size="7.5" text-anchor="middle">被 T2 取代(標上 xmax)</text>
+ <rect x="300" y="48" width="232" height="38" rx="5" fill="#1e2a40" stroke="#4f6df5" stroke-width="1.4"/>
+ <text x="416" y="66" fill="#e6e6e6" font-size="9.5" text-anchor="middle">v2 · 餘額 200</text>
+ <text x="416" y="79" fill="#9aa4b2" font-size="7.5" text-anchor="middle">T2 建立,仍有效</text>
+ <rect x="108" y="118" width="134" height="34" rx="5" fill="#262b3a" stroke="#54b890" stroke-width="1.2"/>
+ <text x="175" y="133" fill="#e6e6e6" font-size="9" text-anchor="middle">讀者 A</text>
+ <text x="175" y="146" fill="#9aa4b2" font-size="7.5" text-anchor="middle">快照:T2 提交前</text>
+ <line x1="175" y1="118" x2="175" y2="88" stroke="#54b890" stroke-width="1.3" marker-end="url(#mv)"/>
+ <text x="175" y="170" fill="#54b890" font-size="8.5" text-anchor="middle">→ 看到 100</text>
+ <rect x="356" y="118" width="134" height="34" rx="5" fill="#262b3a" stroke="#4f6df5" stroke-width="1.2"/>
+ <text x="423" y="133" fill="#e6e6e6" font-size="9" text-anchor="middle">讀者 B</text>
+ <text x="423" y="146" fill="#9aa4b2" font-size="7.5" text-anchor="middle">快照:T2 提交後</text>
+ <line x1="423" y1="118" x2="423" y2="88" stroke="#4f6df5" stroke-width="1.3" marker-end="url(#mv)"/>
+ <text x="423" y="170" fill="#4f6df5" font-size="8.5" text-anchor="middle">→ 看到 200</text>
+ <text x="290" y="196" fill="#9aa4b2" font-size="8" text-anchor="middle">UPDATE = 新增 v2 + 標記 v1 作廢;每個讀者照自己的快照挑版本 → 讀不擋寫</text>
+ </svg>
+ <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">同一列的兩個版本並存,讀者依自己快照的時點,各自看到該看的那一版。「讀」永遠讀得到一個一致的舊版本,不必等「寫」放鎖——這就是<b>讀不擋寫、寫不擋讀</b></figcaption>
 </figure>
 
 ### 隔離層級,其實就是「快照的時機」
@@ -136,7 +136,7 @@ MVCC 讓前面那張隔離層級表變得很好懂——差別只在**你多久�
 
 要注意 MVCC 解的是「讀 vs 寫」的衝突,不是萬能。**兩個交易同時要改同一列,還是會互相擋**——後到的那個得等前一個 commit 或 rollback(在 Repeatable Read / Serializable 下甚至可能直接被判定衝突而 abort,要你重試)。所以「熱點列」(大家搶改同一列,例如全站共用的計數器、秒殺的庫存)在 MVCC 下依然是效能與衝突的痛點,得靠別的招數(拆分、佇列、樂觀鎖重試)化解。
 
-### 代價:舊版本會堆積,要靠 VACUUM 清
+### 代價:舊版本會 backlog ,要靠 VACUUM 清
 
 多版本不是免費的。被作廢的舊版本(dead tuples)不會立刻消失,會留在表裡佔空間,直到 PostgreSQL 的 **`VACUUM`**(通常是背景的 autovacuum)來回收。如果更新很兇、VACUUM 又跟不上,表會**膨脹(bloat)**、掃描變慢。這是 MVCC 的隱形帳單——它用「保留多版本」換來高併發,代價是你得讓 VACUUM 追得上寫入。這套「不覆蓋、而是保留多版本」的思路,跟 [[ddia-reliable-scalable|DDIA]] 儲存那章的 append-only、跟 [[sql-time-scd|SCD Type 2]] 那種「新增版本而非覆蓋」是同一個家族。
 

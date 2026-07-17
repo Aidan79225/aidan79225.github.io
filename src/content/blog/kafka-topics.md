@@ -3,49 +3,49 @@ title: "Kafka 的核心模型:Topic、Partition、Offset 與 Consumer Group"
 date: 2026-06-24
 category: tech
 tags:
-  - kafka
-  - data-engineering
-  - messaging
+ - kafka
+ - data-engineering
+ - messaging
 series: "Kafka 學習筆記"
 seriesOrder: 2
 comments: true
 draft: false
 ---
-[[kafka-intro|第一篇]]把 Kafka 的心智模型定成一句話:**一條可重播的事件 log**。但那條 log 實際上怎麼擺、怎麼平行化、一群消費者又怎麼分工?這篇把 Kafka 的四個核心名詞講透 —— **Topic、Partition、Offset、Consumer Group** —— 它們合起來決定了吞吐、順序與擴展。
+[[kafka-intro|第一篇]]把 Kafka 的心智模型定成一句話:**一條可重播的事件 log**。但那條 log 實際上怎麼擺、怎麼平行化、一群消費者又怎麼分工?這篇把 Kafka 的四個核心名詞講透 —— **Topic、Partition、Offset、Consumer Group** —— 它們合起來決定了 throughput、順序與擴展。
 
 ## Topic 與 Partition:一條 log 怎麼變成可平行的多條
 
-**Topic** 是一個具名的事件流,是邏輯上的分類 —— 例如 `orders`、`clicks`。但如果一個 topic 就只是「一條 log」,那它的吞吐就被單一檔案、單一機器卡死了。
+**Topic** 是一個具名的事件流,是邏輯上的分類 —— 例如 `orders`、`clicks`。但如果一個 topic 就只是「一條 log」,那它的 throughput 就被單一檔案、單一機器卡死了。
 
-所以 Kafka 把每個 topic 切成多個 **Partition**:**真正那條 append-only log,其實是 partition,而不是 topic。** Topic 只是「這些 partition 的集合」這個名字。Partition 是 Kafka 一切平行與順序的單位 —— 不同 partition 可以散在不同 broker 上同時讀寫,吞吐就隨 partition 數放大。
+所以 Kafka 把每個 topic 切成多個 **Partition**:**真正那條 append-only log,其實是 partition,而不是 topic。** Topic 只是「這些 partition 的集合」這個名字。Partition 是 Kafka 一切平行與順序的單位 —— 不同 partition 可以散在不同 broker 上同時讀寫, throughput 就隨 partition 數放大。
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 560 210" role="img" aria-label="Topic orders 被切成三個 partition,每個 partition 是一條獨立有序的 log,producer 依 key 的 hash 決定事件落在哪個 partition" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
-    <defs><marker id="kt1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
-    <rect x="12" y="84" width="92" height="44" rx="8" fill="#262b3a" stroke="#4f6df5" stroke-width="1.6"/>
-    <text x="58" y="103" fill="#e6e6e6" font-size="12" text-anchor="middle">Producer</text>
-    <text x="58" y="118" fill="#9aa4b2" font-size="9" text-anchor="middle">key → hash</text>
-    <rect x="150" y="16" width="398" height="184" rx="10" fill="none" stroke="#3a4154" stroke-width="1.5" stroke-dasharray="5 4"/>
-    <text x="206" y="34" fill="#9aa4b2" font-size="11" text-anchor="middle">Topic: orders</text>
-    <text x="174" y="74" fill="#9aa4b2" font-size="11" text-anchor="middle">P0</text>
-    <rect x="200" y="55" width="40" height="30" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="220" y="75" fill="#9aa4b2" font-size="10" text-anchor="middle">0</text>
-    <rect x="244" y="55" width="40" height="30" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="264" y="75" fill="#9aa4b2" font-size="10" text-anchor="middle">1</text>
-    <rect x="288" y="55" width="40" height="30" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="308" y="75" fill="#9aa4b2" font-size="10" text-anchor="middle">2</text>
-    <rect x="332" y="55" width="40" height="30" rx="4" fill="none" stroke="#3a4154" stroke-width="1.2" stroke-dasharray="3 3"/><text x="352" y="75" fill="#9aa4b2" font-size="10" text-anchor="middle">3</text>
-    <text x="174" y="122" fill="#9aa4b2" font-size="11" text-anchor="middle">P1</text>
-    <rect x="200" y="103" width="40" height="30" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="220" y="123" fill="#9aa4b2" font-size="10" text-anchor="middle">0</text>
-    <rect x="244" y="103" width="40" height="30" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="264" y="123" fill="#9aa4b2" font-size="10" text-anchor="middle">1</text>
-    <rect x="288" y="103" width="40" height="30" rx="4" fill="none" stroke="#3a4154" stroke-width="1.2" stroke-dasharray="3 3"/><text x="308" y="123" fill="#9aa4b2" font-size="10" text-anchor="middle">2</text>
-    <text x="174" y="170" fill="#9aa4b2" font-size="11" text-anchor="middle">P2</text>
-    <rect x="200" y="151" width="40" height="30" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="220" y="171" fill="#9aa4b2" font-size="10" text-anchor="middle">0</text>
-    <rect x="244" y="151" width="40" height="30" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="264" y="171" fill="#9aa4b2" font-size="10" text-anchor="middle">1</text>
-    <rect x="288" y="151" width="40" height="30" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="308" y="171" fill="#9aa4b2" font-size="10" text-anchor="middle">2</text>
-    <rect x="332" y="151" width="40" height="30" rx="4" fill="none" stroke="#3a4154" stroke-width="1.2" stroke-dasharray="3 3"/><text x="352" y="171" fill="#9aa4b2" font-size="10" text-anchor="middle">3</text>
-    <line x1="104" y1="100" x2="168" y2="70" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#kt1)"/>
-    <line x1="104" y1="106" x2="168" y2="118" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#kt1)"/>
-    <line x1="104" y1="112" x2="168" y2="166" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#kt1)"/>
-  </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">Topic 是名字,partition 才是真正那條有序的 log;吞吐隨 partition 數放大,各自往尾端 append</figcaption>
+ <svg viewBox="0 0 560 210" role="img" aria-label="Topic orders 被切成三個 partition,每個 partition 是一條獨立有序的 log,producer 依 key 的 hash 決定事件落在哪個 partition" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
+ <defs><marker id="kt1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
+ <rect x="12" y="84" width="92" height="44" rx="8" fill="#262b3a" stroke="#4f6df5" stroke-width="1.6"/>
+ <text x="58" y="103" fill="#e6e6e6" font-size="12" text-anchor="middle">Producer</text>
+ <text x="58" y="118" fill="#9aa4b2" font-size="9" text-anchor="middle">key → hash</text>
+ <rect x="150" y="16" width="398" height="184" rx="10" fill="none" stroke="#3a4154" stroke-width="1.5" stroke-dasharray="5 4"/>
+ <text x="206" y="34" fill="#9aa4b2" font-size="11" text-anchor="middle">Topic: orders</text>
+ <text x="174" y="74" fill="#9aa4b2" font-size="11" text-anchor="middle">P0</text>
+ <rect x="200" y="55" width="40" height="30" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="220" y="75" fill="#9aa4b2" font-size="10" text-anchor="middle">0</text>
+ <rect x="244" y="55" width="40" height="30" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="264" y="75" fill="#9aa4b2" font-size="10" text-anchor="middle">1</text>
+ <rect x="288" y="55" width="40" height="30" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="308" y="75" fill="#9aa4b2" font-size="10" text-anchor="middle">2</text>
+ <rect x="332" y="55" width="40" height="30" rx="4" fill="none" stroke="#3a4154" stroke-width="1.2" stroke-dasharray="3 3"/><text x="352" y="75" fill="#9aa4b2" font-size="10" text-anchor="middle">3</text>
+ <text x="174" y="122" fill="#9aa4b2" font-size="11" text-anchor="middle">P1</text>
+ <rect x="200" y="103" width="40" height="30" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="220" y="123" fill="#9aa4b2" font-size="10" text-anchor="middle">0</text>
+ <rect x="244" y="103" width="40" height="30" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="264" y="123" fill="#9aa4b2" font-size="10" text-anchor="middle">1</text>
+ <rect x="288" y="103" width="40" height="30" rx="4" fill="none" stroke="#3a4154" stroke-width="1.2" stroke-dasharray="3 3"/><text x="308" y="123" fill="#9aa4b2" font-size="10" text-anchor="middle">2</text>
+ <text x="174" y="170" fill="#9aa4b2" font-size="11" text-anchor="middle">P2</text>
+ <rect x="200" y="151" width="40" height="30" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="220" y="171" fill="#9aa4b2" font-size="10" text-anchor="middle">0</text>
+ <rect x="244" y="151" width="40" height="30" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="264" y="171" fill="#9aa4b2" font-size="10" text-anchor="middle">1</text>
+ <rect x="288" y="151" width="40" height="30" rx="4" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="308" y="171" fill="#9aa4b2" font-size="10" text-anchor="middle">2</text>
+ <rect x="332" y="151" width="40" height="30" rx="4" fill="none" stroke="#3a4154" stroke-width="1.2" stroke-dasharray="3 3"/><text x="352" y="171" fill="#9aa4b2" font-size="10" text-anchor="middle">3</text>
+ <line x1="104" y1="100" x2="168" y2="70" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#kt1)"/>
+ <line x1="104" y1="106" x2="168" y2="118" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#kt1)"/>
+ <line x1="104" y1="112" x2="168" y2="166" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#kt1)"/>
+ </svg>
+ <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">Topic 是名字,partition 才是真正那條有序的 log; throughput 隨 partition 數放大,各自往尾端 append</figcaption>
 </figure>
 
 ## Producer 怎麼決定事件進哪個 partition
@@ -53,7 +53,7 @@ draft: false
 寫入時,**有沒有指定 key,決定了事件落點 —— 也決定了順序保證**:
 
 - **有 key**:Kafka 對 key 取 hash 再對 partition 數取模,**同一個 key 永遠進同一個 partition**。把 `order_id` 當 key,同一筆訂單的所有事件就保證落在同一條 log、嚴格有序。
-- **沒有 key**:平均分散(round-robin / sticky)到各 partition,換取最大吞吐,但放棄跨事件的順序。
+- **沒有 key**:平均分散(round-robin / sticky)到各 partition,換取最大 throughput ,但放棄跨事件的順序。
 
 這是 Kafka 最關鍵的一個設計選擇:**「要哪些事件之間有序」這件事,是你透過 key 自己決定的,不是 Kafka 免費給的。**
 
@@ -73,20 +73,20 @@ draft: false
 - **不同 group 各自獨立讀全量。** 帳務組一個 group、推薦組一個 group,兩邊都讀到每一筆 —— 這讓 Kafka 同時又像個**廣播**。
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 540 200" role="img" aria-label="一個 topic 的三個 partition 分配給 consumer group 裡的兩個 consumer:P0、P1 給 Consumer 1,P2 給 Consumer 2" style="width:100%;max-width:600px;height:auto;margin:0 auto;">
-    <defs><marker id="kt2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
-    <rect x="18" y="28" width="112" height="38" rx="6" fill="#262b3a" stroke="#4f6df5" stroke-width="1.4"/><text x="74" y="52" fill="#e6e6e6" font-size="11.5" text-anchor="middle">Partition 0</text>
-    <rect x="18" y="84" width="112" height="38" rx="6" fill="#262b3a" stroke="#4f6df5" stroke-width="1.4"/><text x="74" y="108" fill="#e6e6e6" font-size="11.5" text-anchor="middle">Partition 1</text>
-    <rect x="18" y="140" width="112" height="38" rx="6" fill="#262b3a" stroke="#4f6df5" stroke-width="1.4"/><text x="74" y="164" fill="#e6e6e6" font-size="11.5" text-anchor="middle">Partition 2</text>
-    <rect x="300" y="18" width="224" height="164" rx="10" fill="none" stroke="#3a4154" stroke-width="1.5" stroke-dasharray="5 4"/>
-    <text x="412" y="36" fill="#9aa4b2" font-size="11" text-anchor="middle">Consumer Group: billing</text>
-    <rect x="332" y="50" width="160" height="40" rx="8" fill="#262b3a" stroke="#d4af37" stroke-width="1.5"/><text x="412" y="74" fill="#e6e6e6" font-size="11.5" text-anchor="middle">Consumer 1</text>
-    <rect x="332" y="122" width="160" height="40" rx="8" fill="#262b3a" stroke="#d4af37" stroke-width="1.5"/><text x="412" y="146" fill="#e6e6e6" font-size="11.5" text-anchor="middle">Consumer 2</text>
-    <line x1="130" y1="47" x2="332" y2="62" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#kt2)"/>
-    <line x1="130" y1="103" x2="332" y2="78" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#kt2)"/>
-    <line x1="130" y1="159" x2="332" y2="142" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#kt2)"/>
-  </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">同 group 內每個 partition 只指派給一個 consumer(平行分攤);換一個 group 則各自獨立讀全部(廣播)</figcaption>
+ <svg viewBox="0 0 540 200" role="img" aria-label="一個 topic 的三個 partition 分配給 consumer group 裡的兩個 consumer:P0、P1 給 Consumer 1,P2 給 Consumer 2" style="width:100%;max-width:600px;height:auto;margin:0 auto;">
+ <defs><marker id="kt2" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
+ <rect x="18" y="28" width="112" height="38" rx="6" fill="#262b3a" stroke="#4f6df5" stroke-width="1.4"/><text x="74" y="52" fill="#e6e6e6" font-size="11.5" text-anchor="middle">Partition 0</text>
+ <rect x="18" y="84" width="112" height="38" rx="6" fill="#262b3a" stroke="#4f6df5" stroke-width="1.4"/><text x="74" y="108" fill="#e6e6e6" font-size="11.5" text-anchor="middle">Partition 1</text>
+ <rect x="18" y="140" width="112" height="38" rx="6" fill="#262b3a" stroke="#4f6df5" stroke-width="1.4"/><text x="74" y="164" fill="#e6e6e6" font-size="11.5" text-anchor="middle">Partition 2</text>
+ <rect x="300" y="18" width="224" height="164" rx="10" fill="none" stroke="#3a4154" stroke-width="1.5" stroke-dasharray="5 4"/>
+ <text x="412" y="36" fill="#9aa4b2" font-size="11" text-anchor="middle">Consumer Group: billing</text>
+ <rect x="332" y="50" width="160" height="40" rx="8" fill="#262b3a" stroke="#d4af37" stroke-width="1.5"/><text x="412" y="74" fill="#e6e6e6" font-size="11.5" text-anchor="middle">Consumer 1</text>
+ <rect x="332" y="122" width="160" height="40" rx="8" fill="#262b3a" stroke="#d4af37" stroke-width="1.5"/><text x="412" y="146" fill="#e6e6e6" font-size="11.5" text-anchor="middle">Consumer 2</text>
+ <line x1="130" y1="47" x2="332" y2="62" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#kt2)"/>
+ <line x1="130" y1="103" x2="332" y2="78" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#kt2)"/>
+ <line x1="130" y1="159" x2="332" y2="142" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#kt2)"/>
+ </svg>
+ <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">同 group 內每個 partition 只指派給一個 consumer(平行分攤);換一個 group 則各自獨立讀全部(廣播)</figcaption>
 </figure>
 
 兩個推論很實用:
@@ -104,7 +104,7 @@ draft: false
 
 ### partition 數是最重要、也最難回頭的前期決定
 
-partition 數一次同時決定了三件事:**吞吐上限、消費者平行度上限、以及順序的顆粒度**。偏偏它「能加不能減」——之後想加 partition 很容易,但加完會打亂既有 key 的 hash 落點(同一個 key 可能換到別的 partition,歷史順序就接不起來了)。所以我的習慣是**前期就抓一個有餘裕、但別誇張的數字**,寧可一開始稍微多給,也不要上線後才發現卡死又動不得。這是 Kafka 少數「開頭沒想清楚、後面很痛」的設計點。
+partition 數一次同時決定了三件事:** throughput 上限、消費者平行度上限、以及順序的顆粒度**。偏偏它「能加不能減」——之後想加 partition 很容易,但加完會打亂既有 key 的 hash 落點(同一個 key 可能換到別的 partition,歷史順序就接不起來了)。所以我的習慣是**前期就抓一個有餘裕、但別誇張的數字**,寧可一開始稍微多給,也不要上線後才發現卡死又動不得。這是 Kafka 少數「開頭沒想清楚、後面很痛」的設計點。
 
 ### 選 key,就是在設計你的順序與負載
 

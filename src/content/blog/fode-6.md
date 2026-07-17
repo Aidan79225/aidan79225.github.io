@@ -3,8 +3,8 @@ title: "資料要存在哪:儲存的階層與抽象,讀《Fundamentals of Data E
 date: 2026-07-01
 category: tech
 tags:
-  - data-engineering
-  - book-notes
+ - data-engineering
+ - book-notes
 series: "Fundamentals of Data Engineering 讀書筆記"
 seriesOrder: 6
 comments: true
@@ -17,17 +17,17 @@ draft: false
 書從最底層的物理材料往上疊:CPU 快取、RAM、SSD、HDD、物件儲存、冷儲存。它們的差別不是「好壞」,而是**同一組取捨的不同落點** —— 越快的越貴、容量越小;越便宜的越慢、容量越大。中間**單價和延遲各差好幾個數量級**。
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 560 300" role="img" aria-label="儲存階層:由上到下為 CPU 快取、RAM、SSD、HDD、物件儲存、冷儲存;越上面越快越貴容量越小,越下面越慢越便宜容量越大,物件儲存是資料工程的重心" style="width:100%;max-width:640px;height:auto;margin:0 auto;">
-    <text x="280" y="18" fill="#9aa4b2" font-size="9.5" text-anchor="middle">↑ 越上面:越快、越貴、容量越小</text>
-    <rect x="215" y="30" width="130" height="34" rx="4" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.3"/><text x="280" y="52" fill="#e6e6e6" font-size="10" text-anchor="middle">CPU 快取</text><text x="548" y="52" fill="#9aa4b2" font-size="8.5" text-anchor="end">~1 ns</text>
-    <rect x="193" y="70" width="175" height="34" rx="4" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.3"/><text x="280" y="92" fill="#e6e6e6" font-size="10" text-anchor="middle">RAM 記憶體</text><text x="548" y="92" fill="#9aa4b2" font-size="8.5" text-anchor="end">~100 ns · 揮發</text>
-    <rect x="168" y="110" width="225" height="34" rx="4" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.3"/><text x="280" y="132" fill="#e6e6e6" font-size="10" text-anchor="middle">SSD</text><text x="548" y="132" fill="#9aa4b2" font-size="8.5" text-anchor="end">~0.1 ms</text>
-    <rect x="138" y="150" width="285" height="34" rx="4" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.3"/><text x="280" y="172" fill="#e6e6e6" font-size="10" text-anchor="middle">HDD 磁碟(轉盤)</text><text x="548" y="172" fill="#9aa4b2" font-size="8.5" text-anchor="end">~10 ms</text>
-    <rect x="100" y="190" width="360" height="34" rx="4" fill="#262b3a" stroke="#4f6df5" stroke-width="1.9"/><text x="280" y="212" fill="#e6e6e6" font-size="10.5" text-anchor="middle">物件儲存(S3 / GCS)</text><text x="548" y="212" fill="#9aa4b2" font-size="8.5" text-anchor="end">~100 ms · 超便宜</text>
-    <rect x="65" y="230" width="430" height="34" rx="4" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.3" stroke-dasharray="4 3"/><text x="280" y="252" fill="#e6e6e6" font-size="10" text-anchor="middle">封存 / 冷儲存</text><text x="548" y="252" fill="#9aa4b2" font-size="8.5" text-anchor="end">分鐘~小時 · 最便宜</text>
-    <text x="280" y="286" fill="#9aa4b2" font-size="9.5" text-anchor="middle">↓ 越下面:越慢、越便宜、容量越大</text>
-  </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">儲存是一條速度↔成本的階層,單價與延遲各差好幾個數量級;資料工程的重心落在最便宜、幾乎無限的物件儲存(藍)</figcaption>
+ <svg viewBox="0 0 560 300" role="img" aria-label="儲存階層:由上到下為 CPU 快取、RAM、SSD、HDD、物件儲存、冷儲存;越上面越快越貴容量越小,越下面越慢越便宜容量越大,物件儲存是資料工程的重心" style="width:100%;max-width:640px;height:auto;margin:0 auto;">
+ <text x="280" y="18" fill="#9aa4b2" font-size="9.5" text-anchor="middle">↑ 越上面:越快、越貴、容量越小</text>
+ <rect x="215" y="30" width="130" height="34" rx="4" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.3"/><text x="280" y="52" fill="#e6e6e6" font-size="10" text-anchor="middle">CPU 快取</text><text x="548" y="52" fill="#9aa4b2" font-size="8.5" text-anchor="end">~1 ns</text>
+ <rect x="193" y="70" width="175" height="34" rx="4" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.3"/><text x="280" y="92" fill="#e6e6e6" font-size="10" text-anchor="middle">RAM 記憶體</text><text x="548" y="92" fill="#9aa4b2" font-size="8.5" text-anchor="end">~100 ns · 揮發</text>
+ <rect x="168" y="110" width="225" height="34" rx="4" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.3"/><text x="280" y="132" fill="#e6e6e6" font-size="10" text-anchor="middle">SSD</text><text x="548" y="132" fill="#9aa4b2" font-size="8.5" text-anchor="end">~0.1 ms</text>
+ <rect x="138" y="150" width="285" height="34" rx="4" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.3"/><text x="280" y="172" fill="#e6e6e6" font-size="10" text-anchor="middle">HDD 磁碟(轉盤)</text><text x="548" y="172" fill="#9aa4b2" font-size="8.5" text-anchor="end">~10 ms</text>
+ <rect x="100" y="190" width="360" height="34" rx="4" fill="#262b3a" stroke="#4f6df5" stroke-width="1.9"/><text x="280" y="212" fill="#e6e6e6" font-size="10.5" text-anchor="middle">物件儲存(S3 / GCS)</text><text x="548" y="212" fill="#9aa4b2" font-size="8.5" text-anchor="end">~100 ms · 超便宜</text>
+ <rect x="65" y="230" width="430" height="34" rx="4" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.3" stroke-dasharray="4 3"/><text x="280" y="252" fill="#e6e6e6" font-size="10" text-anchor="middle">封存 / 冷儲存</text><text x="548" y="252" fill="#9aa4b2" font-size="8.5" text-anchor="end">分鐘~小時 · 最便宜</text>
+ <text x="280" y="286" fill="#9aa4b2" font-size="9.5" text-anchor="middle">↓ 越下面:越慢、越便宜、容量越大</text>
+ </svg>
+ <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">儲存是一條速度↔成本的階層,單價與延遲各差好幾個數量級;資料工程的重心落在最便宜、幾乎無限的物件儲存(藍)</figcaption>
 </figure>
 
 這條階層也是**快取(cache)**的原理:把熱資料往上搬(快、貴),冷資料留在下面(慢、便宜)。[[spark-shuffle|Spark 把資料 cache 進記憶體]]、資料庫用 RAM 當 buffer,都是同一招 —— 拿貴的空間換速度。
@@ -49,30 +49,30 @@ draft: false
 傳統資料庫或 Hadoop,**運算和儲存綁在同一台機器上** —— 想加算力,連硬碟一起加;想加容量,連 CPU 一起加,兩邊永遠一起伸縮,結果常常一邊爆滿、一邊閒置。雲時代把它拆開了:
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 600 250" role="img" aria-label="運算與儲存分離的前後對比:傳統把 compute 與 disk 綁在同一台機器一起伸縮;現代把資料放在共用的物件儲存,多個運算引擎按需長出來、算完關掉、各自獨立伸縮" style="width:100%;max-width:660px;height:auto;margin:0 auto;">
-    <defs><marker id="st1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
-    <line x1="300" y1="30" x2="300" y2="232" stroke="#3a4154" stroke-width="1.2" stroke-dasharray="4 5"/>
-    <text x="150" y="22" fill="#9aa4b2" font-size="10.5" text-anchor="middle">傳統:compute 與 storage 綁死</text>
-    <rect x="64" y="48" width="80" height="96" rx="6" fill="none" stroke="#3a4154" stroke-width="1.4"/>
-    <rect x="72" y="56" width="64" height="40" rx="4" fill="#2e4a40" stroke="#54b890" stroke-width="1.3"/><text x="104" y="80" fill="#e6e6e6" font-size="9" text-anchor="middle">Compute</text>
-    <rect x="72" y="100" width="64" height="38" rx="4" fill="#262b3a" stroke="#4f6df5" stroke-width="1.3"/><text x="104" y="123" fill="#e6e6e6" font-size="9" text-anchor="middle">Disk</text>
-    <rect x="168" y="48" width="80" height="96" rx="6" fill="none" stroke="#3a4154" stroke-width="1.4"/>
-    <rect x="176" y="56" width="64" height="40" rx="4" fill="#2e4a40" stroke="#54b890" stroke-width="1.3"/><text x="208" y="80" fill="#e6e6e6" font-size="9" text-anchor="middle">Compute</text>
-    <rect x="176" y="100" width="64" height="38" rx="4" fill="#262b3a" stroke="#4f6df5" stroke-width="1.3"/><text x="208" y="123" fill="#e6e6e6" font-size="9" text-anchor="middle">Disk</text>
-    <text x="150" y="172" fill="#9aa4b2" font-size="8.5" text-anchor="middle">加算力得連硬碟一起加、</text>
-    <text x="150" y="186" fill="#9aa4b2" font-size="8.5" text-anchor="middle">加容量得連 CPU 一起加</text>
-    <text x="150" y="204" fill="#e6e6e6" font-size="8.5" text-anchor="middle">→ 綁死、常常一邊浪費</text>
-    <text x="450" y="22" fill="#9aa4b2" font-size="10.5" text-anchor="middle">現代:compute / storage 分離</text>
-    <rect x="340" y="56" width="66" height="42" rx="6" fill="#2e4a40" stroke="#54b890" stroke-width="1.4"/><text x="373" y="81" fill="#e6e6e6" font-size="9.5" text-anchor="middle">Spark</text>
-    <rect x="417" y="56" width="66" height="42" rx="6" fill="#2e4a40" stroke="#54b890" stroke-width="1.4"/><text x="450" y="81" fill="#e6e6e6" font-size="9.5" text-anchor="middle">SQL 引擎</text>
-    <rect x="494" y="56" width="66" height="42" rx="6" fill="#262b3a" stroke="#54b890" stroke-width="1.3" stroke-dasharray="4 3"/><text x="527" y="81" fill="#e6e6e6" font-size="9.5" text-anchor="middle">臨時作業</text>
-    <line x1="373" y1="98" x2="392" y2="148" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#st1)"/>
-    <line x1="450" y1="98" x2="450" y2="148" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#st1)"/>
-    <line x1="527" y1="98" x2="508" y2="148" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#st1)"/>
-    <rect x="336" y="150" width="228" height="44" rx="8" fill="#262b3a" stroke="#4f6df5" stroke-width="1.7"/><text x="450" y="170" fill="#e6e6e6" font-size="10" text-anchor="middle">物件儲存(共用・持久)</text><text x="450" y="185" fill="#9aa4b2" font-size="8" text-anchor="middle">便宜、幾乎無限</text>
-    <text x="450" y="214" fill="#9aa4b2" font-size="8.5" text-anchor="middle">各自獨立伸縮 · 按需開關 · 用完即走</text>
-  </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">運算與儲存分離是雲時代最大的轉變:資料躺在便宜持久的物件儲存,運算引擎按需長出來、算完關掉,兩邊互不綁死</figcaption>
+ <svg viewBox="0 0 600 250" role="img" aria-label="運算與儲存分離的前後對比:傳統把 compute 與 disk 綁在同一台機器一起伸縮;現代把資料放在共用的物件儲存,多個運算引擎按需長出來、算完關掉、各自獨立伸縮" style="width:100%;max-width:660px;height:auto;margin:0 auto;">
+ <defs><marker id="st1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
+ <line x1="300" y1="30" x2="300" y2="232" stroke="#3a4154" stroke-width="1.2" stroke-dasharray="4 5"/>
+ <text x="150" y="22" fill="#9aa4b2" font-size="10.5" text-anchor="middle">傳統:compute 與 storage 綁死</text>
+ <rect x="64" y="48" width="80" height="96" rx="6" fill="none" stroke="#3a4154" stroke-width="1.4"/>
+ <rect x="72" y="56" width="64" height="40" rx="4" fill="#2e4a40" stroke="#54b890" stroke-width="1.3"/><text x="104" y="80" fill="#e6e6e6" font-size="9" text-anchor="middle">Compute</text>
+ <rect x="72" y="100" width="64" height="38" rx="4" fill="#262b3a" stroke="#4f6df5" stroke-width="1.3"/><text x="104" y="123" fill="#e6e6e6" font-size="9" text-anchor="middle">Disk</text>
+ <rect x="168" y="48" width="80" height="96" rx="6" fill="none" stroke="#3a4154" stroke-width="1.4"/>
+ <rect x="176" y="56" width="64" height="40" rx="4" fill="#2e4a40" stroke="#54b890" stroke-width="1.3"/><text x="208" y="80" fill="#e6e6e6" font-size="9" text-anchor="middle">Compute</text>
+ <rect x="176" y="100" width="64" height="38" rx="4" fill="#262b3a" stroke="#4f6df5" stroke-width="1.3"/><text x="208" y="123" fill="#e6e6e6" font-size="9" text-anchor="middle">Disk</text>
+ <text x="150" y="172" fill="#9aa4b2" font-size="8.5" text-anchor="middle">加算力得連硬碟一起加、</text>
+ <text x="150" y="186" fill="#9aa4b2" font-size="8.5" text-anchor="middle">加容量得連 CPU 一起加</text>
+ <text x="150" y="204" fill="#e6e6e6" font-size="8.5" text-anchor="middle">→ 綁死、常常一邊浪費</text>
+ <text x="450" y="22" fill="#9aa4b2" font-size="10.5" text-anchor="middle">現代:compute / storage 分離</text>
+ <rect x="340" y="56" width="66" height="42" rx="6" fill="#2e4a40" stroke="#54b890" stroke-width="1.4"/><text x="373" y="81" fill="#e6e6e6" font-size="9.5" text-anchor="middle">Spark</text>
+ <rect x="417" y="56" width="66" height="42" rx="6" fill="#2e4a40" stroke="#54b890" stroke-width="1.4"/><text x="450" y="81" fill="#e6e6e6" font-size="9.5" text-anchor="middle">SQL 引擎</text>
+ <rect x="494" y="56" width="66" height="42" rx="6" fill="#262b3a" stroke="#54b890" stroke-width="1.3" stroke-dasharray="4 3"/><text x="527" y="81" fill="#e6e6e6" font-size="9.5" text-anchor="middle">臨時作業</text>
+ <line x1="373" y1="98" x2="392" y2="148" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#st1)"/>
+ <line x1="450" y1="98" x2="450" y2="148" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#st1)"/>
+ <line x1="527" y1="98" x2="508" y2="148" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#st1)"/>
+ <rect x="336" y="150" width="228" height="44" rx="8" fill="#262b3a" stroke="#4f6df5" stroke-width="1.7"/><text x="450" y="170" fill="#e6e6e6" font-size="10" text-anchor="middle">物件儲存(共用・持久)</text><text x="450" y="185" fill="#9aa4b2" font-size="8" text-anchor="middle">便宜、幾乎無限</text>
+ <text x="450" y="214" fill="#9aa4b2" font-size="8.5" text-anchor="middle">各自獨立伸縮 · 按需開關 · 用完即走</text>
+ </svg>
+ <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">運算與儲存分離是雲時代最大的轉變:資料躺在便宜持久的物件儲存,運算引擎按需長出來、算完關掉,兩邊互不綁死</figcaption>
 </figure>
 
 這一拆,解釋了近十年一堆架構為什麼長這樣:資料一份放在物件儲存,**要跑 Spark 就開一批 [[airflow-spark-on-k8s|executor pod]]、要下 SQL 就叫一個查詢引擎,算完全部關掉、只留資料**。你不再為「尖峰時要多少算力」養一整年的機器,也不再因為資料變多就被迫加 CPU。[[spark-running|Spark 那套 driver/executor 按需伸縮]]、lakehouse、serverless 查詢,地基全是這一條。
@@ -109,7 +109,7 @@ draft: false
 - **溫(warm)**:偶爾查,放便宜一點的層。
 - **冷(cold)**:幾乎不查、但為了合規或備份得留,丟進封存(冷儲存),最便宜、取用最慢。
 
-搭配的是**保存期限(retention)**:資料不是存了就永遠留著,而該有生命週期 —— 什麼時候降溫、什麼時候刪。這既是**省錢**(別讓冷資料佔著貴的層),也是**合規**(該刪的要刪)。跟 [[kafka-ops|Kafka 的 retention / compaction]]是同一種思維:**儲存要主動管理,不是無限堆積。**
+搭配的是**保存期限(retention)**:資料不是存了就永遠留著,而該有生命週期 —— 什麼時候降溫、什麼時候刪。這既是**省錢**(別讓冷資料佔著貴的層),也是**合規**(該刪的要刪)。跟 [[kafka-ops|Kafka 的 retention / compaction]]是同一種思維:**儲存要主動管理,不是無限 backlog。**
 
 ## 反思
 

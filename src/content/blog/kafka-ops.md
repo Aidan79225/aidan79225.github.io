@@ -3,9 +3,9 @@ title: "Kafka 維運與部署:KRaft、retention/compaction 與監控"
 date: 2026-06-26
 category: tech
 tags:
-  - kafka
-  - data-engineering
-  - operations
+ - kafka
+ - data-engineering
+ - operations
 series: "Kafka 學習筆記"
 seriesOrder: 5
 comments: true
@@ -40,23 +40,23 @@ Kafka 是 log 不是 queue —— 事件被讀走不會消失。但磁碟有限,
 它的機制:背景 cleaner 掃過 log,**同一個 key 只保留最後一筆值**,舊值壓掉;若某 key 的最新值是 `null`(稱為 **tombstone**),代表這個 key 被刪除。
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 560 200" role="img" aria-label="Log compaction 前後對比:壓縮前同一個 key 有多筆歷史值,壓縮後每個 key 只保留最後一筆" style="width:100%;max-width:600px;height:auto;margin:0 auto;">
-    <defs><marker id="ko1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
-    <text x="40" y="40" fill="#9aa4b2" font-size="11" text-anchor="start">壓縮前</text>
-    <rect x="40" y="50" width="58" height="34" rx="5" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="69" y="71" fill="#9aa4b2" font-size="10.5" text-anchor="middle">k1:a</text>
-    <rect x="102" y="50" width="58" height="34" rx="5" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="131" y="71" fill="#9aa4b2" font-size="10.5" text-anchor="middle">k2:x</text>
-    <rect x="164" y="50" width="58" height="34" rx="5" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="193" y="71" fill="#9aa4b2" font-size="10.5" text-anchor="middle">k1:b</text>
-    <rect x="226" y="50" width="58" height="34" rx="5" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="255" y="71" fill="#9aa4b2" font-size="10.5" text-anchor="middle">k3:p</text>
-    <rect x="288" y="50" width="58" height="34" rx="5" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="317" y="71" fill="#9aa4b2" font-size="10.5" text-anchor="middle">k2:y</text>
-    <rect x="350" y="50" width="58" height="34" rx="5" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/><text x="379" y="71" fill="#e6e6e6" font-size="10.5" text-anchor="middle">k1:c</text>
-    <line x1="224" y1="104" x2="224" y2="128" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#ko1)"/>
-    <text x="248" y="122" fill="#d4af37" font-size="10" text-anchor="start">cleaner:每個 key 留最後一筆</text>
-    <text x="40" y="156" fill="#9aa4b2" font-size="11" text-anchor="start">壓縮後</text>
-    <rect x="40" y="166" width="58" height="34" rx="5" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/><text x="69" y="187" fill="#e6e6e6" font-size="10.5" text-anchor="middle">k3:p</text>
-    <rect x="102" y="166" width="58" height="34" rx="5" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/><text x="131" y="187" fill="#e6e6e6" font-size="10.5" text-anchor="middle">k2:y</text>
-    <rect x="164" y="166" width="58" height="34" rx="5" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/><text x="193" y="187" fill="#e6e6e6" font-size="10.5" text-anchor="middle">k1:c</text>
-  </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">Compaction:k1 的 a、b 被壓掉只留最新的 c;結果是「每個 key 的最新值」的快照</figcaption>
+ <svg viewBox="0 0 560 200" role="img" aria-label="Log compaction 前後對比:壓縮前同一個 key 有多筆歷史值,壓縮後每個 key 只保留最後一筆" style="width:100%;max-width:600px;height:auto;margin:0 auto;">
+ <defs><marker id="ko1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
+ <text x="40" y="40" fill="#9aa4b2" font-size="11" text-anchor="start">壓縮前</text>
+ <rect x="40" y="50" width="58" height="34" rx="5" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="69" y="71" fill="#9aa4b2" font-size="10.5" text-anchor="middle">k1:a</text>
+ <rect x="102" y="50" width="58" height="34" rx="5" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="131" y="71" fill="#9aa4b2" font-size="10.5" text-anchor="middle">k2:x</text>
+ <rect x="164" y="50" width="58" height="34" rx="5" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="193" y="71" fill="#9aa4b2" font-size="10.5" text-anchor="middle">k1:b</text>
+ <rect x="226" y="50" width="58" height="34" rx="5" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="255" y="71" fill="#9aa4b2" font-size="10.5" text-anchor="middle">k3:p</text>
+ <rect x="288" y="50" width="58" height="34" rx="5" fill="#262b3a" stroke="#3a4154" stroke-width="1.2"/><text x="317" y="71" fill="#9aa4b2" font-size="10.5" text-anchor="middle">k2:y</text>
+ <rect x="350" y="50" width="58" height="34" rx="5" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/><text x="379" y="71" fill="#e6e6e6" font-size="10.5" text-anchor="middle">k1:c</text>
+ <line x1="224" y1="104" x2="224" y2="128" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#ko1)"/>
+ <text x="248" y="122" fill="#d4af37" font-size="10" text-anchor="start">cleaner:每個 key 留最後一筆</text>
+ <text x="40" y="156" fill="#9aa4b2" font-size="11" text-anchor="start">壓縮後</text>
+ <rect x="40" y="166" width="58" height="34" rx="5" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/><text x="69" y="187" fill="#e6e6e6" font-size="10.5" text-anchor="middle">k3:p</text>
+ <rect x="102" y="166" width="58" height="34" rx="5" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/><text x="131" y="187" fill="#e6e6e6" font-size="10.5" text-anchor="middle">k2:y</text>
+ <rect x="164" y="166" width="58" height="34" rx="5" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/><text x="193" y="187" fill="#e6e6e6" font-size="10.5" text-anchor="middle">k1:c</text>
+ </svg>
+ <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">Compaction:k1 的 a、b 被壓掉只留最新的 c;結果是「每個 key 的最新值」的快照</figcaption>
 </figure>
 
 這正好接上 [[kafka-ecosystem|上一篇]]的 **KTable** —— 一個 compacted topic,本質就是一張「可被 key 更新的表」存成 log。兩種策略一張表收掉:
@@ -73,7 +73,7 @@ Kafka 出事很少是「整個掛掉」,多半是某個指標悄悄惡化。最�
 
 - **Consumer Lag(最重要)**:`log 尾端 offset − consumer 已 commit offset`,也就是「消費者落後生產者多少筆」。持續變大 = 消費跟不上,延遲會一路累積。這是我第一個看的數字。
 - **Under-replicated partitions**:ISR 數 < 複本數,代表有複本沒跟上 leader。這直接侵蝕 [[kafka-delivery|上上篇]]講的「不丟」保證 —— 數字 > 0 就要警覺,接近丟資料風險。
-- **Broker 資源**:磁碟使用率(retention 沒設好會塞爆)、網路吞吐、request 延遲。
+- **Broker 資源**:磁碟使用率(retention 沒設好會塞爆)、網路 throughput、request 延遲。
 
 一句話抓重點:**Consumer Lag 顧「快不快」、Under-replicated 顧「會不會丟」**,這兩個盯住,大部分事故能提早攔下。
 
@@ -81,10 +81,10 @@ Kafka 出事很少是「整個掛掉」,多半是某個指標悄悄惡化。最�
 
 這塊是經驗法則,不是精算,但有幾個錨點:
 
-- **partition 數**:給足吞吐與平行度(回顧 [[kafka-topics|第二篇]]:平行度上限 = partition 數),但別爆量 —— 太多 partition 會拖累 metadata 與 rebalance(KRaft 緩解了上限,但仍非無限)。
+- **partition 數**:給足 throughput 與平行度(回顧 [[kafka-topics|第二篇]]:平行度上限 = partition 數),但別爆量 —— 太多 partition 會拖累 metadata 與 rebalance(KRaft 緩解了上限,但仍非無限)。
 - **複本數**:`3` 是常見起點(容許一台掛、仍有兩份)。
-- **磁碟**:粗估 ≈ `每日吞吐量 × retention 天數 × 複本數`,再留緩衝。retention 拉長,磁碟就等比變大。
-- **broker 數**:至少 ≥ 複本數,再依吞吐與分散風險往上加。
+- **磁碟**:粗估 ≈ `每日 throughput × retention 天數 × 複本數`,再留緩衝。retention 拉長,磁碟就等比變大。
+- **broker 數**:至少 ≥ 複本數,再依 throughput 與分散風險往上加。
 
 ## 反思
 

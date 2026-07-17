@@ -3,9 +3,9 @@ title: "Kafka 生態系:Connect、Schema Registry 與 Streams"
 date: 2026-06-26
 category: tech
 tags:
-  - kafka
-  - data-engineering
-  - stream-processing
+ - kafka
+ - data-engineering
+ - stream-processing
 series: "Kafka 學習筆記"
 seriesOrder: 4
 comments: true
@@ -24,31 +24,31 @@ draft: false
 | 在事件流上做轉換 / 聚合 / join | 自己管狀態、容錯、exactly-once | **Kafka Streams** |
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 600 250" role="img" aria-label="Kafka broker 居中,Connect source 從外部系統把資料搬進來、Connect sink 送到下游,Schema Registry 在上方供應 schema,Kafka Streams 在下方讀流運算後寫回" style="width:100%;max-width:640px;height:auto;margin:0 auto;">
-    <defs><marker id="ke1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
-    <rect x="232" y="100" width="136" height="50" rx="10" fill="#262b3a" stroke="#4f6df5" stroke-width="1.8"/>
-    <text x="300" y="122" fill="#e6e6e6" font-size="13" text-anchor="middle">Kafka</text>
-    <text x="300" y="138" fill="#9aa4b2" font-size="9.5" text-anchor="middle">topics / log</text>
-    <rect x="14" y="102" width="96" height="46" rx="8" fill="#262b3a" stroke="#3a4154" stroke-width="1.3"/>
-    <text x="62" y="121" fill="#e6e6e6" font-size="10.5" text-anchor="middle">MySQL / API</text>
-    <text x="62" y="136" fill="#9aa4b2" font-size="9" text-anchor="middle">來源系統</text>
-    <rect x="490" y="102" width="96" height="46" rx="8" fill="#262b3a" stroke="#3a4154" stroke-width="1.3"/>
-    <text x="538" y="121" fill="#e6e6e6" font-size="10.5" text-anchor="middle">DW / ES / S3</text>
-    <text x="538" y="136" fill="#9aa4b2" font-size="9" text-anchor="middle">下游系統</text>
-    <line x1="110" y1="125" x2="230" y2="125" stroke="#9aa4b2" stroke-width="1.4" marker-end="url(#ke1)"/>
-    <text x="170" y="116" fill="#d4af37" font-size="9.5" text-anchor="middle">Connect source</text>
-    <line x1="368" y1="125" x2="488" y2="125" stroke="#9aa4b2" stroke-width="1.4" marker-end="url(#ke1)"/>
-    <text x="428" y="116" fill="#d4af37" font-size="9.5" text-anchor="middle">Connect sink</text>
-    <rect x="222" y="18" width="156" height="40" rx="8" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.3" stroke-dasharray="4 3"/>
-    <text x="300" y="42" fill="#e6e6e6" font-size="11" text-anchor="middle">Schema Registry</text>
-    <line x1="300" y1="58" x2="300" y2="98" stroke="#9aa4b2" stroke-width="1.2" stroke-dasharray="3 3"/>
-    <rect x="222" y="192" width="156" height="42" rx="8" fill="#262b3a" stroke="#d4af37" stroke-width="1.4"/>
-    <text x="300" y="210" fill="#e6e6e6" font-size="11" text-anchor="middle">Kafka Streams</text>
-    <text x="300" y="225" fill="#9aa4b2" font-size="9" text-anchor="middle">讀 → 運算 → 寫回</text>
-    <line x1="280" y1="152" x2="280" y2="190" stroke="#9aa4b2" stroke-width="1.2" marker-end="url(#ke1)"/>
-    <line x1="320" y1="190" x2="320" y2="152" stroke="#9aa4b2" stroke-width="1.2" marker-end="url(#ke1)"/>
-  </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">broker 居中只管存與送;Connect 負責進出、Schema Registry 供應結構共識、Streams 在流上做運算後寫回</figcaption>
+ <svg viewBox="0 0 600 250" role="img" aria-label="Kafka broker 居中,Connect source 從外部系統把資料搬進來、Connect sink 送到下游,Schema Registry 在上方供應 schema,Kafka Streams 在下方讀流運算後寫回" style="width:100%;max-width:640px;height:auto;margin:0 auto;">
+ <defs><marker id="ke1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
+ <rect x="232" y="100" width="136" height="50" rx="10" fill="#262b3a" stroke="#4f6df5" stroke-width="1.8"/>
+ <text x="300" y="122" fill="#e6e6e6" font-size="13" text-anchor="middle">Kafka</text>
+ <text x="300" y="138" fill="#9aa4b2" font-size="9.5" text-anchor="middle">topics / log</text>
+ <rect x="14" y="102" width="96" height="46" rx="8" fill="#262b3a" stroke="#3a4154" stroke-width="1.3"/>
+ <text x="62" y="121" fill="#e6e6e6" font-size="10.5" text-anchor="middle">MySQL / API</text>
+ <text x="62" y="136" fill="#9aa4b2" font-size="9" text-anchor="middle">來源系統</text>
+ <rect x="490" y="102" width="96" height="46" rx="8" fill="#262b3a" stroke="#3a4154" stroke-width="1.3"/>
+ <text x="538" y="121" fill="#e6e6e6" font-size="10.5" text-anchor="middle">DW / ES / S3</text>
+ <text x="538" y="136" fill="#9aa4b2" font-size="9" text-anchor="middle">下游系統</text>
+ <line x1="110" y1="125" x2="230" y2="125" stroke="#9aa4b2" stroke-width="1.4" marker-end="url(#ke1)"/>
+ <text x="170" y="116" fill="#d4af37" font-size="9.5" text-anchor="middle">Connect source</text>
+ <line x1="368" y1="125" x2="488" y2="125" stroke="#9aa4b2" stroke-width="1.4" marker-end="url(#ke1)"/>
+ <text x="428" y="116" fill="#d4af37" font-size="9.5" text-anchor="middle">Connect sink</text>
+ <rect x="222" y="18" width="156" height="40" rx="8" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.3" stroke-dasharray="4 3"/>
+ <text x="300" y="42" fill="#e6e6e6" font-size="11" text-anchor="middle">Schema Registry</text>
+ <line x1="300" y1="58" x2="300" y2="98" stroke="#9aa4b2" stroke-width="1.2" stroke-dasharray="3 3"/>
+ <rect x="222" y="192" width="156" height="42" rx="8" fill="#262b3a" stroke="#d4af37" stroke-width="1.4"/>
+ <text x="300" y="210" fill="#e6e6e6" font-size="11" text-anchor="middle">Kafka Streams</text>
+ <text x="300" y="225" fill="#9aa4b2" font-size="9" text-anchor="middle">讀 → 運算 → 寫回</text>
+ <line x1="280" y1="152" x2="280" y2="190" stroke="#9aa4b2" stroke-width="1.2" marker-end="url(#ke1)"/>
+ <line x1="320" y1="190" x2="320" y2="152" stroke="#9aa4b2" stroke-width="1.2" marker-end="url(#ke1)"/>
+ </svg>
+ <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">broker 居中只管存與送;Connect 負責進出、Schema Registry 供應結構共識、Streams 在流上做運算後寫回</figcaption>
 </figure>
 
 ## Kafka Connect:免寫程式的資料搬運
@@ -92,7 +92,7 @@ Kafka 的事件本質上就是 bytes,broker 不在乎裡面是什麼。問題來
 | 部署模型 | 嵌在你的 app,**無額外叢集** | 獨立 Spark 叢集 |
 | 延遲 | 逐筆,毫秒級 | micro-batch,通常較高 |
 | 語言 | Java / Scala 為主 | Python / SQL 友善 |
-| 適用 | 中等吞吐、低延遲的服務內運算 | 超大量、且想**批流同源**共用一套 API |
+| 適用 | 中等 throughput、低延遲的服務內運算 | 超大量、且想**批流同源**共用一套 API |
 | 資料來源 | 只接 Kafka | Kafka、檔案、多種來源 |
 
 簡單講:**只在 Kafka 內、要低延遲又不想多養叢集 → Streams;資料量巨大、要跟批次共用邏輯、團隊是 Python/SQL → Spark。** 這也呼應 [[spark-running|Spark 那篇]]提的——Structured Streaming 本身就常以 Kafka 當輸入源,兩者是合作而非互斥。
