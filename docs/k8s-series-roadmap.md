@@ -44,7 +44,7 @@
 
 | # | slug | 標題 | 主題 | 狀態 |
 |---|---|---|---|---|
-| 6 | `k8s-storage` | 儲存:Volume、PV/PVC 與 StatefulSet | Volume 類型、PV/PVC 綁定、StorageClass 動態供應、access modes、reclaim policy、StatefulSet——接 `[[infra-kafka]]`、`[[infra-redis]]` | ⬜ ★ |
+| 6 | `k8s-storage` | K8s 儲存:Volume、PV/PVC 與 StatefulSet | Volume 類型(emptyDir/hostPath/PVC)、PV/PVC 供需分離綁定、StorageClass 動態供應、access modes RWO/ROX/RWX、reclaim policy、StatefulSet(volumeClaimTemplates/穩定身分/有序)——接 `[[infra-kafka]]`、`[[infra-redis]]` | ✅ 已發布 ★ |
 
 ## Cluster Architecture, Installation & Configuration(25%)
 
