@@ -29,7 +29,7 @@
 | # | slug | 標題 | 主題 | 狀態 |
 |---|---|---|---|---|
 | 5 | `k8s-config-secret` | ConfigMap 與 Secret | 設定/機密外部化、env vs volume 注入、Secret≠加密 | ✅ 已發布 |
-| 7 | `k8s-scheduling-advanced` | 進階排程:讓 pod 去對的 node | labels/selectors、node affinity、taints & tolerations、requests/limits 影響排程、nodeName 手動排程 | ⬜ |
+| 7 | `k8s-scheduling-advanced` | 進階排程:讓 pod 去對的 node | labels/selectors、node affinity(required/preferred)、taints & tolerations(拉/推/免疫)、requests 影響排程、nodeName 手動排程、pod (anti)affinity/topology spread | ✅ 已發布 |
 | 8 | `airflow-spark-on-k8s` | Airflow + Spark 跑在 K8s 上 | 不同 node 跑不同 pod(實戰示範 selector/affinity) | ✅ 已發布 |
 
 ## Services & Networking(20%)

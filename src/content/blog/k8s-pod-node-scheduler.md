@@ -76,7 +76,7 @@ draft: false
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">Scheduler 先「過濾」出裝得下、規則允許的 node,再「評分」挑最佳綁上去 —— reconcile loop 幫你補 Pod 時,那顆新 Pod 就是這樣找到落腳處的</figcaption>
 </figure>
 
-過濾與評分背後的旋鈕——**requests/limits、node 親和性、taint/toleration**——是[[airflow-spark-on-k8s|後面]]控制「誰跑在哪」的關鍵,這個系列之後會專門一篇講。這裡先知道:**Pod 落在哪台不是隨機,是 Scheduler 依資源與規則算出來的。**
+過濾與評分背後的旋鈕——**requests/limits、node 親和性、taint/toleration**——是控制「誰跑在哪」的關鍵,系列裡[[k8s-scheduling-advanced|進階排程那篇]]會專門講。這裡先知道:**Pod 落在哪台不是隨機,是 Scheduler 依資源與規則算出來的。**
 
 ## 關鍵心態:Pod 是短命的
 
