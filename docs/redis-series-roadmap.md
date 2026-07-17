@@ -20,7 +20,7 @@
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
 | 5 | `redis-expiration-eviction` | 過期與淘汰:TTL、惰性刪除與 maxmemory 政策 | 過期(惰性+定期抽樣、過期≠立刻釋放、replica 等 master DEL)vs 淘汰(maxmemory 撞頂);8 種政策矩陣 allkeys/volatile × LRU/LFU/random/ttl + noeviction 報錯;近似 LRU;純 cache vs 存重要資料怎麼選 | ✅ 已發布 |
-| 6 | `redis-cache-patterns` | 快取三大災難:穿透、擊穿、雪崩,與正確解法 | cache-aside;穿透(查不存在)/擊穿(hot key 過期)/雪崩(大量同時過期)+ 解法:空值快取、布隆過濾器、互斥鎖重建、隨機 TTL——扣回 `[[sre-cron]]` 驚群 | ⬜ ★ |
+| 6 | `redis-cache-patterns` | 快取三大災難:穿透、擊穿、雪崩,與正確解法 | cache-aside;三災難本質=打 DB 的請求為何集中(不存在/一個熱點/一大片);解法空值快取+布隆、互斥鎖收斂、隨機 TTL 打散;共通精神=消除同步性——扣回 `[[sre-cron]]` 驚群、`[[sre-cascading-failures]]` | ✅ 已發布 |
 | 7 | `redis-distributed-lock` | 分散式鎖:從 SETNX 到 Redlock,與那場著名的爭議 | `SET NX PX` + TTL、鎖的釋放要用 Lua 驗 owner;Redlock 演算法 + Kleppmann vs antirez 的辯論;何時該用真共識——接 `[[sre-consensus]]`、`[[zookeeper]]` | ⬜ ★ |
 
 ## 第三批 — 高可用與擴展(含 Cluster)
