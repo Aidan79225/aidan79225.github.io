@@ -16,7 +16,7 @@ draft: false
 ## log vs queue:一個字的差別,兩種 infra
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 580 210" role="img" aria-label="Kafka 的 log 與 RabbitMQ 的 queue 對比。左邊 Kafka 是 log,訊息 m1 到 m5 寫進去就留著,consumer A 和 consumer B 各自用自己的 offset 標記讀到哪、互不影響,可以重播、可以多消費者扇出。右邊 RabbitMQ 是 queue,訊息排隊,consumer 從前面取走並 ack 之後,訊息就從 queue 消失,broker 負責追蹤每一筆的 ack。下方:狀態上 Kafka 是一條消費留痕的 log,RabbitMQ 是 queue 裡待處理的訊息、消費即減少;取捨上要事件流可重播高吞吐選 Kafka,要任務佇列複雜路由 per-message 控制選 RabbitMQ。" style="width:100%;max-width:600px;height:auto;margin:0 auto;">
+  <svg viewBox="0 0 580 210" role="img" aria-label="Kafka 的 log 與 RabbitMQ 的 queue 對比。左邊 Kafka 是 log,訊息 m1 到 m5 寫進去就留著,consumer A 和 consumer B 各自用自己的 offset 標記讀到哪、互不影響,可以重播、可以多消費者 fan out。右邊 RabbitMQ 是 queue,訊息排隊,consumer 從前面取走並 ack 之後,訊息就從 queue 消失,broker 負責追蹤每一筆的 ack。下方:狀態上 Kafka 是一條消費留痕的 log,RabbitMQ 是 queue 裡待處理的訊息、消費即減少;取捨上要事件流可重播高吞吐選 Kafka,要任務佇列複雜路由 per-message 控制選 RabbitMQ。" style="width:100%;max-width:600px;height:auto;margin:0 auto;">
     <defs><marker id="rq" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#9aa4b2"/></marker></defs>
     <line x1="290" y1="16" x2="290" y2="150" stroke="#3a4154" stroke-width="1" stroke-dasharray="4 4"/>
     <text x="145" y="32" fill="#4f6df5" font-size="9.6" text-anchor="middle" font-weight="bold">Kafka:log</text>
@@ -24,7 +24,7 @@ draft: false
     <line x1="95" y1="88" x2="95" y2="70" stroke="#54b890" stroke-width="1.2" marker-end="url(#rq)"/><text x="95" y="100" fill="#54b890" font-size="7" text-anchor="middle">B 讀到 m2</text>
     <line x1="191" y1="88" x2="191" y2="70" stroke="#d6a45c" stroke-width="1.2" marker-end="url(#rq)"/><text x="191" y="100" fill="#d6a45c" font-size="7" text-anchor="middle">A 讀到 m4</text>
     <text x="145" y="122" fill="#9aa4b2" font-size="7.6" text-anchor="middle">訊息留著 · 各自用 offset 讀</text>
-    <text x="145" y="136" fill="#9aa4b2" font-size="7.6" text-anchor="middle">可重播 · 多消費者扇出</text>
+    <text x="145" y="136" fill="#9aa4b2" font-size="7.6" text-anchor="middle">可重播 · 多消費者 fan out</text>
     <text x="435" y="32" fill="#e0733a" font-size="9.6" text-anchor="middle" font-weight="bold">RabbitMQ:queue</text>
     <rect x="316" y="44" width="40" height="24" rx="3" fill="#3a2d1f" stroke="#e0733a" stroke-width="1"/><text x="336" y="60" fill="#e6e6e6" font-size="7.4" text-anchor="middle">m4</text><rect x="358" y="44" width="40" height="24" rx="3" fill="#3a2d1f" stroke="#e0733a" stroke-width="1"/><text x="378" y="60" fill="#e6e6e6" font-size="7.4" text-anchor="middle">m3</text><rect x="400" y="44" width="40" height="24" rx="3" fill="#3a2d1f" stroke="#e0733a" stroke-width="1"/><text x="420" y="60" fill="#e6e6e6" font-size="7.4" text-anchor="middle">m2</text>
     <line x1="442" y1="56" x2="474" y2="56" stroke="#9aa4b2" stroke-width="1.2" marker-end="url(#rq)"/>
@@ -36,7 +36,7 @@ draft: false
     <text x="290" y="176" fill="#e6e6e6" font-size="8" text-anchor="middle">狀態:Kafka = 一條「消費留痕」的 log(磁碟為王)　·　RabbitMQ = queue 裡待處理的訊息(消費即減少)</text>
     <text x="290" y="192" fill="#d6a45c" font-size="8.2" text-anchor="middle" font-weight="bold">取捨:事件流 / 可重播 / 高吞吐 → Kafka　·　任務佇列 / 複雜路由 / per-message → RabbitMQ</text>
   </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;"><b style="color:#4f6df5">Kafka(log)</b>:訊息寫進去就<b>留著</b>,每個 consumer 用自己的 offset 記錄讀到哪、互不干擾——所以能重播、能多消費者各自扇出。<b style="color:#e0733a">RabbitMQ(queue)</b>:訊息排隊等人拿,被取走並 <b>ack</b> 之後就從 queue <b>消失</b>,由 broker 逐筆追蹤誰 ack 了沒。這個「留著 vs 拿走」的模型差,直接決定了兩者的脾氣:Kafka 適合高吞吐的事件流,RabbitMQ 適合要複雜路由、要 per-message 控制(優先級、延遲、逐筆重試)的任務分派</figcaption>
+  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;"><b style="color:#4f6df5">Kafka(log)</b>:訊息寫進去就<b>留著</b>,每個 consumer 用自己的 offset 記錄讀到哪、互不干擾——所以能重播、能多消費者各自 fan out。<b style="color:#e0733a">RabbitMQ(queue)</b>:訊息排隊等人拿,被取走並 <b>ack</b> 之後就從 queue <b>消失</b>,由 broker 逐筆追蹤誰 ack 了沒。這個「留著 vs 拿走」的模型差,直接決定了兩者的脾氣:Kafka 適合高吞吐的事件流,RabbitMQ 適合要複雜路由、要 per-message 控制(優先級、延遲、逐筆重試)的任務分派</figcaption>
 </figure>
 
 從 infra 的角度,這個模型差最關鍵的後果是**狀態的形狀不同**:Kafka 的狀態是一條只增不減、以磁碟吞吐為王的 log;RabbitMQ 的狀態是一堆 queue 裡「還沒被處理掉」的訊息——它會**隨消費而減少、隨堆積而膨脹**。而正是這個「會膨脹的 queue」,埋下了 RabbitMQ 最招牌的坑。

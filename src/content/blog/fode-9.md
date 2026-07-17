@@ -20,12 +20,12 @@ draft: false
 
 **信任是服務的地基,下面所有形式都蓋在它上面。**
 
-## 服務會扇出到很多張嘴
+## 服務會 fan out 到很多張嘴
 
 「服務資料」不是單一動作,而是**同一份建模好的資料,餵給形態完全不同的消費者**:
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 600 300" role="img" aria-label="服務扇出:建模好的資料(Warehouse/Lakehouse)分別餵給商業分析 BI 儀表板、嵌入式分析、機器學習特徵、以及 Reverse ETL 回灌營運系統" style="width:100%;max-width:660px;height:auto;margin:0 auto;">
+  <svg viewBox="0 0 600 300" role="img" aria-label="服務 fan out:建模好的資料(Warehouse/Lakehouse)分別餵給商業分析 BI 儀表板、嵌入式分析、機器學習特徵、以及 Reverse ETL 回灌營運系統" style="width:100%;max-width:660px;height:auto;margin:0 auto;">
     <defs><marker id="sv1" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
     <rect x="24" y="115" width="152" height="70" rx="8" fill="#262b3a" stroke="#4f6df5" stroke-width="1.8"/>
     <text x="100" y="145" fill="#e6e6e6" font-size="12" text-anchor="middle">建模好的資料</text>
@@ -47,7 +47,7 @@ draft: false
     <text x="468" y="236" fill="#e6e6e6" font-size="10.5" text-anchor="middle">Reverse ETL</text>
     <text x="468" y="252" fill="#9aa4b2" font-size="8.5" text-anchor="middle">回灌 CRM・廣告平台</text>
   </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">服務是生命週期的最後一站,也是唯一產生價值的一站;同一份資料扇出給四種形態完全不同的消費者</figcaption>
+  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">服務是生命週期的最後一站,也是唯一產生價值的一站;同一份資料 fan out 給四種形態完全不同的消費者</figcaption>
 </figure>
 
 ## 分析的三種形態,別搞混

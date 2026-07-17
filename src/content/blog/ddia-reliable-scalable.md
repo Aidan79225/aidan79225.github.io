@@ -60,7 +60,7 @@ draft: false
 多數人一講「擴展」就想「加機器」。但 DDIA 的洞見是:**擴展的第一步不是加機器,是描述你的「負載長相」(load parameters)**——讀寫比、每秒請求數、資料的 fan-out、熱點分佈。不先搞懂負載,你根本選不出對的架構。書裡最經典的例子,是 Twitter 首頁 timeline 的兩種做法:
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 580 214" role="img" aria-label="Twitter timeline 的兩種扇出:讀時展開 fan-out on read,發文只寫一筆,讀者看 timeline 時即時去合併所有追蹤對象的推文,讀很貴寫很省;寫時展開 fan-out on write,發文時就把推文推進每個粉絲的收件匣,寫很貴讀很省。選哪個取決於讀寫比與 fan-out 分佈,Twitter 用混合" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
+  <svg viewBox="0 0 580 214" role="img" aria-label="Twitter timeline 的兩種 fan out:讀時展開 fan-out on read,發文只寫一筆,讀者看 timeline 時即時去合併所有追蹤對象的推文,讀很貴寫很省;寫時展開 fan-out on write,發文時就把推文推進每個粉絲的收件匣,寫很貴讀很省。選哪個取決於讀寫比與 fan-out 分佈,Twitter 用混合" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
     <defs><marker id="dd" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L0,6 L7,3 z" fill="#9aa4b2"/></marker></defs>
     <line x1="290" y1="16" x2="290" y2="172" stroke="#3a4154" stroke-width="1" stroke-dasharray="4 4"/>
     <text x="150" y="28" fill="#4f6df5" font-size="10" text-anchor="middle" font-weight="bold">Fan-out on read(讀時展開)</text>
@@ -83,7 +83,7 @@ draft: false
     <text x="430" y="164" fill="#9aa4b2" font-size="8.2" text-anchor="middle">發文時推給每個粉絲 → 寫貴、讀省</text>
     <text x="290" y="196" fill="#9aa4b2" font-size="8.6" text-anchor="middle">選哪個看「負載長相」(讀寫比、fan-out)。Twitter 用混合:一般用寫時、名人用讀時</text>
   </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">同一個功能(看 timeline),兩種扇出、兩種成本結構——選哪個完全取決於負載長相。這就是為什麼「先描述負載」是擴展的第一步:不先量清楚讀寫比,根本選不出對的做法</figcaption>
+  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">同一個功能(看 timeline),兩種 fan out、兩種成本結構——選哪個完全取決於負載長相。這就是為什麼「先描述負載」是擴展的第一步:不先量清楚讀寫比,根本選不出對的做法</figcaption>
 </figure>
 
 還有一個描述「效能」的關鍵,直接呼應我在 [[sre-monitoring|SRE 監控]]那篇畫過的圖:**看回應時間要看 percentile(p99),不是平均**——平均會把長尾那群體驗最差的使用者藏起來。這不是巧合,DDIA 和 SRE 講的是同一件事,只是一個從系統設計、一個從維運的角度。至於怎麼擴展,才輪到 scale up(換更強的機器)vs scale out(加更多機器)——而 scale out 帶來的所有難題(資料放哪、怎麼同步、壞了怎麼辦),正是這本書 Part II 的全部內容。
