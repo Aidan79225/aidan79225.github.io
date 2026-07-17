@@ -37,7 +37,7 @@
 | # | slug | 標題 | 主題 | 狀態 |
 |---|---|---|---|---|
 | 4 | `k8s-service` | Service:擋在短命 Pod 前面的固定門牌 | ClusterIP/NodePort/LoadBalancer、Endpoints、kube-proxy | ✅ 已發布 |
-| 9 | `k8s-ingress-dns` | Ingress 與叢集 DNS:L7 路由與服務發現 | Ingress(L7 vs Service L4)、Ingress Controller、CoreDNS、service DNS 名 | ⬜ |
+| 9 | `k8s-ingress-dns` | Ingress 與叢集 DNS:一個入口進來、一個名字相認 | Ingress(L7 vs Service L4)、TLS 終結、Ingress Controller + IngressClass(規則≠執行)、CoreDNS、`<svc>.<ns>.svc.cluster.local` 命名與 search domain、headless service DNS | ✅ 已發布 |
 | 10 | `k8s-networkpolicy-cni` | NetworkPolicy 與 CNI:pod 之間的防火牆 | NetworkPolicy(預設全通→白名單)、CNI 是什麼、pod 網路模型 | ⬜ |
 
 ## Storage(10%)

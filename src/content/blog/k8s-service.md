@@ -101,7 +101,7 @@ Service 怎麼知道現在哪些 Pod 該收流量?它背後有一份 **Endpoints
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">一層層把服務從叢集內推向公網。實務上對外多半是「Ingress 擺在 LoadBalancer 後面,按 path 把流量分給各個 ClusterIP Service」——它們最後都指向同一種內部門牌</figcaption>
 </figure>
 
-實務上最常見的組合,是**一個對外的 Ingress(或 LoadBalancer)+ 一堆內部的 ClusterIP Service**:外面只開一個入口,進來後按網址路由到各個服務。至於 ClusterIP 的一個變形——**headless Service**(不配虛擬 IP、不做負載均衡,而是讓你用 DNS 直接拿到**每一顆** Pod)——是有狀態服務(資料庫、[[k8s-pod-node-scheduler|StatefulSet]])會用到的,系列第 6 篇再談。
+實務上最常見的組合,是**一個對外的 [[k8s-ingress-dns|Ingress]](或 LoadBalancer)+ 一堆內部的 ClusterIP Service**:外面只開一個入口,進來後按網址路由到各個服務(L7 路由與 TLS 終結怎麼運作,系列第 9 篇專講)。至於 ClusterIP 的一個變形——**headless Service**(不配虛擬 IP、不做負載均衡,而是讓你用 DNS 直接拿到**每一顆** Pod)——是有狀態服務(資料庫、[[k8s-pod-node-scheduler|StatefulSet]])會用到的,系列第 6 篇再談。
 
 ## 反思
 
