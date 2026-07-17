@@ -1,7 +1,6 @@
 # 從 Infra 角度看資料工具 — 系列 Roadmap
 
 內部規劃文件(不發佈;Astro 不會 build `docs/`)。系列鍵:`series: "從 Infra 角度看資料工具"`。
-(備選名:「資料工具的 Infra 視角」、「把工具養在生產」——想換再說。)
 
 定位:**橫切的維運/部署視角**。既有的「XX 學習筆記」講的是「這工具怎麼運作(原理)」;這系列問的是**「這工具怎麼在生產跑起來——部署拓撲、狀態與儲存、擴展、HA、容量、監控、調校、故障模式」**,而且用**同一套框架**去看每一個,凸顯它們的共通與取捨。核心軸線是 **stateful ↔ stateless**:有狀態的(Kafka/Redis/RabbitMQ)難擴難搬、要 StatefulSet + PV;無狀態的(Spark executor/Airflow worker/Connect worker)短命可拋、好水平擴——這條軸決定了每個工具在 k8s 上怎麼跑。
 
@@ -22,7 +21,7 @@
 |---|---|---|---|---|
 | 3 | `infra-kafka` | Kafka:磁碟為王的有狀態叢集 | broker 拓撲、partition + replication + ISR、KRaft、容量規劃(partition 數/retention/磁碟)、rebalance 的痛、在 k8s 上用 StatefulSet + PV——接 `[[kafka-ops]]` | ⬜ ★ |
 | 4 | `infra-redis` | Redis:記憶體為界的有狀態服務 | replication / Sentinel / Cluster 拓撲、persistence 的 fork 開銷與 headroom、maxmemory 容量、在 k8s 上跑的注意事項——接 `[[redis-persistence]]` | ⬜ |
-| 5 | `infra-rabbitmq` | RabbitMQ:訊息 broker 的叢集與流控 | clustering、quorum queue vs mirrored、memory/disk alarm 與 flow control、跟 Kafka 的取捨(queue vs log)——新工具,補一篇原理背景 | ⬜ |
+| 5 | `infra-rabbitmq` | RabbitMQ:訊息 broker 的叢集與流控 | 純 infra 角度:clustering、quorum queue vs mirrored、memory/disk alarm 與 flow control、跟 Kafka 的取捨(queue vs log)——不補原理背景 | ⬜ |
 
 ## 第三批 — 無狀態的運算/連接器(stateless:好水平擴)
 
