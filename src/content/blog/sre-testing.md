@@ -2,7 +2,7 @@
 title: "為可靠度測試:測試不是證明沒 bug,是讓你敢快"
 date: 2026-07-13
 category: tech
-description: "可靠度不是靠「不改」得來的——你一定得改。測試的意義,是把每次改動的『賭』變成『有信心的推進』,讓你敢頻繁小步發布。這篇講測試金字塔(底層多、上層少)、為什麼綠燈不等於生產健康(canary 用真實流量當最後一道測試),以及 flaky test 為什麼是測試界的『狼來了』。"
+description: "可靠度不是靠「不改」得來的——你一定得改。測試的意義,是把每次改動的『賭』變成『有信心的推進』,讓你敢頻繁小步發布。這篇講測試金字塔(底層多、上層少)、為什麼綠燈不等於 Production 健康(canary 用真實流量當最後一道測試),以及 flaky test 為什麼是測試界的『狼來了』。"
 tags:
   - sre
   - reliability
@@ -34,7 +34,7 @@ draft: false
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">底層 <b style="color:#54b890">Unit</b> 又快又穩,該佔絕大多數;<b style="color:#4f6df5">Integration</b> 測元件之間;頂層 <b style="color:#d6a45c">E2E</b> 最像真實使用者但也最慢最脆,點到為止。把金字塔倒過來(一堆 E2E)是常見反模式——跑得慢、還常常紅得不明不白</figcaption>
 </figure>
 
-## 綠燈不等於生產健康:用 Canary 收尾
+## 綠燈不等於 Production 健康:用 Canary 收尾
 
 但這裡有個 SRE 特別在意的真相:**測試全綠,只代表「你想到要測的情境」過了**——真實世界的流量、資料、時序,永遠有你沒測到的。所以光在測試環境過還不夠,最後一道防線是 **Canary(金絲雀發布)**:新版先只放給一小撮真實流量,盯著 SLI,沒問題再逐步全推:
 

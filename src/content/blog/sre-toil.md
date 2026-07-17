@@ -15,7 +15,7 @@ draft: false
 
 ## 什麼是 toil(以及什麼不是)
 
-Toil 指的是「跟跑生產服務有關、但具備下面這些特徵」的工作。符合越多,它就越是 toil:
+Toil 指的是「跟跑 Production 服務有關、但具備下面這些特徵」的工作。符合越多,它就越是 toil:
 
 <figure style="margin:1.5rem 0;text-align:center;">
   <svg viewBox="0 0 560 258" role="img" aria-label="判斷是不是 toil 的六個特徵:手動要人一步步動手、重複做過很多次還會再做、可自動化機器能做只是還沒寫、無長期價值做完系統沒變更好、隨規模線性成長服務變大它就變多、被動反應被觸發才做非主動規劃。符合越多越是 toil。開會規劃 email 是 overhead 不是 toil" style="width:100%;max-width:600px;height:auto;margin:0 auto;">

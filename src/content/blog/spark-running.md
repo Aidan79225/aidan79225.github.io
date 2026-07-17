@@ -92,9 +92,9 @@ spark-submit \
 | Driver 位置 | 你提交的那台(筆電 / edge node) | 叢集內某個節點 |
 | 日誌 | 直接噴回你的終端機 | 要去叢集 / 平台撈 |
 | 終端機關掉 | **作業跟著死** | 不受影響,繼續跑 |
-| 適合 | 互動式、開發、`spark-shell` | 正式排程的生產作業 |
+| 適合 | 互動式、開發、`spark-shell` | 正式排程的 Production 作業 |
 
-新手最常見的災難,就是在本機 `client` 模式下跑得好好的,搬到生產用排程器觸發時,要嘛 Driver 跟著 session 一起斷、要嘛找不到日誌。**生產作業幾乎都該用 `cluster` 模式** —— 讓 Driver 活在叢集裡,不依賴你那台會關機的機器。生產的觸發通常交給 [[airflow-scheduling|Airflow]] 之類的排程器,而它要的正是「提交完就不必掛著」的 `cluster` 模式。
+新手最常見的災難,就是在本機 `client` 模式下跑得好好的,搬到 Production 用排程器觸發時,要嘛 Driver 跟著 session 一起斷、要嘛找不到日誌。**Production 作業幾乎都該用 `cluster` 模式** —— 讓 Driver 活在叢集裡,不依賴你那台會關機的機器。Production 的觸發通常交給 [[airflow-scheduling|Airflow]] 之類的排程器,而它要的正是「提交完就不必掛著」的 `cluster` 模式。
 
 ## Cluster Manager 有哪幾種
 
@@ -129,7 +129,7 @@ spark-submit \
 
 ### `deploy-mode` 是我最常提醒人的坑
 
-「本機跑得動、上生產就炸」十次有八次跟 `client`/`cluster` 脫不了關係 —— Driver 擺錯地方,作業跟著終端機一起死,或日誌憑空消失。我的原則很簡單:**互動除錯用 `client`,排程上線一律 `cluster`**。這跟 [[airflow-scheduling|Airflow]] 那篇講的冪等與可重跑是同一套思路 —— 生產作業不能依賴「某個人的某台機器剛好開著」。
+「本機跑得動、上 Production 就炸」十次有八次跟 `client`/`cluster` 脫不了關係 —— Driver 擺錯地方,作業跟著終端機一起死,或日誌憑空消失。我的原則很簡單:**互動除錯用 `client`,排程上線一律 `cluster`**。這跟 [[airflow-scheduling|Airflow]] 那篇講的冪等與可重跑是同一套思路 —— Production 作業不能依賴「某個人的某台機器剛好開著」。
 
 ### 別為了用 Spark 而架叢集
 

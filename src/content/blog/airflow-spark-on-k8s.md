@@ -202,7 +202,7 @@ spark-submit \
 
 ### pod 用完即刪,逼你把 observability 補起來
 
-K8s 最反直覺的副作用是:**出事的那個 executor pod,往往在你想看 log 時已經被刪掉了。** 在 YARN 時代我習慣 SSH 上去翻日誌,這招在這裡完全失效。所以上 K8s 的同時,日誌與 metrics 一定要**即時送出去**(集中式 logging + Spark History Server 之類),不能依賴「事後上機器撈」。這跟 [[airflow-scheduling|Airflow 那篇]]講的冪等與可重跑是同一種思維 —— 生產系統不能假設任何一台機器、任何一個 pod 事後還在。
+K8s 最反直覺的副作用是:**出事的那個 executor pod,往往在你想看 log 時已經被刪掉了。** 在 YARN 時代我習慣 SSH 上去翻日誌,這招在這裡完全失效。所以上 K8s 的同時,日誌與 metrics 一定要**即時送出去**(集中式 logging + Spark History Server 之類),不能依賴「事後上機器撈」。這跟 [[airflow-scheduling|Airflow 那篇]]講的冪等與可重跑是同一種思維 —— Production 系統不能假設任何一台機器、任何一個 pod 事後還在。
 
 ### 還是那句:先確認痛點再上 K8s
 
