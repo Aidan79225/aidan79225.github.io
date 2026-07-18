@@ -50,7 +50,7 @@
 
 | # | slug | 標題 | 主題 | 狀態 |
 |---|---|---|---|---|
-| 11 | `k8s-rbac` | RBAC:誰能對叢集做什麼 | ServiceAccount、Role/ClusterRole、RoleBinding/ClusterRoleBinding、認證 vs 授權 | ⬜ ★ |
+| 11 | `k8s-rbac` | RBAC:誰能對叢集做什麼 | 認證 vs 授權(401/403 兩道門)、Role/ClusterRole、RoleBinding/ClusterRoleBinding、subject(User/Group/SA)、rule=apiGroups+resources+verbs、白名單/預設拒絕、ClusterRole+RoleBinding 重用、ServiceAccount 與最小權限、`kubectl auth can-i` | ✅ 已發布 ★ |
 | 12 | `k8s-cluster-admin` | 叢集管理:kubeadm、etcd 備份、升級 | kubeadm 建/加入叢集、HA control plane、**etcd backup/restore**、cluster upgrade 流程——接 `[[sre-consensus]]`、`[[infra-k8s]]` | ⬜ ★ |
 | 14 | `k8s-packaging` | 打包與部署:Helm 與 Kustomize | Helm chart/values、Kustomize overlay、跨環境部署(接 `[[k8s-config-secret]]`) | ⬜ (選) |
 
