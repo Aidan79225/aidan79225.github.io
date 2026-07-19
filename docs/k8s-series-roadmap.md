@@ -58,7 +58,7 @@
 
 | # | slug | 標題 | 主題 | 狀態 |
 |---|---|---|---|---|
-| 13 | `k8s-troubleshooting` | 故障排除:pod、node、control plane 怎麼查 | `kubectl describe/logs/events`、pod 生命週期與常見狀態(Pending/CrashLoopBackOff/ImagePullBackOff)、node 與 control plane 組件排障、`kubectl debug`——接 `[[sre-troubleshooting]]` | ⬜ ★ |
+| 13 | `k8s-troubleshooting` | 故障排除:Pod、Node、Control Plane 怎麼查 | Pod 生命週期四關 stall map(Pending/ImagePullBackOff/CrashLoopBackOff/OOMKilled/not Ready)、get→describe(Events 金礦)→logs(--previous)→exec/debug、分層(Pod/Node NotReady/Control Plane)、`kubectl debug` ephemeral container——接 `[[sre-troubleshooting]]`,收束整個系列 | ✅ 已發布 ★ |
 
 ## 建議閱讀順序(CKA 導向)
 1. 先把**地基**(1→2→3)讀熟——沒有 reconcile / Pod 的心智模型,後面都是背。
