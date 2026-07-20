@@ -52,7 +52,7 @@
 |---|---|---|---|---|
 | 11 | `k8s-rbac` | RBAC:誰能對叢集做什麼 | 認證 vs 授權(401/403 兩道門)、Role/ClusterRole、RoleBinding/ClusterRoleBinding、subject(User/Group/SA)、rule=apiGroups+resources+verbs、白名單/預設拒絕、ClusterRole+RoleBinding 重用、ServiceAccount 與最小權限、`kubectl auth can-i` | ✅ 已發布 ★ |
 | 12 | `k8s-cluster-admin` | 叢集管理:kubeadm、etcd 備份、升級 | kubeadm init/join + static pod control plane、HA 奇數 etcd/quorum、**etcd snapshot save/restore**、cluster upgrade(一次一 minor、CP 先於 worker、cordon/drain→upgrade→uncordon 四步)——接 `[[sre-consensus]]`、`[[infra-k8s]]` | ✅ 已發布 ★ |
-| 14 | `k8s-packaging` | 打包與部署:Helm 與 Kustomize | Helm chart/values、Kustomize overlay、跨環境部署(接 `[[k8s-config-secret]]`) | ⬜ (選) |
+| 14 | `k8s-packaging` | 打包與部署:Helm 與 Kustomize | 跨環境痛點(一份來源+每環境差異)、Helm 模板填空(chart/values/release/rollback/生態系)vs Kustomize 疊加補丁(base+overlay、內建 kubectl、configMapGenerator hash 自動 rollout)、該用哪個——接 `[[k8s-config-secret]]` | ✅ 已發布 |
 
 ## Troubleshooting(30% — 考試最大宗)
 
