@@ -29,7 +29,7 @@
 |---|---|---|---|---|
 | 8 | `redis-replication` | 主從複製:讀寫分離與複製延遲 | 非同步複製、replica 只讀、複製延遲的怪現象、部分重同步(PSYNC)——扣回 DDIA replication | ⬜ |
 | 9 | `redis-sentinel` | 高可用:Sentinel 怎麼自動故障轉移 | Sentinel 監控、客觀下線、選一個 Sentinel leader 主導 failover、通知客戶端;為何 Sentinel 也要過半 | ⬜ |
-| 10 | `redis-cluster` | Redis Cluster:16384 個 slot 怎麼分片與擴縮 | hash slot(16384)、key→slot(CRC16)、資料分片;`MOVED`/`ASK` 重定向;multi-key 限制與 hash tag `{}`;gossip 協定;擴縮容的 slot 遷移 | ⬜ ★ |
+| 10 | `redis-cluster` | Redis Cluster:16384 個 slot 怎麼分片與擴縮 | hash slot(16384)、key→slot(CRC16)、資料分片;`MOVED`/`ASK` 重定向;multi-key 限制與 hash tag `{}`;gossip 協定;擴縮容的 slot 遷移;**redis-cli --cluster create/reshard/rebalance/del-node/check + CLUSTER INFO/NODES/SLOTS/KEYSLOT 各種操作** | ✅ 已發布 ★ |
 | 11 | `redis-pipeline-transaction` | 管線、事務與 Lua:省 RTT 與原子性 | pipelining 省往返;`MULTI`/`EXEC` + `WATCH`(樂觀鎖);Lua 腳本的原子性;為什麼 Redis 事務不是真 ACID(不能 rollback) | ⬜ |
 | 12 | `redis-pubsub-stream` | Pub/Sub vs Stream:Redis 版的訊息系統 | Pub/Sub(fire-and-forget、不持久)vs Stream(持久化 log + consumer group,像輕量 Kafka);跟 `[[kafka-intro]]` 對照、何時該直接上 Kafka | ⬜ |
 
