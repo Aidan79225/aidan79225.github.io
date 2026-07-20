@@ -67,6 +67,24 @@ draft: false
 - **混著存了重要資料**:用 `volatile-*`——只踢「有設 TTL 的可丟資料」,保護那些沒 TTL 的重要 key;或用 `noeviction` + 自己控管容量。
 - **千萬別**在「當快取用」的場景留著預設的 `noeviction`——記憶體一滿,**所有寫入都會開始報錯**,而你可能以為 Redis 只是「舊資料被自動清掉」而已。
 
+## redis-cli:TTL 與 maxmemory 操作
+
+過期與淘汰各有一組命令,分別對應「自己該走」與「地方不夠踢誰」:
+
+```bash
+# 過期(TTL)
+SET session:1 "..." EX 3600     # 設值同時給 1 小時 TTL(最常用)
+EXPIRE user:1 60; TTL user:1    # 事後補 TTL / 查剩幾秒(-1=永久,-2=不存在)
+PERSIST user:1                  # 拔掉 TTL,變回永久
+# 淘汰(記憶體上限與政策)
+CONFIG SET maxmemory 2gb
+CONFIG SET maxmemory-policy allkeys-lru   # 8 種政策之一(見上面矩陣)
+INFO stats                      # 看 evicted_keys:不為 0 且一直漲 = 該擴或調政策
+OBJECT FREQ hotkey              # LFU 政策下,看某 key 的存取頻率
+```
+
+盯住兩個數字就抓住重點:`TTL` 告訴你某把 key 還能活多久,`INFO stats` 裡的 **`evicted_keys` 一路上漲**則是「記憶體撞頂、開始踢人」的第一警報——那是該加記憶體、還是該換個淘汰政策的分水嶺。
+
 ## 反思
 
 ### 過期 vs 淘汰:分清「自己該走」和「地方不夠請人走」

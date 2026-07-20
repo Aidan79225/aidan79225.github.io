@@ -70,6 +70,25 @@ draft: false
 
 實務上的地雷清單值得背下來:`KEYS *`(掃全庫)、對大集合做 `HGETALL`/`SMEMBERS`/`LRANGE 0 -1`(整包撈回)、`SORT` 大集合、`DEL` 一個幾百萬元素的大 key(光是釋放記憶體就是 O(N))、以及跑太久的 Lua 腳本。它們的共通點都是 **O(N) 且一次做完**,而在單執行緒的世界裡,「一次做完」就等於「這段時間誰都別想用」。
 
+## 維運命令:避開 O(N)、揪出慢命令
+
+把上面的坑變成實際操作——這幾條是維運 Redis 的日常肌肉記憶:
+
+```bash
+# ✗ 別在 Production 打這些全掃 O(N),一條就卡住所有人
+KEYS *                              # 掃全庫
+SMEMBERS bigset                     # 一次拉整個大集合
+# ✓ 改用游標分批,不阻塞
+SCAN 0 MATCH user:* COUNT 100       # 反覆用回傳的游標再打,直到游標回 0
+# 揪兇手
+SLOWLOG GET 10                      # 最近 10 筆慢命令(含耗時與參數)
+redis-cli --bigkeys                 # 掃出佔記憶體的大 key
+OBJECT ENCODING mykey               # 看底層編碼,巨大結構常是元凶
+UNLINK bigkey                       # ✓ 非阻塞刪除(DEL 大 key 會卡住全場)
+```
+
+心法就一句:**單執行緒下,任何 O(N) 都是全場的稅**。用 `SCAN` 取代 `KEYS`、用 `SLOWLOG` / `--bigkeys` 抓兇手、用 `UNLINK` 取代 `DEL` 大 key——這三件事幾乎涵蓋了 Redis 效能事故的一大半。
+
 ## 反思
 
 ### 單執行緒是「用簡單換可預測」的經典取捨

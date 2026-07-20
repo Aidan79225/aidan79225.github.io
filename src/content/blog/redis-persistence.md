@@ -71,6 +71,25 @@ AOF 有個關鍵設定:寫進 log 之後,**多久真的 `fsync` 刷到磁碟一�
 
 最後一個誠實的結論:即使你開了 AOF `always`,**Redis 也不是要給你「絕不丟任何一筆」的強持久化保證**——它從設計上就是主打速度的。它的持久化,真正的價值在於**「重啟能快速回暖、少回源打爆後面的資料庫」**,而不是拿來當那個輸不起的真相來源。這正好呼應[[redis-intro|第一篇]]的定位:Redis 是**熱資料層**,權威副本應該在後面的資料庫;Redis 裡的資料是**可重建的加速層**。把這個角色擺正,「Redis 掛了資料會不會不見」的焦慮,就從「災難」降級成「回源慢一下」。
 
+## redis-cli:調持久化的三個旋鈕
+
+前面的取捨,落成命令就是三個旋鈕(全都能 `CONFIG SET` 免重啟):
+
+```bash
+# 看 / 調設定
+CONFIG GET save            # RDB 快照觸發條件,如 "3600 1 300 100 60 10000"
+CONFIG SET appendonly yes  # 開 AOF 日誌
+CONFIG GET appendfsync     # AOF 刷盤策略:always / everysec(預設) / no
+CONFIG REWRITE             # 把當前設定寫回 redis.conf(否則重啟就打回原形)
+# 手動觸發與檢查
+BGSAVE                     # 背景 fork 存一次 RDB
+BGREWRITEAOF               # 壓縮 AOF 檔
+LASTSAVE                   # 上次成功存檔的時間戳(拿來確認有沒有卡住)
+INFO persistence           # rdb_last_bgsave_status、aof_enabled、aof_last_write_status…
+```
+
+`save`(RDB 多久拍一次)、`appendonly`(要不要記流水帳)、`appendfsync`(多常刷盤)——這三個旋鈕就決定了你在「持久性↔效能」光譜上站哪個位置。**記得 `CONFIG SET` 只改當下,要 `CONFIG REWRITE` 才會存回設定檔**,不然重啟就白調了。
+
 ## 反思
 
 ### 「會不會丟資料」不是 yes/no,是「你願意用多少效能換多少安全」

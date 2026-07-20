@@ -65,6 +65,25 @@ draft: false
 
 貫穿這一切的心法只有一句:**別從「我要存什麼」出發,要從「我要對它做什麼操作」出發。** 同一份「使用者分數」,如果你只是要存起來讀回,String/Hash 就夠;但只要出現「排名」「取前十」「某分數區間」這種**操作**,答案立刻變成 Sorted Set。結構選對,那個操作就是 O(log N) 的一行命令;選錯,就是把整包資料撈回應用端、自己排序的一場災難。Redis 逼你重新重視一件學校教過、但工作後常忘記的事——**資料結構的選擇,本身就是效能設計**。
 
+## redis-cli:五大結構的招牌命令
+
+每個結構配一組最常用的命令,看一遍就抓到「這結構天生擅長什麼」:
+
+```bash
+# String:原子計數器
+INCR views:page1                       # 就地 +1,不必讀回來加再寫回
+# List:最新動態 / 佇列
+LPUSH feed p3; LRANGE feed 0 9         # 頭塞、取最新 10 筆
+# Hash:存物件的欄位
+HSET user:1 name Aidan age 30; HGETALL user:1
+# Set:去重與交集
+SADD tag:redis u1 u2; SINTER tag:redis tag:db   # 同時有兩個標籤的人
+# ZSet(皇冠):排行榜
+ZADD rank 100 u1 95 u2; ZREVRANGE rank 0 2 WITHSCORES   # Top 3
+```
+
+命令本身就在告訴你選型答案:要**排行榜**,`ZREVRANGE` 天生就是 ZSet 的活;要**交集**(共同好友、同標籤),`SINTER` 天生就是 Set 的活。**先想「我要下哪個操作」,結構自己就浮出來。**
+
 ## 反思
 
 ### 選對資料結構,是 Redis 用得好不好的分水嶺
