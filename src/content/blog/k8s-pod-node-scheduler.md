@@ -36,6 +36,30 @@ draft: false
 
 為什麼要多這層包裝?因為有些容器**天生該綁在一起** —— 例如主服務 ＋ 一個幫它收 log 或當代理的 sidecar,它們要共用網路、一起被排程、一起生死。**但別過度用:多數 Pod 就是一個容器。** 記住這句話就好:**容器是「跑什麼」,Pod 是 K8s 真正搬動、複製、排程的單位。**
 
+落成 YAML,一個「app + sidecar 共享一塊暫存」的 Pod 長這樣——`containers` 是**陣列**(可以放多個),`volumes` 定義的盤兩個容器都掛得到:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: web
+spec:
+  containers:
+    - name: app                     # 主容器:你的服務
+      image: myrepo/web:1.0
+      volumeMounts:
+        - { name: shared, mountPath: /var/log/app }
+    - name: log-agent               # sidecar:順便幫它收 log
+      image: fluent-bit:latest
+      volumeMounts:
+        - { name: shared, mountPath: /logs }   # 掛同一塊盤,就讀得到 app 寫的 log
+  volumes:
+    - name: shared
+      emptyDir: {}                  # 兩個容器共享的暫存(Pod 消失就沒了)
+```
+
+看得出 Pod 的兩個「共享」怎麼落地:兩個容器**掛同一個 `shared` volume**(所以 sidecar 讀得到 app 寫的檔案),又同處一個 Pod、**共用同一個網路**(彼此用 `localhost` 就通)。不過實務上你**很少單獨寫 Pod**——都是讓 [[k8s-deployment|Deployment]] 的 `template` 幫你生,這裡單獨寫只是為了把 Pod 的結構看清楚。
+
 ## Node:一台機器
 
 **Node 就是一台真正的機器**(雲上多半是一台 VM)。[[k8s-intro|上一篇]]提過叢集分兩半:

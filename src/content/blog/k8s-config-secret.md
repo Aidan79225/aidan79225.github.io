@@ -69,6 +69,49 @@ draft: false
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;"><b style="color:#4f6df5">環境變數</b>最簡單,但它在 pod 啟動時就定好了,改了設定<b>得重啟 pod</b> 才生效。<b style="color:#54b890">掛成檔案</b>(volume)則適合整份設定檔或憑證,而且有個好處:更新 ConfigMap 之後,掛進去的檔案會<b>自動更新</b>(雖然 app 通常還是得自己重讀檔案)。實務上小量設定用 env、整份設定檔或憑證用 volume。無論哪種,都別忘了那個紅字——Secret 的名字給了你安全感,但預設它只是 base64</figcaption>
 </figure>
 
+## 落成 YAML:建立設定、再注入 Pod
+
+把上面兩張圖落成實際的宣告。先建 ConfigMap(明文)與 Secret(注意 `data` 要放 **base64** 後的值,或用 `stringData` 直接寫明文讓 K8s 幫你編):
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata: { name: web-config }
+data:
+  LOG_LEVEL: "info"                 # 非機密:直接明文
+  application.yaml: |               # 也可以放「整份設定檔」
+    server:
+      timeout: 30s
+---
+apiVersion: v1
+kind: Secret
+metadata: { name: web-secret }
+type: Opaque
+stringData:
+  DB_PASSWORD: "s3cr3t"             # stringData:寫明文,K8s 存進去時自動 base64(仍非加密)
+```
+
+接著在 Deployment 的 Pod 樣板裡,**兩種注入方式**都示範一次——`env` 拉成環境變數、`volumeMounts` 掛成檔案:
+
+```yaml
+    spec:
+      containers:
+        - name: web
+          image: myrepo/web:1.0
+          env:
+            - name: LOG_LEVEL       # ① 環境變數:從 ConfigMap 拉一個 key
+              valueFrom: { configMapKeyRef: { name: web-config, key: LOG_LEVEL } }
+            - name: DB_PASSWORD     # 機密也一樣,改用 secretKeyRef
+              valueFrom: { secretKeyRef: { name: web-secret, key: DB_PASSWORD } }
+          volumeMounts:
+            - { name: cfg, mountPath: /etc/web }   # ② 掛成檔案:整份 application.yaml 出現在這個目錄
+      volumes:
+        - name: cfg
+          configMap: { name: web-config }
+```
+
+兩個對照就是前面第二張圖的重點:`env`/`...KeyRef` 是**環境變數注入**(啟動時定死,改了要重啟 Pod);`volumeMounts` + `volumes.configMap` 是**掛成檔案**(更新 ConfigMap 後檔案會自動更新,但 app 得自己重讀)。要一次把整份 ConfigMap/Secret 灌成環境變數,還有 `envFrom` 可用,少寫很多行。
+
 ## 反思
 
 ### 設定與映像檔分離,是「一次建置、到處執行」的地基

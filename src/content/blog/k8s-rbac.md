@@ -116,6 +116,32 @@ Role 那對有 namespaced / cluster 之分,Binding 那對也有——這**兩個
 
 所以要讓一個 Pod 能列出 Pod,標準三步:**建一個 ServiceAccount → 建一個 Role(或 ClusterRole)→ 用 RoleBinding 把兩者綁起來**,然後讓 Pod 指定用那個 SA。這裡最該守住的原則是**最小權限**:那個 `default` SA 預設幾乎什麼都不能做,是刻意的——**別為了省事給 workload 一個 cluster-admin,那等於把整座叢集的鑰匙插在門上。**
 
+那「標準三步」落成 YAML,剛好就是綁定鏈那張圖的三個積木:
+
+```yaml
+apiVersion: v1
+kind: ServiceAccount                 # ① 主體:給 workload 的身分
+metadata: { name: ci-bot, namespace: ci }
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: Role                           # ② 角色:一組權限(namespaced,不屬於任何人)
+metadata: { name: pod-reader, namespace: ci }
+rules:
+  - apiGroups: [ "" ]                # "" = 核心 API 群組(pods 就在這)
+    resources: [ "pods" ]
+    verbs: [ "get", "list", "watch" ]  # 只給讀,不給刪
+---
+apiVersion: rbac.authorization.k8s.io/v1
+kind: RoleBinding                    # ③ 綁定:把 Role 黏到主體身上
+metadata: { name: ci-bot-can-read-pods, namespace: ci }
+subjects:
+  - { kind: ServiceAccount, name: ci-bot, namespace: ci }
+roleRef:
+  { kind: Role, name: pod-reader, apiGroup: rbac.authorization.k8s.io }
+```
+
+`roleRef` 指向「給什麼權限」、`subjects` 指向「給誰」——**少了這條 RoleBinding,`pod-reader` 只是躺著沒人擁有的權限,`ci-bot` 也一無所有。** Pod 那邊再寫 `serviceAccountName: ci-bot`,它跑起來呼叫 API 時,就只有讀 pod 的權限、別的一律 403。
+
 想確認到底有沒有權限,不用猜,`kubectl auth can-i` 直接問:
 
 ```bash

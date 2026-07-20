@@ -108,6 +108,36 @@ Pod 這邊寫上對應的 **toleration**,就拿到「這個 taint 擋不住我�
 
 > 順帶一提,除了 Pod 挑 node,還有 Pod 挑 **Pod**:`podAffinity`(把相關的 Pod 湊在同一區,減少跨區延遲)、`podAntiAffinity`(把同一個服務的副本**打散**到不同 node,一台掛了不會全滅),以及 `topologySpreadConstraints`(更精細地要求跨 zone / node 平均分布)。原理跟 node affinity 一樣是「拉」與「推」,只是這回挑的是別的 Pod,不是 node。真要打散高可用副本時,`podAntiAffinity` 是最常用的一招。
 
+## 落成 YAML:三個旋鈕一起上
+
+把「專屬 node」那張組合技圖落成宣告。先給 GPU node 打一個污點(這是指令,不是 YAML):
+
+```bash
+kubectl label node gpu-1 hw=gpu                          # 貼標籤:讓 affinity 挑得到
+kubectl taint node gpu-1 gpu=true:NoSchedule             # 打污點:趕走沒免疫的 Pod
+```
+
+然後在 Pod 樣板裡把三個旋鈕寫齊——`resources.requests`(排程的容量依據)、`nodeAffinity`(拉:我要去 `hw=gpu` 的 node)、`tolerations`(免疫:我扛得住那個 taint):
+
+```yaml
+    spec:
+      containers:
+        - name: trainer
+          image: myrepo/trainer:1.0
+          resources:
+            requests: { cpu: "2", memory: "8Gi" }   # Scheduler 靠這個判斷裝不裝得下
+      affinity:
+        nodeAffinity:                               # 拉:硬性要求去 hw=gpu 的 node
+          requiredDuringSchedulingIgnoredDuringExecution:
+            nodeSelectorTerms:
+              - matchExpressions:
+                  - { key: hw, operator: In, values: [ "gpu" ] }
+      tolerations:                                  # 免疫:容忍 gpu=true:NoSchedule
+        - { key: gpu, operator: Equal, value: "true", effect: NoSchedule }
+```
+
+三段各對應圖裡的一環:少了 `tolerations`,Pod 被 taint 擋在門外;少了 `nodeAffinity`,有免疫的 Pod 也可能飄去別台。**兩個一起,才鎖得住「這台只給這種 Pod、且這種 Pod 一定來這」。** `requests` 則是無論如何都要寫對的地基——它是排程的帳本。
+
 ## 反思
 
 ### 「拉、推、免疫」分清楚,taint/toleration 就不再繞

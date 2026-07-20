@@ -86,6 +86,39 @@ NetworkPolicy 最容易繞暈的,是裡面**有兩個各司其職的 selector**�
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">一條 policy 裡的兩個 selector 職責完全不同:<b>①最外層 podSelector</b> 決定「保護誰」(誰翻成預設拒絕);<b>②ingress.from 的 selector</b> 決定「放行誰」。搞混這兩個,規則就會寫成保護錯 Pod、或放行錯來源</figcaption>
 </figure>
 
+## 落成 YAML:先全關,再開一條白名單
+
+實務上安全的做法是兩層:先給整個 namespace 一條 **default-deny**(把大門關上),再逐條開白名單。default-deny 就是「選中全部 Pod、卻不給任何 ingress 規則」:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: default-deny-ingress }
+spec:
+  podSelector: {}                 # 空的 = 選中這個 namespace 的所有 Pod
+  policyTypes: [ Ingress ]        # 只給 Ingress 型、又不列任何 from → 進向全關
+```
+
+然後單獨放行「api 可以連 db 的 5432」——注意裡面**兩個 selector 職責不同**:
+
+```yaml
+apiVersion: networking.k8s.io/v1
+kind: NetworkPolicy
+metadata: { name: db-allow-api }
+spec:
+  podSelector:
+    matchLabels: { app: db }      # ① 這條規則「保護」誰:db
+  policyTypes: [ Ingress ]
+  ingress:
+    - from:
+        - podSelector:
+            matchLabels: { app: api }   # ② 「放行」誰進來:api
+      ports:
+        - { protocol: TCP, port: 5432 } # 再收斂到特定埠
+```
+
+疊起來的效果就是前面第一張圖的右半邊:db 因為被 policy 選中而翻成預設拒絕,只有帶 `app=api` 標籤的 Pod 打得進 5432,其餘一律擋。想放行**別的 namespace**,把 `from` 換成 `namespaceSelector`;想放行叢集外某個 IP 段,用 `ipBlock`。規則永遠只加不減、取聯集——要更嚴,就再疊一條更窄的,而不是去寫「拒絕」。
+
 ## 一個大坑:NetworkPolicy 要 CNI 撐腰才有效
 
 這是最陰的一點,也把本篇兩個主角接了起來:**NetworkPolicy 物件本身只是規則,真正「擋封包」的是 CNI 插件。** 如果你的叢集用的是**不支援 policy 的 CNI(例如純 Flannel)**,那你 `kubectl apply` 一堆 NetworkPolicy——**它們會安安靜靜地被無視,一個封包都不會被擋。** 沒有錯誤、沒有警告,你以為資料庫鎖起來了,其實門大開。這跟 [[k8s-ingress-dns|Ingress 沒裝 Controller 就沒作用]]是一模一樣的坑:**物件是期望,得有一個真的在跑、且支援它的東西去執行。** 上 policy 前,先確認你的 CNI(Calico / Cilium 這類)真的會 enforce。

@@ -68,6 +68,49 @@ K8s 儲存最核心的設計,是把「**誰要儲存**」和「**儲存實際在
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;"><b style="color:#54b890">StatefulSet</b> 給每個 pod 三樣 Deployment 沒有的東西:<b>穩定的身分</b>(`pod-0`/`pod-1`,重啟名字不變)、<b>各自綁定的儲存</b>(靠 <code>volumeClaimTemplates</code> 讓每個 pod 自動有一塊專屬 PVC,重啟/重排都掛回同一塊盤)、以及<b>有序的部署與擴縮</b>(0→1→2)。這正是為什麼 <a href="/blog/infra-kafka/">Kafka</a>、<a href="/blog/infra-redis/">Redis</a> 這些有狀態的東西,在 k8s 上一律跑 StatefulSet + PV——它們的資料綁在特定身分與磁碟上,不能像無狀態 pod 那樣隨便換</figcaption>
 </figure>
 
+## 落成 YAML:一個 PVC、一個 StatefulSet
+
+先看「需求」那一半——一份 PVC 就是 app 開發者要寫的全部,它完全不提底層是哪種盤,只喊要多大、什麼存取模式、走哪個 StorageClass:
+
+```yaml
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata: { name: data }
+spec:
+  accessModes: [ "ReadWriteOnce" ]     # RWO:單一節點讀寫
+  storageClassName: fast-ssd           # 交給這個 class 動態供應一塊 PV
+  resources:
+    requests: { storage: 10Gi }        # 我要 10Gi
+```
+
+而有狀態服務不會自己手寫 PVC,而是用 **StatefulSet 的 `volumeClaimTemplates`**——它像一個「PVC 模子」,幫**每個** Pod(`pod-0`、`pod-1`…)各生一塊專屬的盤,重排也掛回同一塊:
+
+```yaml
+apiVersion: apps/v1
+kind: StatefulSet
+metadata: { name: db }
+spec:
+  serviceName: db                      # 搭一個 headless Service 給每個 Pod 穩定的 DNS 名
+  replicas: 3
+  selector: { matchLabels: { app: db } }
+  template:
+    metadata: { labels: { app: db } }
+    spec:
+      containers:
+        - name: db
+          image: postgres:16
+          volumeMounts:
+            - { name: data, mountPath: /var/lib/postgresql/data }
+  volumeClaimTemplates:                # ← 關鍵:每個 Pod 自動獲得一塊自己的 PVC
+    - metadata: { name: data }
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: fast-ssd
+        resources: { requests: { storage: 10Gi } }
+```
+
+兩個細節值得記:`volumeClaimTemplates` 生出的 PVC 會叫 `data-db-0`、`data-db-1`……**名字綁著 Pod 的序號**,這就是「`pod-0` 永遠掛回自己那塊盤」的實作;而且**縮容時這些 PVC 預設不會被刪**——K8s 寧可留著資料等你手動確認,也不敢自作主張刪掉有狀態的盤。這跟一般 Deployment「Pod 走了什麼都不留」是完全相反的預設,正是「有狀態」該有的謹慎。
+
 ## 反思
 
 ### PV/PVC 的「供需分離」,是我很欣賞的一個抽象

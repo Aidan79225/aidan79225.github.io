@@ -46,6 +46,44 @@ draft: false
 
 分工很清楚:**Deployment** 管版本與更新策略;它底下的 **ReplicaSet** 只負責一件事——**盯著實際 Pod 數,少了就補、多了就砍。** 你只宣告「我要 3 份 v1」,剩下的都是那個迴圈在跑。
 
+## 這份「期望」落成 YAML 長這樣
+
+K8s 是宣告式的:你不下一步步的指令,而是寫一份描述「我要什麼」的 YAML,交給 reconcile loop 去達成——這也是為什麼大家說 K8s 有種 **Infrastructure as Code** 的味道。上面那整套自我修復,其實就這麼幾行宣告出來的:
+
+```yaml
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+spec:
+  replicas: 3                       # 期望:永遠維持 3 份
+  selector:
+    matchLabels: { app: web }       # 這個 Deployment 管哪些 Pod
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1             # 換版時最多幾個同時不可用
+      maxSurge: 1                   # 換版時最多可額外多開幾個新的
+  template:                         # ↓ 以下是「每個 Pod 長怎樣」的樣板
+    metadata:
+      labels: { app: web }          # Pod 的標籤,要被上面 selector 選中
+    spec:
+      containers:
+        - name: web
+          image: myrepo/web:1.0
+          resources:                # 排程與 QoS 的依據
+            requests: { cpu: "100m", memory: "128Mi" }
+            limits:   { cpu: "500m", memory: "256Mi" }
+          readinessProbe:           # 沒通過就不進 Service 收流量名單
+            httpGet: { path: /healthz, port: 8080 }
+```
+
+三個地方是理解 Deployment 的關鍵:
+
+- **`replicas: 3` 就是你的「期望」**——ReplicaSet 整天盯著它,少了補、多了砍。改成 5、`kubectl apply` 一下,loop 自動補到 5,你從沒下過「開兩個容器」這種指令。
+- **`selector` 與 `template.labels` 必須對得上**——這是 Deployment 認得「哪些 Pod 是我的」的方式。兩邊標籤兜不起來,`apply` 直接被擋。
+- **`template` 是 Pod 的樣板,也是滾動更新的觸發點**——改這裡面任何一格(image、env、resources…)才會觸發換版;只改 `replicas` 不算換版,只是加減數量。(也因此,改一個被引用的 [[k8s-config-secret|ConfigMap/Secret]] 不會自動 rollout——它沒動到這份 template。)
+
 ## 自我修復:reconcile loop 一直在跑
 
 所謂「K8s 會自我修復」,拆開來一點都不神秘,就是 reconcile loop 在做它該做的:
