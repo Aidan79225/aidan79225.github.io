@@ -28,7 +28,7 @@
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
 | 6 | `infra-spark` | Spark:短命 executor 的彈性運算 | 第一個 stateless:拓撲(driver 命門/executor 短命可拋)、狀態借外部(shuffle/driver 協調是過渡態、durable 在 S3/DB)、dynamic allocation(backlog 驅動,對比 Kafka 搬 partition)、driver on-demand vs executor spot、容量 shuffle/skew/OOM、on k8s 取代 YARN——接 `[[spark-running]]`、`[[airflow-spark-on-k8s]]` | ✅ 已發布 |
-| 7 | `infra-airflow` | Airflow:排程器、worker 與那個藏起來的狀態 | scheduler/webserver/worker、executor(Celery vs KubernetesExecutor)、metadata DB 才是真狀態、HA scheduler——接 `[[airflow-scheduling]]` | ⬜ |
+| 7 | `infra-airflow` | Airflow:排程器、worker 與那個藏起來的狀態 | 組件全無狀態(scheduler/webserver/worker)、真狀態=metadata DB(命門)、HA scheduler 靠 DB row lock 協調、executor(Celery 固定池+broker vs KubernetesExecutor 一 task 一 pod)、容量瓶頸常在 DB、on k8s Helm + 觸發 Spark——接 `[[airflow-scheduling]]`、`[[infra-spark]]` | ✅ 已發布 |
 | 8 | `infra-kafka-connect` | Kafka Connect:連接器的執行時 | distributed mode、worker + task rebalance、offset 存回 Kafka、怎麼擴 connector、跟 Kafka 叢集的關係——接 `[[kafka-ecosystem]]` | ⬜ |
 
 ## 第四批 — 兜成一個平台
