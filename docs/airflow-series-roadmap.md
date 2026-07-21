@@ -17,7 +17,7 @@
 | 6 | `airflow-control-flow` | Airflow 複雜流程控制:branching、trigger rules、TaskGroup、動態任務 | branching、trigger rules、TaskGroup、dynamic task mapping | ✅ 已發布 |
 | 7 | `airflow-reliability` | Airflow 可靠性實戰:冪等、重試、SLA 與告警 | 三層防線=冪等(地基,覆寫分區/DELETE+INSERT)→ retries(retry_delay/指數退避/execution_timeout、暫時 vs 永久)→ SLA(慢也是故障)/ 告警(on_failure_callback→Slack、只在重試用完才響)——接 `[[airflow-scheduling]]`、`[[airflow-intro]]`、`[[sre-cron]]`、`[[sre-monitoring]]` | ✅ 已發布 |
 | 8 | `airflow-testing-deploy` | Airflow 測試與部署:別讓一個 typo 弄垮整包 DAG | top-level parse 陷阱(scheduler 反覆解析→重活進 task)、測試三層(DagBag import 驗證/邏輯抽純函數單元測/dag.test())、CI 擋在 merge 前、部署 git-sync/S3/image、self-host vs managed(算維運人力)——接 `[[airflow-reliability]]`、`[[infra-airflow]]`、`[[pain-before-power]]` | ✅ 已發布 |
-| 9 | `airflow-advanced` | 進階主題(選配) | Datasets 資料感知排程、deferrable operators、executor 選型 | ⬜ 選配 |
+| 9 | `airflow-advanced` | Airflow 進階:Datasets、deferrable operators 與 executor 選型 | Datasets(時間驅動→資料驅動、outlets/schedule=[dataset])、deferrable operators(sensor 佔 slot 空等→triggerer async 等)、executor 選型速查(Local/Celery/K8s)——接 `[[airflow-providers]]`、`[[infra-airflow]]`、`[[infra-spark]]`、`[[redis-pubsub-stream]]`、`[[pain-before-power]]` | ✅ 已發布(系列完成 1-9) |
 
 ## 寫每篇時的慣例
 - front matter:`series: "Airflow 學習筆記"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
