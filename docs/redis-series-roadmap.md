@@ -31,7 +31,7 @@
 | 9 | `redis-sentinel` | 高可用:Sentinel 怎麼自動故障轉移 | 五步 failover(監控→SDOWN→ODOWN 過半→選 leader 挑 replica 升主→通知)、SDOWN vs ODOWN、為何要過半(quorum 判定 + 全體過半選 leader、防 split-brain)、Sentinel-aware client 服務發現;偵測比切換難、Sentinel 解可用性 vs Cluster 解容量——接 `[[sre-consensus]]`、`[[redis-replication]]`、`[[redis-cluster]]` | ✅ 已發布 |
 | 10 | `redis-cluster` | Redis Cluster:16384 個 slot 怎麼分片與擴縮 | hash slot(16384)、key→slot(CRC16)、資料分片;`MOVED`/`ASK` 重定向;multi-key 限制與 hash tag `{}`;gossip 協定;擴縮容的 slot 遷移;**redis-cli --cluster create/reshard/rebalance/del-node/check + CLUSTER INFO/NODES/SLOTS/KEYSLOT 各種操作** | ✅ 已發布 ★ |
 | 11 | `redis-pipeline-transaction` | 管線、事務與 Lua:省 RTT 與原子性 | 三者解不同問題:pipeline 省 RTT(不原子)、MULTI/EXEC 一起執行不被插隊(不能 rollback、非 ACID)、WATCH 樂觀鎖 CAS、Lua 原子+帶邏輯(讀了再判斷再寫,MULTI 做不到);把邏輯搬到資料旁——接 `[[redis-single-thread]]`、`[[redis-distributed-lock]]`、`[[sql-transactions]]`、`[[infra-spark]]` | ✅ 已發布 |
-| 12 | `redis-pubsub-stream` | Pub/Sub vs Stream:Redis 版的訊息系統 | Pub/Sub(fire-and-forget、不持久)vs Stream(持久化 log + consumer group,像輕量 Kafka);跟 `[[kafka-intro]]` 對照、何時該直接上 Kafka | ⬜ |
+| 12 | `redis-pubsub-stream` | Pub/Sub vs Stream:Redis 版的訊息系統 | Pub/Sub(fire-and-forget、離線漏、無 ack)vs Stream(append log、可重播、consumer group + XACK + PEL 重送 = 縮小版 Kafka);何時該直接上 Kafka(規模/保留/fan-out/生態);收尾回扣「不只是快取」——接 `[[kafka-intro]]`、`[[infra-kafka]]`、`[[infra-rabbitmq]]`、`[[redis-intro]]` | ✅ 已發布 |
 
 ★ = 投報率最高、圖最好畫(1、2、3、6、7、10)。第一批四篇是地基,優先寫;第二批最貼後端日常;第三批 Cluster 是重頭戲。
 
