@@ -86,6 +86,24 @@ def summarize(**ctx):
 
 第三層,`dag.test()`(Airflow 2.5+)能在本機**把整個 DAG 跑一遍**、不需要 scheduler、不寫 metadata DB,拿來在 CI 或本地做端到端驗證很順手。
 
+## 但跑在 K8s / Spark 上呢?邏輯根本不在 Airflow 裡
+
+有人會問:實務上 task 都用 `KubernetesPodOperator`、`SparkSubmitOperator` 去跑,邏輯不就一定「包在 operator 裡」,還怎麼抽成純函數測?這其實是把**兩種 operator** 混為一談了:
+
+- **執行型**(`PythonOperator` / `@task`):在 Airflow worker 行程裡**真的跑**你的 Python——邏輯就在 callable 裡,**這才是要抽出來的那一塊**。
+- **提交型**(`KubernetesPodOperator`、`SparkSubmitOperator`):它們**不執行**你的邏輯,只負責「用哪個 image、帶什麼參數、丟去哪個叢集」然後 submit。你的邏輯**根本不在 Airflow 裡**,在 image / Spark job 的獨立 codebase。
+
+所以「跑在 K8s / Spark」反而是**邏輯與編排分離做得最徹底**的形式——Airflow 只當交通指揮([[infra-airflow|編排歸編排、運算歸運算]])。邏輯放哪裡,就在哪裡測:
+
+| 邏輯放哪 | 誰執行 | 在哪測 |
+|---|---|---|
+| `@task` / `PythonOperator` callable | Airflow worker | 抽成純函數,pytest 直接測 |
+| Spark job(`SparkSubmitOperator` 提交) | Spark 叢集 | 在 Spark job 自己的 repo,用 pyspark local session 測 |
+| 容器(`KubernetesPodOperator`) | K8s pod | 在容器 app 自己的 repo 測 |
+| DAG 的接線本身 | —— | `DagBag` import + 斷言 operator 的 image / args / 依賴設對 |
+
+一句話:**「別包邏輯進 operator」不是「不准用 KubernetesPodOperator」**——前者是叫你別把 transform 寫死在 `PythonOperator` 的 callable;後者本來就是把邏輯推去容器 / Spark,方向完全一致。**用提交型 operator 時,DAG 這層只要測「有沒有接對」,不必真的把 Spark 跑起來。**
+
 ## 部署:DAG 檔怎麼上環境,以及 self-host vs managed
 
 Airflow 的「部署」,本質就是**把 DAG 檔案送到執行環境**,常見三種:**git-sync**(一個 sidecar 定期把 git repo 拉到 DAG 目錄)、**丟物件儲存**(MWAA 就是把 DAG 放 S3)、**烤進映像檔**(Astronomer / K8s 上,把 DAG 打包成 image 一起部署,最可控)。至於整套 Airflow 要不要自己養,是另一個更大的決策:
