@@ -35,7 +35,7 @@
 
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
-| 9 | `infra-platform` | 把它們兜成一個資料平台 | stateful 跑 StatefulSet+PV、stateless 跑 Deployment+autoscale;self-host vs managed 怎麼選;成本與維運人力的取捨;監控用 LGTM 一塊玻璃 | ⬜ |
+| 9 | `infra-platform` | 把它們兜成一個資料平台 | 平台分層(K8s 底座 + stateful 核心 StatefulSet+PV + stateless 運算 Deployment+autoscale + LGTM 觀測層);一條軸決定一切的 7 工具對照表;self-host vs managed 兩維度(狀態可怕 × 團隊能量);LGTM 一塊玻璃=認知負擔統一;算維運人力不是授權費——接 `[[infra-intro]]`、`[[infra-k8s]]`、`[[sre-monitoring]]`、`[[sre-onboarding-inhouse]]`、`[[pain-before-power]]` | ✅ 已發布(系列完成 1-9) |
 
 ★ = 框架與最高價值(1、2、3)。第一批兩篇是骨架(框架 + 底座),優先寫;第二/三批把框架套在每個工具上;第四批收成平台視角。
 
