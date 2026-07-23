@@ -24,7 +24,7 @@
 |---|---|---|---|---|
 | 3 | `obs-metrics-prometheus` | 指標與 Prometheus:時序、pull、PromQL 與 cardinality 的坑 | 時序資料模型(name+labels、series=label 組合)、**cardinality 爆炸**(series=各 label 基數乘積、高基數 ID 別當 label)、pull vs push(up=0 內建偵測)、metric 四型配四種讀法(counter→rate/gauge 直接/histogram→quantile/summary 少用)、PromQL rate→sum by→閾值、Mimir 水平擴+長期保留+多租戶——接 `[[obs-intro]]`、`[[k8s-troubleshooting]]`、`[[infra-kafka]]` | ✅ 已發布 ★ |
 | 4 | `obs-logs-loki` | 日誌與 Loki:只索引 label,不索引全文 | 只索引 label 不索引全文(兩步查詢:label 縮小→grep chunks、object storage 便宜)、vs ELK 全文索引取捨、同一個 cardinality 陷阱(高基數欄位放 structured line 不當 label)、LogQL(selector+pipeline、`| json`、rate() 把 log 變 metric)——接 `[[obs-metrics-prometheus]]`、`[[obs-intro]]` | ✅ 已發布 |
-| 5 | `obs-traces-tempo` | 追蹤與 Tempo:一個請求走過的路 | distributed tracing、trace/span、context propagation(trace-id 怎麼一路帶)、Tempo(只用 object storage、靠 trace-id 撈)、取樣(sampling)取捨 | ⬜ |
+| 5 | `obs-traces-tempo` | 追蹤與 Tempo:一個請求走過的路 | trace/span/waterfall(補 metric/log 之間「在哪一 hop」的洞)、context propagation(trace-id 靠 traceparent 一路傳、斷一跳就斷 trace)、Tempo(不索引內容、給 trace-id 換 trace、object storage=同 Loki 省錢哲學)、取樣 head vs tail(留異常不留隨機)——接 `[[obs-metrics-prometheus]]`、`[[obs-logs-loki]]`、`[[obs-intro]]`、`[[k8s-service]]` | ✅ 已發布(三支柱完成) |
 
 ## 第三批 — 串起來 & 採集
 
