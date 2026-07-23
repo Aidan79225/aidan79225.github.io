@@ -16,7 +16,7 @@
 | 1 | `ddia-reliable-scalable` | Ch1 Reliable, Scalable, Maintainable | 三個系統目標;fault≠failure、Chaos;load parameter 與 Twitter fan-out;percentile;意外複雜度 | ✅ 已發布 |
 | 2 | `ddia-data-models` | Ch2 Data Models & Query Languages | relational / document / graph;一對多 vs 多對多;schema-on-read/write;關聯式為何贏(宣告式)、文件為何回來 | ✅ 已發布 |
 | 3 | `ddia-storage-engines` | Ch3 Storage and Retrieval | 最簡資料庫(append+grep)→ 索引=用寫買讀;LSM(memtable/SSTable/compaction,順序寫、欠債後還)vs B-tree(page 就地更新+WAL,當場付清);append-only 討好磁碟的暗線(AOF/Kafka log/WAL 同源);OLTP 列式 vs OLAP 欄式(壓縮、數倉分家的底層原因)—— 接 `[[sql-index]]`、`[[redis-persistence]]`、`[[infra-kafka]]`、`[[medallion-architecture]]`、`[[spark-intro]]` | ✅ 已發布 ★ |
-| 4 | `ddia-encoding` | Ch4 Encoding and Evolution | schema evolution、Avro/Protobuf/Thrift、向前/向後相容 —— 接 `[[kafka-intro]]` | ⬜ |
+| 4 | `ddia-encoding` | Ch4 Encoding and Evolution | data outlives code + 滾動更新=新舊並存 → 向後(新讀舊)/向前(舊讀新,最易忘)兩種相容;JSON 的含糊;Protobuf/Thrift field tag 機制(跳過未知 tag/預設值、tag 三鐵律);Avro writer/reader schema 讀時調和;Schema Registry 把紀律自動化;schema 先行的部署紀律 —— 接 `[[k8s-deployment]]`、`[[kafka-intro]]`、`[[kafka-ecosystem]]`、`[[ddia-data-models]]` | ✅ 已發布 |
 
 ## Part II — 分散式資料
 
