@@ -16,7 +16,7 @@
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
 | 1 | `obs-intro` | 可觀測性是什麼:三大支柱與 LGTM 全家桶 | monitoring vs observability(已知的未知 vs 未知的未知)、三支柱各答一問(metric 有沒有/trace 在哪/log 是什麼)+ 排障黃金路徑由粗到細、LGTM 四字母對應 + Prometheus/Alloy 採集、Grafana 只查不存、一塊玻璃——接 `[[k8s-troubleshooting]]`、`[[infra-platform]]` | ✅ 已發布 ★ |
-| 2 | `obs-grafana` | Grafana:一塊玻璃,只查不存 | Grafana 只是「查詢 + 視覺化」層、不存資料(data source 才存);dashboard/panel/variable/template;為何「一塊玻璃」是價值核心(認知負擔統一) | ⬜ |
+| 2 | `obs-grafana` | Grafana:一塊玻璃,只查不存 | Grafana 只查不存(資料在 data source、自己近乎無狀態、能統一異質來源);dashboard/panel(一 panel 答一問);template variable(一張模板服務百目標=規模化);dashboard as code(JSON/git/provisioning)——接 `[[obs-intro]]`、`[[k8s-packaging]]`、`[[k8s-intro]]` | ✅ 已發布 |
 
 ## 第二批 — 三大支柱各講透
 
