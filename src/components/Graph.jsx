@@ -5,11 +5,15 @@ import { useEffect, useRef, useState } from 'react';
 const SERIES = [
   ['Fundamentals of Data Engineering 讀書筆記', '#4f6df5', 'FoDE'],
   ['SQL 我以為我懂', '#2fb6c0', 'SQL'],
+  ['Designing Data-Intensive Applications 讀書筆記', '#6a6fd0', 'DDIA'],
   ['Spark 學習筆記', '#e0733a', 'Spark'],
   ['Kafka 學習筆記', '#9b6ff0', 'Kafka'],
   ['Airflow 學習筆記', '#54b890', 'Airflow'],
   ['Kubernetes 學習筆記', '#d6a45c', 'K8s'],
+  ['Redis 學習筆記', '#dc4c3f', 'Redis'],
+  ['從 Infra 角度看資料工具', '#26a69a', 'Infra'],
   ['Google SRE 讀書筆記', '#d95757', 'SRE'],
+  ['Grafana LGTM 可觀測性', '#c264c2', 'LGTM'],
   ['成為 Tech Leader 讀書筆記', '#e05a7d', 'Tech Leader'],
 ];
 const COLOR = Object.fromEntries(SERIES.map(([s, c]) => [s, c]));

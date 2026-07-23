@@ -20,7 +20,9 @@ const series = {
   airflow: 'Airflow 學習筆記',
   redis: 'Redis 學習筆記',
   k8s: 'Kubernetes 學習筆記',
+  infra: '從 Infra 角度看資料工具',
   sre: 'Google SRE 讀書筆記',
+  obs: 'Grafana LGTM 可觀測性',
   btl: '成為 Tech Leader 讀書筆記',
 };
 
@@ -62,15 +64,19 @@ const layers = [
       { heading: '工作流程編排 · ' + series.airflow, posts: bySeries(series.airflow) },
       { heading: '容器編排 · ' + series.k8s, posts: bySeries(series.k8s) },
       { heading: '分散式協調 · 單篇', posts: pick(['zookeeper']) },
+      { heading: '橫向視角:把工具當 infra 養(維運 / 部署 / 平台)· ' + series.infra, posts: bySeries(series.infra) },
     ],
   },
   {
     tag: '橫切 · Cross-cutting',
     color: '#e05a7d',
-    title: '可靠度:貫穿每一層的 SRE',
+    title: '可靠度與可觀測性:貫穿每一層',
     blurb:
-      '可靠度不屬於某一層,它橫切全部——資料要正確、服務要不掛、變更要安全。讀 Google《Site Reliability Engineering》的筆記,把「維運」從救火英雄主義,變成有指標、可工程化的學科。',
-    groups: [{ heading: series.sre, posts: bySeries(series.sre) }],
+      '這一層橫切全部——資料要正確、服務要不掛、變更要安全,而這一切的前提是「看得見」。SRE 講的是可靠度的觀念與文化(為什麼);Grafana LGTM 這套可觀測性工具講的是怎麼把它變成真的儀表板、告警與 SLO(怎麼做)。這也是我現在身兼 DE team EM 與 SRE、最花心力的一塊。',
+    groups: [
+      { heading: '可靠度的觀念與文化 · ' + series.sre, posts: bySeries(series.sre) },
+      { heading: '可觀測性工具:LGTM 全家桶 · ' + series.obs, posts: bySeries(series.obs) },
+    ],
   },
   {
     tag: '技術之外 · Beyond',
@@ -83,7 +89,7 @@ const layers = [
 ---
 <BaseLayout
   title="Start Here"
-  description="從這裡開始 —— 借用 Clean Architecture 的分層來組織這個部落格:核心觀念(SQL、資料工程、DDIA)在內、最穩定;基礎設施工具(Redis、Kafka、Spark、Airflow、Kubernetes)在外、最具體;SRE 可靠度橫切每一層,技術領導在技術之外。"
+  description="從這裡開始 —— 借用 Clean Architecture 的分層來組織這個部落格:核心觀念(SQL、資料工程、DDIA)在內、最穩定;基礎設施工具(Redis、Kafka、Spark、Airflow、Kubernetes,以及從 infra 角度看它們)在外、最具體;SRE 可靠度與 Grafana LGTM 可觀測性橫切每一層,技術領導在技術之外。"
 >
   <h1 class="text-3xl font-bold mb-2">從這裡開始</h1>
   <p class="text-muted mb-6">
@@ -114,7 +120,8 @@ const layers = [
       <text x="392" y="196" fill="#54b890" font-size="8.8" text-anchor="start" font-weight="bold">學習順序:</text>
       <text x="392" y="210" fill="#54b890" font-size="8.8" text-anchor="start" font-weight="bold">先核心觀念,再具體工具</text>
       <rect x="392" y="232" width="185" height="30" rx="6" fill="#3a2632" stroke="#e05a7d" stroke-width="1.3"/>
-      <text x="404" y="251" fill="#e05a7d" font-size="8.6" text-anchor="start" font-weight="bold">SRE — 可靠度橫切每一層</text>
+      <text x="404" y="248" fill="#e05a7d" font-size="8.6" text-anchor="start" font-weight="bold">SRE + LGTM 可觀測性</text>
+      <text x="404" y="258" fill="#9aa4b2" font-size="7.4" text-anchor="start">可靠度與觀測橫切每一層</text>
       <rect x="392" y="268" width="185" height="30" rx="6" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.2"/>
       <text x="404" y="287" fill="#e6e6e6" font-size="8.6" text-anchor="start">Tech Leader — 技術之外</text>
     </svg>
