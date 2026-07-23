@@ -23,7 +23,7 @@
 | # | slug | 章 | 主題 | 狀態 |
 |---|---|---|---|---|
 | 5 | `ddia-replication` | Ch5 Replication | 三種拓撲=把衝突放在哪(單主源頭消滅→failover 難/多主事後解/無主 quorum w+r>n 讀時調和+read repair);quorum 的邊角(sloppy/並發寫);複製延遲三怪象有名字有藥(read-your-writes→讀 leader、單調讀→固定一台、一致前綴→同分區);一致性是菜單不是開關 —— 接 `[[redis-replication]]`、`[[redis-sentinel]]`、`[[sre-consensus]]`、`[[infra-spark]]`、`[[k8s-troubleshooting]]` | ✅ 已發布 ★ |
-| 6 | `ddia-partitioning` | Ch6 Partitioning | 分片策略(range / hash)、rebalancing、二級索引 —— 接 SQL MPP(#12)、Kafka partition | ⬜ ★ |
+| 6 | `ddia-partitioning` | Ch6 Partitioning | 三道難題:怎麼切(range 保順序怕熱點 vs hash 打熱點失順序、複合主鍵折衷、超熱 key 加鹽);二級索引擺哪(local 寫便宜讀 scatter/gather vs global 讀精準寫跨區非同步=帳付在哪第三次);rebalancing(別 mod N、固定分區數=Redis 16384 活教材、動態分裂、自動搬遷的連鎖失效危險→人按確認鍵)+ 路由三式 —— 接 `[[redis-cluster]]`、`[[kafka-topics]]`、`[[sql-mpp]]`、`[[redis-cache-patterns]]`、`[[sre-cascading-failures]]`、`[[zookeeper]]` | ✅ 已發布 ★ |
 | 7 | `ddia-transactions` | Ch7 Transactions | ACID、隔離層級、可串行化 —— 拉到分散式,跟 `[[sql-index]]` 系列 #11 互補不重複 | ⬜ |
 | 8 | `ddia-distributed-trouble` | Ch8 The Trouble with Distributed Systems | 不可靠的網路 / 時鐘 / 部分失效、拜占庭 —— 接 SRE | ⬜ ★ |
 | 9 | `ddia-consistency-consensus` | Ch9 Consistency and Consensus | linearizability、CAP、共識 / Raft、全序廣播 —— 接 SRE 共識(#14) | ⬜ ★ |
