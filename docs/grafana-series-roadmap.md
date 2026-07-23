@@ -22,7 +22,7 @@
 
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
-| 3 | `obs-metrics-prometheus` | 指標與 Prometheus:pull、時序、PromQL、cardinality | metric 四型(counter/gauge/histogram/summary)、pull vs push、時序資料模型(labels)、PromQL 入門、**cardinality 爆炸**的坑;Mimir 做長期儲存 + 水平擴 + 多租戶 | ⬜ ★ |
+| 3 | `obs-metrics-prometheus` | 指標與 Prometheus:時序、pull、PromQL 與 cardinality 的坑 | 時序資料模型(name+labels、series=label 組合)、**cardinality 爆炸**(series=各 label 基數乘積、高基數 ID 別當 label)、pull vs push(up=0 內建偵測)、metric 四型配四種讀法(counter→rate/gauge 直接/histogram→quantile/summary 少用)、PromQL rate→sum by→閾值、Mimir 水平擴+長期保留+多租戶——接 `[[obs-intro]]`、`[[k8s-troubleshooting]]`、`[[infra-kafka]]` | ✅ 已發布 ★ |
 | 4 | `obs-logs-loki` | 日誌與 Loki:只索引 label,不索引全文 | Loki 的核心設計(像 Prometheus 一樣只索引 label、不做全文索引 → 便宜)、LogQL、structured logging、vs ELK 的取捨、object storage 當後端 | ⬜ |
 | 5 | `obs-traces-tempo` | 追蹤與 Tempo:一個請求走過的路 | distributed tracing、trace/span、context propagation(trace-id 怎麼一路帶)、Tempo(只用 object storage、靠 trace-id 撈)、取樣(sampling)取捨 | ⬜ |
 
