@@ -22,7 +22,7 @@
 
 | # | slug | 章 | 主題 | 狀態 |
 |---|---|---|---|---|
-| 5 | `ddia-replication` | Ch5 Replication | 主從、同步/非同步、複製延遲的怪現象(read-your-writes、單調讀)、多主/無主 | ⬜ ★ |
+| 5 | `ddia-replication` | Ch5 Replication | 三種拓撲=把衝突放在哪(單主源頭消滅→failover 難/多主事後解/無主 quorum w+r>n 讀時調和+read repair);quorum 的邊角(sloppy/並發寫);複製延遲三怪象有名字有藥(read-your-writes→讀 leader、單調讀→固定一台、一致前綴→同分區);一致性是菜單不是開關 —— 接 `[[redis-replication]]`、`[[redis-sentinel]]`、`[[sre-consensus]]`、`[[infra-spark]]`、`[[k8s-troubleshooting]]` | ✅ 已發布 ★ |
 | 6 | `ddia-partitioning` | Ch6 Partitioning | 分片策略(range / hash)、rebalancing、二級索引 —— 接 SQL MPP(#12)、Kafka partition | ⬜ ★ |
 | 7 | `ddia-transactions` | Ch7 Transactions | ACID、隔離層級、可串行化 —— 拉到分散式,跟 `[[sql-index]]` 系列 #11 互補不重複 | ⬜ |
 | 8 | `ddia-distributed-trouble` | Ch8 The Trouble with Distributed Systems | 不可靠的網路 / 時鐘 / 部分失效、拜占庭 —— 接 SRE | ⬜ ★ |
