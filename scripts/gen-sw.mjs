@@ -37,9 +37,14 @@ const files = (await walk(DIST))
   .filter(shouldPrecache)
   .sort();
 
+// Bump when the worker template below changes behaviour, so clients rotate
+// to a fresh cache even if site content is identical.
+const SW_REVISION = 'v2';
+
 // Version = hash of every precached file's content, so identical rebuilds
 // produce an identical worker (no pointless client re-downloads).
 const h = createHash('sha256');
+h.update(SW_REVISION);
 let bytes = 0;
 for (const f of files) {
   const buf = await readFile(join(DIST, f));
@@ -56,16 +61,26 @@ const PRECACHE = ${JSON.stringify(urls)};
 
 self.addEventListener('install', (e) => {
   e.waitUntil((async () => {
+    // Non-atomic on purpose: cache.addAll rejects the whole install if ANY
+    // response is non-ok — and GitHub Pages serves /404.html with status 404,
+    // which would brick the install (and re-attempt the full download on every
+    // page load). Instead: fetch each URL individually, tolerate failures,
+    // and cache /404.html regardless of its status (it's our offline page).
     const c = await caches.open(CACHE);
-    const CHUNK = 20; // small batches: one flaky fetch only fails its chunk retry, not the lot
-    for (let i = 0; i < PRECACHE.length; i += CHUNK) {
-      const part = PRECACHE.slice(i, i + CHUNK).map((u) => new Request(u, { cache: 'reload' }));
-      try {
-        await c.addAll(part);
-      } catch {
-        await c.addAll(part); // one retry per chunk, then give up loudly
+    const CONCURRENCY = 8;
+    let i = 0;
+    async function worker() {
+      while (i < PRECACHE.length) {
+        const url = PRECACHE[i++];
+        try {
+          const res = await fetch(new Request(url, { cache: 'reload' }));
+          if (res.ok || url === '/404.html') await c.put(url, res);
+        } catch {
+          /* skip — runtime caching will pick it up on first visit */
+        }
       }
     }
+    await Promise.all(Array.from({ length: CONCURRENCY }, worker));
     await self.skipWaiting();
   })());
 });
@@ -87,6 +102,34 @@ async function offlineFallback(url) {
   );
 }
 
+// Pages: network-first (always fresh when online), full cache fallback offline.
+async function handleNav(req, url) {
+  let fresh;
+  try {
+    fresh = await fetch(req);
+  } catch {
+    const hit = await offlineFallback(url);
+    if (hit) return hit;
+    throw new Error('offline, uncached');
+  }
+  if (fresh.ok) {
+    try { (await caches.open(CACHE)).put(url.pathname, fresh.clone()); } catch {}
+  }
+  return fresh;
+}
+
+// Assets (hashed _astro/, icons, JSON indexes): cache-first — a new deploy
+// ships a new VERSION and re-precaches, so staleness is bounded by deploys.
+async function handleAsset(req) {
+  const hit = await caches.match(req);
+  if (hit) return hit;
+  const fresh = await fetch(req); // may throw offline → outer fallback
+  if (fresh.ok) {
+    try { (await caches.open(CACHE)).put(req, fresh.clone()); } catch {}
+  }
+  return fresh;
+}
+
 self.addEventListener('fetch', (e) => {
   const req = e.request;
   if (req.method !== 'GET') return;
@@ -94,37 +137,13 @@ self.addEventListener('fetch', (e) => {
   if (url.origin !== self.location.origin) return; // utterances / analytics: pass through
   if (url.pathname.startsWith('/og/')) return;     // share images: network only
 
-  // Pages: network-first (always fresh when online), full cache fallback offline.
+  // Fail-open: any unexpected error inside our handlers falls back to a plain
+  // network fetch — the worker must never be the reason a click goes nowhere.
   if (req.mode === 'navigate') {
-    e.respondWith((async () => {
-      try {
-        const fresh = await fetch(req);
-        if (fresh.ok) {
-          try { (await caches.open(CACHE)).put(url.pathname, fresh.clone()); } catch {}
-        }
-        return fresh;
-      } catch {
-        return (await offlineFallback(url)) || Response.error();
-      }
-    })());
+    e.respondWith(handleNav(req, url).catch(() => fetch(req)));
     return;
   }
-
-  // Assets (hashed _astro/, icons, JSON indexes): cache-first — a new deploy
-  // ships a new VERSION and re-precaches, so staleness is bounded by deploys.
-  e.respondWith((async () => {
-    const hit = await caches.match(req);
-    if (hit) return hit;
-    try {
-      const fresh = await fetch(req);
-      if (fresh.ok) {
-        try { (await caches.open(CACHE)).put(req, fresh.clone()); } catch {}
-      }
-      return fresh;
-    } catch {
-      return (await caches.match(req, { ignoreSearch: true })) || Response.error();
-    }
-  })());
+  e.respondWith(handleAsset(req).catch(() => fetch(req)));
 });
 `;
 
