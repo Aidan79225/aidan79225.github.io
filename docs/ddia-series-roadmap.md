@@ -32,7 +32,7 @@
 
 | # | slug | 章 | 主題 | 狀態 |
 |---|---|---|---|---|
-| 10 | `ddia-batch` | Ch10 Batch Processing | MapReduce、資料流引擎、join 策略 —— 接 `[[spark-intro]]` | ⬜ |
+| 10 | `ddia-batch` | Ch10 Batch Processing | MapReduce=跨千台的 Unix pipe;map–shuffle–reduce 解剖(shuffle=唯一大搬家=一切成本);join 兩條路(reduce-side sort-merge 通用重 vs map-side broadcast 帶小抄,判準=小表裝得進記憶體嗎);資料流引擎進化(中間態不落地);人為容錯=輸入不可變+可重跑(Medallion/backfill 的理論根據)—— 接 `[[spark-intro]]`、`[[sql-joins]]`、`[[medallion-architecture]]`、`[[airflow-reliability]]`、`[[infra-spark]]` | ✅ 已發布 |
 | 11 | `ddia-streaming` | Ch11 Stream Processing | event log、exactly-once、CDC、流批統一 —— 接 `[[kafka-intro]]`、`[[spark-streaming]]` | ⬜ ★ |
 | 12 | `ddia-future` | Ch12 The Future of Data Systems | unbundling the database、lambda / kappa、資料完整性 | ⬜ |
 
