@@ -34,7 +34,7 @@
 |---|---|---|---|---|
 | 10 | `ddia-batch` | Ch10 Batch Processing | MapReduce=跨千台的 Unix pipe;map–shuffle–reduce 解剖(shuffle=唯一大搬家=一切成本);join 兩條路(reduce-side sort-merge 通用重 vs map-side broadcast 帶小抄,判準=小表裝得進記憶體嗎);資料流引擎進化(中間態不落地);人為容錯=輸入不可變+可重跑(Medallion/backfill 的理論根據)—— 接 `[[spark-intro]]`、`[[sql-joins]]`、`[[medallion-architecture]]`、`[[airflow-reliability]]`、`[[infra-spark]]` | ✅ 已發布 |
 | 11 | `ddia-streaming` | Ch11 Stream Processing | 與 Kafka/Spark 系列分工(log/offset/exactly-once/視窗在那);雙寫陷阱(部分失敗+亂序→永久分歧)→ log 先行=leader-follower 推廣到異質系統;CDC=把 DB 複製 log 開放成公共事件流(Debezium 偽裝 follower);流表二象性(表=流的積分、流=表的微分;compaction/materialized view/複製串流/狀態機複製全是化身);只要 log 還在一切狀態都是快取(批次人為容錯帶進串流)—— 接 `[[kafka-intro]]`、`[[kafka-delivery]]`、`[[kafka-ecosystem]]`、`[[spark-streaming]]`、`[[redis-replication]]`、`[[infra-rabbitmq]]`、`[[medallion-architecture]]` | ✅ 已發布 ★ |
-| 12 | `ddia-future` | Ch12 The Future of Data Systems | unbundling the database、lambda / kappa、資料完整性 | ⬜ |
+| 12 | `ddia-future` | Ch12 The Future of Data Systems | unbundling=平台是一台由內翻外的資料庫(ES=索引、Redis=快取、數倉=mat. view、log 當膠水,呼應 infra-platform);lambda(兩套邏輯)vs kappa(一條 log、重算=重放);end-to-end 正確性(exactly-once 有邊界、request id 冪等鍵、稽核:沒報錯≠資料對→DQ 系列引言);倫理收尾 —— 接 `[[ddia-streaming]]`、`[[infra-platform]]`、`[[kafka-delivery]]`、`[[airflow-reliability]]`、`[[spark-streaming]]`、`[[sre-monitoring]]`、`[[pain-before-power]]`、`[[ddia-batch]]` | ✅ 已發布(全書完結 1-12) |
 
 ## 寫每篇時的慣例
 - front matter:`series: "Designing Data-Intensive Applications 讀書筆記"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
