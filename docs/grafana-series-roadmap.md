@@ -30,7 +30,7 @@
 
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
-| 6 | `obs-collection` | 採集層:資料怎麼進來(Alloy / OpenTelemetry) | 沒有採集就沒有觀測;Grafana Alloy / OpenTelemetry Collector 的角色、app instrumentation、在 k8s 上怎麼佈(agent/sidecar/DaemonSet)、OTel 當統一標準 | ⬜ |
+| 6 | `obs-collection` | 採集層:資料怎麼進來——OpenTelemetry 與 Alloy | M×N→M+N(直連 vs collector:OTLP 一協定、批次/重試/脫敏/路由集中、換後端不改 app);OTel 統一三訊號一套 SDK+共用 context(trace-id 進 log、exemplar 掛 metric=互跳的地基)、auto vs manual 埋測;Alloy=collector(OTLP+scrape+撿 log);K8s 三種佈法(DaemonSet 首選/sidecar 特例/gateway 做 tail sampling 全域決策)+兩層組合——接 `[[obs-intro]]`、`[[obs-traces-tempo]]`、`[[kafka-ecosystem]]`、`[[k8s-networkpolicy-cni]]`、`[[ddia-encoding]]`、`[[pain-before-power]]` | ✅ 已發布 |
 | 7 | `obs-correlation` | 三支柱關聯:從一個尖峰,跳到 trace,再跳到 log | 「一塊玻璃」的真義=三支柱能互跳;exemplars(metric→trace)、trace→logs、共用 label 關聯;沒關聯的三支柱只是三個孤島 | ⬜ |
 
 ## 第四批 — 把觀測變行動(SRE 實踐)
