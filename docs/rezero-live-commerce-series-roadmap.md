@@ -94,8 +94,8 @@
 - 抓進來**直接清洗成自訂的 message 格式後 append 進 DB**(先落地、後處理);**raw 原文不保留**。
 - 下游 **batch 每次 200 筆**,用**自建的有限狀態機(FSM)**判斷是否命中 key 與數量;命中就**嘗試扣庫存並建立身分**。
 - **沒有 batch 進度記錄;處理失敗直接略過**——該使用者的單無聲消失(最大痛點之一)。刻意取捨:為了讓主播看到最快的庫存狀態,freshness 優先於 completeness。
-- **「取最後一筆」的實作**:改購物車數量、把差額補回庫存。
-- **庫存獨立 one-to-one 表**(與 product 分開):商品其他資訊直播當下會變(主播現場喊價、現場跟廠商追加貨),熱資料獨立存。**冷熱分開的是「庫存(上限)」與「賣出總量」兩個欄位,不是一個剩餘庫存欄位加加減減**(可賣=庫存−賣出;推測超賣判斷=賣出+n≤庫存、追加貨=調庫存上限不動賣出——待作者確認)。
+- **「取最後一筆」的實作**:改購物車數量、把差額補回庫存。**有 style 之後的覆蓋粒度是「混合」**(key 級與 key+style 級並存——具體規則寫 #3/#6 前再細聊)。
+- **庫存獨立 one-to-one 表**(與 product 分開):商品其他資訊直播當下會變(主播現場喊價、現場跟廠商追加貨),熱資料獨立存。**冷熱分開的是「庫存(上限)」與「賣出總量」兩個欄位,不是一個剩餘庫存欄位加加減減**(可賣=庫存−賣出;**已確認:超賣判斷=賣出+n≤庫存**、追加貨=調庫存上限不動賣出)。
 - **key 語法有各種變體**:商品有 style(顏色/尺寸),一句留言要能對同一 key 下多種 style 各自的數量,如 `A01藍+1紅+1`;一句留言也可能含**多個 key**。語法是為了讓客人**少打字**設計的(直播搶單、手機打字)——這是用 FSM 而非 regex 的原因。
 - **留言量比例 FB:IG:自建 ≈ 100:10:1**,FB 是絕對主力。
 - **扣庫存:ORM + transaction,先查再扣、Serializable 隔離、噴錯重試;重試失敗該顧客直接略過**。冪等靠 transaction 內查購物車,實務上未發生重複扣庫存。
@@ -104,8 +104,12 @@
 
 **團隊與技術棧(#2/#19 相關)**:
 - 團隊:**3 後端 + 3 前端**,偶爾發包給外包 1–2 位工程師。
-- 技術棧:**PostgreSQL、Django(API + WebSocket)、RabbitMQ、Redis、Celery worker**。
-- **CI/CD 健全,開發疊代速度非常快**——小團隊的核心競爭力。
+- 技術棧:**PostgreSQL、Django(API + WebSocket)、RabbitMQ、Redis、Celery worker**;**全套 GCP**;有 staging 環境。
+- **WebSocket 的用途:把客人留言即時推給前端的主播 dashboard**(主播要看現場聊天)——即時通道是給主播用的,不是給客人用的。
+- **RabbitMQ 主要當 Celery 的 broker**;Celery 跑所有適合 async 的 job:抓留言、FSM batch、開發票、寄 email、匯出訂單等。
+- **Redis 主要放 banned user**;**沒有 session,直接 JWT 內嵌權限**(→ #10 權限章;JWT 無法撤銷,Redis 黑名單就是撤銷機制——#10 與 #13 的連接點)。
+- **CI/CD:GitLab flow 分支策略;push staging 自動上 staging;上 prod 走 Cloud Build 人工核准;CI 用 GitHub Actions 跑測試與驗證。每天團隊可上線十幾個 feature。**
+- **重來也不換 Django**:Django admin 幾乎無可取代;**Django + Celery + heartbeat ≈ 有類似 Airflow 的能力但不用管維運**。
 
 **維運與上線(#15 相關)**:
 - 當年**沒有 SRE 這個角色**,backend lead 扛下全部 infrastructure 工作,上線後提心吊膽。
