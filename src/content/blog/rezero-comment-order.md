@@ -69,6 +69,18 @@ class CommentsFSM:
         DETERMIN_KEYWORD_OR_STYLE = "determin_keyword_or_style"
         ERROR = "error"
 
+    def __init__(self) -> None:
+        # 狀態 → handler 的 dispatch table:主迴圈永遠只有一行
+        self.fsm: dict[CommentsFSM.State, Callable[[str], None]] = {
+            self.State.KEYWORD: self._handle_keyword,
+            self.State.STYLE: self._handle_style,
+            self.State.NUMBER: self._handle_number,
+            self.State.DETERMIN_KEYWORD_OR_STYLE: self._handle_determin_keyword_or_style,
+            self.State.ERROR: self._handle_error,
+        }
+        self._reset()
+        self.separate_chars = set([" ", ",", "，", "、"])  # 半形全形逗號、頓號都算分隔
+
     def parse(self, text: str) -> dict[str, int]:
         self._reset()
         for c in text:
@@ -102,6 +114,8 @@ class CommentsFSM:
         self.current_str = ""
         self.current_number = ""
 ```
+
+(節錄:省略了 `_reset` 和 STYLE、NUMBER、DETERMIN、ERROR 四個 handler——它們做的事都畫在下面的狀態圖裡。)
 
 <figure style="margin:1.5rem 0;text-align:center;">
   <svg viewBox="0 0 580 240" role="img" aria-label="留言解析狀態機的轉移圖。KEYWORD 狀態累積開頭數字,遇到加號進 NUMBER,遇到其他字元進 STYLE。STYLE 累積款式字元,遇到加號進 NUMBER。NUMBER 累積數字,遇到非數字先記下一筆結果再進 DETERMIN 狀態;DETERMIN 依下一個字元是不是數字決定回 KEYWORD 開新 key 還是進 STYLE 接續同 key 的下一個款式。數字解析失敗進 ERROR,整則留言作廢。下方以 2601藍+1紅+2 為例:解析出 2601藍一件、2601紅兩件——key 只打一次,款式接力。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
