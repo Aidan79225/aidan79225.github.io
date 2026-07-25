@@ -26,7 +26,7 @@
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
 | 1 | `rezero-overview` | 全景:留言下單的一筆訂單,會經過哪些系統 | 直播代購的商業模式(主播喊 key、留言 `key+1`)、一筆訂單的完整旅程(留言→解析→佔庫存購物車→結帳→金流→出貨)、這系統難在哪(瞬間尖峰、不能超賣、三本帳要對齊)、重來版總架構圖——接 `[[ddia-reliable-scalable]]` | ✅ 已發布 ★ |
-| 2 | `rezero-stack` | 起手式:五個元件與一條 CI/CD | 當年技術棧:PostgreSQL、Django(API+WebSocket)、RabbitMQ、Redis、Celery worker——五個 boring 元件,每個都有明確分工;**健全的 CI/CD 是小團隊最大的槓桿**(3 後端 3 前端 + 外包 1–2,疊代速度非常快);重來會不會換?boring tech 的勝利與代價——接 `[[infra-rabbitmq]]`、`[[pain-before-power]]` | ⬜ |
+| 2 | `rezero-stack` | 起手式:五個元件與一條 CI/CD | 當年技術棧:PostgreSQL、Django(API+WebSocket)、RabbitMQ、Redis、Celery worker——五個 boring 元件,每個都有明確分工;**健全的 CI/CD 是小團隊最大的槓桿**(3 後端 3 前端 + 外包 1–2,疊代速度非常快);重來會不會換?boring tech 的勝利與代價——接 `[[infra-rabbitmq]]`、`[[pain-before-power]]` | ✅ 已發布 |
 
 ## 第二批 — 交易主線
 
