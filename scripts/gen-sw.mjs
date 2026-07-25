@@ -39,7 +39,7 @@ const files = (await walk(DIST))
 
 // Bump when the worker template below changes behaviour, so clients rotate
 // to a fresh cache even if site content is identical.
-const SW_REVISION = 'v2';
+const SW_REVISION = 'v3';
 
 // Version = hash of every precached file's content, so identical rebuilds
 // produce an identical worker (no pointless client re-downloads).
@@ -61,26 +61,39 @@ const PRECACHE = ${JSON.stringify(urls)};
 
 self.addEventListener('install', (e) => {
   e.waitUntil((async () => {
-    // Non-atomic on purpose: cache.addAll rejects the whole install if ANY
-    // response is non-ok — and GitHub Pages serves /404.html with status 404,
-    // which would brick the install (and re-attempt the full download on every
-    // page load). Instead: fetch each URL individually, tolerate failures,
-    // and cache /404.html regardless of its status (it's our offline page).
+    // Not cache.addAll: that rejects the whole install if ANY response is
+    // non-ok, and GitHub Pages serves /404.html with status 404 — which would
+    // brick every install. Instead fetch individually so /404.html can be
+    // cached regardless of status. But the install is still all-or-nothing:
+    // if anything else fails (e.g. the network drops mid-install) we THROW so
+    // the install fails and the browser retries on the next page load —
+    // activating with a partial cache would serve 404s offline until the next
+    // deploy. Entries cached by an earlier failed attempt of this same
+    // VERSION are skipped, so retries resume instead of starting over.
     const c = await caches.open(CACHE);
     const CONCURRENCY = 8;
-    let i = 0;
-    async function worker() {
-      while (i < PRECACHE.length) {
-        const url = PRECACHE[i++];
-        try {
-          const res = await fetch(new Request(url, { cache: 'reload' }));
-          if (res.ok || url === '/404.html') await c.put(url, res);
-        } catch {
-          /* skip — runtime caching will pick it up on first visit */
+    async function fill() {
+      const failed = [];
+      let i = 0;
+      async function worker() {
+        while (i < PRECACHE.length) {
+          const url = PRECACHE[i++];
+          if (await c.match(url)) continue;
+          try {
+            const res = await fetch(new Request(url, { cache: 'reload' }));
+            if (res.ok || url === '/404.html') await c.put(url, res);
+            else failed.push(url);
+          } catch {
+            failed.push(url);
+          }
         }
       }
+      await Promise.all(Array.from({ length: CONCURRENCY }, worker));
+      return failed;
     }
-    await Promise.all(Array.from({ length: CONCURRENCY }, worker));
+    let failed = await fill();
+    if (failed.length) failed = await fill(); // one retry round for transient blips
+    if (failed.length) throw new Error('precache incomplete: ' + failed.length + ' failed');
     await self.skipWaiting();
   })());
 });
