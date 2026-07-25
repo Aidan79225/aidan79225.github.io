@@ -23,6 +23,7 @@ const series = {
   infra: '從 Infra 角度看資料工具',
   sre: 'Google SRE 讀書筆記',
   obs: 'Grafana LGTM 可觀測性',
+  rezero: 'Re:從零開始做直播代購電商平台',
   btl: '成為 Tech Leader 讀書筆記',
 };
 
@@ -79,6 +80,14 @@ const layers = [
     ],
   },
   {
+    tag: '實戰 · War Stories',
+    color: '#9ccc65',
+    title: '戰爭故事:拿真實系統,重打一次',
+    blurb:
+      '上面每一層的觀念,在這裡用真實做過(也真實做錯過)的系統驗收。第一個戰場:直播代購電商平台——使用者留言下單、庫存不能超賣、金流物流一條鏈;每章先講當年怎麼做,再講如果重來會怎麼設計。',
+    groups: [{ heading: series.rezero, posts: bySeries(series.rezero) }],
+  },
+  {
     tag: '技術之外 · Beyond',
     color: '#9aa4b2',
     title: '人與成長:技術領導',
@@ -97,7 +106,7 @@ const layers = [
   </p>
 
   <figure class="my-6 flex justify-center">
-    <svg viewBox="0 0 600 350" role="img" aria-label="用 Clean Architecture 的同心圓組織這個部落格。最內圈是核心觀念 Domain,含 SQL、資料工程、DDIA,最穩定最能遷移。中間圈是應用與架構 Application,如 dbt、Medallion。最外圈是基礎設施 Infrastructure,含 Redis、Kafka、Spark、Airflow、Kubernetes,最具體最會被替換。依賴方向由外指向內,外層依賴內層、內層不依賴外層;外層工具會被替換,內層觀念要穩定。學習順序先核心觀念再具體工具。SRE 可靠度橫切每一層,Tech Leader 在技術之外。" style="width:100%;max-width:600px;height:auto;">
+    <svg viewBox="0 0 600 350" role="img" aria-label="用 Clean Architecture 的同心圓組織這個部落格。最內圈是核心觀念 Domain,含 SQL、資料工程、DDIA,最穩定最能遷移。中間圈是應用與架構 Application,如 dbt、Medallion。最外圈是基礎設施 Infrastructure,含 Redis、Kafka、Spark、Airflow、Kubernetes,最具體最會被替換。依賴方向由外指向內,外層依賴內層、內層不依賴外層;外層工具會被替換,內層觀念要穩定。學習順序先核心觀念再具體工具。SRE 可靠度橫切每一層,戰爭故事系列拿真實系統把每一層串起來驗收,Tech Leader 在技術之外。" style="width:100%;max-width:600px;height:auto;">
       <circle cx="180" cy="168" r="150" fill="#1f2330" stroke="#d6a45c" stroke-width="1.6"/>
       <circle cx="180" cy="168" r="100" fill="#232838" stroke="#4f6df5" stroke-width="1.6"/>
       <circle cx="180" cy="168" r="50" fill="#223528" stroke="#54b890" stroke-width="1.8"/>
@@ -122,8 +131,11 @@ const layers = [
       <rect x="392" y="232" width="185" height="30" rx="6" fill="#3a2632" stroke="#e05a7d" stroke-width="1.3"/>
       <text x="404" y="248" fill="#e05a7d" font-size="8.6" text-anchor="start" font-weight="bold">SRE + LGTM 可觀測性</text>
       <text x="404" y="258" fill="#9aa4b2" font-size="7.4" text-anchor="start">可靠度與觀測橫切每一層</text>
-      <rect x="392" y="268" width="185" height="30" rx="6" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.2"/>
-      <text x="404" y="287" fill="#e6e6e6" font-size="8.6" text-anchor="start">Tech Leader — 技術之外</text>
+      <rect x="392" y="268" width="185" height="30" rx="6" fill="#28331f" stroke="#9ccc65" stroke-width="1.2"/>
+      <text x="404" y="284" fill="#9ccc65" font-size="8.6" text-anchor="start" font-weight="bold">戰爭故事 — 實戰驗收</text>
+      <text x="404" y="294" fill="#9aa4b2" font-size="7.4" text-anchor="start">拿真實系統把每一層串起來</text>
+      <rect x="392" y="304" width="185" height="30" rx="6" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.2"/>
+      <text x="404" y="323" fill="#e6e6e6" font-size="8.6" text-anchor="start">Tech Leader — 技術之外</text>
     </svg>
   </figure>
 

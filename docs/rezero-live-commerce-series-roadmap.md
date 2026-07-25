@@ -25,7 +25,7 @@
 
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
-| 1 | `rezero-overview` | 全景:留言下單的一筆訂單,會經過哪些系統 | 直播代購的商業模式(主播喊 key、留言 `key+1`)、一筆訂單的完整旅程(留言→解析→佔庫存購物車→結帳→金流→出貨)、這系統難在哪(瞬間尖峰、不能超賣、三本帳要對齊)、重來版總架構圖——接 `[[ddia-reliable-scalable]]` | ⬜ ★ |
+| 1 | `rezero-overview` | 全景:留言下單的一筆訂單,會經過哪些系統 | 直播代購的商業模式(主播喊 key、留言 `key+1`)、一筆訂單的完整旅程(留言→解析→佔庫存購物車→結帳→金流→出貨)、這系統難在哪(瞬間尖峰、不能超賣、三本帳要對齊)、重來版總架構圖——接 `[[ddia-reliable-scalable]]` | ✅ 已發布 ★ |
 | 2 | `rezero-comment-order` | 留言即下單:把聊天室變成下單通道 | **多源接入:FB/IG/自建**各自的取得方式與限制(webhook/輪詢/自家直推)→ 每源一個 adapter 收斂成**統一留言事件格式**,下游只認統一格式(M×N→M+N,同 `[[obs-collection]]` 的 collector 哲學);解析 `key+n`(格式容錯:全形/空白/打錯 key)、**同一人重複留言以最後一筆為準 = LWW**(需要穩定的事件順序——留言時間戳 vs 進系統順序,跨源時鐘還不可比)、冪等(同一則留言不能下兩次單)、留言流先進 queue 削峰再消費——接 `[[ddia-replication]]`(LWW)、`[[kafka-why]]`、`[[ddia-streaming]]`、`[[ddia-encoding]]` | ⬜ ★ |
 | 3 | `rezero-identity` | 身分與帳號:留言的那個人,到底是誰 | **identity 與 account 分層**:external identity(fb:xxx / ig:yyy / 自建 zzz)是事實、account 是聚合;**留言下單當下可能沒有 account——庫存卡給 identity,不是卡給 account**(影子帳號/guest identity 先成立、訂單與預留掛在 identity 上);註冊/綁定時的**認領(claim)**流程(OAuth 綁定、驗證碼、私訊引導);最難的一題:**兩個 identity 各自累積了訂單,後來發現是同一人——帳號合併**(合併是不可逆的資料遷移,衝突怎麼解,類比 `[[ddia-replication]]` 的衝突解決);風控邊界(綁定錯人=把別人的訂單搬給你)——接 `[[rezero-comment-order]]` | ⬜ ★ |
 | 4 | `rezero-inventory` | 庫存:不能超賣,是這個系統唯一的鐵律 | 超賣的本質=invariant 在併發下被打破;扣庫存三條路的取捨(DB row lock / Redis 原子操作+回寫 / 單線程排隊消費);佔庫存購物車的釋放策略(TTL?取消?付款逾期?)——當年怎麼選、重來怎麼選;「佔庫存」其實是**預留(reservation)模型**,而且預留主是 identity(見 #3)——接 `[[ddia-transactions]]`(write skew/invariant)、`[[redis-distributed-lock]]`、`[[redis-data-structures]]` | ⬜ ★ |

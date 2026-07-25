@@ -14,6 +14,7 @@ const SERIES = [
   ['從 Infra 角度看資料工具', '#26a69a', 'Infra'],
   ['Google SRE 讀書筆記', '#d95757', 'SRE'],
   ['Grafana LGTM 可觀測性', '#c264c2', 'LGTM'],
+  ['Re:從零開始做直播代購電商平台', '#9ccc65', 'Re:0'],
   ['成為 Tech Leader 讀書筆記', '#e05a7d', 'Tech Leader'],
 ];
 const COLOR = Object.fromEntries(SERIES.map(([s, c]) => [s, c]));
