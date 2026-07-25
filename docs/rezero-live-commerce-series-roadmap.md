@@ -19,53 +19,71 @@
 - ↔ **SRE / Kafka 系列**:開賣尖峰的削峰、backpressure、告警。
 - 這是**戰爭故事**:每章都要有「當年」跟「重來」兩個聲部,反思段比一般系列更重。
 
-★ = 框架 / 最高投報(1、2、3、4、6、13)。邊寫邊發:`draft: true` → `false`。`seriesOrder` = 寫作順序。
+★ = 框架 / 最高投報(1、3、4、5、7、16、17)。邊寫邊發:`draft: true` → `false`。`seriesOrder` = 寫作順序。
 
-## 第一批 — 全景與核心交易路徑
+## 第一批 — 開場與地基
 
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
 | 1 | `rezero-overview` | 全景:留言下單的一筆訂單,會經過哪些系統 | 直播代購的商業模式(主播喊 key、留言 `key+1`)、一筆訂單的完整旅程(留言→解析→佔庫存購物車→結帳→金流→出貨)、這系統難在哪(瞬間尖峰、不能超賣、三本帳要對齊)、重來版總架構圖——接 `[[ddia-reliable-scalable]]` | ✅ 已發布 ★ |
-| 2 | `rezero-comment-order` | 留言即下單:把聊天室變成下單通道 | **多源接入:FB/IG/自建**各自的取得方式與限制(webhook/輪詢/自家直推)→ 每源一個 adapter 收斂成**統一留言事件格式**,下游只認統一格式(M×N→M+N,同 `[[obs-collection]]` 的 collector 哲學);解析 `key+n`(格式容錯:全形/空白/打錯 key)、**同一人重複留言以最後一筆為準 = LWW**(需要穩定的事件順序——留言時間戳 vs 進系統順序,跨源時鐘還不可比)、冪等(同一則留言不能下兩次單)、留言流先進 queue 削峰再消費——接 `[[ddia-replication]]`(LWW)、`[[kafka-why]]`、`[[ddia-streaming]]`、`[[ddia-encoding]]` | ⬜ ★ |
-| 3 | `rezero-identity` | 身分與帳號:留言的那個人,到底是誰 | **identity 與 account 分層**:external identity(fb:xxx / ig:yyy / 自建 zzz)是事實、account 是聚合;**留言下單當下可能沒有 account——庫存卡給 identity,不是卡給 account**(影子帳號/guest identity 先成立、訂單與預留掛在 identity 上);註冊/綁定時的**認領(claim)**流程(OAuth 綁定、驗證碼、私訊引導);最難的一題:**兩個 identity 各自累積了訂單,後來發現是同一人——帳號合併**(合併是不可逆的資料遷移,衝突怎麼解,類比 `[[ddia-replication]]` 的衝突解決);風控邊界(綁定錯人=把別人的訂單搬給你)——接 `[[rezero-comment-order]]` | ⬜ ★ |
-| 4 | `rezero-inventory` | 庫存:不能超賣,是這個系統唯一的鐵律 | 超賣的本質=invariant 在併發下被打破;扣庫存三條路的取捨(DB row lock / Redis 原子操作+回寫 / 單線程排隊消費);佔庫存購物車的釋放策略(TTL?取消?付款逾期?)——當年怎麼選、重來怎麼選;「佔庫存」其實是**預留(reservation)模型**,而且預留主是 identity(見 #3)——接 `[[ddia-transactions]]`(write skew/invariant)、`[[redis-distributed-lock]]`、`[[redis-data-structures]]` | ⬜ ★ |
-| 5 | `rezero-cart-order` | 兩種購物車與訂單狀態機 | 佔庫存購物車(直播來的)vs 不佔庫存購物車(平台加入的)——一個資料模型還是兩個?調整數量的邊界(佔庫存的加量要再搶庫存、減量要釋放);checkout:兩種購物車合併結帳;訂單狀態機(建立→待付款→已付款→備貨→出貨→完成/取消)與逾期未付自動釋放 | ⬜ |
+| 2 | `rezero-stack` | 起手式:五個元件與一條 CI/CD | 當年技術棧:PostgreSQL、Django(API+WebSocket)、RabbitMQ、Redis、Celery worker——五個 boring 元件,每個都有明確分工;**健全的 CI/CD 是小團隊最大的槓桿**(3 後端 3 前端 + 外包 1–2,疊代速度非常快);重來會不會換?boring tech 的勝利與代價——接 `[[infra-rabbitmq]]`、`[[pain-before-power]]` | ⬜ |
 
-## 第二批 — 錢與貨
+## 第二批 — 交易主線
 
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
-| 6 | `rezero-payment` | 第三方金流:錢的事,冪等是唯一的朋友 | 金流整合的形狀(redirect / SDK / webhook 回調);回調的三個坑:**重複通知(冪等)、亂序(付款成功比建單通知先到)、根本不來(主動查單兜底)**;付款成功但庫存已釋放怎麼辦(超時付款);退款流程;金流帳 vs 訂單帳——接 `[[ddia-distributed-trouble]]`(不可靠網路)、`[[ddia-encoding]]` | ⬜ ★ |
-| 7 | `rezero-fulfillment` | 出貨前處理:代購的合併出貨與揀貨 | 代購場景的特殊性:多場直播的訂單**合併出貨**(等貨到齊、一人多單併一箱)、揀貨單與庫存的最終對齊、運費計算、與物流商介接(又是 webhook 冪等那一套)、出貨狀態回寫與通知 | ⬜ |
+| 3 | `rezero-comment-order` | 留言即下單:把聊天室變成下單通道 | **多源接入:FB/IG/自建**各自的取得方式與限制(webhook/輪詢/自家直推)→ 每源一個 adapter 收斂成**統一留言事件格式**,下游只認統一格式(M×N→M+N,同 `[[obs-collection]]` 的 collector 哲學);解析 `key+n`(格式容錯:全形/空白/打錯 key)、**同一人重複留言以最後一筆為準 = LWW**(需要穩定的事件順序——留言時間戳 vs 進系統順序,跨源時鐘還不可比)、冪等(同一則留言不能下兩次單)、留言流先進 queue 削峰再消費——接 `[[ddia-replication]]`(LWW)、`[[kafka-why]]`、`[[ddia-streaming]]`、`[[ddia-encoding]]` | ⬜ ★ |
+| 4 | `rezero-identity` | 身分與帳號:留言的那個人,到底是誰 | **identity 與 account 分層**:external identity(fb:xxx / ig:yyy / 自建 zzz)是事實、account 是聚合;**留言下單當下可能沒有 account——庫存卡給 identity,不是卡給 account**(影子帳號/guest identity 先成立、訂單與預留掛在 identity 上);註冊/綁定時的**認領(claim)**流程(OAuth 綁定、驗證碼、私訊引導);最難的一題:**兩個 identity 各自累積了訂單,後來發現是同一人——帳號合併**(合併是不可逆的資料遷移,衝突怎麼解,類比 `[[ddia-replication]]` 的衝突解決);風控邊界(綁定錯人=把別人的訂單搬給你)——接 `[[rezero-comment-order]]` | ⬜ ★ |
+| 5 | `rezero-inventory` | 庫存:不能超賣,是這個系統唯一的鐵律 | 超賣的本質=invariant 在併發下被打破;扣庫存三條路的取捨(DB row lock / Redis 原子操作+回寫 / 單線程排隊消費);佔庫存購物車的釋放策略(TTL?取消?付款逾期?)——當年怎麼選、重來怎麼選;「佔庫存」其實是**預留(reservation)模型**,而且預留主是 identity(見 #4)——接 `[[ddia-transactions]]`(write skew/invariant)、`[[redis-distributed-lock]]`、`[[redis-data-structures]]` | ⬜ ★ |
+| 6 | `rezero-cart-order` | 兩種購物車與訂單狀態機 | 佔庫存購物車(直播來的)vs 不佔庫存購物車(平台加入的)——一個資料模型還是兩個?調整數量的邊界(佔庫存的加量要再搶庫存、減量要釋放);checkout:兩種購物車合併結帳;訂單狀態機(建立→待付款→已付款→備貨→出貨→完成/取消)與逾期未付自動釋放 | ⬜ |
 
-## 第三批 — 營運面:後台、行銷、通知、風控
-
-| # | slug | 標題(暫定) | 主題 | 狀態 |
-|---|---|---|---|---|
-| 8 | `rezero-console` | 主播與營運後台:開賣的另一端 | key 怎麼綁商品(開賣前建檔 vs 直播中臨時上架)、開賣管理(上/下架、限量、時段);**直播中改庫存**——營運改庫存與使用者佔庫存同時發生的併發邊界(調低庫存低於已佔量怎麼辦);後台操作要留 audit log(對帳章的伏筆)——接 `[[rezero-inventory]]` | ⬜ |
-| 9 | `rezero-promotion` | 優惠券與結帳金額:折扣算錯比超賣還難查 | 券的模型(折抵/滿額/免運、適用範圍、有效期)、疊加規則要是**可枚舉的規則引擎不是 if 海**;結帳金額計算的正確性(分攤到每個品項——退款時才知道痛)、金額用整數分存;發券尖峰與囤券——接 `[[rezero-payment]]`(退款分攤) | ⬜ |
-| 10 | `rezero-notification` | 通知系統:對的訊息,在對的時間,打到對的渠道 | 下單成功/付款提醒/出貨通知的觸發點(事件驅動,訂閱訂單狀態機);渠道選擇跟 identity 章直接掛鉤(FB 來的用 Messenger、IG 有 API 限制、自建用 push/簡訊);逾期未付提醒=釋放庫存前的最後通牒;冪等與頻率上限(不能轟炸)——接 `[[rezero-identity]]`、`[[rezero-cart-order]]` | ⬜ |
-| 11 | `rezero-risk` | 風控與黑名單:惡意下單是對庫存的 DoS | **惡意下單不付款=免費佔庫存攻擊**(佔了不付、逾期釋放、再佔);訊號(棄單率、多 identity 同人)、分級處置(縮短保留時間→要求先付→黑名單);黑名單掛在 account 還是 identity?(跨平台換臉重來——又回到 #3 的身分難題);誤殺的代價與申訴——接 `[[rezero-identity]]`、`[[rezero-inventory]]` | ⬜ |
-
-## 第四批 — 橫切:尖峰、對帳、重來
+## 第三批 — 錢與貨
 
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
-| 12 | `rezero-flash-crowd` | 開賣瞬間:主播喊完 key 的那三秒 | 直播電商的尖峰不是 gradual、是**主播一句話觸發的 thundering herd**;讀寫分開救:商品頁快取、下單走 queue;degrade 優先序(什麼可以慢、什麼不能錯);當年的死法與重來的防線——接 `[[sre-cascading-failures]]`、`[[redis-cache-patterns]]`、`[[kafka-why]]`(backpressure) | ⬜ |
-| 13 | `rezero-reconciliation` | 三本帳:庫存帳、訂單帳、金流帳 | 分散式系統跑久了帳一定歪;把留言/下單事件流當事實來源(event log),庫存與訂單是 derived view;定時對帳 job 抓漂移、錯帳的修法(補償而非改歷史)——這章是 DDIA 第三部分的實戰版——接 `[[ddia-streaming]]`(CDC/事件溯源)、`[[ddia-future]]`、`[[airflow-reliability]]` | ⬜ ★ |
-| 14 | `rezero-retro` | Re:如果真的重來 | 全系列收束:當年哪些決定是對的(即使醜)、哪些是過度設計、哪些該第一天就做(冪等、事件留痕、對帳);「從 monolith 開始」不丟人;一張重來版架構全圖 + 演進路線(什麼規模才需要拆)——接 `[[fode-1]]`、`[[pain-before-power]]` | ⬜ |
+| 7 | `rezero-payment` | 第三方金流:錢的事,冪等是唯一的朋友 | 金流整合的形狀(redirect / SDK / webhook 回調);回調的三個坑:**重複通知(冪等)、亂序(付款成功比建單通知先到)、根本不來(主動查單兜底)**;付款成功但庫存已釋放怎麼辦(超時付款);退款流程;金流帳 vs 訂單帳——接 `[[ddia-distributed-trouble]]`(不可靠網路)、`[[ddia-encoding]]` | ⬜ ★ |
+| 8 | `rezero-fulfillment` | 出貨前處理:代購的合併出貨與揀貨 | 代購場景的特殊性:多場直播的訂單**合併出貨**(等貨到齊、一人多單併一箱)、揀貨單與庫存的最終對齊、運費計算、與物流商介接(又是 webhook 冪等那一套)、出貨狀態回寫與通知 | ⬜ |
+
+## 第四批 — 營運面:後台、權限、行銷、通知、風控
+
+| # | slug | 標題(暫定) | 主題 | 狀態 |
+|---|---|---|---|---|
+| 9 | `rezero-console` | 主播與營運後台:開賣的另一端 | key 怎麼綁商品(開賣前建檔 vs 直播中臨時上架)、開賣管理(上/下架、限量、時段);**直播中改庫存**——營運改庫存與使用者佔庫存同時發生的併發邊界(調低庫存低於已佔量怎麼辦);後台操作要留 audit log(對帳章的伏筆)——接 `[[rezero-inventory]]` | ⬜ |
+| 10 | `rezero-permission` | 權限:誰能按哪顆按鈕 | 角色盤點(主播/營運/客服/工程師/**外包工程師**)、RBAC 模型(role→permission→resource,別把 if user.is_admin 撒滿 code)、後台 UI 權限 vs API 權限要同一套(前端藏按鈕不是安全)、**外包的權限邊界**(code repo、正式資料、部署權——小團隊+外包的真實課題)、敏感操作留 audit log——接 `[[k8s-rbac]]`(對照 K8s 的 RBAC 心智模型) | ⬜ |
+| 11 | `rezero-promotion` | 優惠券與結帳金額:折扣算錯比超賣還難查 | 券的模型(折抵/滿額/免運、適用範圍、有效期)、疊加規則要是**可枚舉的規則引擎不是 if 海**;結帳金額計算的正確性(分攤到每個品項——退款時才知道痛)、金額用整數分存;發券尖峰與囤券——接 `[[rezero-payment]]`(退款分攤) | ⬜ |
+| 12 | `rezero-notification` | 通知系統:對的訊息,在對的時間,打到對的渠道 | 下單成功/付款提醒/出貨通知的觸發點(事件驅動,訂閱訂單狀態機);渠道選擇跟 identity 章直接掛鉤(FB 來的用 Messenger、IG 有 API 限制、自建用 push/簡訊);逾期未付提醒=釋放庫存前的最後通牒;冪等與頻率上限(不能轟炸)——接 `[[rezero-identity]]`、`[[rezero-cart-order]]` | ⬜ |
+| 13 | `rezero-risk` | 風控與黑名單:惡意下單是對庫存的 DoS | **惡意下單不付款=免費佔庫存攻擊**(佔了不付、逾期釋放、再佔);訊號(棄單率、多 identity 同人)、分級處置(縮短保留時間→要求先付→黑名單);黑名單掛在 account 還是 identity?(跨平台換臉重來——又回到 #4 的身分難題);**當年的黑名單實作**:留言進來先查 Redis、命中就不理,Redis 重啟從黑名單 DB 重建(快速判斷放 Redis、事實放 DB——正是 cache 的正確用法);誤殺的代價與申訴——接 `[[rezero-identity]]`、`[[rezero-inventory]]`、`[[redis-cache-patterns]]` | ⬜ |
+
+## 第五批 — 橫切與維運:尖峰、無 SRE 的上線、對帳
+
+| # | slug | 標題(暫定) | 主題 | 狀態 |
+|---|---|---|---|---|
+| 14 | `rezero-flash-crowd` | 開賣瞬間:主播喊完 key 的那三秒 | 直播電商的尖峰不是 gradual、是**主播一句話觸發的 thundering herd**;讀寫分開救:商品頁快取、下單走 queue;degrade 優先序(什麼可以慢、什麼不能錯);當年的死法與重來的防線——接 `[[sre-cascading-failures]]`、`[[redis-cache-patterns]]`、`[[kafka-intro]]`(backpressure) | ⬜ |
+| 15 | `rezero-ops` | 沒有 SRE 的年代:backend lead 的上線日記 | 當年沒有 SRE 這個角色,backend lead 扛全部 infra、上線後提心吊膽;**單一 process、單 CPU 的 API server 被打爆 → 緊急上 traefik 開 4 個 process 扛住**;Celery worker 同款調整(慢呼叫如打開發票 API 要隔離隊列);**遇過 DDoS**;每場直播人肉跟播=用恐懼當監控;重來版:容量估算、負載測試、監控告警在上線前就位——接 `[[sre-monitoring]]`、`[[obs-intro]]`、`[[k8s-deployment]]`(多副本) | ⬜ |
+| 16 | `rezero-reconciliation` | 三本帳:庫存帳、訂單帳、金流帳 | 分散式系統跑久了帳一定歪;把留言/下單事件流當事實來源(event log),庫存與訂單是 derived view;定時對帳 job 抓漂移、錯帳的修法(補償而非改歷史)——這章是 DDIA 第三部分的實戰版——接 `[[ddia-streaming]]`(CDC/事件溯源)、`[[ddia-future]]`、`[[airflow-reliability]]` | ⬜ ★ |
+
+## 第六批 — 演進與終局
+
+| # | slug | 標題(暫定) | 主題 | 狀態 |
+|---|---|---|---|---|
+| 17 | `rezero-microservices` | 拆與不拆:monolith 到三個微服務 | 當年真實的演進:monolithic 起家,後期拆成**電商、選標、採購**三個 microservice、**各自另開 DB 解耦**,再新增**會員 service** 讓選標與採購共用認證與操作;為何而拆(業務線分岔、組織與政治也是架構力)、拆分順序與資料遷移、服務間契約;「從 monolith 開始」不丟人,拆是演進不是信仰——接 `[[infra-platform]]`、`[[ddia-encoding]]`(服務間契約) | ⬜ ★ |
+| 18 | `rezero-saas` | 如果變成 SaaS:多租戶與分片 | 假想章:平台若賣給多個直播主/商家變 SaaS,什麼要重設計——多租戶模型三選(shared schema 帶 tenant_id / schema per tenant / DB per tenant)、shard key 怎麼選(tenant?商品?)、噪音鄰居(一個大主播的開賣尖峰打掛所有租戶)、per-tenant 金流與設定——接 `[[ddia-partitioning]]`、`[[redis-cluster]]` | ⬜ |
+| 19 | `rezero-team` | 六個工程師,跑出二十個人的速度 | EM/lead 視角:3 後端 + 3 前端 + 外包 1–2 的組成;**發包的邊界怎麼切**(規格清楚、低耦合的模組才外包;核心不變量絕不外包);CI/CD 是小團隊的槓桿;一人多帽(backend lead 兼 infra)的效率與代價;快疊代文化怎麼來的——接 `[[btl-1]]`、`[[pain-before-power]]` | ⬜ |
+| 20 | `rezero-retro` | Re:如果真的重來 | 全系列收束,也是**終局**:專案最後因政治因素走向關閉與資遣——系列叫「Re:」的原因;當年哪些決定是對的(即使醜)、哪些是過度設計、哪些該第一天就做(冪等、事件留痕、對帳);一張重來版架構全圖 + 演進路線;技術做對了,專案仍然會死——那工程師還剩下什麼(帶得走的能力與判斷)——接 `[[fode-1]]`、`[[btl-6]]` | ⬜ |
 
 ## 可擴展章節(需求還很多,想到就加)
-- 留言源深入篇:單一平台的實戰細節(FB webhook 的訂閱與限流、IG API 的限制、自建聊天室的設計)——#2 講抽象,這裡講各源的坑。
+- 留言源深入篇:單一平台的實戰細節(FB webhook 的訂閱與限流、IG API 的限制、自建聊天室的設計)——#3 講抽象,這裡講各源的坑。
 - 直播成效資料:場均下單、key 轉換率、留言熱度——DE 視角把營運數據做出來(可接 DDIA 批次/串流)。
 - 退貨/換貨流程(代購退貨的特殊性:貨還在海外?)。
 - 客服工單與訂單查詢(客服視角的資料需求)。
 
 ## 建議閱讀順序
-1. **交易主線**(1→2→3→4→5):全景、留言下單、身分與帳號、庫存、購物車——這是系統的心臟;3(identity)是全系列最容易被低估的一章。
-2. **錢與貨**(6→7):金流與出貨,把交易走完。
-3. **營運面**(8→9→10→11):後台、優惠券、通知、風控——平台要能長期經營靠這批;11(風控)會把 identity 與庫存兩章的線收在一起。
-4. **橫切**(12→13→14):尖峰、對帳、重來反思——戰爭故事的高潮與收束。
+1. **開場與地基**(1→2):全景、技術棧與 CI/CD 起手式。
+2. **交易主線**(3→4→5→6):留言下單、身分與帳號、庫存、購物車——系統的心臟;4(identity)是全系列最容易被低估的一章。
+3. **錢與貨**(7→8):金流與出貨,把交易走完。
+4. **營運面**(9→10→11→12→13):後台、權限、優惠券、通知、風控——平台要能長期經營靠這批;13(風控)會把 identity 與庫存兩章的線收在一起。
+5. **橫切與維運**(14→15→16):尖峰、無 SRE 的上線、對帳。
+6. **演進與終局**(17→18→19→20):微服務拆分、SaaS 假想、小團隊 EM 視角、以及「Re:」的真正意思。
 
 ## 當年實際做法(作者口述;每章動筆前先討論、記錄在這)
 
@@ -83,6 +101,26 @@
 - **扣庫存:ORM + transaction,先查再扣、Serializable 隔離、噴錯重試;重試失敗該顧客直接略過**。冪等靠 transaction 內查購物車,實務上未發生重複扣庫存。
 - 單一行程從沒掛過——但作者**每場直播人肉跟播待命**,很怕它掛。
 - 尖峰時 batch 跟不上,留言到下單成功的延遲可達**幾分鐘**。
+
+**團隊與技術棧(#2/#19 相關)**:
+- 團隊:**3 後端 + 3 前端**,偶爾發包給外包 1–2 位工程師。
+- 技術棧:**PostgreSQL、Django(API + WebSocket)、RabbitMQ、Redis、Celery worker**。
+- **CI/CD 健全,開發疊代速度非常快**——小團隊的核心競爭力。
+
+**維運與上線(#15 相關)**:
+- 當年**沒有 SRE 這個角色**,backend lead 扛下全部 infrastructure 工作,上線後提心吊膽。
+- 一開始只開**一台 process、單一 CPU 的 API server,被打爆**;緊急加 **traefik、開 4 個 process** 扛住。
+- Celery worker 也有類似調整(例如打開發票 API 等慢呼叫)。
+- **遇過 DDoS**。
+
+**黑名單(#13 相關)**:
+- message 進來**先查 Redis 黑名單,命中就不處理**。
+- Redis 重啟時**從黑名單 DB 重建**;Redis 只負責快速判斷,事實在 DB。
+
+**架構演進與終局(#17/#20 相關)**:
+- 原本 **monolithic**;後期作者把專案拆成**電商、選標、採購**三個 microservice,**各自另開 DB 解耦**。
+- 新增**會員 service**,讓選標與採購都用它做認證與操作。
+- 專案最後**因政治因素走向關閉與資遣**。
 
 ## 寫每篇時的慣例
 - **每章動筆前,先與作者討論當年的實際做法**,把口述記錄到上面「當年實際做法」段落,再開寫——當年聲部必須是真的,不能腦補。
