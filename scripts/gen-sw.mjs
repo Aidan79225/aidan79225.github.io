@@ -39,7 +39,7 @@ const files = (await walk(DIST))
 
 // Bump when the worker template below changes behaviour, so clients rotate
 // to a fresh cache even if site content is identical.
-const SW_REVISION = 'v3';
+const SW_REVISION = 'v4';
 
 // Version = hash of every precached file's content, so identical rebuilds
 // produce an identical worker (no pointless client re-downloads).
@@ -72,17 +72,32 @@ self.addEventListener('install', (e) => {
     // VERSION are skipped, so retries resume instead of starting over.
     const c = await caches.open(CACHE);
     const CONCURRENCY = 8;
-    async function fill() {
+    const TOTAL = PRECACHE.length;
+    let done = 0;
+    // Progress for the page's unobtrusive indicator (see BaseLayout). The
+    // installing worker doesn't control any page yet → includeUncontrolled.
+    async function report(final) {
+      try {
+        const cs = await self.clients.matchAll({ includeUncontrolled: true });
+        for (const cl of cs) cl.postMessage({ type: 'sw-precache', done: final ? TOTAL : done, total: TOTAL });
+      } catch {}
+    }
+    async function fill(track) {
       const failed = [];
       let i = 0;
       async function worker() {
         while (i < PRECACHE.length) {
           const url = PRECACHE[i++];
-          if (await c.match(url)) continue;
+          if (await c.match(url)) {
+            if (track && ++done % 16 === 0) report();
+            continue;
+          }
           try {
             const res = await fetch(new Request(url, { cache: 'reload' }));
-            if (res.ok || url === '/404.html') await c.put(url, res);
-            else failed.push(url);
+            if (res.ok || url === '/404.html') {
+              await c.put(url, res);
+              if (track && ++done % 16 === 0) report();
+            } else failed.push(url);
           } catch {
             failed.push(url);
           }
@@ -91,9 +106,10 @@ self.addEventListener('install', (e) => {
       await Promise.all(Array.from({ length: CONCURRENCY }, worker));
       return failed;
     }
-    let failed = await fill();
-    if (failed.length) failed = await fill(); // one retry round for transient blips
+    let failed = await fill(true);
+    if (failed.length) failed = await fill(false); // retry round: small, no progress churn
     if (failed.length) throw new Error('precache incomplete: ' + failed.length + ' failed');
+    await report(true); // 100% → page shows "done" state, then fades it out
     await self.skipWaiting();
   })());
 });

@@ -42,6 +42,41 @@ const fullTitle = title === SITE_NAME ? SITE_NAME : `${title} · ${SITE_NAME}`;
           addEventListener('load', () => {
             navigator.serviceWorker.register('/sw.js').catch(() => {});
           });
+          // 離線快取進度:安裝中的 SW 會 postMessage {type:'sw-precache', done, total}。
+          // 右下角一顆小藥丸,pointer-events:none 不擋任何操作;快取很快跑完
+          // (600ms 內)就完全不出現,完成後顯示「已可離線閱讀」再淡出。
+          var swBox = null, swFill = null, swLabel = null, swHide = null, swFirst = 0;
+          navigator.serviceWorker.addEventListener('message', (ev) => {
+            var d = ev.data;
+            if (!d || d.type !== 'sw-precache' || !d.total) return;
+            if (!swFirst) swFirst = Date.now();
+            if (!swBox) {
+              swBox = document.createElement('div');
+              swBox.setAttribute('role', 'status');
+              swBox.style.cssText = 'position:fixed;right:12px;bottom:calc(12px + env(safe-area-inset-bottom,0px));z-index:9999;display:flex;align-items:center;gap:8px;padding:6px 12px;border-radius:999px;background:#262b3a;border:1px solid #3a4154;color:#9aa4b2;font-size:12px;line-height:1;pointer-events:none;opacity:0;transition:opacity .3s;';
+              var track = document.createElement('span');
+              track.style.cssText = 'width:72px;height:3px;border-radius:2px;background:#3a4154;overflow:hidden;display:inline-block;';
+              swFill = document.createElement('span');
+              swFill.style.cssText = 'display:block;height:100%;width:0%;background:#4f6df5;transition:width .2s;';
+              track.appendChild(swFill);
+              swLabel = document.createElement('span');
+              swBox.appendChild(track);
+              swBox.appendChild(swLabel);
+              document.body.appendChild(swBox);
+            }
+            var pct = Math.min(100, Math.round((d.done / d.total) * 100));
+            swFill.style.width = pct + '%';
+            if (d.done >= d.total) {
+              if (swBox.style.opacity === '1') {
+                swLabel.textContent = '已可離線閱讀';
+                clearTimeout(swHide);
+                swHide = setTimeout(() => { swBox.style.opacity = '0'; }, 2000);
+              }
+              return;
+            }
+            swLabel.textContent = '離線快取中 ' + pct + '%';
+            if (Date.now() - swFirst > 600) swBox.style.opacity = '1';
+          });
         }
       </script>
     )}
