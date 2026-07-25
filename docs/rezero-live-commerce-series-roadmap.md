@@ -104,7 +104,7 @@
 
 **團隊與技術棧(#2/#19 相關)**:
 - 團隊:**3 後端 + 3 前端**,偶爾發包給外包 1–2 位工程師。
-- 技術棧:**PostgreSQL、Django(API + WebSocket)、RabbitMQ、Redis、Celery worker**;**全套 GCP**;有 staging 環境。
+- 技術棧:**PostgreSQL、Django(API + WebSocket)、RabbitMQ、Redis、Celery worker**;**全套 GCP**;有 staging 環境。API 層用 **Django Ninja**(體驗非常像 FastAPI:型別、自動文件,現代化)。
 - **WebSocket 的用途:把客人留言即時推給前端的主播 dashboard**(主播要看現場聊天)——即時通道是給主播用的,不是給客人用的。
 - **RabbitMQ 主要當 Celery 的 broker**;Celery 跑所有適合 async 的 job:抓留言、FSM batch、開發票、寄 email、匯出訂單等。
 - **Redis 主要放 banned user**;**沒有 session,直接 JWT 內嵌權限**(→ #10 權限章;JWT 無法撤銷,Redis 黑名單就是撤銷機制——#10 與 #13 的連接點)。
