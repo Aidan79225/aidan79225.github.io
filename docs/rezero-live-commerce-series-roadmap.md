@@ -107,6 +107,11 @@
 - 單一行程從沒掛過——但作者**每場直播人肉跟播待命**,很怕它掛。
 - 尖峰時 batch 跟不上,留言到下單成功的延遲可達**幾分鐘**。
 
+**身分與購物車資料模型(#4/#6 相關)**:
+- 下單創 **cart item**;訊息下單則創 **fb user + fb message → cart item**,cart item 帶 bidding key id 與 fb user id——**每個欄位都是 id**:cart item 本質是「事實之間的關聯」(哪個人、哪則留言、哪場開賣),天然自帶溯源。
+- **綁定:使用者登入 app 後嘗試綁 ASID(app-scoped id)↔ PSID(page-scoped id)**。當時大部分綁得上;**剩下 ~1% 靠客服人工綁,仍然很累**。FB API 限制:ASID/PSID 的配對不主動給,拿不到就沒輒。
+- (現代做法備忘,#4 素材:Business Mapping API `ids_for_pages`/`ids_for_apps` 需 BM+商業驗證;更根本的是**把配對變成使用者的動作**——private reply / m.me ref 帶一次性 token,讓客人自己把兩個身分接起來。)
+
 **團隊與技術棧(#2/#19 相關)**:
 - 團隊:**3 後端 + 3 前端**,偶爾發包給外包 1–2 位工程師。
 - 技術棧:**PostgreSQL、Django(API + WebSocket)、RabbitMQ、Redis、Celery worker**;**全套 GCP**;有 staging 環境。API 層用 **Django Ninja**(體驗非常像 FastAPI:型別、自動文件,現代化)。
