@@ -108,9 +108,14 @@
 - 尖峰時 batch 跟不上,留言到下單成功的延遲可達**幾分鐘**。
 
 **身分與購物車資料模型(#4/#6 相關)**:
-- 下單創 **cart item**;訊息下單則創 **fb user + fb message → cart item**,cart item 帶 bidding key id 與 fb user id——**每個欄位都是 id**:cart item 本質是「事實之間的關聯」(哪個人、哪則留言、哪場開賣),天然自帶溯源。
-- **綁定:使用者登入 app 後嘗試綁 ASID(app-scoped id)↔ PSID(page-scoped id)**。當時大部分綁得上;**剩下 ~1% 靠客服人工綁,仍然很累**。FB API 限制:ASID/PSID 的配對不主動給,拿不到就沒輒。
-- (現代做法備忘,#4 素材:Business Mapping API `ids_for_pages`/`ids_for_apps` 需 BM+商業驗證;更根本的是**把配對變成使用者的動作**——private reply / m.me ref 帶一次性 token,讓客人自己把兩個身分接起來。)
+- **cart item 是一張表,用 content type + object id(泛型外鍵)決定來源**——直播訊息單、平台加入的單,同一張表、多型溯源。「兩種購物車」的資料模型答案:一張表,來源多型。
+- 訊息下單另有 join 表 **fbmsgtocartitem:(fb_user_id, fb_msg_id, cart_item_id, bidding_key_id)**——每個欄位都是 id,單→留言→場次的溯源鏈完整。
+- **fb_user_id 是刻意的 3NF 違反**:fb msg 量太大、查太慢,把使用者 id 反正規化進 join 表讓熱查詢(此人此 key 的單)不用穿過巨大的 msg 表。註:拷貝的是**不可變欄位**(訊息作者不會變),漂移風險趨近零——安全的反正規化。
+- **綁定:使用者登入 app 後嘗試綁 ASID(app-scoped id)↔ PSID(page-scoped id)**。大部分綁得上;剩下 ~1% 靠客服人工,很累。FB API 限制:ASID/PSID 配對不主動給。
+- **private reply 帶 token 當年就有做,而且兼作得標通知**——通知本身就是綁定機會。
+- **沒綁定的客人 → 通知客服人工綁 fb user → account**;綁上之後客人繼續喊單照常運作。
+- **真實案例:客人用自己帳號喊單、用電腦結帳時一直登入家人的帳號**——最後客服做**多重綁定**解決。結論:identity ≠ person、account 對 identities 是 1:N,現實中帳號邊界跨越家庭(風控章要接這條)。
+- IG 應有類似身分問題,當年由其他同仁負責、未細追;自建無此問題。
 
 **團隊與技術棧(#2/#19 相關)**:
 - 團隊:**3 後端 + 3 前端**,偶爾發包給外包 1–2 位工程師。
