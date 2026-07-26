@@ -85,7 +85,21 @@ UPDATE inventory
 -- 查與扣之間沒有間隙,也就沒有 Serializable、沒有重試風暴
 ```
 
-檢查和扣減在同一個原子動作裡,不變量由 `WHERE` 子句守著:搶不到就是乾淨的 0 列,不用隔離級別撐腰、不用重試、也就沒有重試耗盡的偏差。單列的原子條件更新,是關聯式資料庫最被低估的併發原語。
+當年主力是 ORM,而 Django 寫得出一模一樣的東西——`filter()` 就是 `WHERE`,`F()` 讓運算下推到資料庫、不把值撈回 Python:
+
+```python
+from django.db.models import F
+
+updated = Inventory.objects.filter(
+    product_id=pid,
+    stock_cap__gte=F("cart_qty") + F("order_qty") + n,  # 不變量寫在 WHERE 裡
+).update(cart_qty=F("cart_qty") + n)                    # 一句 UPDATE,原子完成
+
+if updated == 0:
+    ...  # 沒搶到:乾淨地回「完售」,沒有例外、沒有重試
+```
+
+檢查和扣減在同一個原子動作裡,不變量由 `WHERE` 子句守著:搶不到就是乾淨的 0 列,不用隔離級別撐腰、不用重試、也就沒有重試耗盡的偏差。單列的原子條件更新,是關聯式資料庫最被低估的併發原語——而且它跟 ORM 毫無衝突,差別只在你有沒有意識到 `filter().update()` 是一句話,而「先 `get()` 再改欄位再 `save()`」是兩句話,中間的空隙就是當年 Serializable 在補的洞。
 
 ## 那次真的超賣:兇手不是併發,是一次 migration
 
