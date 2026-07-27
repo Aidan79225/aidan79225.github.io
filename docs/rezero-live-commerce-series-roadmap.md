@@ -167,6 +167,13 @@
 - **CI/CD:GitLab flow 分支策略;push staging 自動上 staging;上 prod 走 Cloud Build 人工核准;CI 用 GitHub Actions 跑測試與驗證。每天團隊可上線十幾個 feature。**
 - **重來也不換 Django**:Django admin 幾乎無可取代;**Django + Celery + heartbeat ≈ 有類似 Airflow 的能力但不用管維運**。
 
+**後台與 dashboard(#9 相關)**:
+- **Django admin 只有工程師用**——理由:直接改 DB 太危險,admin 是安全操作台;設定 Celery task、處理花式需求方便。**營運/客服/主播端的介面全是自建**(#2 已修正)。
+- **主播 dashboard(看,不操作)**:留言流+**黑名單標籤**、販賣商品數量與下單的人、直播觀看人數等各種數據——**主播沒時間操作平台,但要看數據抓直播節奏**。
+- **直播助理 dashboard(操作台)**:商品資訊填入、**起標/結標/重新起標**——平台操作都交給助理。
+- **商品資訊支援「事前填入」也支援「臨時開」**(直播現實:有些情況不好事前填)。
+- **設計哲學(作者自陳):平台根據使用者不同,有各種不同的介面處理專項事務**——後台不是一個,是一組角色介面(主播看/助理操作/客服處理/工程師 admin)。
+
 **維運與上線(#15 相關)**:
 - 當年**沒有 SRE 這個角色**,backend lead 扛下全部 infrastructure 工作,上線後提心吊膽。
 - 一開始只開**一台 process、單一 CPU 的 API server,被打爆**;緊急加 **traefik、開 4 個 process** 扛住。
