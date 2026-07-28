@@ -49,7 +49,7 @@
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
 | 9 | `rezero-console` | 主播與營運後台:沒有一個叫「後台」的東西 | 五角色五介面全景(主播看/助理操作/營運檔期級頁面/客服善後/工程師 admin);看與操作分離(演員與舞台監督)、主播 dashboard 黑名單標籤=風控情報卡、事前填+臨時開;admin=不確定需求試驗場、成熟度光譜「介面投資額度=需求確定度」;重來補 audit log 全面化+調整帳——接 `[[rezero-inventory]]`、`[[rezero-fulfillment]]`、`[[obs-grafana]]` | ✅ 已發布 |
-| 10 | `rezero-permission` | 權限:誰能按哪顆按鈕 | 角色盤點(主播/營運/客服/工程師/**外包工程師**)、RBAC 模型(role→permission→resource,別把 if user.is_admin 撒滿 code)、後台 UI 權限 vs API 權限要同一套(前端藏按鈕不是安全)、**外包的權限邊界**(code repo、正式資料、部署權——小團隊+外包的真實課題)、敏感操作留 audit log——接 `[[k8s-rbac]]`(對照 K8s 的 RBAC 心智模型) | ⬜ |
+| 10 | `rezero-permission` | 權限:誰能按哪顆按鈕——我們改了三次 | 誠實失敗章:三幕劇(Django permission 太細沒語意→塞 JWT 固化錯粒度→role-based 暴增)→落點 cost monitor 可疊加 role=role 組合;乘法變加法第三次(對照 `[[k8s-rbac]]` 只加不減);外包邊界(GitHub 管 repo、GCP 不給、資料碰不到);重來:單一 enforcement point、雙軌 role、JWT 只放 role 名單、敏感存取 audit;反思:摩擦債無催收、粒度標準是語意、先圍資產再優化模型 | ✅ 已發布 |
 | 11 | `rezero-promotion` | 優惠券與結帳金額:折扣算錯比超賣還難查 | 券的模型(折抵/滿額/免運、適用範圍、有效期)、疊加規則要是**可枚舉的規則引擎不是 if 海**;結帳金額計算的正確性(分攤到每個品項——退款時才知道痛)、金額用整數分存;發券尖峰與囤券——接 `[[rezero-payment]]`(退款分攤) | ⬜ |
 | 12 | `rezero-notification` | 通知系統:對的訊息,在對的時間,打到對的渠道 | 下單成功/付款提醒/出貨通知的觸發點(事件驅動,訂閱訂單狀態機);渠道選擇跟 identity 章直接掛鉤(FB 來的用 Messenger、IG 有 API 限制、自建用 push/簡訊);逾期未付提醒=釋放庫存前的最後通牒;冪等與頻率上限(不能轟炸)——接 `[[rezero-identity]]`、`[[rezero-cart-order]]` | ⬜ |
 | 13 | `rezero-risk` | 風控與黑名單:惡意下單是對庫存的 DoS | **惡意下單不付款=免費佔庫存攻擊**(佔了不付、逾期釋放、再佔);訊號(棄單率、多 identity 同人)、分級處置(縮短保留時間→要求先付→黑名單);黑名單掛在 account 還是 identity?(跨平台換臉重來——又回到 #4 的身分難題);**當年的黑名單實作**:留言進來先查 Redis、命中就不理,Redis 重啟從黑名單 DB 重建(快速判斷放 Redis、事實放 DB——正是 cache 的正確用法);誤殺的代價與申訴——接 `[[rezero-identity]]`、`[[rezero-inventory]]`、`[[redis-cache-patterns]]` | ⬜ |
