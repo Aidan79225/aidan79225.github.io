@@ -103,34 +103,103 @@ draft: false
 3. **JWT 裡只放 role 名單。** 幾個字串,token 不肥;role 到權限的展開放在 server 側,改權限的生效速度就不被 token 綁架——重登只在 role 本身變動時需要。
 4. **敏感資料的存取留 audit。** 誰在什麼時候看了成本——這不是不信任,是讓「圍住最貴的東西」有證據可查。
 
-拿最常見的場景把第 1 則落地——get product API,成本欄位只給 cost monitor(Django Ninja):
+拿最常見的場景把上面四則一次落地——get product API,成本只給 cost monitor。先講回應的形狀:直覺寫法是繼承(`ProductWithCostOut(ProductOut)`),但維度一多,schema 數量就是 2^N——**把能力乘進型別名字,跟把維度乘進 role 名字是同一個錯**。加法版是 **base + 可疊加的 section**,跟能力 role 同構。
+
+先看 use case(class-based、依賴用 injector 注入——這也是當年整個 codebase 的真實方言):
 
 ```python
+from dataclasses import dataclass
+from enum import StrEnum
+from typing import Protocol
+
+from injector import inject
+
+
+class Role(StrEnum):
+    OPERATOR = "operator"
+    COST_MONITOR = "cost_monitor"          # 能力 role,可疊加
+
+
+class Capability(StrEnum):
+    SEE_COST = "see_cost"                  # use case 的輸出資格,view 只認識這個
+
+
+class ProductRepository(Protocol):         # port:use case 只依賴介面
+    def get(self, product_id: int) -> Product: ...
+
+
+@dataclass(frozen=True)
+class GetProductResult:
+    product: Product
+    capabilities: frozenset[Capability]
+
+
+class GetProductUseCase:
+    @inject
+    def __init__(
+        self,
+        products: ProductRepository,
+        auth: AuthorizationService,
+        audit: AuditLog,
+    ) -> None:
+        self._products = products
+        self._auth = auth
+        self._audit = audit
+
+    def execute(self, principal: Principal, product_id: int) -> GetProductResult:
+        self._auth.require(principal, use_case=type(self))     # enforcement point:進門先驗
+
+        product = self._products.get(product_id)
+
+        caps: set[Capability] = set()
+        if self._auth.has_role(principal, Role.COST_MONITOR):  # role → 資格的翻譯只發生在這裡
+            caps.add(Capability.SEE_COST)
+            self._audit.viewed_cost(principal, product_id)     # 敏感存取留痕(第 4 則)
+
+        return GetProductResult(product=product, capabilities=frozenset(caps))
+```
+
+再看 view——它是 presenter,只挑出口:
+
+```python
+from django.http import HttpRequest
 from ninja import Router, Schema
 
-router = Router()
+
+class CostSection(Schema):
+    cost: int
+    margin: float
+
 
 class ProductOut(Schema):
     id: int
     name: str
-    price: int                      # 售價:人人可看
+    price: int
+    cost_info: CostSection | None = None   # 能力 section:一個能力一塊
 
-class ProductWithCostOut(ProductOut):
-    cost: int                       # 成本:只有 cost monitor 看得到
 
-@router.get("/products/{product_id}",
-            response=ProductWithCostOut | ProductOut)   # 較寬的 schema 放前面
-def get_product(request, product_id: int):
-    # use case:歸屬與資格在這裡判(單一 enforcement point)
-    product, caps = get_product_use_case(request.auth, product_id)
+router = Router()
 
-    # presenter:依 use case 給的資格選 schema——執行只是挑一個出口
-    if "cost_monitor" in caps:
-        return ProductWithCostOut.from_orm(product)
-    return ProductOut.from_orm(product)
+
+@router.get("/products/{product_id}", response=ProductOut, exclude_none=True)
+def get_product(request: HttpRequest, product_id: int) -> ProductOut:
+    use_case = request.injector.get(GetProductUseCase)   # django-injector 綁定
+    result = use_case.execute(request.auth, product_id)
+
+    out = ProductOut.from_orm(result.product)
+    if Capability.SEE_COST in result.capabilities:       # 不做權限推理,只挑出口
+        out.cost_info = CostSection.from_orm(result.product)
+    return out
 ```
 
-兩個細節是刻意的:**用兩個 schema,而不是同一個 schema 塞 `null`**——`"cost": null` 也是洩漏,它告訴對方「有這個欄位存在」;沒資格的人拿到的 JSON 裡,成本這個 key **根本不存在**。以及**判斷在 use case、view 只挑出口**——view 層拿到的 `caps` 是 use case 給的結論,它自己不做任何權限推理,換權限模型時這段程式碼一行都不用動。
+幾個細節是刻意的:
+
+- **section 是加法。** 再多一個敏感維度(個資、毛利)就是再多一個 `xxx_info: Section | None`——schema 總數相加,不相乘。能力 role 疊加、回應 section 疊加,同一條數學管到 API 的形狀。
+- **`exclude_none=True` 讓沒授權的 section 連 key 都不出現。** `"cost_info": null` 也是洩漏——它告訴對方「有這個欄位存在」。
+- **view 不認識任何 role。** 它拿到的是 use case 翻譯過的資格(`SEE_COST`);role 改名、拆併、換模型,view 一行不動。`StrEnum` 讓這些識別字有型別、有補全,打錯字在測試就爆,不會活到線上變成一個永遠 false 的字串比對。
+- **repo 走 injector 注入。** use case 依賴的是 `ProductRepository` 介面——權限判斷的單元測試換個假 repo 就能跑,不用碰資料庫;一個 use case class 只有一個公開的 `execute`,多了就會滑向 service 大雜燴。
+
+最後,還有一個更徹底的版本:如果敏感資料其實屬於**另一個領域**,正解是獨立成子資源——`GET /products/{id}/cost`,權限掛在資源上,schema 完全不用玩花樣,audit 天然分離、公開資料放心快取。成本恰好就是這種資料:它是**採購域**的,不是商品域的——專案終局拆出採購服務,正好印證這條邊界。section 是「必須內嵌」時的加法解,子資源是「域邊界清楚」時的徹底解。
 
 ## 反思
 
