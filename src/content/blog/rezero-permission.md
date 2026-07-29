@@ -103,6 +103,35 @@ draft: false
 3. **JWT 裡只放 role 名單。** 幾個字串,token 不肥;role 到權限的展開放在 server 側,改權限的生效速度就不被 token 綁架——重登只在 role 本身變動時需要。
 4. **敏感資料的存取留 audit。** 誰在什麼時候看了成本——這不是不信任,是讓「圍住最貴的東西」有證據可查。
 
+拿最常見的場景把第 1 則落地——get product API,成本欄位只給 cost monitor(Django Ninja):
+
+```python
+from ninja import Router, Schema
+
+router = Router()
+
+class ProductOut(Schema):
+    id: int
+    name: str
+    price: int                      # 售價:人人可看
+
+class ProductWithCostOut(ProductOut):
+    cost: int                       # 成本:只有 cost monitor 看得到
+
+@router.get("/products/{product_id}",
+            response=ProductWithCostOut | ProductOut)   # 較寬的 schema 放前面
+def get_product(request, product_id: int):
+    # use case:歸屬與資格在這裡判(單一 enforcement point)
+    product, caps = get_product_use_case(request.auth, product_id)
+
+    # presenter:依 use case 給的資格選 schema——執行只是挑一個出口
+    if "cost_monitor" in caps:
+        return ProductWithCostOut.from_orm(product)
+    return ProductOut.from_orm(product)
+```
+
+兩個細節是刻意的:**用兩個 schema,而不是同一個 schema 塞 `null`**——`"cost": null` 也是洩漏,它告訴對方「有這個欄位存在」;沒資格的人拿到的 JSON 裡,成本這個 key **根本不存在**。以及**判斷在 use case、view 只挑出口**——view 層拿到的 `caps` 是 use case 給的結論,它自己不做任何權限推理,換權限模型時這段程式碼一行都不用動。
+
 ## 反思
 
 ### 摩擦型的債,沒有催收機制
