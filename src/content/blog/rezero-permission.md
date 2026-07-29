@@ -98,7 +98,7 @@ draft: false
 
 權限是那種很難「第一天就做對」的東西——day 1 就上完整的 RBAC+ABAC 是過度設計,day N 才補又是三次改版。重來我不追求一步到位,追求**讓改版便宜**:
 
-1. **單一 enforcement point。** 權限判斷收斂成一個函式/一層中介——`can(user, action, resource)`——所有介面和 API 都問它。這樣 permission 換 role、role 換組合,都只改一個地方,不用全 codebase 搜替。當年三次改版之所以貴,一半的成本花在「權限判斷散落各處」。
+1. **權限判斷的家,在 use case 的入口。** 用 Clean Architecture 的語言說:授權是**應用層的業務規則**——「助理可以起標」描述的不是資料表(所以不在 entity/ORM)、也不是 HTTP(所以不在 controller),是**這個任務本身允許誰做**;而任務的程式化身就是 use case。所以 enforcement point 收斂在 use case 的邊界:每個 use case 宣告誰能呼叫它,進門先問 `can(user, this_use_case, resource)`。這個選擇跟本章的結論互相鎖定——權限的正確粒度=任務=use case,**role 就是一組 use case 的集合**,權限模型和程式結構從此說同一種語言。外圈可以留一道 middleware 粗篩(登入了嗎、有沒有基本 role)當縱深防禦,但那只是快速失敗的禮貌;前端藏按鈕更只是體驗——**作準的永遠是 use case 入口**,因為只有它擋得住「換個入口重打同一個操作」。兩個特例:資源歸屬(只能動自己的購物車)要載入 entity 才判得了,就在 use case 內部、拿到資料後判;欄位可見性(成本)的**決策在 use case、執行在 presenter**——沒授權的欄位在資料出門前剝掉。當年三次改版之所以貴,一半的成本花在權限判斷散落各處——收斂到 use case 邊界後,permission 換 role、role 換組合,都只動一層。
 2. **第一天就用「職能+能力」的雙軌 role。** 職能 role 對齊[[rezero-console|五組介面]](上一章說過:介面切法=權限模型,兩者描述的都是「誰在做什麼」);敏感能力(成本、個資)從第一天就是獨立可疊加的 role——不是預測未來,是承認「正交維度一定會出現」這個規律。
 3. **JWT 裡只放 role 名單。** 幾個字串,token 不肥;role 到權限的展開放在 server 側,改權限的生效速度就不被 token 綁架——重登只在 role 本身變動時需要。
 4. **敏感資料的存取留 audit。** 誰在什麼時候看了成本——這不是不信任,是讓「圍住最貴的東西」有證據可查。
