@@ -105,18 +105,16 @@ draft: false
 
 拿最常見的場景把上面四則一次落地——get product API,成本只給 cost monitor。先講回應的形狀:直覺寫法是繼承(`ProductWithCostOut(ProductOut)`),但維度一多,schema 數量就是 2^N——**把能力乘進型別名字,跟把維度乘進 role 名字是同一個錯**。加法版是 **base + 可疊加的 section**,跟能力 role 同構。
 
-先看 use case(class-based、依賴用 injector 注入——這也是當年整個 codebase 的真實方言):
+先把權限模型本身寫完——它小到只有幾個型別、一張表、一個函式:
 
 ```python
 from dataclasses import dataclass
 from enum import StrEnum
-from typing import Protocol
-
-from injector import inject
 
 
 class Role(StrEnum):
-    OPERATOR = "operator"
+    OPERATOR = "operator"                  # 職能 role
+    ASSISTANT = "assistant"
     COST_MONITOR = "cost_monitor"          # 能力 role,可疊加
 
 
@@ -124,8 +122,49 @@ class Capability(StrEnum):
     SEE_COST = "see_cost"                  # use case 的輸出資格,view 只認識這個
 
 
+@dataclass(frozen=True)
+class Principal:
+    account_id: int
+    roles: frozenset[Role]                 # JWT 解出來的全部內容,就這麼小
+
+    def has_role(self, role: Role) -> bool:
+        return role in self.roles
+
+
+class PermissionDenied(Exception):
+    pass
+
+
+# 「role 是一組 use case 的集合」——這句話直接長成資料結構。
+# 全系統的授權真相只有這張表(活在 composition root,匯入所有 use case)。
+ROLE_USE_CASES: dict[Role, frozenset[type]] = {
+    Role.OPERATOR:     frozenset({GetProductUseCase, EndPeriodUseCase}),
+    Role.ASSISTANT:    frozenset({GetProductUseCase, StartBiddingUseCase}),
+    Role.COST_MONITOR: frozenset(),        # 能力 role 不開任何門,只給資格
+}
+
+
+def require(principal: Principal, use_case: type) -> None:
+    if not any(use_case in ROLE_USE_CASES[r] for r in principal.roles):
+        raise PermissionDenied(f"{principal.account_id} cannot {use_case.__name__}")
+```
+
+注意這裡**沒有 AuthorizationService**——權限檢查不需要一個 service:role 清單躺在 `Principal` 上(entity 自己的資料)、role 對 use case 的映射是一張常數表、`require` 是一個純函式。想把它包成 service 的衝動,多半來自權限判斷散落各處的年代;收斂到 use case 邊界之後,它小得不值得一個 class。
+
+use case 本體只依賴兩個 port,用 injector 注入(這也是當年整個 codebase 的真實方言):
+
+```python
+from typing import Protocol
+
+from injector import inject
+
+
 class ProductRepository(Protocol):         # port:use case 只依賴介面
     def get(self, product_id: int) -> Product: ...
+
+
+class AuditLog(Protocol):
+    def viewed_cost(self, principal: Principal, product_id: int) -> None: ...
 
 
 @dataclass(frozen=True)
@@ -136,25 +175,19 @@ class GetProductResult:
 
 class GetProductUseCase:
     @inject
-    def __init__(
-        self,
-        products: ProductRepository,
-        auth: AuthorizationService,
-        audit: AuditLog,
-    ) -> None:
+    def __init__(self, products: ProductRepository, audit: AuditLog) -> None:
         self._products = products
-        self._auth = auth
         self._audit = audit
 
     def execute(self, principal: Principal, product_id: int) -> GetProductResult:
-        self._auth.require(principal, use_case=type(self))     # enforcement point:進門先驗
+        require(principal, type(self))                      # enforcement point:進門先驗
 
         product = self._products.get(product_id)
 
         caps: set[Capability] = set()
-        if self._auth.has_role(principal, Role.COST_MONITOR):  # role → 資格的翻譯只發生在這裡
+        if principal.has_role(Role.COST_MONITOR):           # role → 資格的翻譯只發生在這裡
             caps.add(Capability.SEE_COST)
-            self._audit.viewed_cost(principal, product_id)     # 敏感存取留痕(第 4 則)
+            self._audit.viewed_cost(principal, product_id)  # 敏感存取留痕(第 4 則)
 
         return GetProductResult(product=product, capabilities=frozenset(caps))
 ```
@@ -194,6 +227,7 @@ def get_product(request: HttpRequest, product_id: int) -> ProductOut:
 
 幾個細節是刻意的:
 
+- **授權的真相是一張表。** `ROLE_USE_CASES` 就是全系統權限的單一事實:review 權限=review 一張表,新人問「營運能做什麼」=看一行,產權限文件=迭代一個 dict。三次改版的年代,回答這些問題要 grep 整個 codebase。
 - **section 是加法。** 再多一個敏感維度(個資、毛利)就是再多一個 `xxx_info: Section | None`——schema 總數相加,不相乘。能力 role 疊加、回應 section 疊加,同一條數學管到 API 的形狀。
 - **`exclude_none=True` 讓沒授權的 section 連 key 都不出現。** `"cost_info": null` 也是洩漏——它告訴對方「有這個欄位存在」。
 - **view 不認識任何 role。** 它拿到的是 use case 翻譯過的資格(`SEE_COST`);role 改名、拆併、換模型,view 一行不動。`StrEnum` 讓這些識別字有型別、有補全,打錯字在測試就爆,不會活到線上變成一個永遠 false 的字串比對。
