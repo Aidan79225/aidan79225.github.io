@@ -132,7 +132,21 @@ import '../styles/tools.css';
     // ── 狀態與儲存 ──────────────────────────────────────────────
     const LS_ENDPOINT = 'travel-split:endpoint';
     const LS_LAST = 'travel-split:last-code';
+    const LS_LASTCUR = 'travel-split:last-currency';
+    const LS_LASTRATE = 'travel-split:last-rate';
     const tripKey = (code) => `travel-split:trip:${code || '_default'}`;
+
+    // 記住上一次填的幣別與匯率,新增下一筆時自動帶入。
+    let lastCurrency = '';
+    let lastRate = '';
+    function rememberCurrency(cur, rate) {
+      lastCurrency = cur || '';
+      lastRate = rate == null ? '' : String(rate);
+      try {
+        localStorage.setItem(LS_LASTCUR, lastCurrency);
+        localStorage.setItem(LS_LASTRATE, lastRate);
+      } catch (_) {}
+    }
 
     const uid = () =>
       (crypto.randomUUID?.() ||
@@ -461,6 +475,7 @@ import '../styles/tools.css';
       } else {
         trip.expenses.push({ id: uid(), ...base });
       }
+      rememberCurrency(currency, rate); // 供下一筆預帶
       saveTrip();
       resetForm();
       renderExpenses();
@@ -473,8 +488,10 @@ import '../styles/tools.css';
       $('expAmount').value = '';
       $('expCategory').value = '';
       $('expMode').value = 'even';
-      $('expCurrency').value = baseCur();
-      $('expRate').value = '1';
+      // 幣別預帶上一次填的內容(沒有紀錄時用主要幣別)
+      const cur = lastCurrency || baseCur();
+      $('expCurrency').value = cur;
+      $('expRate').value = cur === baseCur() ? '1' : lastRate || '1';
       renderSplitList();
       syncRateField();
       syncModeUI();
@@ -679,6 +696,8 @@ function doPost(e) {
       const lastCode = localStorage.getItem(LS_LAST) || '';
       trip = loadTrip(lastCode);
       trip.code = trip.code || lastCode;
+      lastCurrency = localStorage.getItem(LS_LASTCUR) || '';
+      lastRate = localStorage.getItem(LS_LASTRATE) || '';
       $('endpoint').value = localStorage.getItem(LS_ENDPOINT) || '';
       render();
       resetForm();
