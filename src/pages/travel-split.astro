@@ -10,6 +10,7 @@ import '../styles/tools.css';
     <h2>🧳 旅遊分帳</h2>
     <p class="ts-intro">
       記錄一趟旅程裡「誰付了什麼、誰要分攤」,自動算出每個人的結餘與<strong>最少筆數</strong>的還款方案。
+      支援<strong>多幣別</strong>:每筆可填原幣金額＋自訂匯率,或直接填台幣;結餘與還款一律換算成<strong>主要幣別(台幣)</strong>。
       資料預設存在本機瀏覽器;設定一個 <strong>Google Apps Script 端點</strong>後,同一組<strong>行程代碼</strong>的成員就能共享同一份帳
       ——各自新增的支出會自動合併,不會互相蓋掉。
     </p>
@@ -18,7 +19,7 @@ import '../styles/tools.css';
     <div class="ts-card">
       <div class="ts-row">
         <label class="ts-field ts-grow"><span>行程名稱</span><input type="text" id="tripName" placeholder="例如:2026 沖繩" /></label>
-        <label class="ts-field"><span>幣別</span><input type="text" id="tripCurrency" class="ts-w6" placeholder="TWD" /></label>
+        <label class="ts-field"><span>主要幣別(結算用)</span><input type="text" id="tripCurrency" class="ts-w6" placeholder="TWD" /></label>
         <label class="ts-field"><span>行程代碼(共享用)</span><input type="text" id="tripCode" class="ts-w9" placeholder="okinawa26" /></label>
       </div>
     </div>
@@ -38,10 +39,20 @@ import '../styles/tools.css';
     <div class="ts-card">
       <div class="ts-row">
         <label class="ts-field ts-grow"><span>說明</span><input type="text" id="expDesc" placeholder="例如:午餐、租車" /></label>
-        <label class="ts-field"><span>金額</span><input type="number" id="expAmount" class="ts-w9" min="0" step="1" /></label>
-        <label class="ts-field"><span>付款人</span><select id="expPayer" class="ts-w9"></select></label>
+        <label class="ts-field"><span id="expAmountLabel">金額</span><input type="number" id="expAmount" class="ts-w9" min="0" step="0.01" /></label>
+        <label class="ts-field"><span>原幣別</span><input type="text" id="expCurrency" class="ts-w6" list="curList" placeholder="TWD" /></label>
+        <label class="ts-field"><span>匯率(1 原幣=? 台幣)</span><input type="number" id="expRate" class="ts-w9" min="0" step="0.0001" value="1" /></label>
       </div>
+      <datalist id="curList">
+        <option value="TWD"></option><option value="JPY"></option><option value="USD"></option>
+        <option value="EUR"></option><option value="KRW"></option><option value="THB"></option>
+        <option value="CNY"></option><option value="HKD"></option><option value="SGD"></option>
+        <option value="GBP"></option><option value="AUD"></option><option value="VND"></option>
+        <option value="MYR"></option><option value="PHP"></option><option value="IDR"></option>
+      </datalist>
+      <p class="ts-muted ts-conv" id="convHint" style="margin:.5rem 0 0"></p>
       <div class="ts-row" style="margin-top:.6rem">
+        <label class="ts-field"><span>付款人</span><select id="expPayer" class="ts-w9"></select></label>
         <label class="ts-field"><span>分攤方式</span>
           <select id="expMode" class="ts-w9">
             <option value="even">平均分攤</option>
@@ -52,7 +63,7 @@ import '../styles/tools.css';
         <label class="ts-field"><span>日期</span><input type="date" id="expDate" class="ts-w9" /></label>
         <label class="ts-field"><span>分類</span><input type="text" id="expCategory" class="ts-w9" placeholder="餐飲/交通…" /></label>
       </div>
-      <p class="ts-muted" style="margin:.7rem 0 .2rem">分攤對象</p>
+      <p class="ts-muted" style="margin:.7rem 0 .2rem" id="splitHint">分攤對象</p>
       <div class="ts-split-list" id="splitList"></div>
       <div class="ts-row" style="margin-top:.6rem">
         <button id="saveExpense">＋ 新增支出</button>
@@ -106,7 +117,8 @@ import '../styles/tools.css';
     </div>
 
     <p class="note ts-muted" style="margin-top:1.5rem">
-      ※ 金額以「分」為單位精算,平均分攤的零頭會依成員順序逐分分配,加總必定等於原金額。
+      ※ 多幣別:每筆存原幣金額與你自填的匯率,實際計算一律用換算後的<strong>主要幣別(台幣)</strong>基準額;
+      幣別填台幣時匯率自動鎖 1,等同直接輸台幣。金額以「分」為單位精算,平均分攤的零頭會依成員順序逐分分配,加總必定等於總額。
       共享採「最後修改者勝出」的合併策略:兩人同時各記各的沒問題,但若兩人幾乎同時修改<em>同一筆</em>支出,較晚同步者會覆蓋較早者。
     </p>
   </div>
@@ -114,6 +126,7 @@ import '../styles/tools.css';
   <script>
     import {
       shareOf, computeBalances, settle, totalSpent, mergeTrips, round2,
+      toBase, deriveExactBase,
     } from '../lib/travel-split.mjs';
 
     // ── 狀態與儲存 ──────────────────────────────────────────────
@@ -163,13 +176,25 @@ import '../styles/tools.css';
       const m = trip.members.find((x) => x.id === id);
       return m ? m.name : '(已移除)';
     };
-    const fmt = (n) => {
+    const num2 = (n) => {
       const v = round2(n);
-      const s = Number.isInteger(v) ? String(v) : v.toFixed(2);
-      return `${s} ${trip.currency || ''}`.trim();
+      return Number.isInteger(v) ? String(v) : v.toFixed(2);
     };
+    const baseCur = () => (trip.currency || 'TWD').trim() || 'TWD';
+    const fmt = (n) => `${num2(n)} ${baseCur()}`.trim(); // 主要幣別(台幣)
+    const fmtCur = (n, cur) => `${num2(n)} ${cur || ''}`.trim(); // 指定幣別
 
     const $ = (id) => document.getElementById(id);
+    const expCur = () => ($('expCurrency').value.trim() || baseCur());
+    const expRate = () => {
+      const r = Number($('expRate').value);
+      return r > 0 ? r : 1;
+    };
+    const sumExactOrig = () =>
+      [...document.querySelectorAll('[data-share]:checked')].reduce((s, cb) => {
+        const el = document.querySelector(`[data-weight="${cb.dataset.share}"]`);
+        return s + (Number(el?.value) || 0);
+      }, 0);
 
     // ── 渲染 ────────────────────────────────────────────────────
     function render() {
@@ -219,10 +244,11 @@ import '../styles/tools.css';
         .map((m) => {
           const checked = preset ? preset.checked.has(m.id) : true;
           const val = preset && preset.values[m.id] != null ? preset.values[m.id] : mode === 'weight' ? 1 : '';
+          const ph = mode === 'weight' ? '權重' : `金額(${expCur()})`;
           const numField =
             mode === 'even'
               ? ''
-              : `<input type="number" min="0" step="${mode === 'weight' ? '1' : '0.01'}" data-weight="${m.id}" value="${val}" placeholder="${mode === 'weight' ? '權重' : '金額'}" ${checked ? '' : 'disabled'} />`;
+              : `<input type="number" min="0" step="${mode === 'weight' ? '1' : '0.01'}" data-weight="${m.id}" value="${val}" placeholder="${ph}" ${checked ? '' : 'disabled'} />`;
           return `<div class="ts-split-item">
             <label><input type="checkbox" data-share="${m.id}" ${checked ? 'checked' : ''} /> ${escapeHtml(m.name)}</label>
             ${numField}
@@ -231,16 +257,17 @@ import '../styles/tools.css';
         .join('');
     }
 
+    // 回傳分攤設定。exact 模式回傳的是「原幣」金額(exactOrig),換算成基準額由 saveExpense 處理。
     function collectSplit() {
       const mode = $('expMode').value;
       const shared = [...document.querySelectorAll('[data-share]:checked')].map((el) => el.dataset.share);
-      const out = { splitMode: mode, sharedBy: shared, weights: {}, exact: {} };
+      const out = { splitMode: mode, sharedBy: shared, weights: {}, exactOrig: {} };
       if (mode === 'weight' || mode === 'exact') {
         shared.forEach((id) => {
           const el = document.querySelector(`[data-weight="${id}"]`);
           const num = Number(el?.value) || 0;
           if (mode === 'weight') out.weights[id] = num;
-          else out.exact[id] = num;
+          else out.exactOrig[id] = num;
         });
       }
       return out;
@@ -257,10 +284,15 @@ import '../styles/tools.css';
         .map((e) => {
           const shares = shareOf(e);
           const who = Object.keys(shares).map(memberName).join('、');
+          const cur = e.currency || baseCur();
+          const foreign = cur !== baseCur() && e.rate && Number(e.rate) !== 1;
+          const amtCell = foreign
+            ? `${fmtCur(e.origAmount ?? e.amount, cur)}<br><span class="ts-muted">≈ ${fmt(e.amount)}</span>`
+            : fmt(e.amount);
           return `<tr>
             <td>${escapeHtml(e.date || '')}</td>
             <td>${escapeHtml(e.desc || '')}${e.category ? `<br><span class="ts-muted">${escapeHtml(e.category)}</span>` : ''}</td>
-            <td class="num">${fmt(e.amount)}</td>
+            <td class="num">${amtCell}</td>
             <td>${escapeHtml(memberName(e.payerId))}</td>
             <td><span class="ts-muted">${escapeHtml(who)}</span></td>
             <td class="num">
@@ -317,7 +349,10 @@ import '../styles/tools.css';
     }
 
     $('tripName').addEventListener('input', (e) => { trip.name = e.target.value; touchMeta(); saveTrip(); });
-    $('tripCurrency').addEventListener('input', (e) => { trip.currency = e.target.value; touchMeta(); saveTrip(); renderExpenses(); renderBalances(); });
+    $('tripCurrency').addEventListener('input', (e) => {
+      trip.currency = e.target.value; touchMeta(); saveTrip();
+      syncRateField(); renderSplitList(); syncModeUI(); renderExpenses(); renderBalances();
+    });
     $('tripCode').addEventListener('change', (e) => {
       const code = e.target.value.trim();
       saveTrip();               // 存回舊代碼
@@ -356,39 +391,67 @@ import '../styles/tools.css';
       renderBalances();
     });
 
-    $('expMode').addEventListener('change', () => renderSplitList());
-    // 勾選/取消時同步啟用對應的數字欄位
+    $('expMode').addEventListener('change', () => { renderSplitList(); syncModeUI(); });
+    $('expCurrency').addEventListener('input', () => { syncRateField(); renderSplitList(); syncModeUI(); });
+    $('expRate').addEventListener('input', updateConvHint);
+    $('expAmount').addEventListener('input', updateConvHint);
+    // 勾選/取消時同步啟用對應的數字欄位;exact 模式下改動金額時更新加總與換算
     $('splitList').addEventListener('change', (e) => {
       const cb = e.target.closest('[data-share]');
       if (!cb) return;
       const num = document.querySelector(`[data-weight="${cb.dataset.share}"]`);
       if (num) num.disabled = !cb.checked;
+      syncModeUI();
+    });
+    $('splitList').addEventListener('input', (e) => {
+      if (e.target.matches('[data-weight]')) syncModeUI();
     });
 
     $('saveExpense').addEventListener('click', saveExpense);
     $('cancelEdit').addEventListener('click', () => { editingId = null; resetForm(); });
 
     function saveExpense() {
-      const amount = Number($('expAmount').value);
       const desc = $('expDesc').value.trim();
       const payerId = $('expPayer').value;
+      const currency = expCur();
+      const rate = expRate();
       if (!aliveMembers().length) return setStatus('請先新增成員', 'err');
-      if (!(amount > 0)) return setStatus('請輸入正確的金額', 'err');
       if (!payerId) return setStatus('請選擇付款人', 'err');
       const split = collectSplit();
       if (!split.sharedBy.length) return setStatus('請至少勾選一位分攤對象', 'err');
+
+      // 換算成主要幣別(台幣)基準額。amount 一律是基準額,計算全用它。
+      let origAmount;
+      let amount;
+      let exact = {};
+      let exactOrig = {};
       if (split.splitMode === 'exact') {
-        const s = round2(split.sharedBy.reduce((a, id) => a + (split.exact[id] || 0), 0));
-        if (s !== round2(amount)) return setStatus(`指定金額加總 ${s} 與總額 ${amount} 不符`, 'err');
+        exactOrig = split.exactOrig;
+        const derived = deriveExactBase(exactOrig, rate); // 各人原幣 × 匯率 → 基準額
+        exact = derived.exact;
+        amount = derived.total; // 總額 = 各人基準額之和,分攤必定加總相等
+        origAmount = round2(split.sharedBy.reduce((a, id) => a + (exactOrig[id] || 0), 0));
+        if (!(origAmount > 0)) return setStatus('請填寫每個人的指定金額', 'err');
+      } else {
+        origAmount = Number($('expAmount').value);
+        if (!(origAmount > 0)) return setStatus('請輸入正確的金額', 'err');
+        amount = toBase(origAmount, rate);
       }
 
       const base = {
         desc,
-        amount: round2(amount),
+        amount,
+        origAmount: round2(origAmount),
+        currency,
+        rate,
         payerId,
         date: $('expDate').value || '',
         category: $('expCategory').value.trim(),
-        ...split,
+        splitMode: split.splitMode,
+        sharedBy: split.sharedBy,
+        weights: split.weights,
+        exact,
+        exactOrig,
         updatedAt: now(),
       };
       if (editingId) {
@@ -410,9 +473,37 @@ import '../styles/tools.css';
       $('expAmount').value = '';
       $('expCategory').value = '';
       $('expMode').value = 'even';
+      $('expCurrency').value = baseCur();
+      $('expRate').value = '1';
       renderSplitList();
+      syncRateField();
+      syncModeUI();
       $('saveExpense').textContent = '＋ 新增支出';
       $('cancelEdit').style.display = editingId ? 'inline-block' : 'none';
+    }
+
+    // 幣別＝主要幣別時,匯率鎖 1 並禁用(等同「直接填台幣」);否則可自填匯率。
+    function syncRateField() {
+      const isBase = expCur() === baseCur();
+      const r = $('expRate');
+      if (isBase) { r.value = '1'; r.disabled = true; } else { r.disabled = false; }
+    }
+    // exact 模式:總額欄改為唯讀(由各人加總自動帶入);其餘模式可輸入。
+    function syncModeUI() {
+      const exact = $('expMode').value === 'exact';
+      $('expAmount').disabled = exact;
+      $('expAmountLabel').textContent = exact ? '金額(自動加總)' : '金額';
+      if (exact) $('expAmount').value = num2(sumExactOrig());
+      updateConvHint();
+    }
+    function updateConvHint() {
+      const cur = expCur();
+      const rate = expRate();
+      const orig = $('expMode').value === 'exact' ? sumExactOrig() : Number($('expAmount').value) || 0;
+      $('convHint').textContent =
+        cur === baseCur() || !(orig > 0)
+          ? ''
+          : `${fmtCur(orig, cur)} × ${num2(rate)} ≈ ${fmt(toBase(orig, rate))}`;
     }
 
     $('expenseList').addEventListener('click', (e) => {
@@ -436,15 +527,20 @@ import '../styles/tools.css';
       if (!e) return;
       editingId = id;
       $('expDesc').value = e.desc || '';
-      $('expAmount').value = e.amount ?? '';
+      $('expCurrency').value = e.currency || baseCur();
+      $('expRate').value = e.rate ?? 1;
+      $('expAmount').value = e.origAmount ?? e.amount ?? ''; // 顯示原幣金額
       $('expCategory').value = e.category || '';
       $('expDate').value = e.date || '';
       $('expMode').value = e.splitMode || 'even';
       if (aliveMembers().some((m) => m.id === e.payerId)) $('expPayer').value = e.payerId;
       const values = {};
       if (e.splitMode === 'weight') Object.assign(values, e.weights || {});
-      if (e.splitMode === 'exact') Object.assign(values, e.exact || {});
+      // exact:優先用原幣金額回填,舊資料(無 exactOrig)退回用基準額
+      if (e.splitMode === 'exact') Object.assign(values, e.exactOrig || e.exact || {});
       renderSplitList({ checked: new Set(e.sharedBy || []), values });
+      syncRateField();
+      syncModeUI();
       $('saveExpense').textContent = '✓ 更新支出';
       $('cancelEdit').style.display = 'inline-block';
       $('expDesc').scrollIntoView({ behavior: 'smooth', block: 'center' });

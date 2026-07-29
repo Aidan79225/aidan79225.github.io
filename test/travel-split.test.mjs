@@ -6,6 +6,8 @@ import {
   settle,
   totalSpent,
   mergeTrips,
+  toBase,
+  deriveExactBase,
   round2,
 } from '../src/lib/travel-split.mjs';
 
@@ -116,6 +118,34 @@ test('mergeTrips unions members/expenses by id, newest updatedAt wins', () => {
   assert.equal(m.members.find((x) => x.id === 'm1').name, '小明(改名)'); // updatedAt 3 > 1
   assert.equal(m.expenses.find((x) => x.id === 'e1').amount, 100); // updatedAt 5 > 4
   assert.equal(m.expenses.length, 2);
+});
+
+test('toBase converts by rate, defaulting a blank rate to 1', () => {
+  assert.equal(toBase(3000, 0.21), 630);
+  assert.equal(toBase(500, ''), 500);
+  assert.equal(toBase(500, null), 500);
+  assert.equal(toBase(99.5, 1), 99.5);
+});
+
+test('deriveExactBase converts each share and the total is the sum of the parts', () => {
+  const { exact, total } = deriveExactBase({ a: 1000, b: 2000 }, 0.215);
+  assert.equal(exact.a, 215);
+  assert.equal(exact.b, 430);
+  assert.equal(total, 645); // = 215 + 430, so shareOf sums to amount exactly
+  // 用這組值組出的支出,分攤加總 === amount
+  const s = shareOf({ amount: total, splitMode: 'exact', exact });
+  assert.equal(round2(Object.values(s).reduce((x, y) => x + y, 0)), total);
+});
+
+test('foreign-currency even split settles in base currency', () => {
+  // ¥6000 晚餐,匯率 0.22 → 1320 台幣,3 人均分
+  const amount = toBase(6000, 0.22); // 1320
+  const members = [{ id: 'a' }, { id: 'b' }, { id: 'c' }];
+  const expenses = [{ id: 'e', amount, payerId: 'a', splitMode: 'even', sharedBy: ['a', 'b', 'c'] }];
+  const net = computeBalances(members, expenses);
+  assert.equal(net.a, 880); // 付 1320 分攤 440
+  assert.equal(net.b, -440);
+  assert.equal(net.c, -440);
 });
 
 test('mergeTrips honours deletion tombstones and is commutative', () => {

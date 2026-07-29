@@ -62,6 +62,7 @@
   .ts-w9 { width: 9rem; }
 
   .ts-muted { color: #9aa4b2; font-size: 0.85rem; }
+  .ts-conv { color: #93c5fd; font-variant-numeric: tabular-nums; min-height: 1em; }
   .ts-status { min-height: 1.2em; }
   .ts-status.err { color: #f87171; }
   .ts-status.ok { color: #4ade80; }

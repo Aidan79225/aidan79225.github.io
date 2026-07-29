@@ -10,10 +10,14 @@
 //   member  = { id, name, deleted?, updatedAt }
 //   expense = {
 //     id, desc, amount, payerId,
+//     currency, rate, origAmount,          // 多幣別:amount 一律是「主要幣別(台幣)」基準額,
+//                                          //   origAmount 是原幣金額,rate 是 1 原幣 = ? 台幣。
+//                                          //   計算一律用 amount(基準額),原幣資訊僅供顯示/編輯。
 //     splitMode: 'even' | 'weight' | 'exact',
 //     sharedBy:  [memberId, ...],          // even 模式:平均分攤的人
 //     weights:   { memberId: number },     // weight 模式:各人權重
-//     exact:     { memberId: number },     // exact 模式:各人固定金額
+//     exact:     { memberId: number },     // exact 模式:各人固定金額(基準額/台幣)
+//     exactOrig: { memberId: number },     // exact 模式:各人原幣金額(供編輯回填)
 //     date, category, deleted?, updatedAt,
 //   }
 //
@@ -175,6 +179,27 @@ function mergeById(listA, listB) {
   (listA || []).forEach(consider);
   (listB || []).forEach(consider);
   return [...map.values()];
+}
+
+// ---- 多幣別換算 -----------------------------------------------------------
+// 原幣金額 × 匯率 → 主要幣別(台幣)基準額,四捨五入到分。
+export function toBase(origAmount, rate) {
+  const r = rate == null || rate === '' ? 1 : Number(rate);
+  return round2((Number(origAmount) || 0) * (Number.isFinite(r) ? r : 1));
+}
+
+// exact 模式:把各人「原幣金額」換算成基準額,並回傳基準額總計。
+// 基準額總額 = 各人換算後之和(而非 origTotal×rate),確保 shareOf 的分攤加總
+// 恰等於支出 amount,不會因逐筆四捨五入而產生 1 分誤差。
+export function deriveExactBase(exactOrig, rate) {
+  const exact = {};
+  let total = 0;
+  Object.keys(exactOrig || {}).forEach((id) => {
+    const v = toBase(exactOrig[id], rate);
+    exact[id] = v;
+    total = round2(total + v);
+  });
+  return { exact, total };
 }
 
 export function mergeTrips(a, b) {
