@@ -32,3 +32,89 @@
     margin-top: 1rem;
   }
 }
+
+/* ── 旅遊分帳 ─────────────────────────────────────────────────────── */
+.tool-page.travel-split {
+  h3 { margin-top: 1.6rem; }
+
+  .ts-intro { color: #9aa4b2; font-size: 0.95rem; line-height: 1.6; }
+
+  .ts-card {
+    background: #1f2330;
+    border: 1px solid #3a4154;
+    border-radius: 8px;
+    padding: 0.9rem 1rem;
+    margin-top: 0.75rem;
+  }
+
+  .ts-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: flex-end;
+  }
+  .ts-field { display: flex; flex-direction: column; gap: 0.25rem; }
+  .ts-field > span { font-size: 0.8rem; color: #9aa4b2; }
+  .ts-field input, .ts-field select { min-width: 0; }
+  .ts-grow { flex: 1 1 12rem; }
+  .ts-grow input, .ts-grow select { width: 100%; }
+  .ts-w6 { width: 6.5rem; }
+  .ts-w9 { width: 9rem; }
+
+  .ts-muted { color: #9aa4b2; font-size: 0.85rem; }
+  .ts-conv { color: #93c5fd; font-variant-numeric: tabular-nums; min-height: 1em; }
+  .ts-status { min-height: 1.2em; }
+  .ts-status.err { color: #f87171; }
+  .ts-status.ok { color: #4ade80; }
+
+  .ts-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: #262b3a;
+    border: 1px solid #3a4154;
+    border-radius: 999px;
+    padding: 0.25rem 0.7rem;
+    margin: 0.2rem;
+    font-size: 0.9rem;
+  }
+  .ts-chip button {
+    background: none; border: none; color: #f87171;
+    padding: 0; margin: 0; font-size: 1rem; line-height: 1; cursor: pointer;
+  }
+  .ts-chip button:hover { background: none; color: #ef4444; }
+
+  .ts-split-list { display: grid; gap: 0.35rem; margin: 0.4rem 0; }
+  .ts-split-item {
+    display: flex; align-items: center; gap: 0.6rem;
+    background: #262b3a; border: 1px solid #3a4154;
+    border-radius: 6px; padding: 0.3rem 0.6rem;
+  }
+  .ts-split-item label { display: flex; align-items: center; gap: 0.5rem; flex: 1; cursor: pointer; }
+  .ts-split-item input[type="number"] { width: 6.5rem; }
+
+  table.ts-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; font-size: 0.9rem; }
+  table.ts-table th, table.ts-table td {
+    text-align: left; padding: 0.45rem 0.5rem; border-bottom: 1px solid #3a4154; vertical-align: top;
+  }
+  table.ts-table th { color: #9aa4b2; font-weight: 600; }
+  table.ts-table td.num, table.ts-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
+  table.ts-table .ts-mini { background: #374151; padding: 0.2em 0.6em; font-size: 0.8rem; margin: 0 0.15rem; }
+  table.ts-table .ts-mini.del { background: #7f1d1d; }
+  table.ts-table .ts-mini.del:hover { background: #991b1b; }
+
+  .ts-balance { display: flex; justify-content: space-between; padding: 0.4rem 0.2rem; border-bottom: 1px solid #3a4154; }
+  .ts-pos { color: #4ade80; font-variant-numeric: tabular-nums; }
+  .ts-neg { color: #f87171; font-variant-numeric: tabular-nums; }
+  .ts-settle { padding: 0.45rem 0.2rem; border-bottom: 1px solid #3a4154; }
+  .ts-settle b { font-variant-numeric: tabular-nums; }
+
+  details.ts-guide { margin-top: 1rem; }
+  details.ts-guide summary { cursor: pointer; color: #60a5fa; }
+  details.ts-guide pre {
+    background: #11141c; border: 1px solid #3a4154; border-radius: 6px;
+    padding: 0.8rem; overflow-x: auto; font-size: 0.8rem; line-height: 1.5;
+  }
+  details.ts-guide ol { padding-left: 1.3rem; line-height: 1.7; }
+  .ts-empty { color: #9aa4b2; padding: 0.6rem 0.2rem; }
+}

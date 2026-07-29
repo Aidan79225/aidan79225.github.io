@@ -1,0 +1,706 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import '../styles/tools.css';
+---
+<BaseLayout
+  title="旅遊分帳"
+  description="多人旅遊記帳與分帳工具 —— 平均／權重／指定金額分攤,自動算出最少筆數的還款方案,並可透過 Google Sheet 讓同行成員共享同一份帳。"
+>
+  <div class="tool-page travel-split">
+    <h2>🧳 旅遊分帳</h2>
+    <p class="ts-intro">
+      記錄一趟旅程裡「誰付了什麼、誰要分攤」,自動算出每個人的結餘與<strong>最少筆數</strong>的還款方案。
+      支援<strong>多幣別</strong>:每筆可填原幣金額＋自訂匯率,或直接填台幣;結餘與還款一律換算成<strong>主要幣別(台幣)</strong>。
+      資料預設存在本機瀏覽器;設定一個 <strong>Google Apps Script 端點</strong>後,同一組<strong>行程代碼</strong>的成員就能共享同一份帳
+      ——各自新增的支出會自動合併,不會互相蓋掉。
+    </p>
+
+    <!-- 行程 -->
+    <div class="ts-card">
+      <div class="ts-row">
+        <label class="ts-field ts-grow"><span>行程名稱</span><input type="text" id="tripName" placeholder="例如:2026 沖繩" /></label>
+        <label class="ts-field"><span>主要幣別(結算用)</span><input type="text" id="tripCurrency" class="ts-w6" placeholder="TWD" /></label>
+        <label class="ts-field"><span>行程代碼(共享用)</span><input type="text" id="tripCode" class="ts-w9" placeholder="okinawa26" /></label>
+      </div>
+    </div>
+
+    <!-- 成員 -->
+    <h3>👥 成員</h3>
+    <div class="ts-card">
+      <div class="ts-row">
+        <input type="text" id="memberName" class="ts-grow" placeholder="輸入名字後按新增" />
+        <button id="addMember">＋ 新增成員</button>
+      </div>
+      <div id="memberList" style="margin-top:.6rem"></div>
+    </div>
+
+    <!-- 記一筆 -->
+    <h3>💸 記一筆</h3>
+    <div class="ts-card">
+      <div class="ts-row">
+        <label class="ts-field ts-grow"><span>說明</span><input type="text" id="expDesc" placeholder="例如:午餐、租車" /></label>
+        <label class="ts-field"><span id="expAmountLabel">金額</span><input type="number" id="expAmount" class="ts-w9" min="0" step="0.01" /></label>
+        <label class="ts-field"><span>原幣別</span><input type="text" id="expCurrency" class="ts-w6" list="curList" placeholder="TWD" /></label>
+        <label class="ts-field"><span>匯率(1 原幣=? 台幣)</span><input type="number" id="expRate" class="ts-w9" min="0" step="0.0001" value="1" /></label>
+      </div>
+      <datalist id="curList">
+        <option value="TWD"></option><option value="JPY"></option><option value="USD"></option>
+        <option value="EUR"></option><option value="KRW"></option><option value="THB"></option>
+        <option value="CNY"></option><option value="HKD"></option><option value="SGD"></option>
+        <option value="GBP"></option><option value="AUD"></option><option value="VND"></option>
+        <option value="MYR"></option><option value="PHP"></option><option value="IDR"></option>
+      </datalist>
+      <p class="ts-muted ts-conv" id="convHint" style="margin:.5rem 0 0"></p>
+      <div class="ts-row" style="margin-top:.6rem">
+        <label class="ts-field"><span>付款人</span><select id="expPayer" class="ts-w9"></select></label>
+        <label class="ts-field"><span>分攤方式</span>
+          <select id="expMode" class="ts-w9">
+            <option value="even">平均分攤</option>
+            <option value="weight">依權重</option>
+            <option value="exact">指定金額</option>
+          </select>
+        </label>
+        <label class="ts-field"><span>日期</span><input type="date" id="expDate" class="ts-w9" /></label>
+        <label class="ts-field"><span>分類</span><input type="text" id="expCategory" class="ts-w9" placeholder="餐飲/交通…" /></label>
+      </div>
+      <p class="ts-muted" style="margin:.7rem 0 .2rem" id="splitHint">分攤對象</p>
+      <div class="ts-split-list" id="splitList"></div>
+      <div class="ts-row" style="margin-top:.6rem">
+        <button id="saveExpense">＋ 新增支出</button>
+        <button class="ghost" id="cancelEdit" style="display:none;background:#374151">取消編輯</button>
+      </div>
+    </div>
+
+    <!-- 支出清單 -->
+    <h3>🧾 支出清單</h3>
+    <div id="expenseList"></div>
+
+    <!-- 結餘 -->
+    <h3>📊 結餘</h3>
+    <p class="ts-muted">正數 = 別人欠他;負數 = 他要付出。</p>
+    <div id="balanceList"></div>
+
+    <!-- 還款 -->
+    <h3>🤝 建議還款(最少筆數)</h3>
+    <div id="settleList"></div>
+
+    <!-- 同步 / 共享 -->
+    <h3>☁️ 共享(Google Sheet)</h3>
+    <div class="ts-card">
+      <label class="ts-field" style="width:100%">
+        <span>Google Apps Script 端點網址(以 /exec 結尾)</span>
+        <input type="text" id="endpoint" placeholder="https://script.google.com/macros/s/……/exec" />
+      </label>
+      <div class="ts-row" style="margin-top:.6rem">
+        <button id="syncBtn">⟲ 同步</button>
+        <button class="ghost" id="exportBtn" style="background:#374151">匯出 JSON</button>
+        <button class="ghost" id="importBtn" style="background:#374151">匯入 JSON</button>
+        <input type="file" id="importFile" accept="application/json,.json" style="display:none" />
+        <button class="ghost" id="resetBtn" style="background:#7f1d1d">清空此行程</button>
+      </div>
+      <p class="ts-status ts-muted" id="syncStatus" style="margin-top:.5rem"></p>
+
+      <details class="ts-guide">
+        <summary>如何設定 Google Sheet 共享(一次性,約 3 分鐘)</summary>
+        <ol>
+          <li>開一份新的 <a href="https://sheets.new" target="_blank" rel="noopener">Google 試算表</a>。</li>
+          <li>上方選單 <b>擴充功能 → Apps Script</b>。</li>
+          <li>把編輯器裡的內容全部刪掉,貼上下面這段程式碼,按 💾 儲存。</li>
+          <li>右上角 <b>部署 → 新增部署作業</b>,類型選 <b>網頁應用程式</b>;「執行身分」選<b>我</b>,「誰可以存取」選 <b>任何人</b>,按<b>部署</b>並授權。</li>
+          <li>複製產生的<b>網頁應用程式網址</b>(以 <code>/exec</code> 結尾),貼到上面的「端點網址」欄位。</li>
+          <li>把同一個<b>行程代碼</b>與這個端點網址告訴同行的人,大家按「同步」就會共用同一份帳。</li>
+        </ol>
+        <p class="ts-muted">資料存在你自己的 Google 帳號裡,本站不經手也不保存任何資料。程式碼:</p>
+        <pre id="gasCode"></pre>
+        <button id="copyGas" style="margin-top:.4rem">複製程式碼</button>
+      </details>
+    </div>
+
+    <p class="note ts-muted" style="margin-top:1.5rem">
+      ※ 多幣別:每筆存原幣金額與你自填的匯率,實際計算一律用換算後的<strong>主要幣別(台幣)</strong>基準額;
+      幣別填台幣時匯率自動鎖 1,等同直接輸台幣。金額以「分」為單位精算,平均分攤的零頭會依成員順序逐分分配,加總必定等於總額。
+      共享採「最後修改者勝出」的合併策略:兩人同時各記各的沒問題,但若兩人幾乎同時修改<em>同一筆</em>支出,較晚同步者會覆蓋較早者。
+    </p>
+  </div>
+
+  <script>
+    import {
+      shareOf, computeBalances, settle, totalSpent, mergeTrips, round2,
+      toBase, deriveExactBase,
+    } from '../lib/travel-split.mjs';
+
+    // ── 狀態與儲存 ──────────────────────────────────────────────
+    const LS_ENDPOINT = 'travel-split:endpoint';
+    const LS_LAST = 'travel-split:last-code';
+    const LS_LASTCUR = 'travel-split:last-currency';
+    const LS_LASTRATE = 'travel-split:last-rate';
+    const tripKey = (code) => `travel-split:trip:${code || '_default'}`;
+
+    // 記住上一次填的幣別與匯率,新增下一筆時自動帶入。
+    let lastCurrency = '';
+    let lastRate = '';
+    function rememberCurrency(cur, rate) {
+      lastCurrency = cur || '';
+      lastRate = rate == null ? '' : String(rate);
+      try {
+        localStorage.setItem(LS_LASTCUR, lastCurrency);
+        localStorage.setItem(LS_LASTRATE, lastRate);
+      } catch (_) {}
+    }
+
+    const uid = () =>
+      (crypto.randomUUID?.() ||
+        `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`);
+    const now = () => Date.now();
+
+    function emptyTrip(code) {
+      return {
+        code: code || '',
+        name: '',
+        currency: 'TWD',
+        metaUpdatedAt: now(),
+        members: [],
+        expenses: [],
+      };
+    }
+
+    let trip = null;
+    let editingId = null; // 正在編輯的支出 id
+
+    function loadTrip(code) {
+      try {
+        const raw = localStorage.getItem(tripKey(code));
+        if (raw) return JSON.parse(raw);
+      } catch (_) {}
+      return emptyTrip(code);
+    }
+    function saveTrip() {
+      try {
+        localStorage.setItem(tripKey(trip.code), JSON.stringify(trip));
+        localStorage.setItem(LS_LAST, trip.code || '');
+      } catch (_) {}
+    }
+
+    const aliveMembers = () => trip.members.filter((m) => !m.deleted);
+    const aliveExpenses = () =>
+      trip.expenses
+        .filter((e) => !e.deleted)
+        .sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.updatedAt || 0) - (a.updatedAt || 0));
+    const memberName = (id) => {
+      const m = trip.members.find((x) => x.id === id);
+      return m ? m.name : '(已移除)';
+    };
+    const num2 = (n) => {
+      const v = round2(n);
+      return Number.isInteger(v) ? String(v) : v.toFixed(2);
+    };
+    const baseCur = () => (trip.currency || 'TWD').trim() || 'TWD';
+    const fmt = (n) => `${num2(n)} ${baseCur()}`.trim(); // 主要幣別(台幣)
+    const fmtCur = (n, cur) => `${num2(n)} ${cur || ''}`.trim(); // 指定幣別
+
+    const $ = (id) => document.getElementById(id);
+    const expCur = () => ($('expCurrency').value.trim() || baseCur());
+    const expRate = () => {
+      const r = Number($('expRate').value);
+      return r > 0 ? r : 1;
+    };
+    const sumExactOrig = () =>
+      [...document.querySelectorAll('[data-share]:checked')].reduce((s, cb) => {
+        const el = document.querySelector(`[data-weight="${cb.dataset.share}"]`);
+        return s + (Number(el?.value) || 0);
+      }, 0);
+
+    // ── 渲染 ────────────────────────────────────────────────────
+    function render() {
+      $('tripName').value = trip.name || '';
+      $('tripCurrency').value = trip.currency || '';
+      $('tripCode').value = trip.code || '';
+      renderMembers();
+      renderPayer();
+      renderSplitList();
+      renderExpenses();
+      renderBalances();
+    }
+
+    function renderMembers() {
+      const box = $('memberList');
+      const ms = aliveMembers();
+      if (!ms.length) {
+        box.innerHTML = '<span class="ts-muted">還沒有成員,先新增幾個人。</span>';
+        return;
+      }
+      box.innerHTML = ms
+        .map(
+          (m) =>
+            `<span class="ts-chip">${escapeHtml(m.name)}<button data-act="delMember" data-id="${m.id}" title="移除">×</button></span>`,
+        )
+        .join('');
+    }
+
+    function renderPayer() {
+      const sel = $('expPayer');
+      const prev = sel.value;
+      const ms = aliveMembers();
+      sel.innerHTML = ms.map((m) => `<option value="${m.id}">${escapeHtml(m.name)}</option>`).join('');
+      if (ms.some((m) => m.id === prev)) sel.value = prev;
+    }
+
+    // 分攤對象:依模式顯示 checkbox（even）或 checkbox＋數字（weight/exact）
+    function renderSplitList(preset) {
+      const mode = $('expMode').value;
+      const box = $('splitList');
+      const ms = aliveMembers();
+      if (!ms.length) {
+        box.innerHTML = '<span class="ts-muted">先新增成員才能分攤。</span>';
+        return;
+      }
+      box.innerHTML = ms
+        .map((m) => {
+          const checked = preset ? preset.checked.has(m.id) : true;
+          const val = preset && preset.values[m.id] != null ? preset.values[m.id] : mode === 'weight' ? 1 : '';
+          const ph = mode === 'weight' ? '權重' : `金額(${expCur()})`;
+          const numField =
+            mode === 'even'
+              ? ''
+              : `<input type="number" min="0" step="${mode === 'weight' ? '1' : '0.01'}" data-weight="${m.id}" value="${val}" placeholder="${ph}" ${checked ? '' : 'disabled'} />`;
+          return `<div class="ts-split-item">
+            <label><input type="checkbox" data-share="${m.id}" ${checked ? 'checked' : ''} /> ${escapeHtml(m.name)}</label>
+            ${numField}
+          </div>`;
+        })
+        .join('');
+    }
+
+    // 回傳分攤設定。exact 模式回傳的是「原幣」金額(exactOrig),換算成基準額由 saveExpense 處理。
+    function collectSplit() {
+      const mode = $('expMode').value;
+      const shared = [...document.querySelectorAll('[data-share]:checked')].map((el) => el.dataset.share);
+      const out = { splitMode: mode, sharedBy: shared, weights: {}, exactOrig: {} };
+      if (mode === 'weight' || mode === 'exact') {
+        shared.forEach((id) => {
+          const el = document.querySelector(`[data-weight="${id}"]`);
+          const num = Number(el?.value) || 0;
+          if (mode === 'weight') out.weights[id] = num;
+          else out.exactOrig[id] = num;
+        });
+      }
+      return out;
+    }
+
+    function renderExpenses() {
+      const box = $('expenseList');
+      const es = aliveExpenses();
+      if (!es.length) {
+        box.innerHTML = '<p class="ts-empty">還沒有任何支出。</p>';
+        return;
+      }
+      const rows = es
+        .map((e) => {
+          const shares = shareOf(e);
+          const who = Object.keys(shares).map(memberName).join('、');
+          const cur = e.currency || baseCur();
+          const foreign = cur !== baseCur() && e.rate && Number(e.rate) !== 1;
+          const amtCell = foreign
+            ? `${fmtCur(e.origAmount ?? e.amount, cur)}<br><span class="ts-muted">≈ ${fmt(e.amount)}</span>`
+            : fmt(e.amount);
+          return `<tr>
+            <td>${escapeHtml(e.date || '')}</td>
+            <td>${escapeHtml(e.desc || '')}${e.category ? `<br><span class="ts-muted">${escapeHtml(e.category)}</span>` : ''}</td>
+            <td class="num">${amtCell}</td>
+            <td>${escapeHtml(memberName(e.payerId))}</td>
+            <td><span class="ts-muted">${escapeHtml(who)}</span></td>
+            <td class="num">
+              <button class="ts-mini" data-act="editExp" data-id="${e.id}">改</button>
+              <button class="ts-mini del" data-act="delExp" data-id="${e.id}">刪</button>
+            </td>
+          </tr>`;
+        })
+        .join('');
+      box.innerHTML = `<table class="ts-table">
+        <thead><tr><th>日期</th><th>說明</th><th class="num">金額</th><th>付款人</th><th>分攤</th><th></th></tr></thead>
+        <tbody>${rows}</tbody>
+        <tfoot><tr><td colspan="2"><b>合計</b></td><td class="num"><b>${fmt(totalSpent(trip.expenses))}</b></td><td colspan="3"></td></tr></tfoot>
+      </table>`;
+    }
+
+    function renderBalances() {
+      const net = computeBalances(trip.members, trip.expenses);
+      const bbox = $('balanceList');
+      const ids = aliveMembers().map((m) => m.id);
+      if (!ids.length) {
+        bbox.innerHTML = '<p class="ts-empty">尚無資料。</p>';
+        $('settleList').innerHTML = '';
+        return;
+      }
+      bbox.innerHTML = ids
+        .map((id) => {
+          const v = net[id] || 0;
+          const cls = v > 0 ? 'ts-pos' : v < 0 ? 'ts-neg' : 'ts-muted';
+          const sign = v > 0 ? '+' : '';
+          return `<div class="ts-balance"><span>${escapeHtml(memberName(id))}</span><span class="${cls}">${sign}${fmt(v)}</span></div>`;
+        })
+        .join('');
+
+      const transfers = settle(net);
+      const sbox = $('settleList');
+      sbox.innerHTML = transfers.length
+        ? transfers
+            .map(
+              (t) =>
+                `<div class="ts-settle">${escapeHtml(memberName(t.from))} → ${escapeHtml(memberName(t.to))} <b>${fmt(t.amount)}</b></div>`,
+            )
+            .join('')
+        : '<p class="ts-empty">已結清,無需還款 🎉</p>';
+    }
+
+    function escapeHtml(s) {
+      return String(s ?? '').replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+    }
+
+    // ── 事件 ────────────────────────────────────────────────────
+    function touchMeta() {
+      trip.metaUpdatedAt = now();
+    }
+
+    $('tripName').addEventListener('input', (e) => { trip.name = e.target.value; touchMeta(); saveTrip(); });
+    $('tripCurrency').addEventListener('input', (e) => {
+      trip.currency = e.target.value; touchMeta(); saveTrip();
+      syncRateField(); renderSplitList(); syncModeUI(); renderExpenses(); renderBalances();
+    });
+    $('tripCode').addEventListener('change', (e) => {
+      const code = e.target.value.trim();
+      saveTrip();               // 存回舊代碼
+      trip = loadTrip(code);    // 切換到新代碼
+      trip.code = code;
+      editingId = null;
+      resetForm();
+      saveTrip();
+      render();
+      setStatus(code ? `已切換到行程「${code}」` : '', 'ok');
+    });
+
+    $('addMember').addEventListener('click', addMember);
+    $('memberName').addEventListener('keydown', (e) => { if (e.key === 'Enter') addMember(); });
+    function addMember() {
+      const name = $('memberName').value.trim();
+      if (!name) return;
+      trip.members.push({ id: uid(), name, updatedAt: now() });
+      $('memberName').value = '';
+      saveTrip();
+      renderMembers();
+      renderPayer();
+      renderSplitList();
+    }
+
+    $('memberList').addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-act="delMember"]');
+      if (!btn) return;
+      const m = trip.members.find((x) => x.id === btn.dataset.id);
+      if (m) { m.deleted = true; m.updatedAt = now(); }
+      saveTrip();
+      renderMembers();
+      renderPayer();
+      renderSplitList();
+      renderExpenses();
+      renderBalances();
+    });
+
+    $('expMode').addEventListener('change', () => { renderSplitList(); syncModeUI(); });
+    $('expCurrency').addEventListener('input', () => { syncRateField(); renderSplitList(); syncModeUI(); });
+    $('expRate').addEventListener('input', updateConvHint);
+    $('expAmount').addEventListener('input', updateConvHint);
+    // 勾選/取消時同步啟用對應的數字欄位;exact 模式下改動金額時更新加總與換算
+    $('splitList').addEventListener('change', (e) => {
+      const cb = e.target.closest('[data-share]');
+      if (!cb) return;
+      const num = document.querySelector(`[data-weight="${cb.dataset.share}"]`);
+      if (num) num.disabled = !cb.checked;
+      syncModeUI();
+    });
+    $('splitList').addEventListener('input', (e) => {
+      if (e.target.matches('[data-weight]')) syncModeUI();
+    });
+
+    $('saveExpense').addEventListener('click', saveExpense);
+    $('cancelEdit').addEventListener('click', () => { editingId = null; resetForm(); });
+
+    function saveExpense() {
+      const desc = $('expDesc').value.trim();
+      const payerId = $('expPayer').value;
+      const currency = expCur();
+      const rate = expRate();
+      if (!aliveMembers().length) return setStatus('請先新增成員', 'err');
+      if (!payerId) return setStatus('請選擇付款人', 'err');
+      const split = collectSplit();
+      if (!split.sharedBy.length) return setStatus('請至少勾選一位分攤對象', 'err');
+
+      // 換算成主要幣別(台幣)基準額。amount 一律是基準額,計算全用它。
+      let origAmount;
+      let amount;
+      let exact = {};
+      let exactOrig = {};
+      if (split.splitMode === 'exact') {
+        exactOrig = split.exactOrig;
+        const derived = deriveExactBase(exactOrig, rate); // 各人原幣 × 匯率 → 基準額
+        exact = derived.exact;
+        amount = derived.total; // 總額 = 各人基準額之和,分攤必定加總相等
+        origAmount = round2(split.sharedBy.reduce((a, id) => a + (exactOrig[id] || 0), 0));
+        if (!(origAmount > 0)) return setStatus('請填寫每個人的指定金額', 'err');
+      } else {
+        origAmount = Number($('expAmount').value);
+        if (!(origAmount > 0)) return setStatus('請輸入正確的金額', 'err');
+        amount = toBase(origAmount, rate);
+      }
+
+      const base = {
+        desc,
+        amount,
+        origAmount: round2(origAmount),
+        currency,
+        rate,
+        payerId,
+        date: $('expDate').value || '',
+        category: $('expCategory').value.trim(),
+        splitMode: split.splitMode,
+        sharedBy: split.sharedBy,
+        weights: split.weights,
+        exact,
+        exactOrig,
+        updatedAt: now(),
+      };
+      if (editingId) {
+        const idx = trip.expenses.findIndex((x) => x.id === editingId);
+        if (idx >= 0) trip.expenses[idx] = { ...trip.expenses[idx], ...base };
+        editingId = null;
+      } else {
+        trip.expenses.push({ id: uid(), ...base });
+      }
+      rememberCurrency(currency, rate); // 供下一筆預帶
+      saveTrip();
+      resetForm();
+      renderExpenses();
+      renderBalances();
+      setStatus('已儲存', 'ok');
+    }
+
+    function resetForm() {
+      $('expDesc').value = '';
+      $('expAmount').value = '';
+      $('expCategory').value = '';
+      $('expMode').value = 'even';
+      // 幣別預帶上一次填的內容(沒有紀錄時用主要幣別)
+      const cur = lastCurrency || baseCur();
+      $('expCurrency').value = cur;
+      $('expRate').value = cur === baseCur() ? '1' : lastRate || '1';
+      renderSplitList();
+      syncRateField();
+      syncModeUI();
+      $('saveExpense').textContent = '＋ 新增支出';
+      $('cancelEdit').style.display = editingId ? 'inline-block' : 'none';
+    }
+
+    // 幣別＝主要幣別時,匯率鎖 1 並禁用(等同「直接填台幣」);否則可自填匯率。
+    function syncRateField() {
+      const isBase = expCur() === baseCur();
+      const r = $('expRate');
+      if (isBase) { r.value = '1'; r.disabled = true; } else { r.disabled = false; }
+    }
+    // exact 模式:總額欄改為唯讀(由各人加總自動帶入);其餘模式可輸入。
+    function syncModeUI() {
+      const exact = $('expMode').value === 'exact';
+      $('expAmount').disabled = exact;
+      $('expAmountLabel').textContent = exact ? '金額(自動加總)' : '金額';
+      if (exact) $('expAmount').value = num2(sumExactOrig());
+      updateConvHint();
+    }
+    function updateConvHint() {
+      const cur = expCur();
+      const rate = expRate();
+      const orig = $('expMode').value === 'exact' ? sumExactOrig() : Number($('expAmount').value) || 0;
+      $('convHint').textContent =
+        cur === baseCur() || !(orig > 0)
+          ? ''
+          : `${fmtCur(orig, cur)} × ${num2(rate)} ≈ ${fmt(toBase(orig, rate))}`;
+    }
+
+    $('expenseList').addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-act]');
+      if (!btn) return;
+      const id = btn.dataset.id;
+      if (btn.dataset.act === 'delExp') {
+        const ex = trip.expenses.find((x) => x.id === id);
+        if (ex) { ex.deleted = true; ex.updatedAt = now(); }
+        if (editingId === id) { editingId = null; resetForm(); }
+        saveTrip();
+        renderExpenses();
+        renderBalances();
+      } else if (btn.dataset.act === 'editExp') {
+        loadExpenseIntoForm(id);
+      }
+    });
+
+    function loadExpenseIntoForm(id) {
+      const e = trip.expenses.find((x) => x.id === id);
+      if (!e) return;
+      editingId = id;
+      $('expDesc').value = e.desc || '';
+      $('expCurrency').value = e.currency || baseCur();
+      $('expRate').value = e.rate ?? 1;
+      $('expAmount').value = e.origAmount ?? e.amount ?? ''; // 顯示原幣金額
+      $('expCategory').value = e.category || '';
+      $('expDate').value = e.date || '';
+      $('expMode').value = e.splitMode || 'even';
+      if (aliveMembers().some((m) => m.id === e.payerId)) $('expPayer').value = e.payerId;
+      const values = {};
+      if (e.splitMode === 'weight') Object.assign(values, e.weights || {});
+      // exact:優先用原幣金額回填,舊資料(無 exactOrig)退回用基準額
+      if (e.splitMode === 'exact') Object.assign(values, e.exactOrig || e.exact || {});
+      renderSplitList({ checked: new Set(e.sharedBy || []), values });
+      syncRateField();
+      syncModeUI();
+      $('saveExpense').textContent = '✓ 更新支出';
+      $('cancelEdit').style.display = 'inline-block';
+      $('expDesc').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+
+    // ── 同步 / 匯出入 ──────────────────────────────────────────
+    function setStatus(msg, kind) {
+      const el = $('syncStatus');
+      el.textContent = msg;
+      el.className = 'ts-status ' + (kind === 'err' ? 'err' : kind === 'ok' ? 'ok' : 'ts-muted');
+    }
+
+    $('endpoint').addEventListener('change', (e) => {
+      localStorage.setItem(LS_ENDPOINT, e.target.value.trim());
+    });
+
+    $('syncBtn').addEventListener('click', sync);
+    async function sync() {
+      const endpoint = $('endpoint').value.trim();
+      if (!endpoint) return setStatus('請先設定 Google Apps Script 端點(見下方說明)', 'err');
+      if (!trip.code) return setStatus('請先設定「行程代碼」才能共享', 'err');
+      localStorage.setItem(LS_ENDPOINT, endpoint);
+      setStatus('同步中…');
+      try {
+        const res = await fetch(`${endpoint}?code=${encodeURIComponent(trip.code)}`);
+        const remote = await res.json();
+        if (!remote.ok) throw new Error(remote.error || '讀取失敗');
+        const merged = mergeTrips(trip, remote.data);
+        const put = await fetch(endpoint, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' }, // 避免 CORS preflight
+          body: JSON.stringify({ code: trip.code, data: merged }),
+        });
+        const pr = await put.json();
+        if (!pr.ok) throw new Error(pr.error || '寫入失敗');
+        trip = merged;
+        saveTrip();
+        render();
+        setStatus(`已與雲端同步 ✓ (${new Date().toLocaleTimeString()})`, 'ok');
+      } catch (err) {
+        setStatus(`同步失敗:${err.message}。請確認端點網址正確、且部署權限設為「任何人」。`, 'err');
+      }
+    }
+
+    $('exportBtn').addEventListener('click', () => {
+      const blob = new Blob([JSON.stringify(trip, null, 2)], { type: 'application/json' });
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = `travel-split-${trip.code || 'trip'}.json`;
+      a.click();
+      URL.revokeObjectURL(a.href);
+    });
+    $('importBtn').addEventListener('click', () => $('importFile').click());
+    $('importFile').addEventListener('change', async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      try {
+        const data = JSON.parse(await file.text());
+        trip = mergeTrips(trip, data); // 與現有資料合併,不覆蓋
+        saveTrip();
+        render();
+        setStatus('已匯入並合併', 'ok');
+      } catch (_) {
+        setStatus('匯入失敗:檔案格式不正確', 'err');
+      }
+      e.target.value = '';
+    });
+
+    $('resetBtn').addEventListener('click', () => {
+      if (!confirm('確定要清空此行程的所有本機資料嗎?(雲端與其他人的資料不受影響)')) return;
+      trip = emptyTrip(trip.code);
+      editingId = null;
+      saveTrip();
+      resetForm();
+      render();
+      setStatus('已清空此行程', 'ok');
+    });
+
+    // Apps Script 範本 + 一鍵複製
+    const GAS = `// 旅遊分帳 —— Google Apps Script 後端(貼到試算表的 Apps Script 編輯器)
+const SHEET = 'trips';
+
+function sheet_() {
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  let sh = ss.getSheetByName(SHEET);
+  if (!sh) { sh = ss.insertSheet(SHEET); sh.appendRow(['code', 'updatedAt', 'data']); }
+  return sh;
+}
+function findRow_(sh, code) {
+  const last = sh.getLastRow();
+  if (last < 2) return -1;
+  const codes = sh.getRange(2, 1, last - 1, 1).getValues();
+  for (let i = 0; i < codes.length; i++) if (String(codes[i][0]) === String(code)) return i + 2;
+  return -1;
+}
+function json_(obj) {
+  return ContentService.createTextOutput(JSON.stringify(obj))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+function doGet(e) {
+  const code = (e.parameter.code || '').trim();
+  if (!code) return json_({ ok: false, error: 'no code' });
+  const sh = sheet_(), r = findRow_(sh, code);
+  if (r < 0) return json_({ ok: true, data: null });
+  const raw = sh.getRange(r, 3).getValue();
+  return json_({ ok: true, data: raw ? JSON.parse(raw) : null });
+}
+function doPost(e) {
+  const lock = LockService.getScriptLock();
+  lock.waitLock(20000); // 避免多人同時寫入互相覆蓋
+  try {
+    const body = JSON.parse(e.postData.contents);
+    const code = (body.code || '').trim();
+    if (!code) return json_({ ok: false, error: 'no code' });
+    const sh = sheet_(), r = findRow_(sh, code);
+    const row = [code, new Date().toISOString(), JSON.stringify(body.data)];
+    if (r < 0) sh.appendRow(row); else sh.getRange(r, 1, 1, 3).setValues([row]);
+    return json_({ ok: true });
+  } finally {
+    lock.releaseLock();
+  }
+}`;
+    $('gasCode').textContent = GAS;
+    $('copyGas').addEventListener('click', async () => {
+      try {
+        await navigator.clipboard.writeText(GAS);
+        $('copyGas').textContent = '已複製 ✓';
+        setTimeout(() => ($('copyGas').textContent = '複製程式碼'), 1500);
+      } catch (_) {
+        setStatus('複製失敗,請手動選取', 'err');
+      }
+    });
+
+    // ── 啟動 ────────────────────────────────────────────────────
+    (function init() {
+      const lastCode = localStorage.getItem(LS_LAST) || '';
+      trip = loadTrip(lastCode);
+      trip.code = trip.code || lastCode;
+      lastCurrency = localStorage.getItem(LS_LASTCUR) || '';
+      lastRate = localStorage.getItem(LS_LASTRATE) || '';
+      $('endpoint').value = localStorage.getItem(LS_ENDPOINT) || '';
+      render();
+      resetForm();
+    })();
+  </script>
+</BaseLayout>
