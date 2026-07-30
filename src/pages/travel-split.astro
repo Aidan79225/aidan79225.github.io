@@ -39,9 +39,13 @@ import '../styles/tools.css';
     <div class="ts-card">
       <div class="ts-row">
         <label class="ts-field ts-grow"><span>說明</span><input type="text" id="expDesc" placeholder="例如:午餐、租車" /></label>
-        <label class="ts-field"><span id="expAmountLabel">金額</span><input type="number" id="expAmount" class="ts-w9" min="0" step="0.01" /></label>
         <label class="ts-field"><span>原幣別</span><input type="text" id="expCurrency" class="ts-w6" list="curList" placeholder="TWD" /></label>
-        <label class="ts-field"><span>匯率(1 原幣=? 台幣)</span><input type="number" id="expRate" class="ts-w9" min="0" step="0.0001" value="1" /></label>
+        <label class="ts-field"><span id="expAmountLabel">原幣金額</span><input type="number" id="expAmount" class="ts-w9" min="0" step="0.01" /></label>
+      </div>
+      <div class="ts-row" style="margin-top:.6rem">
+        <label class="ts-field"><span>計價幣別</span><input type="text" id="expBaseCur" class="ts-w6" disabled /></label>
+        <label class="ts-field"><span id="expBaseAmountLabel">計價金額(刷卡跳出的)</span><input type="number" id="expBaseAmount" class="ts-w9" min="0" step="0.01" /></label>
+        <label class="ts-field"><span>匯率(自動,可自填)</span><input type="number" id="expRate" class="ts-w9" min="0" step="0.0001" value="1" /></label>
       </div>
       <datalist id="curList">
         <option value="TWD"></option><option value="JPY"></option><option value="USD"></option>
@@ -117,8 +121,9 @@ import '../styles/tools.css';
     </div>
 
     <p class="note ts-muted" style="margin-top:1.5rem">
-      ※ 多幣別:每筆存原幣金額與你自填的匯率,實際計算一律用換算後的<strong>主要幣別(台幣)</strong>基準額;
-      幣別填台幣時匯率自動鎖 1,等同直接輸台幣。金額以「分」為單位精算,平均分攤的零頭會依成員順序逐分分配,加總必定等於總額。
+      ※ 多幣別:填原幣金額後,可直接填<strong>計價金額(刷卡跳出的台幣)</strong>——此時匯率會自動反推,實際結算<strong>以刷卡金額為準</strong>(比手動填匯率準);
+      也可只填匯率讓系統換算。計算一律用計價幣別(台幣)基準額;原幣別填台幣時匯率鎖 1,等同直接輸台幣。
+      金額以「分」為單位精算,平均分攤的零頭會依成員順序逐分分配,加總必定等於總額。
       共享採「最後修改者勝出」的合併策略:兩人同時各記各的沒問題,但若兩人幾乎同時修改<em>同一筆</em>支出,較晚同步者會覆蓋較早者。
     </p>
   </div>
@@ -365,7 +370,7 @@ import '../styles/tools.css';
     $('tripName').addEventListener('input', (e) => { trip.name = e.target.value; touchMeta(); saveTrip(); });
     $('tripCurrency').addEventListener('input', (e) => {
       trip.currency = e.target.value; touchMeta(); saveTrip();
-      syncRateField(); renderSplitList(); syncModeUI(); renderExpenses(); renderBalances();
+      renderSplitList(); refreshMoneyUI(); renderExpenses(); renderBalances();
     });
     $('tripCode').addEventListener('change', (e) => {
       const code = e.target.value.trim();
@@ -405,20 +410,21 @@ import '../styles/tools.css';
       renderBalances();
     });
 
-    $('expMode').addEventListener('change', () => { renderSplitList(); syncModeUI(); });
-    $('expCurrency').addEventListener('input', () => { syncRateField(); renderSplitList(); syncModeUI(); });
-    $('expRate').addEventListener('input', updateConvHint);
-    $('expAmount').addEventListener('input', updateConvHint);
+    $('expMode').addEventListener('change', () => { renderSplitList(); refreshMoneyUI(); });
+    $('expCurrency').addEventListener('input', () => { renderSplitList(); refreshMoneyUI(); });
+    $('expRate').addEventListener('input', () => { recalcBaseFromInputs(); updateConvHint(); });
+    $('expAmount').addEventListener('input', () => { recalcBaseFromInputs(); updateConvHint(); });
+    $('expBaseAmount').addEventListener('input', recalcRateFromBase); // 改計價金額 → 反推匯率
     // 勾選/取消時同步啟用對應的數字欄位;exact 模式下改動金額時更新加總與換算
     $('splitList').addEventListener('change', (e) => {
       const cb = e.target.closest('[data-share]');
       if (!cb) return;
       const num = document.querySelector(`[data-weight="${cb.dataset.share}"]`);
       if (num) num.disabled = !cb.checked;
-      syncModeUI();
+      refreshMoneyUI();
     });
     $('splitList').addEventListener('input', (e) => {
-      if (e.target.matches('[data-weight]')) syncModeUI();
+      if (e.target.matches('[data-weight]')) refreshMoneyUI();
     });
 
     $('saveExpense').addEventListener('click', saveExpense);
@@ -434,9 +440,10 @@ import '../styles/tools.css';
       const split = collectSplit();
       if (!split.sharedBy.length) return setStatus('請至少勾選一位分攤對象', 'err');
 
-      // 換算成主要幣別(台幣)基準額。amount 一律是基準額,計算全用它。
+      // amount 一律是「計價幣別(台幣)基準額」,結算全用它 —— 以刷卡跳出的計價金額為準。
       let origAmount;
       let amount;
+      let rateOut = rate;
       let exact = {};
       let exactOrig = {};
       if (split.splitMode === 'exact') {
@@ -448,8 +455,12 @@ import '../styles/tools.css';
         if (!(origAmount > 0)) return setStatus('請填寫每個人的指定金額', 'err');
       } else {
         origAmount = Number($('expAmount').value);
-        if (!(origAmount > 0)) return setStatus('請輸入正確的金額', 'err');
-        amount = toBase(origAmount, rate);
+        if (!(origAmount > 0)) return setStatus('請輸入正確的原幣金額', 'err');
+        // 計價金額(刷卡金額)為準;沒填才用 原幣×匯率 推算
+        const typedBase = Number($('expBaseAmount').value);
+        amount = typedBase > 0 ? round2(typedBase) : toBase(origAmount, rate);
+        // 讓儲存的匯率與計價金額一致(供顯示/日後編輯)
+        rateOut = origAmount > 0 ? Math.round((amount / origAmount) * 1e6) / 1e6 : rate;
       }
 
       const base = {
@@ -457,7 +468,8 @@ import '../styles/tools.css';
         amount,
         origAmount: round2(origAmount),
         currency,
-        rate,
+        baseCurrency: baseCur(),
+        rate: rateOut,
         payerId,
         date: $('expDate').value || '',
         category: $('expCategory').value.trim(),
@@ -475,7 +487,7 @@ import '../styles/tools.css';
       } else {
         trip.expenses.push({ id: uid(), ...base });
       }
-      rememberCurrency(currency, rate); // 供下一筆預帶
+      rememberCurrency(currency, rateOut); // 供下一筆預帶
       saveTrip();
       resetForm();
       renderExpenses();
@@ -486,6 +498,7 @@ import '../styles/tools.css';
     function resetForm() {
       $('expDesc').value = '';
       $('expAmount').value = '';
+      $('expBaseAmount').value = '';
       $('expCategory').value = '';
       $('expMode').value = 'even';
       // 幣別預帶上一次填的內容(沒有紀錄時用主要幣別)
@@ -493,34 +506,73 @@ import '../styles/tools.css';
       $('expCurrency').value = cur;
       $('expRate').value = cur === baseCur() ? '1' : lastRate || '1';
       renderSplitList();
-      syncRateField();
-      syncModeUI();
+      refreshMoneyUI();
       $('saveExpense').textContent = '＋ 新增支出';
       $('cancelEdit').style.display = editingId ? 'inline-block' : 'none';
     }
 
-    // 幣別＝主要幣別時,匯率鎖 1 並禁用(等同「直接填台幣」);否則可自填匯率。
-    function syncRateField() {
-      const isBase = expCur() === baseCur();
-      const r = $('expRate');
-      if (isBase) { r.value = '1'; r.disabled = true; } else { r.disabled = false; }
+    // 三個金額欄位維持 計價金額 = 原幣金額 × 匯率 的連動:
+    //   改 原幣金額 / 匯率 → 重算「計價金額」
+    //   改 計價金額(刷卡跳出的) → 反推「匯率」(以刷卡金額為準,計算也以它為準)
+    // exact 模式的原幣金額與計價金額皆為各人加總,唯讀;原幣別＝計價幣別時匯率鎖 1。
+    const isExactMode = () => $('expMode').value === 'exact';
+
+    // exact 模式各人「計價幣別(基準額)」加總。
+    function sumExactBase(rate) {
+      return [...document.querySelectorAll('[data-share]:checked')].reduce((s, cb) => {
+        const el = document.querySelector(`[data-weight="${cb.dataset.share}"]`);
+        return round2(s + toBase(Number(el?.value) || 0, rate));
+      }, 0);
     }
-    // exact 模式:總額欄改為唯讀(由各人加總自動帶入);其餘模式可輸入。
-    function syncModeUI() {
-      const exact = $('expMode').value === 'exact';
+
+    // 依欄位狀態重新整理三個金額欄的可編輯性與自動值。
+    function refreshMoneyUI() {
+      const exact = isExactMode();
+      const isBase = expCur() === baseCur();
+      $('expBaseCur').value = baseCur();
+
       $('expAmount').disabled = exact;
-      $('expAmountLabel').textContent = exact ? '金額(自動加總)' : '金額';
+      $('expAmountLabel').textContent = exact ? '原幣金額(自動加總)' : '原幣金額';
       if (exact) $('expAmount').value = num2(sumExactOrig());
+
+      $('expRate').disabled = isBase;
+      if (isBase) $('expRate').value = '1';
+
+      // 計價金額:exact(各人加總)或 原幣別＝計價幣別(等同原幣金額)時為自動、唯讀
+      $('expBaseAmount').disabled = exact || isBase;
+      recalcBaseFromInputs();
       updateConvHint();
     }
+
+    // 計價金額 = 原幣金額 × 匯率(exact 為各人基準額加總),寫回顯示。
+    function recalcBaseFromInputs() {
+      const rate = expRate();
+      const base = isExactMode()
+        ? sumExactBase(rate)
+        : toBase(Number($('expAmount').value) || 0, rate);
+      $('expBaseAmount').value = base > 0 ? num2(base) : '';
+    }
+
+    // 使用者改「計價金額」→ 反推匯率 = 計價金額 ÷ 原幣金額。
+    function recalcRateFromBase() {
+      const orig = Number($('expAmount').value) || 0;
+      const base = Number($('expBaseAmount').value) || 0;
+      if (orig > 0 && base > 0) {
+        $('expRate').value = String(Math.round((base / orig) * 1e6) / 1e6);
+      }
+      updateConvHint();
+    }
+
     function updateConvHint() {
       const cur = expCur();
       const rate = expRate();
-      const orig = $('expMode').value === 'exact' ? sumExactOrig() : Number($('expAmount').value) || 0;
+      const orig = isExactMode() ? sumExactOrig() : Number($('expAmount').value) || 0;
+      const base = Number($('expBaseAmount').value) || 0;
+      const rateStr = String(Math.round(rate * 1e6) / 1e6); // 保留匯率精度,不做 2 位進位
       $('convHint').textContent =
-        cur === baseCur() || !(orig > 0)
+        cur === baseCur() || !(orig > 0) || !(base > 0)
           ? ''
-          : `${fmtCur(orig, cur)} × ${num2(rate)} ≈ ${fmt(toBase(orig, rate))}`;
+          : `${fmtCur(orig, cur)} × ${rateStr} ≈ ${fmt(base)}`;
     }
 
     $('expenseList').addEventListener('click', (e) => {
@@ -556,8 +608,12 @@ import '../styles/tools.css';
       // exact:優先用原幣金額回填,舊資料(無 exactOrig)退回用基準額
       if (e.splitMode === 'exact') Object.assign(values, e.exactOrig || e.exact || {});
       renderSplitList({ checked: new Set(e.sharedBy || []), values });
-      syncRateField();
-      syncModeUI();
+      refreshMoneyUI();
+      // 以儲存的計價金額(基準額)為準顯示,不用 原幣×匯率 重算以免進位差
+      if (!isExactMode() && !$('expBaseAmount').disabled && e.amount != null) {
+        $('expBaseAmount').value = num2(e.amount);
+        updateConvHint();
+      }
       $('saveExpense').textContent = '✓ 更新支出';
       $('cancelEdit').style.display = 'inline-block';
       $('expDesc').scrollIntoView({ behavior: 'smooth', block: 'center' });
