@@ -19,7 +19,7 @@ draft: false
 先盤點渠道。這個系統的通知走四條路,嚴重度越高、渠道越貴:
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 580 264" role="img" aria-label="通知渠道的嚴重度階梯。第一級 private reply:自動、免費、量大,用於得標通知並附綁定 token,受 FB 政策牆限制一則留言只能回覆一次。第二級 email:常規與內部通知,async 任務完成通知走這裡,用 Google Workspace,缺點是會沉底。第三級電話:人工、最貴,保留給最後通牒——錢要被清、人要進黑名單之前,由客服撥打;這條渠道是用「綁定電話送免運」的活動買來的。旁支簡訊:只用於身份認證 OTP。底部結論:渠道成本與訊息嚴重度對齊,觸達權是產品換來的。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
+  <svg viewBox="0 0 580 264" role="img" aria-label="通知渠道的嚴重度階梯。第一級 private reply:自動、免費、量大,用於得標通知並附綁定 token,受 FB 政策牆限制一則留言只能回覆一次。第二級 email:常規與內部通知,async 任務完成通知走這裡,用 Google Workspace,缺點是會沉底。第三級電話:人工、最貴,保留給最後通牒——錢要被清、人要進黑名單之前,由客服撥打;這條渠道是用「綁定電話送免運」的活動買來的。旁支簡訊:平時只用於身份認證 OTP,催繳時每個檔期只發一次最後催繳簡訊,簡訊沒催動的才輪到客服電話。底部結論:渠道成本與訊息嚴重度對齊,觸達權是產品換來的。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
     <defs><marker id="rnt" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#9aa4b2"/></marker></defs>
     <text x="252" y="22" fill="#9aa4b2" font-size="7.6" text-anchor="middle">訊息嚴重度 →</text>
     <line x1="120" y1="30" x2="390" y2="30" stroke="#3a4154" stroke-width="1" marker-end="url(#rnt)"/>
@@ -41,15 +41,15 @@ draft: false
     <text x="481" y="100" fill="#e6e6e6" font-size="6.8" text-anchor="middle">最後通牒:錢要被清、</text>
     <text x="481" y="113" fill="#e6e6e6" font-size="6.8" text-anchor="middle">人要進黑名單之前</text>
     <text x="481" y="134" fill="#54b890" font-size="6.2" text-anchor="middle" font-weight="bold">渠道來源:綁電話送免運</text>
-    <rect x="206" y="170" width="170" height="34" rx="7" fill="#262b3a" stroke="#9aa4b2" stroke-width="1"/>
-    <text x="291" y="185" fill="#e6e6e6" font-size="7" text-anchor="middle">簡訊:只做身份認證(OTP)</text>
-    <text x="291" y="197" fill="#9aa4b2" font-size="6" text-anchor="middle">渠道用途有紀律,不混用</text>
+    <rect x="186" y="170" width="210" height="34" rx="7" fill="#262b3a" stroke="#9aa4b2" stroke-width="1"/>
+    <text x="291" y="185" fill="#e6e6e6" font-size="7" text-anchor="middle">簡訊:OTP+最後催繳(一檔期只發一次)</text>
+    <text x="291" y="197" fill="#9aa4b2" font-size="6" text-anchor="middle">簡訊沒催動的,才輪到電話</text>
     <text x="290" y="238" fill="#9aa4b2" font-size="7.6" text-anchor="middle">渠道成本與訊息嚴重度對齊;而觸達權不是接 API 就有的——它是產品換來的</text>
   </svg>
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">三級階梯加一條旁支:越嚴重的訊息走越貴的渠道,最貴的那條靠人。</figcaption>
 </figure>
 
-最值得停的是電話那格。催付——檔期要結了、再不付款單就要被清、人要進黑名單——這種訊息交給任何自動渠道都不夠:private reply 有政策牆(FB 規定一則留言只能回一次,得標通知已經用掉了),email 會沉底。**必達的訊息只有電話**,但打電話要有號碼——所以當年做了「**綁定電話送免運**」的活動,很多客人綁了。用運費**採購**一條高觸達渠道,順便給簡訊 OTP 鋪路——**觸達權是稀缺資產,它不是接了 API 就有,是產品拿東西換來的**。這是我在這個系統裡最喜歡的增長設計之一。
+最值得停的是催付這條線,它是**兩段式**的。檔期尾聲,先發**一次催繳簡訊**——簡訊有 API,但一個檔期只用這一次,稀缺渠道省著用的紀律做到了極致;簡訊沒催動的,才進**客服電話**:再不付款單就要被清、人要進黑名單,這種最後通牒交給任何自動渠道都不夠——private reply 有政策牆(FB 規定一則留言只能回一次,得標通知已經用掉了),email 會沉底,**必達的訊息只有電話**。而無論簡訊還是電話,前提都是有號碼——所以當年做了「**綁定電話送免運**」的活動,很多客人綁了。用運費**採購**一條高觸達渠道,順便給簡訊 OTP 鋪路——**觸達權是稀缺資產,它不是接了 API 就有,是產品拿東西換來的**。這是我在這個系統裡最喜歡的增長設計之一。
 
 ## 沒有隊列的通知隊列
 
