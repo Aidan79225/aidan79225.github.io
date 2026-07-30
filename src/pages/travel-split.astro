@@ -97,11 +97,16 @@ import '../styles/tools.css';
       </label>
       <div class="ts-row" style="margin-top:.6rem">
         <button id="syncBtn">⟲ 同步</button>
+        <button id="shareBtn">🔗 複製分享連結</button>
         <button class="ghost" id="exportBtn" style="background:#374151">匯出 JSON</button>
         <button class="ghost" id="importBtn" style="background:#374151">匯入 JSON</button>
         <input type="file" id="importFile" accept="application/json,.json" style="display:none" />
         <button class="ghost" id="resetBtn" style="background:#7f1d1d">清空此行程</button>
       </div>
+      <p class="ts-muted" style="margin:.5rem 0 0">
+        「複製分享連結」會把端點與行程代碼打包進網址,朋友點開即自動帶入並同步,不用手動設定。
+        (連結含此帳本的讀寫權限,只傳給同行的人。)
+      </p>
       <p class="ts-status ts-muted" id="syncStatus" style="margin-top:.5rem"></p>
 
       <details class="ts-guide">
@@ -153,6 +158,19 @@ import '../styles/tools.css';
       } catch (_) {}
     }
 
+    // UTF-8-safe base64url(可含中文的行程名稱)。
+    const b64urlEncode = (str) =>
+      btoa(String.fromCharCode(...new TextEncoder().encode(str)))
+        .replace(/\+/g, '-').replace(/\//g, '_').replace(/=+$/, '');
+    const b64urlDecode = (s) => {
+      const b64 = s.replace(/-/g, '+').replace(/_/g, '/');
+      const bin = atob(b64 + '==='.slice((b64.length + 3) % 4));
+      return new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0)));
+    };
+    // 把共享設定打包成分享連結的 payload,及反向解析。
+    const encodeShare = (obj) => b64urlEncode(JSON.stringify(obj));
+    const decodeShare = (s) => JSON.parse(b64urlDecode(s));
+
     const uid = () =>
       (crypto.randomUUID?.() ||
         `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`);
@@ -163,7 +181,7 @@ import '../styles/tools.css';
         code: code || '',
         name: '',
         currency: 'TWD',
-        metaUpdatedAt: now(),
+        metaUpdatedAt: 0, // 尚未編輯過 → 合併時不會蓋掉雲端既有的名稱/幣別
         members: [],
         expenses: [],
       };
@@ -658,6 +676,50 @@ import '../styles/tools.css';
       }
     }
 
+    // 產生「朋友點開即自動帶入並同步」的分享連結
+    $('shareBtn').addEventListener('click', async () => {
+      const endpoint = $('endpoint').value.trim();
+      if (!endpoint) return setStatus('請先設定端點網址,才能產生分享連結', 'err');
+      if (!trip.code) return setStatus('請先設定「行程代碼」,才能產生分享連結', 'err');
+      const payload = { e: endpoint, c: trip.code, n: trip.name || '', cur: trip.currency || '' };
+      const url = `${location.origin}${location.pathname}#s=${encodeShare(payload)}`;
+      try {
+        await navigator.clipboard.writeText(url);
+        setStatus('分享連結已複製 ✓,傳給同行的人點開即可', 'ok');
+      } catch (_) {
+        prompt('複製這段分享連結給同行的人:', url); // clipboard 不可用時的退路
+      }
+    });
+
+    // 從網址 #s=<base64> 帶入端點/行程代碼,並自動同步。回傳是否成功帶入。
+    async function importFromHash() {
+      const m = (location.hash || '').match(/[#&]s=([^&]+)/);
+      if (!m) return false;
+      let cfg;
+      try {
+        cfg = decodeShare(decodeURIComponent(m[1]));
+      } catch (_) {
+        setStatus('分享連結格式不正確', 'err');
+        return false;
+      }
+      if (cfg.e) { $('endpoint').value = cfg.e; localStorage.setItem(LS_ENDPOINT, cfg.e); }
+      const code = (cfg.c || '').trim();
+      if (code) {
+        saveTrip();            // 存回目前這份
+        trip = loadTrip(code); // 切到分享的行程代碼
+        trip.code = code;
+        if (!trip.name && cfg.n) trip.name = cfg.n;
+        if (!trip.currency && cfg.cur) trip.currency = cfg.cur;
+        saveTrip();
+      }
+      // 帶入後清掉網址上的 hash,避免每次重新整理又觸發
+      history.replaceState(null, '', location.pathname + location.search);
+      render();
+      resetForm();
+      if (cfg.e && code) { setStatus('已從分享連結帶入,正在同步…'); await sync(); }
+      return true;
+    }
+
     $('exportBtn').addEventListener('click', () => {
       const blob = new Blob([JSON.stringify(trip, null, 2)], { type: 'application/json' });
       const a = document.createElement('a');
@@ -748,7 +810,7 @@ function doPost(e) {
     });
 
     // ── 啟動 ────────────────────────────────────────────────────
-    (function init() {
+    (async function init() {
       const lastCode = localStorage.getItem(LS_LAST) || '';
       trip = loadTrip(lastCode);
       trip.code = trip.code || lastCode;
@@ -757,6 +819,8 @@ function doPost(e) {
       $('endpoint').value = localStorage.getItem(LS_ENDPOINT) || '';
       render();
       resetForm();
+      // 若網址帶有 #s=<base64> 分享設定,帶入並自動同步
+      await importFromHash();
     })();
   </script>
 </BaseLayout>
