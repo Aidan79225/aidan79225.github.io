@@ -58,8 +58,8 @@
 
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
-| 14 | `rezero-flash-crowd` | 開賣瞬間:主播喊完 key 的那三秒 | 直播電商的尖峰不是 gradual、是**主播一句話觸發的 thundering herd**;讀寫分開救:商品頁快取、下單走 queue;degrade 優先序(什麼可以慢、什麼不能錯);當年的死法與重來的防線——接 `[[sre-cascading-failures]]`、`[[redis-cache-patterns]]`、`[[kafka-intro]]`(backpressure) | ⬜ |
-| 15 | `rezero-ops` | 沒有 SRE 的年代:backend lead 的上線日記 | 當年沒有 SRE 這個角色,backend lead 扛全部 infra、上線後提心吊膽;**單一 process、單 CPU 的 API server 被打爆 → 緊急上 traefik 開 4 個 process 扛住**;Celery worker 同款調整(慢呼叫如打開發票 API 要隔離隊列);**遇過 DDoS**;每場直播人肉跟播=用恐懼當監控;重來版:容量估算、負載測試、監控告警在上線前就位——接 `[[sre-monitoring]]`、`[[obs-intro]]`、`[[k8s-deployment]]`(多副本) | ⬜ |
+| 14 | `rezero-flash-crowd` | 開賣瞬間:主播喊完 key 的那三秒 | 尖峰的形狀圖(介紹期 10–20/s → 起標垂直牆 200/s → 放優惠脈衝列;13,000 人在線、副台疊加 ~250/s);**商業模式自帶削峰**(口播節奏=天然流控);兩種命運對照圖:**批次淤而不倒 vs 同步一觸即炸**(過載付帳的貨幣=延遲 vs 可用性);毒藥訊息事故(batch 200 一筆炸整批棄、「留言看起來很多,下單量只有小貓兩三隻」、合約談崩被迫提早上線;演進:整批死→單筆略過→重來補 dead-letter);讀路徑戰記四連環(肥檔期列表 API→單 process 爆→traefik 開 4 台→DDoS 一小時帳單 +$1000、Cloud Armor 沒用→Cloudflare 免費解決「雲端菩薩拯救世人」);重來四則(RESTful 列表紀律、day-1 Cloudflare、dead-letter、batch-lag 量表);反思:過載付帳貨幣、尖峰是商業模式的形狀、**帳單也是攻擊面** | ✅ 已發布 |
+| 15 | `rezero-ops` | 沒有 SRE 的年代:backend lead 的上線日記 | 當年沒有 SRE 這個角色,backend lead 扛全部 infra、上線後提心吊膽;Celery worker 隊列調整(慢呼叫如打開發票 API 要隔離隊列);每場直播人肉跟播=用恐懼當監控;重來版:容量估算、負載測試、監控告警在上線前就位(traefik×4 與 DDoS 戰記已在 #14 講完,本章聚焦「沒有 SRE 的日常」)——接 `[[sre-monitoring]]`、`[[obs-intro]]`、`[[k8s-deployment]]`(多副本) | ⬜ |
 | 16 | `rezero-reconciliation` | 三本帳:庫存帳、訂單帳、金流帳 | **開場 frame(作者中段體悟之三):整個系統=一台拆開的資料庫**(留言落地=WAL、FSM=log consumer 建索引、計數=物化視圖、每時重算=repair、配貨紀錄=redo log、掃表=內建 job queue、讀時派生=view、結算=compaction;拆開的代價=親手補回 DB 免費送的交易保證——本章主角);三本帳=副本一致性檢查、定時對帳抓漂移、錯帳修法(補償不改歷史)——DDIA 第三部分實戰版——接 `[[ddia-streaming]]`、`[[ddia-future]]`(unbundled database)、`[[airflow-reliability]]` | ⬜ ★ |
 
 ## 第六批 — 演進與終局
