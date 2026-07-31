@@ -60,7 +60,7 @@
 |---|---|---|---|---|
 | 14 | `rezero-flash-crowd` | 開賣瞬間:主播喊完 key 的那三秒 | 直播電商的尖峰不是 gradual、是**主播一句話觸發的 thundering herd**;讀寫分開救:商品頁快取、下單走 queue;degrade 優先序(什麼可以慢、什麼不能錯);當年的死法與重來的防線——接 `[[sre-cascading-failures]]`、`[[redis-cache-patterns]]`、`[[kafka-intro]]`(backpressure) | ⬜ |
 | 15 | `rezero-ops` | 沒有 SRE 的年代:backend lead 的上線日記 | 當年沒有 SRE 這個角色,backend lead 扛全部 infra、上線後提心吊膽;**單一 process、單 CPU 的 API server 被打爆 → 緊急上 traefik 開 4 個 process 扛住**;Celery worker 同款調整(慢呼叫如打開發票 API 要隔離隊列);**遇過 DDoS**;每場直播人肉跟播=用恐懼當監控;重來版:容量估算、負載測試、監控告警在上線前就位——接 `[[sre-monitoring]]`、`[[obs-intro]]`、`[[k8s-deployment]]`(多副本) | ⬜ |
-| 16 | `rezero-reconciliation` | 三本帳:庫存帳、訂單帳、金流帳 | 分散式系統跑久了帳一定歪;把留言/下單事件流當事實來源(event log),庫存與訂單是 derived view;定時對帳 job 抓漂移、錯帳的修法(補償而非改歷史)——這章是 DDIA 第三部分的實戰版——接 `[[ddia-streaming]]`(CDC/事件溯源)、`[[ddia-future]]`、`[[airflow-reliability]]` | ⬜ ★ |
+| 16 | `rezero-reconciliation` | 三本帳:庫存帳、訂單帳、金流帳 | **開場 frame(作者中段體悟之三):整個系統=一台拆開的資料庫**(留言落地=WAL、FSM=log consumer 建索引、計數=物化視圖、每時重算=repair、配貨紀錄=redo log、掃表=內建 job queue、讀時派生=view、結算=compaction;拆開的代價=親手補回 DB 免費送的交易保證——本章主角);三本帳=副本一致性檢查、定時對帳抓漂移、錯帳修法(補償不改歷史)——DDIA 第三部分實戰版——接 `[[ddia-streaming]]`、`[[ddia-future]]`(unbundled database)、`[[airflow-reliability]]` | ⬜ ★ |
 
 ## 第六批 — 演進與終局
 
