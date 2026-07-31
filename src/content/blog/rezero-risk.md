@@ -1,0 +1,133 @@
+---
+title: "風控與黑名單:不是逐客令,是信用體系"
+date: 2026-07-31
+category: tech
+description: "營運面收官:惡意下單是對庫存的 DoS——四級分級懲罰(從一顆確認鈕到永 ban)、只禁喊單不禁刷卡的信用邏輯、banned user 表與 Redis 的執行機關、連坐與綁定傳播,以及重來唯一要補的一件事:給風控裝上眼睛。"
+tags:
+  - war-story
+  - live-commerce
+  - risk-control
+series: "Re:從零開始做直播代購電商平台"
+seriesOrder: 13
+comments: true
+draft: false
+---
+先把攻擊模型講清楚。這個系統裡,留言喊單**當場佔庫存**、付款卻在檔期尾聲——中間隔著幾天的信任。惡意的玩法於是很簡單:**喊單、佔住、不付**。庫存被白佔最長一整週(檔期長度),真想買的客人搶不到,主播的貨卡在幽靈訂單手上——**惡意下單就是對庫存的 DoS**,而且發動成本是零:打幾個字而已。
+
+[[rezero-inventory|庫存]]是這個系統的公共資源,風控就是它的治理。這章講當年那套治理長什麼樣——它比「黑名單」三個字精緻得多。
+
+## 分級懲罰:從一顆確認鈕到永 ban
+
+不付款被抓到,不是一刀封殺,是**四級遞進**:
+
+<figure style="margin:1.5rem 0;text-align:center;">
+  <svg viewBox="0 0 580 234" role="img" aria-label="四級分級懲罰的階梯。第一次:客人開網頁跳出警示對話框,按下確認即解鎖——本質是簽收警告,誤殺成本趨近零。第二次:鎖一個月,不能直播喊單。第三次:鎖三個月。第四次:永久封鎖。再犯一次就往上爬一級。底部結論:分級讓誤殺變便宜,讓慣犯自己爬上重罰。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
+    <defs><marker id="rkf" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#9aa4b2"/></marker></defs>
+    <rect x="16" y="96" width="130" height="72" rx="8" fill="#233528" stroke="#54b890" stroke-width="1.4"/>
+    <text x="81" y="116" fill="#54b890" font-size="8.2" text-anchor="middle" font-weight="bold">第一次</text>
+    <text x="81" y="132" fill="#e6e6e6" font-size="6.8" text-anchor="middle">開網頁跳警示 dialog</text>
+    <text x="81" y="146" fill="#e6e6e6" font-size="6.8" text-anchor="middle">按「確認」即解鎖</text>
+    <text x="81" y="160" fill="#54b890" font-size="6" text-anchor="middle">簽收警告・誤殺成本≈0</text>
+    <line x1="146" y1="130" x2="162" y2="120" stroke="#9aa4b2" stroke-width="1.1" marker-end="url(#rkf)"/>
+    <rect x="166" y="76" width="130" height="72" rx="8" fill="#2e2a20" stroke="#d6a45c" stroke-width="1.4"/>
+    <text x="231" y="96" fill="#d6a45c" font-size="8.2" text-anchor="middle" font-weight="bold">第二次</text>
+    <text x="231" y="114" fill="#e6e6e6" font-size="7" text-anchor="middle">鎖一個月</text>
+    <text x="231" y="130" fill="#9aa4b2" font-size="6" text-anchor="middle">時效到自動解</text>
+    <line x1="296" y1="110" x2="312" y2="100" stroke="#9aa4b2" stroke-width="1.1" marker-end="url(#rkf)"/>
+    <rect x="316" y="56" width="130" height="72" rx="8" fill="#3a2e20" stroke="#e0733a" stroke-width="1.4"/>
+    <text x="381" y="76" fill="#e0733a" font-size="8.2" text-anchor="middle" font-weight="bold">第三次</text>
+    <text x="381" y="94" fill="#e6e6e6" font-size="7" text-anchor="middle">鎖三個月</text>
+    <text x="381" y="110" fill="#9aa4b2" font-size="6" text-anchor="middle">時效到自動解</text>
+    <line x1="446" y1="90" x2="462" y2="80" stroke="#9aa4b2" stroke-width="1.1" marker-end="url(#rkf)"/>
+    <rect x="466" y="36" width="100" height="72" rx="8" fill="#3a2632" stroke="#e05a7d" stroke-width="1.5"/>
+    <text x="516" y="56" fill="#e05a7d" font-size="8.2" text-anchor="middle" font-weight="bold">第四次</text>
+    <text x="516" y="76" fill="#e6e6e6" font-size="7.4" text-anchor="middle" font-weight="bold">永 ban</text>
+    <text x="516" y="92" fill="#9aa4b2" font-size="6" text-anchor="middle">僅客服可解</text>
+    <text x="290" y="204" fill="#9aa4b2" font-size="7.8" text-anchor="middle">再犯一次,往上爬一級——分級讓誤殺變便宜,讓慣犯自己爬上重罰</text>
+  </svg>
+  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">四級階梯:第一級只要你「知道」,最後一級才是門。</figcaption>
+</figure>
+
+第一級是整座階梯的靈魂。它**不是懲罰,是簽收**:下次開網頁跳一個警示 dialog,按下確認、當場解鎖——什麼都沒失去,但「規則已告知」這件事完成了。我原本以為誤殺(真的忘了付、臨時出國的好客人)要靠申訴流程去救,這個設計給了高一個層次的答案:**讓第一級罰則便宜到誤殺無所謂**——無辜者的全部代價是按一顆按鈕,連客服都不用找。偵測不用做到多準,因為判錯的傷害已經被結構吸收了。
+
+而慣犯不需要另外偵測——**他們自己會沿著階梯往上爬**:一個月、三個月、永 ban。這套「警告→輕罰→重罰→除名」的遞進,治理學裡有個名字叫 graduated sanctions,是管理公共資源的經典設計——當年沒有人讀過那些文獻,它是被業務直覺長出來的。
+
+## 只禁喊單,不禁刷卡
+
+被 ban 之後,實際上失去的是什麼?這是全章我最喜歡的一刀:**banned user 只是不能在直播喊單——去商城刷卡付錢下單,照常歡迎。**
+
+拆開看它為什麼對。這個系統有兩種交易:
+
+- **喊單是信用交易**:留言先佔庫存、檔期尾聲才付錢——中間那幾天,平台在給你信用。
+- **商城刷卡是現金交易**:先付錢,才有貨——不需要任何信任。
+
+惡意不付款的人,濫用的是**前者的信用**——所以被拔掉的,精準地只有那個特權。信用破產的人不是不能做生意,是**只能現金交易**:這是銀行業幾百年的邏輯,在直播電商裡被重新發明了一次。附帶的商業紅利也真實:慣犯的錢照賺,只是要先付;真心悔改的路永遠開著,走商城累積紀錄就是。**懲罰的顆粒度,對齊被濫用的信任的顆粒度**——罰其所犯,不多不少。
+
+## 執行機關:一張表、一個 cache、一排按鈕
+
+<figure style="margin:1.5rem 0;text-align:center;">
+  <svg viewBox="0 0 580 274" role="img" aria-label="黑名單的執行架構。留言進來先查 Redis 的黑名單集合:命中就不處理,未命中才進 FSM 下單。Redis 只做快速判斷,事實在 DB 的 banned user 表——content type 加 object id 的泛型外鍵,可封鎖 identity 或 account 任何主體,帶時效欄位。寫入來源有三:結算檔期後以 Redis pipeline 批次寫入、主播與助理的留言瀑布一鍵拉黑、新身份綁定到被封帳號時的連坐傳播。解鎖有二:時效到自動解、客服在 user 管理介面手動解。Redis 重啟時從 DB 全量重建。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
+    <defs><marker id="rke" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#4f6df5"/></marker><marker id="rkg" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#54b890"/></marker></defs>
+    <rect x="16" y="28" width="96" height="30" rx="6" fill="#262b3a" stroke="#9aa4b2" stroke-width="1"/>
+    <text x="64" y="47" fill="#e6e6e6" font-size="7.4" text-anchor="middle">留言進來</text>
+    <line x1="112" y1="43" x2="150" y2="43" stroke="#4f6df5" stroke-width="1.3" marker-end="url(#rke)"/>
+    <rect x="154" y="20" width="180" height="46" rx="8" fill="#3a2626" stroke="#dc4c3f" stroke-width="1.5"/>
+    <text x="244" y="40" fill="#dc4c3f" font-size="8.6" text-anchor="middle" font-weight="bold">Redis 黑名單</text>
+    <text x="244" y="56" fill="#9aa4b2" font-size="6.4" text-anchor="middle">只做快速判斷・重啟從 DB 重建</text>
+    <line x1="334" y1="36" x2="392" y2="30" stroke="#e05a7d" stroke-width="1.2"/>
+    <text x="404" y="33" fill="#e05a7d" font-size="7" text-anchor="start">命中 → 不處理</text>
+    <line x1="334" y1="54" x2="392" y2="60" stroke="#54b890" stroke-width="1.2" marker-end="url(#rkg)"/>
+    <text x="404" y="63" fill="#54b890" font-size="7" text-anchor="start">未命中 → FSM 下單</text>
+    <rect x="150" y="112" width="280" height="54" rx="8" fill="#2e2a20" stroke="#d6a45c" stroke-width="1.5"/>
+    <text x="290" y="132" fill="#d6a45c" font-size="8.6" text-anchor="middle" font-weight="bold">banned user 表(事實)</text>
+    <text x="290" y="148" fill="#9aa4b2" font-size="6.6" text-anchor="middle">content type + object id:可封任何主體(identity/account)</text>
+    <text x="290" y="160" fill="#9aa4b2" font-size="6.6" text-anchor="middle">帶時效——第幾次・鎖到何時</text>
+    <line x1="252" y1="112" x2="244" y2="70" stroke="#d6a45c" stroke-width="1.1" stroke-dasharray="3 3" marker-end="url(#rke)"/>
+    <text x="204" y="92" fill="#9aa4b2" font-size="6" text-anchor="middle">同步/重建</text>
+    <rect x="16" y="204" width="168" height="44" rx="7" fill="#26324a" stroke="#4f6df5" stroke-width="1.2"/>
+    <text x="100" y="222" fill="#4f6df5" font-size="7.2" text-anchor="middle" font-weight="bold">結算檔期</text>
+    <text x="100" y="237" fill="#9aa4b2" font-size="6.2" text-anchor="middle">依條件入名單・pipeline 批次寫</text>
+    <rect x="204" y="204" width="168" height="44" rx="7" fill="#2a2440" stroke="#9b6ff0" stroke-width="1.2"/>
+    <text x="288" y="222" fill="#9b6ff0" font-size="7.2" text-anchor="middle" font-weight="bold">留言瀑布一鍵拉黑</text>
+    <text x="288" y="237" fill="#9aa4b2" font-size="6.2" text-anchor="middle">主播/助理 dashboard・即時</text>
+    <rect x="392" y="204" width="172" height="44" rx="7" fill="#233528" stroke="#54b890" stroke-width="1.2"/>
+    <text x="478" y="222" fill="#54b890" font-size="7.2" text-anchor="middle" font-weight="bold">綁定傳播(連坐)</text>
+    <text x="478" y="237" fill="#9aa4b2" font-size="6.2" text-anchor="middle">新身份綁被封帳號→更新 Redis</text>
+    <line x1="100" y1="204" x2="200" y2="170" stroke="#4f6df5" stroke-width="1" marker-end="url(#rke)"/>
+    <line x1="288" y1="204" x2="288" y2="170" stroke="#4f6df5" stroke-width="1" marker-end="url(#rke)"/>
+    <line x1="478" y1="204" x2="382" y2="170" stroke="#4f6df5" stroke-width="1" marker-end="url(#rke)"/>
+    <text x="474" y="130" fill="#9aa4b2" font-size="6.6" text-anchor="start">出獄:時效自動解</text>
+    <text x="474" y="144" fill="#9aa4b2" font-size="6.6" text-anchor="start">+ 客服介面手動解</text>
+    <text x="474" y="158" fill="#9aa4b2" font-size="6.6" text-anchor="start">(可 filter banned)</text>
+  </svg>
+  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">快速判斷在 Redis、事實在 DB;三個入口、兩個出口,一鍵可查。</figcaption>
+</figure>
+
+執行層的每個零件,前面的章節都見過它的親戚:
+
+- **banned user 表用 content type + object id**——泛型外鍵在這個系統第三次出場(購物車來源、如今是封鎖主體):要封 fb user 封 fb user、要封 account 封 account,一張表通吃。**連坐是 account 級的**:封了帳號,名下綁定的身份一起生效;而且[[rezero-identity|綁定]]的瞬間會更新 Redis——**新身份綁上被封的帳號,當場繼承前科**。當然,身份的天生限制還在:換一張全新的臉(新 FB 帳號)有時就是擋不住——這是 #4 講過的老實話,風控只能提高成本,不能消滅匿名。
+- **Redis 只做快速判斷,事實在 DB**——[[redis-cache-patterns|快取的正確姿勢]]:每則留言都要問「這人在不在名單裡」,這是高頻小查詢,batch 攤不掉,所以住 Redis;重啟從 DB 重建,結算檔期後用 **pipeline 批次寫入**(一次直播季的名單更新,一輪往返打完),空窗只有結算那一小段。
+- **留言瀑布一鍵拉黑**——[[rezero-console|主播和助理的 dashboard]]上,黑名單標籤旁邊就是執法按鈕:鬧場的、辱罵的,現場處置,不用等檔期結算。情報卡和執法台是同一個畫面。
+- **出獄有兩條路**:時效到自動解(一個月、三個月的鎖),客服在 user 管理介面手動解(介面可以直接 filter banned 狀態——內部工具的 UX,第 N 次)。
+
+## 重來:給風控裝上眼睛
+
+這章的重來清單只有一項,而且是你在前面每章都沒見過的類型:**測量**。
+
+當年這套風控上線之後,「後面沒收到負面的 feedback」——但我們**沒有做任何相關測量**。擋掉了多少惡意訂單?第一級警告之後有多少人乖乖付款(改過率)?有沒有好客人被三個月的鎖冤枉(誤殺率)?永 ban 的人換臉回流了多少?**全部不知道。**「沒收到抱怨」是沉默偏差,不是證據——被誤殺的客人最可能的反應不是申訴,是安靜地再也不來。
+
+回頭看,風控是整個系統唯一「**做了,但不知道有沒有效**」的子系統:庫存有不變量守著、金流有對帳、通知有送達欄位——風控什麼都沒有。重來的清單就一條:每一級懲罰的觸發量、一級警告後的付款率、解鎖後的回購率、慣犯的回流率——**先裝眼睛,再談調參**。這件事在當年是奢侈,在我後來做 DE 的世界裡是常識:沒有測量的機制,連「它還在不在運作」都是信仰。
+
+## 反思
+
+### 懲罰的設計,比偵測的設計重要
+
+業界談風控,九成的力氣花在偵測:更準的模型、更多的訊號、更即時的攔截。這個系統把重心放在另一頭——**懲罰的結構**:第一級便宜到誤殺無所謂,遞進讓慣犯自己浮上來,罰其所犯讓懲罰不傷及無辜的部分。結果是**偵測可以很笨**(就看有沒有付款,連模型都沒有),系統照樣運轉。這個順序值得每個做風控的人想一想:偵測的準度是漸進的軍備競賽,懲罰的結構是一次性的設計——**當懲罰結構對了,偵測只要大致對;當懲罰結構錯了(一刀永 ban),偵測再準都在製造冤案。**
+
+### 治理的智慧,長在業務直覺裡
+
+分級制裁、規則簽收、罰其所犯、連坐與時效——這一章的每個設計,拿去對照公共資源治理的文獻都能找到對應的原則,而當年沒有人讀過那些。它們是主播、營運、客服在一場一場直播裡磨出來的直覺,工程只是把直覺翻譯成表和 cache。這跟[[rezero-promotion|greedy 贏過最優解]]、[[rezero-cart-order|狀態機被拔掉]]是同一件事的第三次出現:**現場對「人會怎麼行為」的理解,常常領先工程師對「系統該怎麼設計」的理解**——好的系統設計者不是發明規則,是聽懂現場已經在用的規則,然後把它變得可執行、可追溯。
+
+### 風控的終點,是把人留下來
+
+「只禁喊單、不禁刷卡」藏著一個容易被忽略的價值觀:**風控的目標不是驅逐,是修復信任**。階梯的每一級都留著回頭路——按個確認、等一個月、走商城重新累積紀錄;連永 ban 都留了客服這扇門。對比很多平台「偵測到異常→永久封號→申訴無門」的做法,這套設計把「人會犯錯、也會回頭」當成預設。而最可惜的也在這:**改過率——這套價值觀有沒有兌現的唯一證據——恰恰是沒被測量的那個數字**。重來的那雙眼睛,第一個要看的就是它。

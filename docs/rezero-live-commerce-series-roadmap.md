@@ -52,7 +52,7 @@
 | 10 | `rezero-permission` | 權限:誰能按哪顆按鈕——我們改了三次 | 誠實失敗章:三幕劇(Django permission 太細沒語意→塞 JWT 固化錯粒度→role-based 暴增)→落點 cost monitor 可疊加 role=role 組合;乘法變加法第三次(對照 `[[k8s-rbac]]` 只加不減);外包邊界(GitHub 管 repo、GCP 不給、資料碰不到);重來:單一 enforcement point、雙軌 role、JWT 只放 role 名單、敏感存取 audit;反思:摩擦債無催收、粒度標準是語意、先圍資產再優化模型 | ✅ 已發布 |
 | 11 | `rezero-promotion` | 優惠與金額:折扣算錯,比超賣還難查 | 優惠地圖(券=效果×門檻×範疇三軸參數表、多件優惠、admin 實驗層);NP-hard 最優組合讓位 greedy(主播第三課:可解釋性——演算法總成本=計算+解釋);三層開欄位=錢住語意所在層;floor-and-subtract 數字例(捨去零頭有主、減法總和恆等);反思:聰明演算法的墳墓是解釋成本、參數化重複隔離不確定、錢的正確性是會計性質——接 `[[rezero-cart-order]]`、`[[rezero-console]]` | ✅ 已發布 |
 | 12 | `rezero-notification` | 通知系統:兩個欄位、一支排程,和一通電話 | 渠道帳本(private reply/email/電話嚴重度階梯、電話渠道用免運買、簡訊僅 OTP);事實表當通知隊列(fbmsgtocartitem 五重身分、成功欄+重試≤5 終態、99% 送達殘量歸客服);FB 文件坑限速戰記(batch API 修復);10 秒規則、催付=一次查詢、站內通知不做;重來最短清單(殘量一鍵 filter、等第二渠道再抽象);反思:觸達權是買來的、最好的基礎設施是沒蓋的那些、99% 的系統 1% 的人——接 `[[rezero-identity]]`、`[[rezero-comment-order]]`、`[[rezero-console]]` | ✅ 已發布 |
-| 13 | `rezero-risk` | 風控與黑名單:惡意下單是對庫存的 DoS | **惡意下單不付款=免費佔庫存攻擊**(佔了不付、逾期釋放、再佔);訊號(棄單率、多 identity 同人)、分級處置(縮短保留時間→要求先付→黑名單);黑名單掛在 account 還是 identity?(跨平台換臉重來——又回到 #4 的身分難題);**當年的黑名單實作**:留言進來先查 Redis、命中就不理,Redis 重啟從黑名單 DB 重建(快速判斷放 Redis、事實放 DB——正是 cache 的正確用法);誤殺的代價與申訴——接 `[[rezero-identity]]`、`[[rezero-inventory]]`、`[[redis-cache-patterns]]` | ⬜ |
+| 13 | `rezero-risk` | 風控與黑名單:不是逐客令,是信用體系 | 攻擊模型(惡意下單=庫存 DoS、發動成本零);四級分級懲罰階梯圖(dialog 簽收→1 月→3 月→永 ban,誤殺被結構吸收=graduated sanctions);**只禁喊單不禁刷卡**(信用交易 vs 現金交易,罰其所犯);執行架構圖(banned user 泛型外鍵、Redis 快判+DB 事實+pipeline 批次、連坐綁定傳播、留言瀑布一鍵拉黑、時效+客服雙出口);重來唯一一項=測量(沒收到抱怨是沉默偏差);反思:懲罰結構比偵測準度重要、治理智慧長在業務直覺、風控終點是把人留下來——接 `[[rezero-identity]]`、`[[rezero-inventory]]`、`[[redis-cache-patterns]]`、`[[rezero-console]]` | ✅ 已發布 |
 
 ## 第五批 — 橫切與維運:尖峰、無 SRE 的上線、對帳
 
