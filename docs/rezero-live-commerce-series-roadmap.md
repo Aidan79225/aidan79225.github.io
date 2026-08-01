@@ -245,6 +245,11 @@
 - 一開始只開**一台 process、單一 CPU 的 API server,被打爆**;緊急加 **traefik、開 4 個 process** 扛住。
 - Celery worker 也有類似調整(例如打開發票 API 等慢呼叫)。
 - **遇過 DDoS**。
+- **監控=純人肉**(2026-08-01 記錄):當年的認知還不夠,只做到**用 Sentry 看 error**;一開始 **Sentry 容量一下就炸了,後來才加 sampling**;團隊沒人懂,作者也是「模模糊糊地看」。→ 角度:用 error tracking 當監控=只看得到 exception,看不到延遲與飽和。
+- **Celery 三個 docker container**:(1) **heartbeat**——跟 Django 結合做排程;(2) **抓留言專用,只有一個 worker**——推送留言透過 Redis 進 group、轉進 API server(API server 同時做 WebSocket)→ 接 #3:單 worker 天生序列化=「單一抓取 job 定義全域順序」讓 LWW 成立的物理基礎;(3) **各種 async task,10 個 worker**,走 RabbitMQ,**acks_late 盡量保證完成才做下一件**(至少一次語意→冪等需求,接 #7)。
+- **跟播四個視窗**:主播 dashboard(看各種數據進來是否正常)、VM terminal(看各 docker container CPU 使用量)、Django admin(隨時抽查 bidding key 狀態)、**直播本身——聽主播老闆有沒有說系統怪怪的**(最靈敏的告警系統是直播的聲音)。
+- **半夜事故:被 call 的是 CTO**(不是作者),而且 CTO 常常被這樣對待;伴隨**各種胡亂許願——連許願的人都說不清楚要什麼**。→ 定調(討論共識):當一節寫進 #15——當年缺的不只是監控,是**「事故的語言」**:沒有 severity 分級、triage、runbook,「系統怪怪的」無法翻譯成可操作訊號,雜訊全數升級到職位最高的技術人;許願人說不清楚,是因為系統沒給他們描述問題的詞彙。SRE 制度的價值之一=把翻譯成本從人肉搬進制度。EM 視角餘波(保護團隊不被許願池淹沒)#20 回收。
+- 動筆前待補:上線前有無任何 checklist(還是 staging 過了就上)?Sentry 有沒有真抓到過關鍵 bug?跟播是每場都跟嗎、穩定後有沒有少跟?半夜 call/胡亂許願有沒有具體例子?docker container 跑在幾台 VM 上?
 
 **黑名單(#13 相關)**:
 - message 進來**先查 Redis 黑名單,命中就不處理**。
