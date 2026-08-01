@@ -64,7 +64,7 @@ draft: false
 
 - **heartbeat**:跟 Django 結合做排程,整個系統所有「定時發生的事」——抓留言的節奏、每小時重算賣出數量、催付掃表——心跳都從這裡來。[[rezero-stack|#2]] 說過,Django + Celery + heartbeat 就是我們的免維運版 Airflow。
 - **抓留言:只有一個 worker。** 這不是省,是設計——單一 worker 天生序列化,[[rezero-comment-order|#3]] 講的「單一抓取 job 自己定義了全域順序」,讓 LWW 成立的物理基礎就是這一個 worker。它抓完留言,透過 Redis 的 group 把留言轉進 API server,由同一組 process 的 WebSocket 推上主播 dashboard——[[rezero-console|#9]] 的留言瀑布就是這條線。
-- **async task:10 個 worker**,走 RabbitMQ,設 `acks_late`——**做完才認,寧可重做,不可丟單**。這是至少一次語意,代價是任務要冪等,[[rezero-payment|#7]] 那套「事實表天生冪等」在這裡再度收利息。發票 API 這種一打就好幾秒的慢呼叫,後來被隔離出去,免得慢任務佔滿 worker、快任務全部排隊。
+- **async task:10 個 worker**,走 RabbitMQ,設 `acks_late`——**做完才認,寧可重做,不可丟單**。這是至少一次語意,代價是任務要冪等,[[rezero-payment|#7]] 那套「事實表天生冪等」在這裡再度收利息。發票 API 這種一打就好幾秒的慢呼叫,靠 RabbitMQ 排隊自然消化——做完一件、才消耗下一則訊息,慢任務淤在隊裡慢慢排,不會拖垮誰。[[rezero-flash-crowd|淤而不倒]],又一例。
 
 ## 監控:Sentry,和模模糊糊的我們
 

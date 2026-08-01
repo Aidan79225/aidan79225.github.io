@@ -61,7 +61,7 @@
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
 | 14 | `rezero-flash-crowd` | 開賣瞬間:主播喊完 key 的那三秒 | 尖峰的形狀圖(介紹期 10–20/s → 起標垂直牆 200/s → 放優惠脈衝列;13,000 人在線、副台疊加 ~250/s);**商業模式自帶削峰**(口播節奏=天然流控);兩種命運對照圖:**批次淤而不倒 vs 同步一觸即炸**(過載付帳的貨幣=延遲 vs 可用性);毒藥訊息事故(batch 200 一筆炸整批棄、「留言看起來很多,下單量只有小貓兩三隻」、合約談崩被迫提早上線;演進:整批死→單筆略過→重來補 dead-letter);讀路徑戰記四連環(肥檔期列表 API→單 process 爆→traefik 開 4 台→DDoS 一小時帳單 +$1000、Cloud Armor 沒用→Cloudflare 免費解決「雲端菩薩拯救世人」);重來四則(RESTful 列表紀律、day-1 Cloudflare、dead-letter、batch-lag 量表);反思:過載付帳貨幣、尖峰是商業模式的形狀、**帳單也是攻擊面** | ✅ 已發布 |
-| 15 | `rezero-ops` | 沒有 SRE 的年代:backend lead 的上線日記 | 一台 VM 的帝國圖(traefik+API×4+Celery 三容器+Redis+RabbitMQ 全擠一台、Cloud SQL 8 core,「厲害吧」;極簡資源是哲學);Celery 三容器分工(heartbeat=排程心臟、抓留言單 worker=全域順序的物理基礎接 #3、async 10 workers acks_late=至少一次接 #7 冪等、發票慢呼叫隔離);監控=模模糊糊的 Sentry(炸容量加 sampling;真戰績在 demo 階段=**持久化的錯誤記憶**;四黃金訊號只看得到 errors 一格);跟播四視窗圖(dashboard/terminal CPU/admin 抽查/**聽主播=最靈敏的告警**)+退場曲線(每場跟→有問題才 call→連 call 都沒了);**事故的語言**(半夜 call CTO、胡亂許願=沒給描述問題的詞彙、後選樣式隕石埋線給 #21;制度=翻譯機);重來:**pipeline 只保證部署是對的,不保證扛得住**——補另半張 checklist(容量+負載測試、四黃金訊號+batch lag、三級 severity+runbook、跟播轉產品觀察);反思:恐懼是最貴的監控(儀表板的意義是允許你不看)、制度是翻譯機、**職稱可以缺席問題不會缺席**(SRE 起點) | ✅ 已發布 |
+| 15 | `rezero-ops` | 沒有 SRE 的年代:backend lead 的上線日記 | 一台 VM 的帝國圖(traefik+API×4+Celery 三容器+Redis+RabbitMQ 全擠一台、Cloud SQL 8 core,「厲害吧」;極簡資源是哲學);Celery 三容器分工(heartbeat=排程心臟、抓留言單 worker=全域順序的物理基礎接 #3、async 10 workers acks_late=至少一次接 #7 冪等、發票慢呼叫靠 RabbitMQ 排隊做完才消耗下一則=淤而不倒又一例);監控=模模糊糊的 Sentry(炸容量加 sampling;真戰績在 demo 階段=**持久化的錯誤記憶**;四黃金訊號只看得到 errors 一格);跟播四視窗圖(dashboard/terminal CPU/admin 抽查/**聽主播=最靈敏的告警**)+退場曲線(每場跟→有問題才 call→連 call 都沒了);**事故的語言**(半夜 call CTO、胡亂許願=沒給描述問題的詞彙、後選樣式隕石埋線給 #21;制度=翻譯機);重來:**pipeline 只保證部署是對的,不保證扛得住**——補另半張 checklist(容量+負載測試、四黃金訊號+batch lag、三級 severity+runbook、跟播轉產品觀察);反思:恐懼是最貴的監控(儀表板的意義是允許你不看)、制度是翻譯機、**職稱可以缺席問題不會缺席**(SRE 起點) | ✅ 已發布 |
 | 16 | `rezero-reconciliation` | 三本帳:庫存帳、訂單帳、金流帳 | **開場 frame(作者中段體悟之三):整個系統=一台拆開的資料庫**(留言落地=WAL、FSM=log consumer 建索引、計數=物化視圖、每時重算=repair、配貨紀錄=redo log、掃表=內建 job queue、讀時派生=view、結算=compaction;拆開的代價=親手補回 DB 免費送的交易保證——本章主角);三本帳=副本一致性檢查、定時對帳抓漂移、錯帳修法(補償不改歷史)——DDIA 第三部分實戰版——接 `[[ddia-streaming]]`、`[[ddia-future]]`(unbundled database)、`[[airflow-reliability]]` | ⬜ ★ |
 | 17 | `rezero-asset-lifecycle` | 上傳容易,刪除難:圖片與資源的生命週期(暫定) | 上傳管線:前端切正方形+特定 size 轉 webp(優化),後端不信前端、驗檔+非 webp 再轉+做 thumbnail 上 GCS(保證)——**「前端的處理是優化,後端的處理是保證」**=縱深防禦,與 #3 DB-as-validator 同一信念;`image_metadata` 表存路徑/content type/object id=**泛型外鍵第四次登場**,且**雙向引用**:正向(product/style 直接存 image_metadata id)服務讀取、反向(泛型外鍵指回擁有者)只為清理——DB 外鍵管不到 blob storage,這張表把 FK 紀律延伸到 GCS 上=**手寫 reference tracking,清理=mark-and-sweep 手寫 GC**(接 #16 拆開的資料庫:GCS=外部 heap、image_metadata=GC root table);thumbnail=派生資料(原圖=事實);**軟刪除**收尾(不敢真刪的東西怎麼刪)——細節動筆前再討論 | ⬜ |
 
@@ -243,7 +243,7 @@
 **維運與上線(#15 相關)**:
 - 當年**沒有 SRE 這個角色**,backend lead 扛下全部 infrastructure 工作,上線後提心吊膽。
 - 一開始只開**一台 process、單一 CPU 的 API server,被打爆**;緊急加 **traefik、開 4 個 process** 扛住。
-- Celery worker 也有類似調整(例如打開發票 API 等慢呼叫)。
+- Celery worker 也有類似調整;**發票 API 等慢呼叫走 RabbitMQ 排隊,做成一件做完才消耗下一則 msg**(排隊自然消化,非隔離隊列——2026-08-01 作者更正,#15 正文已修)。
 - **遇過 DDoS**。
 - **監控=純人肉**(2026-08-01 記錄):當年的認知還不夠,只做到**用 Sentry 看 error**;一開始 **Sentry 容量一下就炸了,後來才加 sampling**;團隊沒人懂,作者也是「模模糊糊地看」。→ 角度:用 error tracking 當監控=只看得到 exception,看不到延遲與飽和。
 - **Celery 三個 docker container**:(1) **heartbeat**——跟 Django 結合做排程;(2) **抓留言專用,只有一個 worker**——推送留言透過 Redis 進 group、轉進 API server(API server 同時做 WebSocket)→ 接 #3:單 worker 天生序列化=「單一抓取 job 定義全域順序」讓 LWW 成立的物理基礎;(3) **各種 async task,10 個 worker**,走 RabbitMQ,**acks_late 盡量保證完成才做下一件**(至少一次語意→冪等需求,接 #7)。
