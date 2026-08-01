@@ -270,7 +270,8 @@
 - **軟刪除重來版=討論共識(作者已同意記入)**:三層——(1) **存事實不存旗標**:`deleted_at` nullable timestamp,不要 `is_deleted`(is_deleted=派生、deleted_at=事實;當年補 deleted_at 的崩壞第一天就不會發生);(2) **共用 QuerySet 不共用 base model**:`objects` 永遠誠實回傳全部,`SoftDeleteQuerySet.as_manager()` 提供 `.active()`/`.deleted()`,欄位每個 model 顯式宣告——繼承共用的是政策,組合共用的才是機制;附條件 unique constraint(`condition=Q(deleted_at__isnull=True)`)防軟刪 row 佔住唯一鍵;(3) **軟刪除是 per-table 政策不是全域預設**:三分類——事實(order/payment/配貨紀錄)永不刪、被事實引用的主資料(product/style/image_metadata)軟刪、暫態(購物車)硬刪;當年行為早已照此走(結束檔期硬刪購物車、沒人敢刪訂單),錯在 base model 把三類拉平。
 - **清理實況(2026-08-01 記錄)**:圖片主要用在 **product 與 style**;**換圖時把舊 image_metadata 標記「待刪除」**;**sweep=每日排程,真的會刪 GCS 圖片並清 metadata**。但**「從 image_metadata 反查 product/style 是否還在用」漏做了**——反向引用(content type+object id)是為反查而存,結果反查從來沒寫。→ 角度修正:實際機制不是 tracing GC,是**更新當下即時標記(refcount 式墓碑)+延遲 sweep**;反向引用=從沒理賠過的保險單。沒出事的原因=刪除入口只有一個(換圖),結構讓反查不必做——但這是僥倖版:多一個刪除入口,沒有反查的 sweep 就會誤殺。重來=sweep 前反查一次(便宜的 tracing 保險)。
 - **尺寸與供圖(2026-08-01 記錄)**:每張圖存**兩檔**(webp 原圖+thumbnail;確切 size 作者不記得,寫作時不給數字);**DB 存 path(事實),API 回應時把 image URL 解出來(派生)**——實際 URL=GCS 掛 CDN。→ 角度:URL 讀時派生=換 CDN domain 不用 migrate;商品圖走 CDN 也呼應 #14「商品資訊頁只靠 CDN,所以 DB 硬扛的是列表 API」。
-- 動筆前待問(一題一題進行中):檔案檢查深度(魔術數字/size 上限/壞檔實戰)?誰在上傳、有無直播中臨時傳圖?
+- **檔案檢查(2026-08-01 記錄;作者查了當年程式碼確認)**:**所有上傳一律重編碼——webp 進來也重編碼一次**,原始 bytes 不落地。→ 定調:**「轉檔即驗證」**——驗證六層梯(副檔名/宣告 Content-Type/魔術數字/真正解碼/重編碼/存放側)中,重編碼=最強層;解不開的檔轉檔直接失敗、藏 payload 與 EXIF 在重編碼時銷毀;與 #3「查詢即驗證」同哲學(驗證是正常流程的副產品,不是流程前的關卡);存放側天然達標(GCS+CDN=獨立 domain、path 自己生成)。size 上限:作者無印象,寫作時不給數字。
+- 動筆前待問(最後一題):誰在上傳——助理填商品時?有無直播中臨時開賣現場急傳圖的場景?
 
 **對帳與三本帳(#16 相關;2026-08-01 記錄)**:
 - **系統層沒有對帳**:對帳是**會計部門**的工作,每個檔期結束後才開始對;系統的責任只到**按會計部門的要求匯出訂單**。
