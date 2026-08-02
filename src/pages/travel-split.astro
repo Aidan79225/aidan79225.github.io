@@ -90,7 +90,26 @@ import '../styles/tools.css';
 
     <!-- 還款 -->
     <h3>🤝 建議還款(最少筆數)</h3>
+    <p class="ts-muted">按「已還」把該筆記成還款(金額可改成部分),結餘與建議會即時更新。</p>
     <div id="settleList"></div>
+
+    <!-- 已還款紀錄 -->
+    <h3>✅ 已還款紀錄</h3>
+    <div id="settlementList"></div>
+    <details class="ts-guide" style="margin-top:.6rem">
+      <summary>手動新增一筆還款</summary>
+      <div class="ts-card">
+        <div class="ts-row">
+          <label class="ts-field"><span>誰付(from)</span><select id="stFrom" class="ts-w9"></select></label>
+          <label class="ts-field"><span>付給誰(to)</span><select id="stTo" class="ts-w9"></select></label>
+          <label class="ts-field"><span>金額</span><input type="number" id="stAmount" class="ts-w9" min="0" step="0.01" /></label>
+          <label class="ts-field"><span>日期</span><input type="date" id="stDate" class="ts-w9" /></label>
+        </div>
+        <div class="ts-row" style="margin-top:.6rem">
+          <button id="addSettlement">＋ 新增還款</button>
+        </div>
+      </div>
+    </details>
 
     <!-- 同步 / 共享 -->
     <h3>☁️ 共享(Google Sheet)</h3>
@@ -207,6 +226,7 @@ import '../styles/tools.css';
         metaUpdatedAt: 0, // 尚未編輯過 → 合併時不會蓋掉雲端既有的名稱/幣別
         members: [],
         expenses: [],
+        settlements: [],
       };
     }
 
@@ -216,7 +236,11 @@ import '../styles/tools.css';
     function loadTrip(code) {
       try {
         const raw = localStorage.getItem(tripKey(code));
-        if (raw) return JSON.parse(raw);
+        if (raw) {
+          const t = JSON.parse(raw);
+          if (!t.settlements) t.settlements = []; // 舊資料補欄位
+          return t;
+        }
       } catch (_) {}
       return emptyTrip(code);
     }
@@ -231,6 +255,10 @@ import '../styles/tools.css';
     const aliveExpenses = () =>
       trip.expenses
         .filter((e) => !e.deleted)
+        .sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.updatedAt || 0) - (a.updatedAt || 0));
+    const aliveSettlements = () =>
+      (trip.settlements || [])
+        .filter((s) => !s.deleted)
         .sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.updatedAt || 0) - (a.updatedAt || 0));
     const memberName = (id) => {
       const m = trip.members.find((x) => x.id === id);
@@ -264,6 +292,7 @@ import '../styles/tools.css';
       renderMembers();
       renderMe();
       renderPayer();
+      renderSettleSelects();
       renderSplitList();
       renderExpenses();
       renderBalances();
@@ -385,12 +414,13 @@ import '../styles/tools.css';
     }
 
     function renderBalances() {
-      const net = computeBalances(trip.members, trip.expenses);
+      const net = computeBalances(trip.members, trip.expenses, trip.settlements);
       const bbox = $('balanceList');
       const ids = aliveMembers().map((m) => m.id);
       if (!ids.length) {
         bbox.innerHTML = '<p class="ts-empty">尚無資料。</p>';
         $('settleList').innerHTML = '';
+        renderSettlements();
         return;
       }
       bbox.innerHTML = ids
@@ -408,10 +438,52 @@ import '../styles/tools.css';
         ? transfers
             .map(
               (t) =>
-                `<div class="ts-settle">${escapeHtml(memberName(t.from))} → ${escapeHtml(memberName(t.to))} <b>${fmt(t.amount)}</b></div>`,
+                `<div class="ts-settle" style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap">
+                   <span>${escapeHtml(memberName(t.from))} → ${escapeHtml(memberName(t.to))}</span>
+                   <input type="number" class="ts-w6" min="0" step="0.01" value="${num2(t.amount)}"
+                     data-settle-amt="${t.from}:${t.to}" />
+                   <span class="ts-muted">${baseCur()}</span>
+                   <button class="ts-mini" data-act="markPaid" data-from="${t.from}" data-to="${t.to}">已還</button>
+                 </div>`,
             )
             .join('')
         : '<p class="ts-empty">已結清,無需還款 🎉</p>';
+      renderSettlements();
+    }
+
+    function renderSettlements() {
+      const box = $('settlementList');
+      const ss = aliveSettlements();
+      if (!ss.length) {
+        box.innerHTML = '<p class="ts-empty">還沒有還款紀錄。</p>';
+        return;
+      }
+      box.innerHTML = ss
+        .map((s) => {
+          const by = s.createdBy ? ` · 記錄:${escapeHtml(memberName(s.createdBy))}` : '';
+          const canDel = !s.createdBy || s.createdBy === me;
+          const del = canDel
+            ? `<button class="ts-mini del" data-act="delSettle" data-id="${s.id}">刪</button>`
+            : `<span class="ts-lock" title="只有記錄者可刪">🔒</span>`;
+          return `<div class="ts-settle" style="display:flex;justify-content:space-between;align-items:center;gap:.6rem">
+            <span>${escapeHtml(memberName(s.from))} → ${escapeHtml(memberName(s.to))} <b>${fmt(s.amount)}</b>
+              <span class="ts-by">${escapeHtml(s.date || '')}${by}</span></span>
+            ${del}
+          </div>`;
+        })
+        .join('');
+    }
+
+    // 還款用的成員下拉(手動新增)
+    function renderSettleSelects() {
+      const ms = aliveMembers();
+      const opts = ms.map((m) => `<option value="${m.id}">${escapeHtml(m.name)}</option>`).join('');
+      ['stFrom', 'stTo'].forEach((id) => {
+        const sel = $(id);
+        const prev = sel.value;
+        sel.innerHTML = opts;
+        if (ms.some((m) => m.id === prev)) sel.value = prev;
+      });
     }
 
     function escapeHtml(s) {
@@ -463,6 +535,7 @@ import '../styles/tools.css';
       renderMembers();
       renderMe();
       renderPayer();
+      renderSettleSelects();
       renderSplitList();
       scheduleSync();
     }
@@ -479,6 +552,7 @@ import '../styles/tools.css';
       renderMembers();
       renderMe();
       renderPayer();
+      renderSettleSelects();
       renderSplitList();
       renderExpenses();
       renderBalances();
@@ -703,6 +777,67 @@ import '../styles/tools.css';
       clearTimeout(undoTimer);
       $('undoToast').classList.remove('show');
     }
+
+    // ── 還款 ────────────────────────────────────────────────────
+    function todayStr() {
+      const d = $('stDate').value;
+      return d || '';
+    }
+    function addSettlementRecord(from, to, amount, date) {
+      if (!me) { setStatus('請先在「成員」區選擇『我是誰』,才能記還款', 'err'); return false; }
+      if (!from || !to || from === to) { setStatus('請選擇不同的付款人與收款人', 'err'); return false; }
+      if (!(amount > 0)) { setStatus('請輸入正確的還款金額', 'err'); return false; }
+      trip.settlements = trip.settlements || [];
+      trip.settlements.push({
+        id: uid(), from, to, amount: round2(amount), date: date || '',
+        createdBy: me, updatedAt: now(),
+      });
+      saveTrip();
+      renderBalances();
+      scheduleSync();
+      return true;
+    }
+
+    // 建議還款列的「已還」:讀該列可編輯的金額,記成一筆還款
+    $('settleList').addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-act="markPaid"]');
+      if (!btn) return;
+      const { from, to } = btn.dataset;
+      const input = document.querySelector(`[data-settle-amt="${from}:${to}"]`);
+      const amount = Number(input?.value) || 0;
+      if (addSettlementRecord(from, to, amount, '')) {
+        setStatus(`已記還款:${memberName(from)} → ${memberName(to)} ${fmt(amount)}`, 'ok');
+      }
+    });
+
+    // 手動新增還款
+    $('addSettlement').addEventListener('click', () => {
+      const from = $('stFrom').value, to = $('stTo').value;
+      const amount = Number($('stAmount').value) || 0;
+      if (addSettlementRecord(from, to, amount, todayStr())) {
+        $('stAmount').value = '';
+        setStatus('已新增還款紀錄', 'ok');
+      }
+    });
+
+    // 刪除還款紀錄(記錄者本人)+ 誤刪救回
+    $('settlementList').addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-act="delSettle"]');
+      if (!btn) return;
+      const s = (trip.settlements || []).find((x) => x.id === btn.dataset.id);
+      if (!s) return;
+      if (s.createdBy && s.createdBy !== me) return setStatus('這筆是別人記的,不能刪除', 'err');
+      s.deleted = true; s.updatedAt = now();
+      saveTrip();
+      renderBalances();
+      scheduleSync();
+      showUndo(`已刪除還款「${memberName(s.from)} → ${memberName(s.to)} ${fmt(s.amount)}」`, () => {
+        s.deleted = false; s.updatedAt = now();
+        saveTrip();
+        renderBalances();
+        scheduleSync();
+      });
+    });
 
     function loadExpenseIntoForm(id) {
       const e = trip.expenses.find((x) => x.id === id);
@@ -929,6 +1064,7 @@ function mergeTrips_(a, b) {
     metaUpdatedAt: Math.max(aMeta, bMeta),
     members: mergeById_(a.members, b.members),
     expenses: mergeById_(a.expenses, b.expenses),
+    settlements: mergeById_(a.settlements, b.settlements),
   };
 }
 function doPost(e) {
@@ -993,9 +1129,20 @@ function writeDetail_(data) {
     });
   rows.push(['', '', '', '', '', '合計', Math.round(total * 100) / 100, '', '']);
 
+  // 已還款紀錄(接在支出下方,空一列後另起一段)
+  var setts = (data.settlements || []).filter(function (s) { return !s.deleted; });
+  if (setts.length) {
+    rows.push(['', '', '', '', '', '', '', '', '']);
+    rows.push(['── 已還款 ──', '日期', '誰付', '付給誰', '金額(' + cur + ')', '記錄者', '', '', '']);
+    setts.sort(function (a, b) { return String(a.date || '').localeCompare(String(b.date || '')); })
+      .forEach(function (s) {
+        rows.push(['', s.date || '', nameOf[s.from] || '(已移除)', nameOf[s.to] || '(已移除)',
+          Number(s.amount) || 0, nameOf[s.createdBy] || '', '', '', '']);
+      });
+  }
+
   sh.getRange(1, 1, rows.length, rows[0].length).setValues(rows);
   sh.getRange(1, 1, 1, rows[0].length).setFontWeight('bold');
-  sh.getRange(rows.length, 1, 1, rows[0].length).setFontWeight('bold');
   sh.setFrozenRows(1);
 }`;
     $('gasCode').textContent = GAS;
