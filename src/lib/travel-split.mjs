@@ -4,10 +4,13 @@
 //   trip = {
 //     code, name, currency,
 //     metaUpdatedAt,                       // 行程層級欄位(name/currency)的最後修改時間
-//     members:  [ member ],
-//     expenses: [ expense ],
+//     members:     [ member ],
+//     expenses:    [ expense ],
+//     settlements: [ settlement ],         // 已還款紀錄
 //   }
-//   member  = { id, name, deleted?, updatedAt }
+//   member     = { id, name, deleted?, updatedAt }
+//   settlement = { id, from, to, amount, date, note, createdBy, deleted?, updatedAt }
+//                                          // from 付錢給 to,計算結餘時 from 欠得更少、to 被欠得更少
 //   expense = {
 //     id, desc, amount, payerId,
 //     currency, rate, origAmount,          // 多幣別:amount 一律是「主要幣別(台幣)」基準額,
@@ -96,9 +99,10 @@ export function shareOf(expense) {
   return out;
 }
 
-// 計算每位成員的淨額(元):付出的 - 應分攤的。正值=別人欠他,負值=他欠別人。
-// 回傳 { memberId: net } 只含未刪除的成員。
-export function computeBalances(members, expenses) {
+// 計算每位成員的淨額(元):付出的 - 應分攤的,再扣掉已還款。
+// 正值=別人欠他,負值=他欠別人。回傳 { memberId: net } 只含未刪除的成員。
+// settlements:已還款紀錄 [{ from, to, amount }];from 付錢給 to,故 from 欠得更少、to 被欠得更少。
+export function computeBalances(members, expenses, settlements) {
   const alive = (members || []).filter((m) => !m.deleted);
   const net = {};
   alive.forEach((m) => {
@@ -113,6 +117,12 @@ export function computeBalances(members, expenses) {
     Object.keys(shares).forEach((k) => {
       if (net[k] != null) net[k] = round2(net[k] - shares[k]);
     });
+  });
+  (settlements || []).forEach((s) => {
+    if (s.deleted) return;
+    const amt = Number(s.amount) || 0;
+    if (s.from != null && net[s.from] != null) net[s.from] = round2(net[s.from] + amt);
+    if (s.to != null && net[s.to] != null) net[s.to] = round2(net[s.to] - amt);
   });
   Object.keys(net).forEach((k) => {
     net[k] = round2(net[k]);
@@ -215,5 +225,6 @@ export function mergeTrips(a, b) {
     metaUpdatedAt: Math.max(aMeta, bMeta),
     members: mergeById(a.members, b.members),
     expenses: mergeById(a.expenses, b.expenses),
+    settlements: mergeById(a.settlements, b.settlements),
   };
 }

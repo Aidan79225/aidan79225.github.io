@@ -69,6 +69,47 @@ test('balances ignore deleted members and expenses', () => {
   assert.deepEqual(net, { a: 50, b: -50 });
 });
 
+test('settlement reduces balances toward zero and clears suggestions when fully paid', () => {
+  const members = [{ id: 'a' }, { id: 'b' }];
+  const expenses = [{ id: 'e1', amount: 100, payerId: 'a', splitMode: 'even', sharedBy: ['a', 'b'] }];
+  // a 先墊 100,兩人均分 → a +50, b -50
+  assert.deepEqual(computeBalances(members, expenses), { a: 50, b: -50 });
+  // b 還 a 50 → 全部歸零,settle 無建議
+  const settled = [{ id: 's1', from: 'b', to: 'a', amount: 50 }];
+  const net = computeBalances(members, expenses, settled);
+  assert.deepEqual(net, { a: 0, b: 0 });
+  assert.deepEqual(settle(net), []);
+});
+
+test('partial settlement leaves the remainder outstanding', () => {
+  const members = [{ id: 'a' }, { id: 'b' }];
+  const expenses = [{ id: 'e1', amount: 100, payerId: 'a', splitMode: 'even', sharedBy: ['a', 'b'] }];
+  const net = computeBalances(members, expenses, [{ id: 's', from: 'b', to: 'a', amount: 20 }]);
+  assert.deepEqual(net, { a: 30, b: -30 });
+  assert.deepEqual(settle(net), [{ from: 'b', to: 'a', amount: 30 }]);
+});
+
+test('deleted settlement does not affect balances', () => {
+  const members = [{ id: 'a' }, { id: 'b' }];
+  const expenses = [{ id: 'e1', amount: 100, payerId: 'a', splitMode: 'even', sharedBy: ['a', 'b'] }];
+  const net = computeBalances(members, expenses, [{ id: 's', from: 'b', to: 'a', amount: 50, deleted: true }]);
+  assert.deepEqual(net, { a: 50, b: -50 });
+});
+
+test('mergeTrips unions settlements by id with tombstones', () => {
+  const a = { code: 'T', metaUpdatedAt: 0, name: '', currency: '', members: [], expenses: [],
+    settlements: [{ id: 's1', from: 'b', to: 'a', amount: 50, updatedAt: 1 }] };
+  const b = { code: 'T', metaUpdatedAt: 0, name: '', currency: '', members: [], expenses: [],
+    settlements: [
+      { id: 's1', from: 'b', to: 'a', amount: 50, deleted: true, updatedAt: 2 }, // 較新:刪除
+      { id: 's2', from: 'c', to: 'a', amount: 10, updatedAt: 1 },
+    ] };
+  const m = mergeTrips(a, b);
+  assert.equal(m.settlements.length, 2);
+  assert.equal(m.settlements.find((x) => x.id === 's1').deleted, true);
+  assert.equal(m.settlements.find((x) => x.id === 's2').amount, 10);
+});
+
 test('settle produces transfers that clear every balance', () => {
   const net = { a: 60, b: -15, c: -45 };
   const transfers = settle(net);
