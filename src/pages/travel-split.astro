@@ -119,6 +119,12 @@ import '../styles/tools.css';
           <li>複製產生的<b>網頁應用程式網址</b>(以 <code>/exec</code> 結尾),貼到上面的「端點網址」欄位。</li>
           <li>把同一個<b>行程代碼</b>與這個端點網址告訴同行的人,大家按「同步」就會共用同一份帳。</li>
         </ol>
+        <p class="ts-muted">
+          每次同步後,試算表會自動多出一個 <b>明細_&lt;行程代碼&gt;</b> 分頁(一列一筆、可讀、可下載成 Excel)——
+          它是<b>唯讀鏡像</b>,每次同步會用主資料重建,直接在上面手改不會回寫。
+          <br>已在用舊版的人要換這版:到 Apps Script <b>部署 → 管理部署作業 → ✏️ 編輯 → 版本選「新版本」→ 部署</b>,
+          這樣<b>網址不變</b>(不要「新增部署作業」,那會產生新網址)。
+        </p>
         <p class="ts-muted">資料存在你自己的 Google 帳號裡,本站不經手也不保存任何資料。程式碼:</p>
         <pre id="gasCode"></pre>
         <button id="copyGas" style="margin-top:.4rem">複製程式碼</button>
@@ -793,10 +799,58 @@ function doPost(e) {
     const sh = sheet_(), r = findRow_(sh, code);
     const row = [code, new Date().toISOString(), JSON.stringify(body.data)];
     if (r < 0) sh.appendRow(row); else sh.getRange(r, 1, 1, 3).setValues([row]);
+    try { writeDetail_(body.data); } catch (err) {} // 明細分頁失敗不影響主同步
     return json_({ ok: true });
   } finally {
     lock.releaseLock();
   }
+}
+
+// ── 可讀明細分頁(每次同步自動重建,唯讀鏡像;手改不會回寫) ──────────
+function detailName_(code) {
+  // 分頁名稱不可含 : / ? * [ ] \\,逐字淨化(避免 regex 轉義問題)
+  var bad = [':', '/', '?', '*', '[', ']', String.fromCharCode(92)];
+  var raw = '明細_' + (code || 'trip');
+  var safe = '';
+  for (var i = 0; i < raw.length; i++) {
+    safe += bad.indexOf(raw.charAt(i)) >= 0 ? '_' : raw.charAt(i);
+  }
+  return safe.slice(0, 90);
+}
+function writeDetail_(data) {
+  if (!data) return;
+  const ss = SpreadsheetApp.getActiveSpreadsheet();
+  const sh = ss.getSheetByName(detailName_(data.code)) || ss.insertSheet(detailName_(data.code));
+  sh.clear();
+
+  const nameOf = {};
+  (data.members || []).forEach(function (m) { nameOf[m.id] = m.name; });
+  const cur = data.currency || 'TWD';
+
+  const rows = [['日期', '說明', '分類', '原幣別', '原幣金額', '匯率', '計價金額(' + cur + ')', '付款人', '分攤成員']];
+  var total = 0;
+  (data.expenses || [])
+    .filter(function (x) { return !x.deleted; })
+    .sort(function (a, b) { return String(a.date || '').localeCompare(String(b.date || '')); })
+    .forEach(function (x) {
+      var who = (x.sharedBy || []).map(function (id) { return nameOf[id] || '(已移除)'; }).join('、');
+      total += Number(x.amount) || 0;
+      rows.push([
+        x.date || '', x.desc || '', x.category || '',
+        x.currency || cur,
+        x.origAmount != null ? x.origAmount : x.amount,
+        x.rate != null ? x.rate : 1,
+        Number(x.amount) || 0,
+        nameOf[x.payerId] || '(已移除)',
+        who,
+      ]);
+    });
+  rows.push(['', '', '', '', '', '合計', Math.round(total * 100) / 100, '', '']);
+
+  sh.getRange(1, 1, rows.length, rows[0].length).setValues(rows);
+  sh.getRange(1, 1, 1, rows[0].length).setFontWeight('bold');
+  sh.getRange(rows.length, 1, 1, rows[0].length).setFontWeight('bold');
+  sh.setFrozenRows(1);
 }`;
     $('gasCode').textContent = GAS;
     $('copyGas').addEventListener('click', async () => {
