@@ -32,6 +32,10 @@ import '../styles/tools.css';
         <button id="addMember">＋ 新增成員</button>
       </div>
       <div id="memberList" style="margin-top:.6rem"></div>
+      <div class="ts-row" style="margin-top:.7rem; align-items:flex-end">
+        <label class="ts-field"><span>我是(這台裝置)</span><select id="meSelect" class="ts-w9"></select></label>
+        <span class="ts-muted" id="meHint">選好「我是誰」後,你記的支出只有你自己能改/刪</span>
+      </div>
     </div>
 
     <!-- 記一筆 -->
@@ -139,6 +143,8 @@ import '../styles/tools.css';
     </p>
   </div>
 
+  <div class="ts-toast" id="undoToast" role="status" aria-live="polite"></div>
+
   <script>
     import {
       shareOf, computeBalances, settle, totalSpent, mergeTrips, round2,
@@ -151,6 +157,13 @@ import '../styles/tools.css';
     const LS_LASTCUR = 'travel-split:last-currency';
     const LS_LASTRATE = 'travel-split:last-rate';
     const tripKey = (code) => `travel-split:trip:${code || '_default'}`;
+    const meKey = (code) => `travel-split:me:${code || '_default'}`; // 本機的「我是誰」(依行程代碼)
+
+    let me = ''; // 目前這台裝置對應的成員 id
+    const loadMe = (code) => { try { me = localStorage.getItem(meKey(code)) || ''; } catch (_) { me = ''; } };
+    const saveMe = () => { try { localStorage.setItem(meKey(trip.code), me); } catch (_) {} };
+    // 是否可修改此支出:沒有記錄者(舊資料)→ 任何人可改;否則僅記錄者本人
+    const isOwner = (e) => !e || !e.createdBy || e.createdBy === me;
 
     // 記住上一次填的幣別與匯率,新增下一筆時自動帶入。
     let lastCurrency = '';
@@ -245,10 +258,23 @@ import '../styles/tools.css';
       $('tripCurrency').value = trip.currency || '';
       $('tripCode').value = trip.code || '';
       renderMembers();
+      renderMe();
       renderPayer();
       renderSplitList();
       renderExpenses();
       renderBalances();
+    }
+
+    function renderMe() {
+      const sel = $('meSelect');
+      const ms = aliveMembers();
+      if (me && !ms.some((m) => m.id === me)) me = ''; // 我的成員被移除了
+      sel.innerHTML = '<option value="">(請選擇)</option>' +
+        ms.map((m) => `<option value="${m.id}">${escapeHtml(m.name)}</option>`).join('');
+      sel.value = me;
+      $('meHint').textContent = me
+        ? `你是「${memberName(me)}」——只有你能改/刪自己記的支出`
+        : '選好「我是誰」後,你記的支出只有你自己能改/刪';
     }
 
     function renderMembers() {
@@ -332,16 +358,18 @@ import '../styles/tools.css';
           const amtCell = foreign
             ? `${fmtCur(e.origAmount ?? e.amount, cur)}<br><span class="ts-muted">≈ ${fmt(e.amount)}</span>`
             : fmt(e.amount);
+          const by = e.createdBy ? `<br><span class="ts-by">記錄:${escapeHtml(memberName(e.createdBy))}</span>` : '';
+          const actions = isOwner(e)
+            ? `<button class="ts-mini" data-act="editExp" data-id="${e.id}">改</button>
+               <button class="ts-mini del" data-act="delExp" data-id="${e.id}">刪</button>`
+            : `<span class="ts-lock" title="只有記錄者「${escapeHtml(memberName(e.createdBy))}」可以改/刪">🔒</span>`;
           return `<tr>
             <td>${escapeHtml(e.date || '')}</td>
-            <td>${escapeHtml(e.desc || '')}${e.category ? `<br><span class="ts-muted">${escapeHtml(e.category)}</span>` : ''}</td>
+            <td>${escapeHtml(e.desc || '')}${e.category ? `<br><span class="ts-muted">${escapeHtml(e.category)}</span>` : ''}${by}</td>
             <td class="num">${amtCell}</td>
             <td>${escapeHtml(memberName(e.payerId))}</td>
             <td><span class="ts-muted">${escapeHtml(who)}</span></td>
-            <td class="num">
-              <button class="ts-mini" data-act="editExp" data-id="${e.id}">改</button>
-              <button class="ts-mini del" data-act="delExp" data-id="${e.id}">刪</button>
-            </td>
+            <td class="num">${actions}</td>
           </tr>`;
         })
         .join('');
@@ -401,6 +429,7 @@ import '../styles/tools.css';
       saveTrip();               // 存回舊代碼
       trip = loadTrip(code);    // 切換到新代碼
       trip.code = code;
+      loadMe(code);             // 換行程 → 換這台裝置在該行程的身分
       editingId = null;
       resetForm();
       saveTrip();
@@ -408,15 +437,26 @@ import '../styles/tools.css';
       setStatus(code ? `已切換到行程「${code}」` : '', 'ok');
     });
 
+    $('meSelect').addEventListener('change', (e) => {
+      me = e.target.value;
+      saveMe();
+      renderMe();
+      renderExpenses(); // 擁有權變了,改/刪按鈕要重繪
+    });
+
     $('addMember').addEventListener('click', addMember);
     $('memberName').addEventListener('keydown', (e) => { if (e.key === 'Enter') addMember(); });
     function addMember() {
       const name = $('memberName').value.trim();
       if (!name) return;
-      trip.members.push({ id: uid(), name, updatedAt: now() });
+      const nm = { id: uid(), name, updatedAt: now() };
+      trip.members.push(nm);
+      // 這台裝置還沒設定「我是誰」時,新增的第一個成員預設為我(可再改)
+      if (!me) { me = nm.id; saveMe(); }
       $('memberName').value = '';
       saveTrip();
       renderMembers();
+      renderMe();
       renderPayer();
       renderSplitList();
     }
@@ -428,8 +468,10 @@ import '../styles/tools.css';
       if (!m) return;
       if (!confirm(`移除成員「${m.name}」?\n(他已建立的支出仍會保留,但會顯示為「已移除」)`)) return;
       m.deleted = true; m.updatedAt = now();
+      if (me === m.id) { me = ''; saveMe(); } // 移除的是我自己
       saveTrip();
       renderMembers();
+      renderMe();
       renderPayer();
       renderSplitList();
       renderExpenses();
@@ -462,6 +504,7 @@ import '../styles/tools.css';
       const currency = expCur();
       const rate = expRate();
       if (!aliveMembers().length) return setStatus('請先新增成員', 'err');
+      if (!me) return setStatus('請先在「成員」區選擇『我是誰』,才能記帳', 'err');
       if (!payerId) return setStatus('請選擇付款人', 'err');
       const split = collectSplit();
       if (!split.sharedBy.length) return setStatus('請至少勾選一位分攤對象', 'err');
@@ -508,10 +551,13 @@ import '../styles/tools.css';
       };
       if (editingId) {
         const idx = trip.expenses.findIndex((x) => x.id === editingId);
-        if (idx >= 0) trip.expenses[idx] = { ...trip.expenses[idx], ...base };
+        if (idx >= 0) {
+          if (!isOwner(trip.expenses[idx])) return setStatus('這筆是別人記的,不能修改', 'err');
+          trip.expenses[idx] = { ...trip.expenses[idx], ...base }; // 保留原 createdBy
+        }
         editingId = null;
       } else {
-        trip.expenses.push({ id: uid(), ...base });
+        trip.expenses.push({ id: uid(), createdBy: me, ...base });
       }
       rememberCurrency(currency, rateOut); // 供下一筆預帶
       saveTrip();
@@ -608,17 +654,45 @@ import '../styles/tools.css';
       if (btn.dataset.act === 'delExp') {
         const ex = trip.expenses.find((x) => x.id === id);
         if (!ex) return;
-        const label = `${ex.desc || '(無說明)'} ${fmt(ex.amount)} · ${memberName(ex.payerId)}付`;
-        if (!confirm(`確定刪除這筆支出?\n\n${label}`)) return;
+        if (!isOwner(ex)) return setStatus('這筆是別人記的,不能刪除', 'err');
         ex.deleted = true; ex.updatedAt = now();
         if (editingId === id) { editingId = null; resetForm(); }
         saveTrip();
         renderExpenses();
         renderBalances();
+        // 誤刪救回:幾秒內可一鍵復原
+        showUndo(`已刪除「${ex.desc || '無說明'} ${fmt(ex.amount)}」`, () => {
+          ex.deleted = false; ex.updatedAt = now();
+          saveTrip();
+          renderExpenses();
+          renderBalances();
+        });
       } else if (btn.dataset.act === 'editExp') {
+        const ex = trip.expenses.find((x) => x.id === id);
+        if (ex && !isOwner(ex)) return setStatus('這筆是別人記的,不能修改', 'err');
         loadExpenseIntoForm(id);
       }
     });
+
+    // ── 誤刪救回 toast ──────────────────────────────────────────
+    let undoTimer = null;
+    function showUndo(msg, onUndo) {
+      const t = $('undoToast');
+      clearTimeout(undoTimer);
+      t.innerHTML = '';
+      const span = document.createElement('span');
+      span.textContent = msg;
+      const btn = document.createElement('button');
+      btn.textContent = '復原';
+      btn.addEventListener('click', () => { hideUndo(); onUndo(); });
+      t.append(span, btn);
+      t.classList.add('show');
+      undoTimer = setTimeout(hideUndo, 6000);
+    }
+    function hideUndo() {
+      clearTimeout(undoTimer);
+      $('undoToast').classList.remove('show');
+    }
 
     function loadExpenseIntoForm(id) {
       const e = trip.expenses.find((x) => x.id === id);
@@ -720,6 +794,7 @@ import '../styles/tools.css';
         saveTrip();            // 存回目前這份
         trip = loadTrip(code); // 切到分享的行程代碼
         trip.code = code;
+        loadMe(code);
         if (!trip.name && cfg.n) trip.name = cfg.n;
         if (!trip.currency && cfg.cur) trip.currency = cfg.cur;
         saveTrip();
@@ -902,6 +977,7 @@ function writeDetail_(data) {
       const lastCode = localStorage.getItem(LS_LAST) || '';
       trip = loadTrip(lastCode);
       trip.code = trip.code || lastCode;
+      loadMe(trip.code);
       lastCurrency = localStorage.getItem(LS_LASTCUR) || '';
       lastRate = localStorage.getItem(LS_LASTRATE) || '';
       $('endpoint').value = localStorage.getItem(LS_ENDPOINT) || '';
