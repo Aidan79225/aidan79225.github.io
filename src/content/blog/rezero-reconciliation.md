@@ -65,7 +65,7 @@ draft: false
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">整個系統,是一台被拆開攤在桌上的資料庫——每個元件都對得上號。</figcaption>
 </figure>
 
-留言清洗後先落地是 WAL([[rezero-comment-order|#3]]);FSM batch 消化留言建購物車,是 log consumer 在建索引;賣出數量是物化視圖([[rezero-inventory|#5]]);付款狀態讀時派生是 view([[rezero-payment|#7]]);配貨紀錄可整段重建,是 redo log([[rezero-fulfillment|#8]]);heartbeat 掃表是內建排程([[rezero-ops|#15]]);每小時重算,就是 repair。[[ddia-future|DDIA 最後一章]]管這個叫 **unbundled database**——把資料庫拆開,用一個個元件重新組裝。我們沒讀過那一章,卻用兩年把它蓋了出來。
+留言清洗後先落地是 WAL([[rezero-comment-order|#3]]);FSM batch 消化留言建購物車,是 log consumer 在建索引;賣出數量是物化視圖([[rezero-inventory|#5]]);付款狀態讀時派生是 view([[rezero-payment|#7]]);配貨紀錄可整段重建,是 redo log([[rezero-fulfillment|#8]]);heartbeat 掃表是內建排程([[rezero-ops|#15]]);每小時重算,就是 repair。[[ddia-future|DDIA 最後一章]]管這個叫 **unbundled database**——把資料庫拆開,用一個個元件重新組裝。我們沒讀過那一章,卻用一年半把它蓋了出來。
 
 拆開不是免費的。一台資料庫裡,index 永遠跟得上 heap、物化視圖有 refresh 保證、transaction 罩住一切;拆開之後,**這些保證得自己補**。對帳,理論上就是「自己補一致性」的最後一道防線——所以「我們沒做對帳」這件事,需要一個交代。
 
