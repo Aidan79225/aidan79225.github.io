@@ -425,7 +425,9 @@ import '../styles/tools.css';
       const btn = e.target.closest('[data-act="delMember"]');
       if (!btn) return;
       const m = trip.members.find((x) => x.id === btn.dataset.id);
-      if (m) { m.deleted = true; m.updatedAt = now(); }
+      if (!m) return;
+      if (!confirm(`移除成員「${m.name}」?\n(他已建立的支出仍會保留,但會顯示為「已移除」)`)) return;
+      m.deleted = true; m.updatedAt = now();
       saveTrip();
       renderMembers();
       renderPayer();
@@ -605,7 +607,10 @@ import '../styles/tools.css';
       const id = btn.dataset.id;
       if (btn.dataset.act === 'delExp') {
         const ex = trip.expenses.find((x) => x.id === id);
-        if (ex) { ex.deleted = true; ex.updatedAt = now(); }
+        if (!ex) return;
+        const label = `${ex.desc || '(無說明)'} ${fmt(ex.amount)} · ${memberName(ex.payerId)}付`;
+        if (!confirm(`確定刪除這筆支出?\n\n${label}`)) return;
+        ex.deleted = true; ex.updatedAt = now();
         if (editingId === id) { editingId = null; resetForm(); }
         saveTrip();
         renderExpenses();
