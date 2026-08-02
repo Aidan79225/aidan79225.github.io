@@ -107,6 +107,9 @@ import '../styles/tools.css';
         <input type="file" id="importFile" accept="application/json,.json" style="display:none" />
         <button class="ghost" id="resetBtn" style="background:#7f1d1d">清空此行程</button>
       </div>
+      <label class="ts-muted" style="display:inline-flex;align-items:center;gap:.4rem;margin-top:.5rem;cursor:pointer">
+        <input type="checkbox" id="autoSync" style="width:auto" /> 新增/修改/刪除後自動同步
+      </label>
       <p class="ts-muted" style="margin:.5rem 0 0">
         「複製分享連結」會把端點與行程代碼打包進網址,朋友點開即自動帶入並同步,不用手動設定。
         (連結含此帳本的讀寫權限,只傳給同行的人。)
@@ -156,6 +159,7 @@ import '../styles/tools.css';
     const LS_LAST = 'travel-split:last-code';
     const LS_LASTCUR = 'travel-split:last-currency';
     const LS_LASTRATE = 'travel-split:last-rate';
+    const LS_AUTOSYNC = 'travel-split:autosync';
     const tripKey = (code) => `travel-split:trip:${code || '_default'}`;
     const meKey = (code) => `travel-split:me:${code || '_default'}`; // 本機的「我是誰」(依行程代碼)
 
@@ -419,10 +423,10 @@ import '../styles/tools.css';
       trip.metaUpdatedAt = now();
     }
 
-    $('tripName').addEventListener('input', (e) => { trip.name = e.target.value; touchMeta(); saveTrip(); });
+    $('tripName').addEventListener('input', (e) => { trip.name = e.target.value; touchMeta(); saveTrip(); scheduleSync(); });
     $('tripCurrency').addEventListener('input', (e) => {
       trip.currency = e.target.value; touchMeta(); saveTrip();
-      renderSplitList(); refreshMoneyUI(); renderExpenses(); renderBalances();
+      renderSplitList(); refreshMoneyUI(); renderExpenses(); renderBalances(); scheduleSync();
     });
     $('tripCode').addEventListener('change', (e) => {
       const code = e.target.value.trim();
@@ -435,6 +439,7 @@ import '../styles/tools.css';
       saveTrip();
       render();
       setStatus(code ? `已切換到行程「${code}」` : '', 'ok');
+      scheduleSync(); // 切到新代碼 → 自動拉回該行程雲端資料
     });
 
     $('meSelect').addEventListener('change', (e) => {
@@ -459,6 +464,7 @@ import '../styles/tools.css';
       renderMe();
       renderPayer();
       renderSplitList();
+      scheduleSync();
     }
 
     $('memberList').addEventListener('click', (e) => {
@@ -476,6 +482,7 @@ import '../styles/tools.css';
       renderSplitList();
       renderExpenses();
       renderBalances();
+      scheduleSync();
     });
 
     $('expMode').addEventListener('change', () => { renderSplitList(); refreshMoneyUI(); });
@@ -565,6 +572,7 @@ import '../styles/tools.css';
       renderExpenses();
       renderBalances();
       setStatus('已儲存', 'ok');
+      scheduleSync();
     }
 
     function resetForm() {
@@ -660,12 +668,14 @@ import '../styles/tools.css';
         saveTrip();
         renderExpenses();
         renderBalances();
+        scheduleSync();
         // 誤刪救回:幾秒內可一鍵復原
         showUndo(`已刪除「${ex.desc || '無說明'} ${fmt(ex.amount)}」`, () => {
           ex.deleted = false; ex.updatedAt = now();
           saveTrip();
           renderExpenses();
           renderBalances();
+          scheduleSync();
         });
       } else if (btn.dataset.act === 'editExp') {
         const ex = trip.expenses.find((x) => x.id === id);
@@ -733,13 +743,36 @@ import '../styles/tools.css';
       localStorage.setItem(LS_ENDPOINT, e.target.value.trim());
     });
 
-    $('syncBtn').addEventListener('click', sync);
-    async function sync() {
+    // 自動同步:開關存本機;有設端點+代碼才會作用。
+    let autoSync = true;
+    $('autoSync').addEventListener('change', (e) => {
+      autoSync = e.target.checked;
+      try { localStorage.setItem(LS_AUTOSYNC, autoSync ? '1' : '0'); } catch (_) {}
+      if (autoSync) scheduleSync();
+    });
+
+    // 任何動到共享資料的操作後呼叫:防抖 1.2 秒,把連續操作合併成一次同步。
+    let syncTimer = null;
+    function scheduleSync() {
+      if (!autoSync) return;
+      if (!$('endpoint').value.trim() || !trip.code) return; // 沒設定就純本機,不自動同步
+      clearTimeout(syncTimer);
+      setStatus('稍後自動同步…');
+      syncTimer = setTimeout(() => sync({ auto: true }), 1200);
+    }
+
+    $('syncBtn').addEventListener('click', () => sync());
+    let syncing = false, syncQueued = false;
+    async function sync(opts) {
+      const auto = opts && opts.auto;
       const endpoint = $('endpoint').value.trim();
-      if (!endpoint) return setStatus('請先設定 Google Apps Script 端點(見下方說明)', 'err');
-      if (!trip.code) return setStatus('請先設定「行程代碼」才能共享', 'err');
+      if (!endpoint) return auto ? null : setStatus('請先設定 Google Apps Script 端點(見下方說明)', 'err');
+      if (!trip.code) return auto ? null : setStatus('請先設定「行程代碼」才能共享', 'err');
+      if (syncing) { syncQueued = true; return; } // 同步進行中 → 記下待補,結束後再跑一次
+      clearTimeout(syncTimer);
+      syncing = true;
       localStorage.setItem(LS_ENDPOINT, endpoint);
-      setStatus('同步中…');
+      setStatus(auto ? '自動同步中…' : '同步中…');
       try {
         const res = await fetch(`${endpoint}?code=${encodeURIComponent(trip.code)}`);
         const remote = await res.json();
@@ -756,9 +789,12 @@ import '../styles/tools.css';
         trip = pr.data || merged;
         saveTrip();
         render();
-        setStatus(`已與雲端同步 ✓ (${new Date().toLocaleTimeString()})`, 'ok');
+        setStatus(`${auto ? '已自動同步' : '已與雲端同步'} ✓ (${new Date().toLocaleTimeString()})`, 'ok');
       } catch (err) {
         setStatus(`同步失敗:${err.message}。請確認端點網址正確、且部署權限設為「任何人」。`, 'err');
+      } finally {
+        syncing = false;
+        if (syncQueued) { syncQueued = false; sync({ auto: true }); } // 補跑最新一次
       }
     }
 
@@ -825,6 +861,7 @@ import '../styles/tools.css';
         saveTrip();
         render();
         setStatus('已匯入並合併', 'ok');
+        scheduleSync();
       } catch (_) {
         setStatus('匯入失敗:檔案格式不正確', 'err');
       }
@@ -980,6 +1017,8 @@ function writeDetail_(data) {
       loadMe(trip.code);
       lastCurrency = localStorage.getItem(LS_LASTCUR) || '';
       lastRate = localStorage.getItem(LS_LASTRATE) || '';
+      autoSync = localStorage.getItem(LS_AUTOSYNC) !== '0'; // 預設開
+      $('autoSync').checked = autoSync;
       $('endpoint').value = localStorage.getItem(LS_ENDPOINT) || '';
       render();
       resetForm();
