@@ -1,7 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getPublishedPosts } from '../lib/posts';
-import { seriesList } from '../data/series';
+import { seriesList, seriesBySlug } from '../data/series';
 
 const all = await getPublishedPosts();
 const byId = new Map(all.map((p) => [p.id, p]));
@@ -11,9 +11,14 @@ const bySeries = (name: string) =>
     .sort((a, b) => (a.data.seriesOrder ?? 0) - (b.data.seriesOrder ?? 0));
 const pick = (ids: string[]) => ids.map((id) => byId.get(id)).filter(Boolean);
 
-// Series names come from the shared registry (src/data/series.ts), keyed by
-// slug here. Series-based blocks stay fresh automatically as new entries land.
-const series = Object.fromEntries(seriesList.map((s) => [s.slug, s.name]));
+// A series-backed group: metadata from the shared registry
+// (src/data/series.ts), posts collected by series name so blocks stay fresh
+// automatically as new entries land. `slug` doubles as the #anchor target
+// used by the homepage cards and each post's series box.
+const sGroup = (slug: string, prefix = '') => {
+  const s = seriesBySlug.get(slug)!;
+  return { slug, heading: prefix + s.name, posts: bySeries(s.name) };
+};
 
 // Organised like Clean Architecture: inner layers (概念) are stable & portable,
 // outer layers (工具) are concrete & replaceable. Dependencies point inward.
@@ -24,11 +29,7 @@ const layers = [
     title: '核心觀念:最穩、最能遷移的一層',
     blurb:
       '這一層是換幾份工作都還在用的東西——查詢語言、資料工程的心智地圖、資料密集系統的原理。工具會被替換,這些不會。先把這裡打牢,再往外走。',
-    groups: [
-      { heading: series.fode, posts: bySeries(series.fode) },
-      { heading: series.sql, posts: bySeries(series.sql) },
-      { heading: series.ddia, posts: bySeries(series.ddia) },
-    ],
+    groups: [sGroup('fode'), sGroup('sql'), sGroup('ddia')],
   },
   {
     tag: '應用與架構 · Application',
@@ -47,13 +48,13 @@ const layers = [
     blurb:
       '最外層、最具體、也最會被替換的一層。這些工具各自把上面的觀念變成能跑的東西——但它們是「手段」,核心觀念才是「目的」。看工具時,常回頭想它在實作哪個觀念。',
     groups: [
-      { heading: '記憶體資料結構 · ' + series.redis, posts: bySeries(series.redis) },
-      { heading: '事件串流 · ' + series.kafka, posts: bySeries(series.kafka) },
-      { heading: '分散式運算 · ' + series.spark, posts: bySeries(series.spark) },
-      { heading: '工作流程編排 · ' + series.airflow, posts: bySeries(series.airflow) },
-      { heading: '容器編排 · ' + series.k8s, posts: bySeries(series.k8s) },
+      sGroup('redis', '記憶體資料結構 · '),
+      sGroup('kafka', '事件串流 · '),
+      sGroup('spark', '分散式運算 · '),
+      sGroup('airflow', '工作流程編排 · '),
+      sGroup('k8s', '容器編排 · '),
       { heading: '分散式協調 · 單篇', posts: pick(['zookeeper']) },
-      { heading: '橫向視角:把工具當 infra 養(維運 / 部署 / 平台)· ' + series.infra, posts: bySeries(series.infra) },
+      sGroup('infra', '橫向視角:把工具當 infra 養(維運 / 部署 / 平台)· '),
     ],
   },
   {
@@ -63,8 +64,8 @@ const layers = [
     blurb:
       '這一層橫切全部——資料要正確、服務要不掛、變更要安全,而這一切的前提是「看得見」。SRE 講的是可靠度的觀念與文化(為什麼);Grafana LGTM 這套可觀測性工具講的是怎麼把它變成真的儀表板、告警與 SLO(怎麼做)。這也是我現在身兼 DE team EM 與 SRE、最花心力的一塊。',
     groups: [
-      { heading: '可靠度的觀念與文化 · ' + series.sre, posts: bySeries(series.sre) },
-      { heading: '可觀測性工具:LGTM 全家桶 · ' + series.obs, posts: bySeries(series.obs) },
+      sGroup('sre', '可靠度的觀念與文化 · '),
+      sGroup('obs', '可觀測性工具:LGTM 全家桶 · '),
     ],
   },
   {
@@ -73,14 +74,14 @@ const layers = [
     title: '戰爭故事:拿真實系統,重打一次',
     blurb:
       '上面每一層的觀念,在這裡用真實做過(也真實做錯過)的系統驗收。第一個戰場:直播代購電商平台——使用者留言下單、庫存不能超賣、金流物流一條鏈;每章先講當年怎麼做,再講如果重來會怎麼設計。',
-    groups: [{ heading: series.rezero, posts: bySeries(series.rezero) }],
+    groups: [sGroup('rezero')],
   },
   {
     tag: '技術之外 · Beyond',
     color: '#9aa4b2',
     title: '人與成長:技術領導',
     blurb: '技術之外的另一條線——讀《成為 Tech Leader》的筆記與反思,寫給正在或即將帶人的工程師。',
-    groups: [{ heading: series.btl, posts: bySeries(series.btl) }],
+    groups: [sGroup('btl')],
   },
 ];
 ---
@@ -92,6 +93,16 @@ const layers = [
   <p class="text-muted mb-6">
     這裡的文章多半用一張圖 + 精簡的文字,把複雜的東西講清楚。我把它們借用 <strong class="text-ink">Clean Architecture</strong> 的分層來組織——<strong class="text-ink">越靠核心越穩定、越能遷移(觀念);越往外越具體、越會被替換(工具)</strong>。依賴指向核心、學習也一樣:先把內圈的觀念打牢,再往外學會被換掉的工具。
   </p>
+
+  <nav class="flex flex-wrap gap-2 mb-6" aria-label="系列快速跳轉">
+    {seriesList.map((s) => (
+      <a
+        href={`#${s.slug}`}
+        class="text-xs bg-surface border border-line rounded px-2 py-1 text-ink hover:text-accent no-underline"
+        style={`border-left:3px solid ${s.color}`}
+      >{s.name}</a>
+    ))}
+  </nav>
 
   <figure class="my-6 flex justify-center">
     <svg viewBox="0 0 600 350" role="img" aria-label="用 Clean Architecture 的同心圓組織這個部落格。最內圈是核心觀念 Domain,含 SQL、資料工程、DDIA,最穩定最能遷移。中間圈是應用與架構 Application,如 dbt、Medallion。最外圈是基礎設施 Infrastructure,含 Redis、Kafka、Spark、Airflow、Kubernetes,最具體最會被替換。依賴方向由外指向內,外層依賴內層、內層不依賴外層;外層工具會被替換,內層觀念要穩定。學習順序先核心觀念再具體工具。SRE 可靠度橫切每一層,戰爭故事系列拿真實系統把每一層串起來驗收,Tech Leader 在技術之外。" style="width:100%;max-width:600px;height:auto;">
@@ -138,8 +149,10 @@ const layers = [
         <p class="text-muted text-sm mb-4">{layer.blurb}</p>
         <div class="space-y-4">
           {layer.groups.map((g) => (
-            <div>
-              {g.heading && <p class="text-xs text-muted mb-2">📚 {g.heading}</p>}
+            <div id={'slug' in g ? g.slug : undefined} class="scroll-mt-4">
+              {g.heading && (
+                <p class="text-xs text-muted mb-2">📚 {g.heading}{'slug' in g && ` · ${g.posts.length} 篇`}</p>
+              )}
               <ol class="list-none m-0 p-0 space-y-1.5">
                 {g.posts.map((p, i) => (
                   <li class="flex gap-3">
