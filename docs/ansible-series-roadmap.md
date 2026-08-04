@@ -16,7 +16,7 @@
 | # | slug | 對應章 | 主題 | 狀態 |
 |---|---|---|---|---|
 | 1 | `ansible-intro` | Ch 1 | Ansible 是什麼:雪花伺服器與組態飄移;**Agentless**(SSH 推送 vs master+agent 拉取);**冪等**(描述終點不是步驟);第一個 inventory + ad-hoc | ✅ 已發布 |
-| 2 | `ansible-adhoc` | Ch 2, 3 | 本機實驗環境(Vagrant/容器,能重建才敢玩)+ ad-hoc 指令實戰:一行管一群機器、常用模組(ping/command/yum/service/setup)、`-m` vs 裸 shell 的差別、什麼時候該升級成 playbook | ⬜ |
+| 2 | `ansible-adhoc` | Ch 2, 3 | 本機實驗環境(Vagrant/容器,能重建才敢玩)+ ad-hoc 指令實戰:一行管一群機器、常用模組(ping/command/yum/service/setup)、`-m` vs 裸 shell 的差別、什麼時候該升級成 playbook | ✅ 已發布 |
 | 3 | `ansible-playbooks` | Ch 4 | 第一份 playbook:tasks / handlers / notify;從 shell 腳本翻譯成宣告式的思路;`--check` dry run;冪等在實戰裡長什麼樣 | ⬜ |
 | 4 | `ansible-playbooks-advanced` | Ch 5 | 進階 playbook:變數優先序、facts、register、when / loop、blocks 與錯誤處理、tags;**Vault 管密文**;環境變數與 prompt | ⬜ |
 | 5 | `ansible-roles` | Ch 6 | 組織之道:role 的標準目錄結構;include vs import(動態 vs 靜態);Ansible Galaxy 現成 role 的取捨;可重用性 = 團隊資產(附錄 B 慣例融入此篇) | ⬜ |
