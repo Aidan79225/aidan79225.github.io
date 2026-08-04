@@ -2,19 +2,65 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PostCard from '../components/PostCard.astro';
 import { getPublishedPosts, byDateDesc } from '../lib/posts';
-const posts = (await getPublishedPosts())
-  .sort(byDateDesc)
-  .slice(0, 5);
+import { seriesList, seriesBySlug } from '../data/series';
+
+const all = await getPublishedPosts();
+const posts = [...all].sort(byDateDesc).slice(0, 5);
+
+const countBySeries = new Map<string, number>();
+for (const p of all) {
+  if (p.data.series) countBySeries.set(p.data.series, (countBySeries.get(p.data.series) ?? 0) + 1);
+}
+const seriesCount = seriesList.filter((s) => (countBySeries.get(s.name) ?? 0) > 0).length;
+
+// One card per storyline: core concepts (DDIA), war stories (Re:Zero),
+// leadership (BTL). The full list lives at /series/.
+const featured = ['ddia', 'rezero', 'btl']
+  .map((slug) => seriesBySlug.get(slug)!)
+  .map((s) => ({ ...s, count: countBySeries.get(s.name) ?? 0 }));
 ---
 <BaseLayout title="Aidan's Blog" description="Aidan 的部落格 —— 用圖像加精簡的文字,把資料工程與技術領導講清楚。涵蓋 Airflow、Spark、Kafka、dbt 與資料架構筆記。">
-  <h1 class="text-3xl font-bold mb-2">Aidan's Blog</h1>
-  <p class="text-muted mb-8">軟體開發筆記、技術整理與個人興趣。</p>
+  <header class="mb-10">
+    <h1 class="text-3xl font-bold mb-3">嗨,我是 Aidan 👋</h1>
+    <p class="text-lg text-ink mb-2">
+      用<strong>一張圖加精簡的文字</strong>,把<strong>資料工程</strong>與<strong>技術領導</strong>講清楚。
+    </p>
+    <p class="text-muted text-sm mb-5">
+      後端 Lead。目前寫了 {seriesCount} 個系列、{all.length} 篇文章——從 SQL、DDIA、Kafka、Airflow、Kubernetes、SRE,到帶團隊的心得與實戰的電商系統設計。
+    </p>
+    <p class="flex flex-wrap gap-3 text-sm">
+      <a href="/start/" class="bg-accent text-ink font-bold rounded px-4 py-2 no-underline hover:opacity-90">從這裡開始 →</a>
+      <a href="/series/" class="bg-surface border border-line text-ink rounded px-4 py-2 no-underline hover:border-accent">系列總覽</a>
+      <a href="/about/" class="bg-surface border border-line text-ink rounded px-4 py-2 no-underline hover:border-accent">關於我</a>
+    </p>
+  </header>
+
+  <h2 class="text-xl font-bold mb-3">精選系列</h2>
+  <div class="grid gap-4 sm:grid-cols-3 mb-10">
+    {featured.map((s) => (
+      <a
+        href={`/series/#${s.slug}`}
+        class="block bg-surface border border-line rounded-lg p-4 no-underline hover:border-accent transition-colors"
+        style={`border-top:3px solid ${s.color}`}
+      >
+        <p class="font-bold text-ink mb-1 leading-snug">{s.name}</p>
+        <p class="text-muted text-xs mb-2">{s.count} 篇</p>
+        <p class="text-muted text-sm m-0">{s.blurb}</p>
+      </a>
+    ))}
+  </div>
+  <p class="text-sm text-muted -mt-6 mb-10">
+    還有 Redis、Kafka、Spark、Airflow、K8s、SRE 等共 {seriesCount} 個系列 →
+    <a href="/series/" class="text-accent hover:underline">看全部</a>
+  </p>
+
   <h2 class="text-xl font-bold mb-3">最新文章</h2>
   <div class="space-y-4 mb-8">
     {posts.map((p) => <PostCard post={p} />)}
   </div>
   <p class="text-sm">
     <a href="/tools/" class="text-accent hover:underline">Tools</a> ·
-    <a href="/guides/" class="text-accent hover:underline">Guides</a>
+    <a href="/guides/" class="text-accent hover:underline">Guides</a> ·
+    <a href="/rss.xml" class="text-accent hover:underline">RSS</a>
   </p>
 </BaseLayout>
