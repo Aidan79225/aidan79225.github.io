@@ -4,6 +4,7 @@ import { getPublishedPosts } from '../lib/posts';
 import BaseLayout from './BaseLayout.astro';
 import AuthorCard from '../components/AuthorCard.astro';
 import Comments from '../components/Comments.astro';
+import Toc from '../components/Toc.astro';
 import { getBacklinks } from '../lib/backlinks';
 import { groupBySection } from '../lib/group-backlinks.mjs';
 import { excerpt } from '../lib/post';
@@ -27,6 +28,10 @@ if (series) {
   nextPost = idx >= 0 && idx < seriesPosts.length - 1 ? seriesPosts[idx + 1] : null;
 }
 const backlinkGroups = groupBySection(await getBacklinks(post.id), headings);
+
+// TOC: h2/h3 only (deeper is noise), skipped entirely for short posts.
+const tocHeadings = headings.filter((h) => h.depth === 2 || h.depth === 3);
+const showToc = tocHeadings.length >= 3;
 ---
 <BaseLayout
   title={title}
@@ -68,6 +73,8 @@ const backlinkGroups = groupBySection(await getBacklinks(post.id), headings);
         </ol>
       </aside>
     )}
+
+    {showToc && <Toc headings={tocHeadings} />}
 
     <div class="prose prose-invert max-w-none">
       <slot />

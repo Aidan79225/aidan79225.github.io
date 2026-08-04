@@ -1,0 +1,70 @@
+---
+// Table of contents, two presentations fed by the same heading list:
+// - narrow screens: a collapsible <details> block at the top of the article
+// - xl+ screens: a fixed sidebar in the empty right margin of the centered
+//   column (50% + 25rem clears the max-w-3xl article), with the current
+//   section highlighted on scroll.
+// Astro already stamps matching `id`s on rendered markdown headings, so the
+// slugs here anchor-link directly.
+import type { MarkdownHeading } from 'astro';
+interface Props { headings: MarkdownHeading[] }
+const { headings } = Astro.props;
+---
+<details class="xl:hidden bg-surface border border-line rounded p-4 mb-6 text-sm">
+  <summary class="font-bold cursor-pointer">📑 目錄</summary>
+  <ul class="list-none m-0 mt-2 p-0 space-y-1">
+    {headings.map((h) => (
+      <li style={`padding-left:${(h.depth - 2)}rem`}>
+        <a href={`#${h.slug}`} class="text-accent hover:underline">{h.text}</a>
+      </li>
+    ))}
+  </ul>
+</details>
+
+<aside
+  class="hidden xl:block fixed w-56 text-sm"
+  style="left:calc(50% + 25rem);top:6rem;max-height:calc(100vh - 8rem);overflow-y:auto"
+  aria-label="目錄"
+>
+  <p class="font-bold text-muted text-xs mb-2 mt-0">目錄</p>
+  <ul class="list-none m-0 p-0 space-y-1.5 border-l border-line">
+    {headings.map((h) => (
+      <li style={`padding-left:${(h.depth - 1) * 0.75}rem`}>
+        <a
+          href={`#${h.slug}`}
+          data-toc-link={h.slug}
+          class="block text-muted hover:text-accent no-underline text-xs leading-relaxed"
+        >{h.text}</a>
+      </li>
+    ))}
+  </ul>
+</aside>
+
+<script>
+  // Highlight the section currently in view: the last heading whose top has
+  // passed the upper part of the viewport wins. Plain scroll handler — cheap
+  // (a dozen getBoundingClientRect calls) and deterministic in both
+  // directions, unlike IntersectionObserver juggling.
+  const links = document.querySelectorAll<HTMLAnchorElement>('[data-toc-link]');
+  if (links.length > 0) {
+    const pairs = [...links]
+      .map((link) => ({ link, el: document.getElementById(link.dataset.tocLink!) }))
+      .filter((p): p is { link: HTMLAnchorElement; el: HTMLElement } => p.el !== null);
+    let activeLink: HTMLAnchorElement | null = null;
+    const update = () => {
+      let current = pairs[0];
+      for (const p of pairs) {
+        if (p.el.getBoundingClientRect().top <= 100) current = p;
+        else break;
+      }
+      if (!current || current.link === activeLink) return;
+      activeLink?.classList.remove('text-accent');
+      activeLink?.classList.add('text-muted');
+      current.link.classList.remove('text-muted');
+      current.link.classList.add('text-accent');
+      activeLink = current.link;
+    };
+    document.addEventListener('scroll', update, { passive: true });
+    update();
+  }
+</script>
