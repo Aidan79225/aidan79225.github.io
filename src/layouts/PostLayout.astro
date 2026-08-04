@@ -54,7 +54,7 @@ const backlinkGroups = groupBySection(await getBacklinks(post.id), headings);
       <aside class="bg-surface border border-line rounded p-4 mb-6 text-sm">
         <p class="font-bold mb-2">
           📚 系列:{seriesByName.has(series)
-            ? <a href={`/series/#${seriesByName.get(series)!.slug}`} class="text-ink hover:text-accent no-underline">{series}</a>
+            ? <a href={`/start/#${seriesByName.get(series)!.slug}`} class="text-ink hover:text-accent no-underline">{series}</a>
             : series}
         </p>
         <ol class="list-decimal list-inside space-y-1 m-0">

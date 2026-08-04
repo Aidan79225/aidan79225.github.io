@@ -66,7 +66,7 @@ Three-layer taxonomy:
 
 - `/` — home (recent posts)
 - `/blog/<slug>/` — a post
-- `/series/` — series overview (all series in reading order; metadata in `src/data/series.ts`)
+- `/start/` — start-here map; every series has an anchor (`/start/#<slug>`, metadata in `src/data/series.ts`)
 - `/tech/`, `/food/` — category listings
 - `/tags/`, `/tags/<tag>/` — tag browse
 - `/guides/`, `/guides/<slug>/` — guides (e.g. `/guides/odoo-usage-guide/`)

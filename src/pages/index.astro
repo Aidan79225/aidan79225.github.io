@@ -14,7 +14,7 @@ for (const p of all) {
 const seriesCount = seriesList.filter((s) => (countBySeries.get(s.name) ?? 0) > 0).length;
 
 // One card per storyline: core concepts (DDIA), war stories (Re:Zero),
-// leadership (BTL). The full list lives at /series/.
+// leadership (BTL). The full list lives at /start/.
 const featured = ['ddia', 'rezero', 'btl']
   .map((slug) => seriesBySlug.get(slug)!)
   .map((s) => ({ ...s, count: countBySeries.get(s.name) ?? 0 }));
@@ -31,7 +31,6 @@ const featured = ['ddia', 'rezero', 'btl']
     </p>
     <p class="flex flex-wrap gap-3 text-sm">
       <a href="/start/" class="bg-accent text-ink font-bold rounded px-4 py-2 no-underline hover:opacity-90">從這裡開始 →</a>
-      <a href="/series/" class="bg-surface border border-line text-ink rounded px-4 py-2 no-underline hover:border-accent">系列總覽</a>
       <a href="/about/" class="bg-surface border border-line text-ink rounded px-4 py-2 no-underline hover:border-accent">關於我</a>
     </p>
   </header>
@@ -40,7 +39,7 @@ const featured = ['ddia', 'rezero', 'btl']
   <div class="grid gap-4 sm:grid-cols-3 mb-10">
     {featured.map((s) => (
       <a
-        href={`/series/#${s.slug}`}
+        href={`/start/#${s.slug}`}
         class="block bg-surface border border-line rounded-lg p-4 no-underline hover:border-accent transition-colors"
         style={`border-top:3px solid ${s.color}`}
       >
@@ -52,7 +51,7 @@ const featured = ['ddia', 'rezero', 'btl']
   </div>
   <p class="text-sm text-muted -mt-6 mb-10">
     還有 Redis、Kafka、Spark、Airflow、K8s、SRE 等共 {seriesCount} 個系列 →
-    <a href="/series/" class="text-accent hover:underline">看全部</a>
+    <a href="/start/" class="text-accent hover:underline">看全部</a>
   </p>
 
   <h2 class="text-xl font-bold mb-3">最新文章</h2>

@@ -1,8 +1,8 @@
 // Canonical registry of blog series — the single source of truth for
-// series metadata used by the homepage, /series/, /start/ and PostLayout.
+// series metadata used by the homepage, /start/ and PostLayout.
 //
 // `name` must match the `series` frontmatter string in posts exactly.
-// `slug` is the ASCII anchor used in URLs (/series/#<slug>).
+// `slug` is the ASCII anchor used in URLs (/start/#<slug>).
 // `color` reuses the layer colors from /start/ so the two pages read as
 // one system (Domain green, Infra amber, Cross-cutting pink, …).
 export interface SeriesInfo {

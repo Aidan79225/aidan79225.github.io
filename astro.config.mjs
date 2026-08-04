@@ -10,6 +10,8 @@ import remarkWikiLink from './src/lib/remark-wiki-link.mjs';
 export default defineConfig({
   site: 'https://blog.aidan.tw',
   base: '/',
+  // /series/ shipped briefly before being folded into /start/ — keep the URL alive.
+  redirects: { '/series/': '/start/' },
   integrations: [react(), sitemap()],
   markdown: {
     remarkPlugins: [remarkCjkFriendly, remarkMath, remarkWikiLink],
