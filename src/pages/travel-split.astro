@@ -15,12 +15,21 @@ import '../styles/tools.css';
       ——各自新增的支出會自動合併,不會互相蓋掉。
     </p>
 
+    <!-- 鎖定橫幅 -->
+    <div id="lockBanner" class="ts-lockbar" style="display:none">
+      <span>🔒 此行程已鎖定,禁止修改</span>
+      <button id="unlockBtn">🔓 解鎖</button>
+    </div>
+
     <!-- 行程 -->
     <div class="ts-card">
       <div class="ts-row">
         <label class="ts-field ts-grow"><span>行程名稱</span><input type="text" id="tripName" placeholder="例如:2026 沖繩" /></label>
         <label class="ts-field"><span>主要幣別(結算用)</span><input type="text" id="tripCurrency" class="ts-w6" placeholder="TWD" /></label>
         <label class="ts-field"><span>行程代碼(共享用)</span><input type="text" id="tripCode" class="ts-w9" placeholder="okinawa26" /></label>
+      </div>
+      <div class="ts-row" style="margin-top:.6rem">
+        <button id="lockBtn" style="background:#374151">🔒 鎖定此行程(禁止再修改)</button>
       </div>
     </div>
 
@@ -124,7 +133,6 @@ import '../styles/tools.css';
         <button class="ghost" id="exportBtn" style="background:#374151">匯出 JSON</button>
         <button class="ghost" id="importBtn" style="background:#374151">匯入 JSON</button>
         <input type="file" id="importFile" accept="application/json,.json" style="display:none" />
-        <button class="ghost" id="resetBtn" style="background:#7f1d1d">清空此行程</button>
       </div>
       <label class="ts-muted" style="display:inline-flex;align-items:center;gap:.4rem;margin-top:.5rem;cursor:pointer">
         <input type="checkbox" id="autoSync" style="width:auto" /> 新增/修改/刪除後自動同步
@@ -260,6 +268,11 @@ import '../styles/tools.css';
       (trip.settlements || [])
         .filter((s) => !s.deleted)
         .sort((a, b) => (b.date || '').localeCompare(a.date || '') || (b.updatedAt || 0) - (a.updatedAt || 0));
+    const isLocked = () => !!trip.locked;
+    const lockGuard = () => {
+      if (isLocked()) { setStatus('行程已鎖定,無法修改。請先解鎖。', 'err'); return true; }
+      return false;
+    };
     const memberName = (id) => {
       const m = trip.members.find((x) => x.id === id);
       return m ? m.name : '(已移除)';
@@ -296,6 +309,21 @@ import '../styles/tools.css';
       renderSplitList();
       renderExpenses();
       renderBalances();
+      applyLockUI();
+    }
+
+    // 鎖定時:顯示橫幅、停用會改資料的控件(清單裡的改/刪/已還按鈕另在各 render 內隱藏)
+    function applyLockUI() {
+      const locked = isLocked();
+      $('lockBanner').style.display = locked ? '' : 'none';
+      $('lockBtn').style.display = locked ? 'none' : '';
+      const ids = ['memberName', 'addMember', 'expDesc', 'expAmount', 'expBaseAmount', 'expRate',
+        'expCurrency', 'expPayer', 'expMode', 'expDate', 'expCategory', 'saveExpense', 'cancelEdit',
+        'stFrom', 'stTo', 'stAmount', 'stDate', 'addSettlement'];
+      ids.forEach((id) => { const el = $(id); if (el) el.disabled = locked; });
+      $('tripName').readOnly = locked;
+      $('tripCurrency').readOnly = locked;
+      document.querySelectorAll('#splitList input').forEach((el) => { el.disabled = locked; });
     }
 
     function renderMe() {
@@ -392,7 +420,9 @@ import '../styles/tools.css';
             ? `${fmtCur(e.origAmount ?? e.amount, cur)}<br><span class="ts-muted">≈ ${fmt(e.amount)}</span>`
             : fmt(e.amount);
           const by = e.createdBy ? `<br><span class="ts-by">記錄:${escapeHtml(memberName(e.createdBy))}</span>` : '';
-          const actions = isOwner(e)
+          const actions = isLocked()
+            ? ''
+            : isOwner(e)
             ? `<button class="ts-mini" data-act="editExp" data-id="${e.id}">改</button>
                <button class="ts-mini del" data-act="delExp" data-id="${e.id}">刪</button>`
             : `<span class="ts-lock" title="只有記錄者「${escapeHtml(memberName(e.createdBy))}」可以改/刪">🔒</span>`;
@@ -434,16 +464,16 @@ import '../styles/tools.css';
 
       const transfers = settle(net);
       const sbox = $('settleList');
+      const locked = isLocked();
       sbox.innerHTML = transfers.length
         ? transfers
             .map(
               (t) =>
                 `<div class="ts-settle" style="display:flex;align-items:center;gap:.6rem;flex-wrap:wrap">
-                   <span>${escapeHtml(memberName(t.from))} → ${escapeHtml(memberName(t.to))}</span>
-                   <input type="number" class="ts-w6" min="0" step="0.01" value="${num2(t.amount)}"
-                     data-settle-amt="${t.from}:${t.to}" />
+                   <span>${escapeHtml(memberName(t.from))} → ${escapeHtml(memberName(t.to))}${locked ? ` <b>${fmt(t.amount)}</b>` : ''}</span>
+                   ${locked ? '' : `<input type="number" class="ts-w6" min="0" step="0.01" value="${num2(t.amount)}" data-settle-amt="${t.from}:${t.to}" />
                    <span class="ts-muted">${baseCur()}</span>
-                   <button class="ts-mini" data-act="markPaid" data-from="${t.from}" data-to="${t.to}">已還</button>
+                   <button class="ts-mini" data-act="markPaid" data-from="${t.from}" data-to="${t.to}">已還</button>`}
                  </div>`,
             )
             .join('')
@@ -462,7 +492,9 @@ import '../styles/tools.css';
         .map((s) => {
           const by = s.createdBy ? ` · 記錄:${escapeHtml(memberName(s.createdBy))}` : '';
           const canDel = !s.createdBy || s.createdBy === me;
-          const del = canDel
+          const del = isLocked()
+            ? ''
+            : canDel
             ? `<button class="ts-mini del" data-act="delSettle" data-id="${s.id}">刪</button>`
             : `<span class="ts-lock" title="只有記錄者可刪">🔒</span>`;
           return `<div class="ts-settle" style="display:flex;justify-content:space-between;align-items:center;gap:.6rem">
@@ -521,9 +553,31 @@ import '../styles/tools.css';
       renderExpenses(); // 擁有權變了,改/刪按鈕要重繪
     });
 
+    function setLocked(locked) {
+      trip.locked = locked;
+      trip.lockedAt = now();
+      trip.lockedBy = locked ? (me || '') : trip.lockedBy;
+      editingId = null;
+      saveTrip();
+      render();
+      resetForm();
+      scheduleSync();
+    }
+    $('lockBtn').addEventListener('click', () => {
+      if (!confirm('鎖定此行程?鎖定後所有人都不能再新增/修改/刪除,直到有人解鎖。')) return;
+      setLocked(true);
+      setStatus('已鎖定 🔒', 'ok');
+    });
+    $('unlockBtn').addEventListener('click', () => {
+      if (!confirm('解鎖此行程?解鎖後就能再次修改。')) return;
+      setLocked(false);
+      setStatus('已解鎖 🔓', 'ok');
+    });
+
     $('addMember').addEventListener('click', addMember);
     $('memberName').addEventListener('keydown', (e) => { if (e.key === 'Enter') addMember(); });
     function addMember() {
+      if (lockGuard()) return;
       const name = $('memberName').value.trim();
       if (!name) return;
       const nm = { id: uid(), name, updatedAt: now() };
@@ -543,6 +597,7 @@ import '../styles/tools.css';
     $('memberList').addEventListener('click', (e) => {
       const btn = e.target.closest('[data-act="delMember"]');
       if (!btn) return;
+      if (lockGuard()) return;
       const m = trip.members.find((x) => x.id === btn.dataset.id);
       if (!m) return;
       if (!confirm(`移除成員「${m.name}」?\n(他已建立的支出仍會保留,但會顯示為「已移除」)`)) return;
@@ -580,6 +635,7 @@ import '../styles/tools.css';
     $('cancelEdit').addEventListener('click', () => { editingId = null; resetForm(); });
 
     function saveExpense() {
+      if (lockGuard()) return;
       const desc = $('expDesc').value.trim();
       const payerId = $('expPayer').value;
       const currency = expCur();
@@ -732,6 +788,7 @@ import '../styles/tools.css';
     $('expenseList').addEventListener('click', (e) => {
       const btn = e.target.closest('[data-act]');
       if (!btn) return;
+      if (lockGuard()) return;
       const id = btn.dataset.id;
       if (btn.dataset.act === 'delExp') {
         const ex = trip.expenses.find((x) => x.id === id);
@@ -784,6 +841,7 @@ import '../styles/tools.css';
       return d || '';
     }
     function addSettlementRecord(from, to, amount, date) {
+      if (lockGuard()) return false;
       if (!me) { setStatus('請先在「成員」區選擇『我是誰』,才能記還款', 'err'); return false; }
       if (!from || !to || from === to) { setStatus('請選擇不同的付款人與收款人', 'err'); return false; }
       if (!(amount > 0)) { setStatus('請輸入正確的還款金額', 'err'); return false; }
@@ -824,6 +882,7 @@ import '../styles/tools.css';
     $('settlementList').addEventListener('click', (e) => {
       const btn = e.target.closest('[data-act="delSettle"]');
       if (!btn) return;
+      if (lockGuard()) return;
       const s = (trip.settlements || []).find((x) => x.id === btn.dataset.id);
       if (!s) return;
       if (s.createdBy && s.createdBy !== me) return setStatus('這筆是別人記的,不能刪除', 'err');
@@ -1003,16 +1062,6 @@ import '../styles/tools.css';
       e.target.value = '';
     });
 
-    $('resetBtn').addEventListener('click', () => {
-      if (!confirm('確定要清空此行程的所有本機資料嗎?(雲端與其他人的資料不受影響)')) return;
-      trip = emptyTrip(trip.code);
-      editingId = null;
-      saveTrip();
-      resetForm();
-      render();
-      setStatus('已清空此行程', 'ok');
-    });
-
     // Apps Script 範本 + 一鍵複製
     const GAS = `// 旅遊分帳 —— Google Apps Script 後端(貼到試算表的 Apps Script 編輯器)
 const SHEET = 'trips';
@@ -1059,9 +1108,12 @@ function mergeTrips_(a, b) {
   if (!b) return a || null;
   var aMeta = a.metaUpdatedAt || 0, bMeta = b.metaUpdatedAt || 0;
   var win = bMeta > aMeta ? b : a;
+  var aLock = a.lockedAt || 0, bLock = b.lockedAt || 0;
+  var lockWin = bLock > aLock ? b : a;
   return {
     code: a.code || b.code, name: win.name, currency: win.currency,
     metaUpdatedAt: Math.max(aMeta, bMeta),
+    locked: !!lockWin.locked, lockedAt: Math.max(aLock, bLock), lockedBy: lockWin.lockedBy,
     members: mergeById_(a.members, b.members),
     expenses: mergeById_(a.expenses, b.expenses),
     settlements: mergeById_(a.settlements, b.settlements),

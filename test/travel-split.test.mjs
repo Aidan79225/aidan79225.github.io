@@ -189,6 +189,24 @@ test('foreign-currency even split settles in base currency', () => {
   assert.equal(net.c, -440);
 });
 
+test('mergeTrips resolves lock state by latest lockedAt', () => {
+  const base = { code: 'T', metaUpdatedAt: 0, name: '', currency: '', members: [], expenses: [], settlements: [] };
+  const locked = { ...base, locked: true, lockedAt: 5, lockedBy: 'a' };
+  const unlockedLater = { ...base, locked: false, lockedAt: 8 };
+  // 較新的「解鎖」勝出
+  let m = mergeTrips(locked, unlockedLater);
+  assert.equal(m.locked, false);
+  assert.equal(m.lockedAt, 8);
+  // 交換順序結果相同
+  m = mergeTrips(unlockedLater, locked);
+  assert.equal(m.locked, false);
+  // 較新的「鎖定」勝出
+  const lockedLater = { ...base, locked: true, lockedAt: 10, lockedBy: 'b' };
+  m = mergeTrips(unlockedLater, lockedLater);
+  assert.equal(m.locked, true);
+  assert.equal(m.lockedBy, 'b');
+});
+
 test('mergeTrips honours deletion tombstones and is commutative', () => {
   const a = {
     code: 'T', metaUpdatedAt: 1, members: [], name: '', currency: '',

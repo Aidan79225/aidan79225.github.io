@@ -7,6 +7,7 @@
 //     members:     [ member ],
 //     expenses:    [ expense ],
 //     settlements: [ settlement ],         // 已還款紀錄
+//     locked, lockedAt, lockedBy,          // 鎖定:禁止修改;合併時以 lockedAt 較新者為準
 //   }
 //   member     = { id, name, deleted?, updatedAt }
 //   settlement = { id, from, to, amount, date, note, createdBy, deleted?, updatedAt }
@@ -218,11 +219,17 @@ export function mergeTrips(a, b) {
   const aMeta = a.metaUpdatedAt || 0;
   const bMeta = b.metaUpdatedAt || 0;
   const metaWinner = bMeta > aMeta ? b : a;
+  const aLock = a.lockedAt || 0;
+  const bLock = b.lockedAt || 0;
+  const lockWinner = bLock > aLock ? b : a; // 鎖定狀態獨立 LWW,不受名稱/幣別修改影響
   return {
     code: a.code || b.code,
     name: metaWinner.name,
     currency: metaWinner.currency,
     metaUpdatedAt: Math.max(aMeta, bMeta),
+    locked: !!lockWinner.locked,
+    lockedAt: Math.max(aLock, bLock),
+    lockedBy: lockWinner.lockedBy,
     members: mergeById(a.members, b.members),
     expenses: mergeById(a.expenses, b.expenses),
     settlements: mergeById(a.settlements, b.settlements),

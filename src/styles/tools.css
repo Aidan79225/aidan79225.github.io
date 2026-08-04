@@ -66,6 +66,23 @@
   .ts-lock { color: #6b7280; font-size: 1rem; }
   .ts-by { color: #9aa4b2; font-size: 0.78rem; }
 
+  .ts-lockbar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    background: #422006;
+    border: 1px solid #b45309;
+    color: #fcd34d;
+    border-radius: 8px;
+    padding: 0.7rem 1rem;
+    margin-bottom: 0.75rem;
+    font-weight: 600;
+  }
+  .ts-lockbar button { background: #b45309; margin: 0; }
+  .ts-lockbar button:hover { background: #92400e; }
+
   .ts-toast {
     position: fixed;
     right: 12px;
