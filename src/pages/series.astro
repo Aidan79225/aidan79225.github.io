@@ -1,0 +1,63 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { getPublishedPosts } from '../lib/posts';
+import { seriesList } from '../data/series';
+
+const all = await getPublishedPosts();
+const sections = seriesList
+  .map((s) => ({
+    ...s,
+    posts: all
+      .filter((p) => p.data.series === s.name)
+      .sort((a, b) => (a.data.seriesOrder ?? 0) - (b.data.seriesOrder ?? 0)),
+  }))
+  .filter((s) => s.posts.length > 0);
+const totalPosts = sections.reduce((n, s) => n + s.posts.length, 0);
+---
+<BaseLayout
+  title="系列總覽"
+  description={`全部 ${sections.length} 個系列、${totalPosts} 篇文章的總覽 —— 從 SQL、DDIA、資料工程,到 Redis、Kafka、Spark、Airflow、Kubernetes、SRE 與技術領導,每個系列都照順序排好,可以從第一篇讀到最後一篇。`}
+>
+  <h1 class="text-3xl font-bold mb-2">系列總覽</h1>
+  <p class="text-muted mb-6">
+    這裡的長文多半成系列——每個系列照順序排好,從第一篇讀到最後一篇就是一條完整的學習路徑。共
+    <strong class="text-ink">{sections.length} 個系列、{totalPosts} 篇</strong>。
+    不知道從哪個開始?先看 <a href="/start/" class="text-accent hover:underline">從這裡開始</a>,那裡有整個部落格的地圖。
+  </p>
+
+  <nav class="flex flex-wrap gap-2 mb-8" aria-label="系列快速跳轉">
+    {sections.map((s) => (
+      <a
+        href={`#${s.slug}`}
+        class="text-xs bg-surface border border-line rounded px-2 py-1 text-ink hover:text-accent no-underline"
+        style={`border-left:3px solid ${s.color}`}
+      >{s.name}</a>
+    ))}
+  </nav>
+
+  <div class="space-y-6">
+    {sections.map((s) => (
+      <section
+        id={s.slug}
+        class="bg-surface border border-line rounded-lg p-5 scroll-mt-4"
+        style={`border-left:3px solid ${s.color}`}
+      >
+        <div class="flex items-baseline justify-between gap-3 mb-1">
+          <h2 class="text-xl font-bold">{s.name}</h2>
+          <span class="text-xs text-muted font-mono shrink-0">{s.posts.length} 篇</span>
+        </div>
+        <p class="text-muted text-sm mb-4">{s.blurb}</p>
+        <ol class="list-none m-0 p-0 space-y-1.5">
+          {s.posts.map((p, i) => (
+            <li class="flex gap-3">
+              <span class="text-accent text-sm font-mono shrink-0 w-5 text-right">{i + 1}</span>
+              <a href={`/blog/${p.id}/`} class="text-ink hover:text-accent no-underline text-sm leading-relaxed">
+                {p.data.title}
+              </a>
+            </li>
+          ))}
+        </ol>
+      </section>
+    ))}
+  </div>
+</BaseLayout>

@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { getPublishedPosts } from '../lib/posts';
+import { seriesList } from '../data/series';
 
 const all = await getPublishedPosts();
 const byId = new Map(all.map((p) => [p.id, p]));
@@ -10,22 +11,9 @@ const bySeries = (name: string) =>
     .sort((a, b) => (a.data.seriesOrder ?? 0) - (b.data.seriesOrder ?? 0));
 const pick = (ids: string[]) => ids.map((id) => byId.get(id)).filter(Boolean);
 
-// Series keys. Series-based blocks stay fresh automatically as new entries land.
-const series = {
-  fode: 'Fundamentals of Data Engineering 讀書筆記',
-  sql: 'SQL 我以為我懂',
-  ddia: 'Designing Data-Intensive Applications 讀書筆記',
-  spark: 'Spark 學習筆記',
-  kafka: 'Kafka 學習筆記',
-  airflow: 'Airflow 學習筆記',
-  redis: 'Redis 學習筆記',
-  k8s: 'Kubernetes 學習筆記',
-  infra: '從 Infra 角度看資料工具',
-  sre: 'Google SRE 讀書筆記',
-  obs: 'Grafana LGTM 可觀測性',
-  rezero: 'Re:從零開始做直播代購電商平台',
-  btl: '成為 Tech Leader 讀書筆記',
-};
+// Series names come from the shared registry (src/data/series.ts), keyed by
+// slug here. Series-based blocks stay fresh automatically as new entries land.
+const series = Object.fromEntries(seriesList.map((s) => [s.slug, s.name]));
 
 // Organised like Clean Architecture: inner layers (概念) are stable & portable,
 // outer layers (工具) are concrete & replaceable. Dependencies point inward.
