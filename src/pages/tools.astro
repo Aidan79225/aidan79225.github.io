@@ -1,30 +1,53 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 
-const tools = [
-  { icon: '🔥', title: 'FIRE 計算機', href: '/fire-calculator/', desc: '計算 FIRE / LeanFIRE 財務自由目標', external: false },
-  { icon: '🧳', title: '旅遊分帳', href: '/travel-split/', desc: '多人旅遊記帳分帳,可用 Google Sheet 共享同一份帳', external: false },
-  { icon: '🎵', title: '線上節拍器', href: '/metronome/', desc: '練習用的可調速節拍器', external: false },
-  { icon: '⏱', title: '拉密計時', href: '/rummikub-timer/', desc: '桌遊回合計時器', external: false },
-  { icon: '🅿️', title: '車位抽籤', href: '/lottery/', desc: '可重現的公正抽籤', external: false },
-  { icon: '🧭', title: 'MBTI · 認識你自己', href: '/mbti96/', desc: '96 題性格測驗', external: false },
-  { icon: '☎️', title: '轉盤計算機', href: '/rotary-calculator/', desc: '用古董轉盤電話打數字的計算機', external: false },
+// `post` links a card to its intro article on the blog (the tool's story:
+// what problem, how it's built); `source` to a public repo. Both optional —
+// cards without them render as before.
+interface Tool {
+  icon: string;
+  title: string;
+  href: string;
+  desc: string;
+  external?: boolean;
+  post?: string;
+  source?: string;
+}
+
+const tools: Tool[] = [
+  { icon: '🔥', title: 'FIRE 計算機', href: '/fire-calculator/', desc: '計算 FIRE / LeanFIRE 財務自由目標' },
+  { icon: '🧳', title: '旅遊分帳', href: '/travel-split/', desc: '多人旅遊記帳分帳,可用 Google Sheet 共享同一份帳' },
+  { icon: '🎵', title: '線上節拍器', href: '/metronome/', desc: '練習用的可調速節拍器' },
+  { icon: '⏱', title: '拉密計時', href: '/rummikub-timer/', desc: '桌遊回合計時器' },
+  { icon: '🅿️', title: '車位抽籤', href: '/lottery/', desc: '可重現的公正抽籤', post: '/blog/lottery/' },
+  { icon: '🧭', title: 'MBTI · 認識你自己', href: '/mbti96/', desc: '96 題性格測驗' },
+  { icon: '☎️', title: '轉盤計算機', href: '/rotary-calculator/', desc: '用古董轉盤電話打數字的計算機' },
   { icon: '🌿', title: 'GitCrisp', href: 'https://blog.aidan.tw/GitCrisp/', desc: '個人實作的 Git GUI', external: true },
   { icon: '🧱', title: 'block6', href: 'https://block6.aidan.tw/', desc: '個人使用的生產力工具', external: true },
 ];
 ---
-<BaseLayout title="Tools" description="小工具集 —— FIRE 計算機、抽籤、節拍器等自製線上工具。">
+<BaseLayout title="Tools" description="小工具集 —— FIRE 計算機、抽籤、節拍器等自製線上工具,部分附開發介紹文章。">
   <h1 class="text-2xl font-bold mb-6">Tools</h1>
   <div class="grid gap-4 sm:grid-cols-2">
     {tools.map((t) => (
-      <a
-        href={t.href}
-        {...(t.external ? { target: '_blank', rel: 'noopener' } : {})}
-        class="block p-4 bg-surface border border-line rounded-lg no-underline hover:border-accent transition-colors"
-      >
-        <p class="font-bold text-ink mb-1"><span class="mr-2">{t.icon}</span>{t.title}</p>
-        <p class="text-muted text-sm">{t.desc}</p>
-      </a>
+      <div class="relative p-4 bg-surface border border-line rounded-lg hover:border-accent transition-colors">
+        {/* Stretched link: the title's ::after covers the card, keeping the
+            whole card clickable while footer links sit above it on z-10. */}
+        <p class="font-bold text-ink mb-1">
+          <a
+            href={t.href}
+            {...(t.external ? { target: '_blank', rel: 'noopener' } : {})}
+            class="text-ink no-underline after:absolute after:inset-0"
+          ><span class="mr-2">{t.icon}</span>{t.title}</a>
+        </p>
+        <p class="text-muted text-sm m-0">{t.desc}</p>
+        {(t.post || t.source) && (
+          <p class="relative z-10 flex gap-3 mt-2 mb-0 text-xs">
+            {t.post && <a href={t.post} class="text-accent hover:underline">📝 介紹文章</a>}
+            {t.source && <a href={t.source} target="_blank" rel="noopener" class="text-accent hover:underline">Source</a>}
+          </p>
+        )}
+      </div>
     ))}
   </div>
 </BaseLayout>
