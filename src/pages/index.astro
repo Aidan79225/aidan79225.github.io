@@ -19,10 +19,10 @@ const featured = ['ddia', 'rezero', 'btl']
   .map((slug) => seriesBySlug.get(slug)!)
   .map((s) => ({ ...s, count: countBySeries.get(s.name) ?? 0 }));
 ---
-<BaseLayout title="Aidan's Blog" description="Aidan 的部落格 —— 用圖像加精簡的文字,把資料工程與技術領導講清楚。涵蓋 Airflow、Spark、Kafka、dbt 與資料架構筆記。">
+<BaseLayout title="Aidan's Blog" description="Aidan 的部落格 —— 用一張圖加精簡的文字,把複雜的系統講清楚。涵蓋資料工程、Kafka、Kubernetes、SRE、可觀測性與技術領導筆記。">
   <header class="mb-10">
     <h1 class="text-3xl font-bold mb-2">Aidan Wang</h1>
-    <p class="text-muted mb-3">Backend Lead · 寫資料工程與技術領導</p>
+    <p class="text-muted mb-3">Backend Lead · 寫複雜系統與技術領導</p>
     <p class="text-lg text-ink mb-2">
       用<strong>一張圖</strong>加精簡的文字,把複雜的系統講清楚。
     </p>

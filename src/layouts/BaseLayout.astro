@@ -18,7 +18,7 @@ const CF_BEACON_TOKEN = import.meta.env.PUBLIC_CF_BEACON_TOKEN ?? '';
 
 const SITE_NAME = "Aidan's Blog";
 const DEFAULT_DESCRIPTION =
-  'Aidan 的部落格 —— 用圖像加精簡的文字,把資料工程與技術領導講清楚。';
+  'Aidan 的部落格 —— 用一張圖加精簡的文字,把複雜的系統講清楚。';
 const canonical = new URL(Astro.url.pathname, Astro.site).href;
 const desc = description ?? DEFAULT_DESCRIPTION;
 const ogImage = new URL(image ?? '/og/default.png', Astro.site).href;

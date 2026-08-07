@@ -1,7 +1,23 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { author } from '../data/author';
+
+// Person schema:讓搜尋引擎把「Aidan Wang」建成實體,sameAs 綁定 GitHub/LinkedIn 檔案。
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: author.name,
+  url: new URL('/about/', Astro.site).href,
+  image: new URL(author.avatar, Astro.site).href,
+  jobTitle: 'Backend Lead',
+  description: author.bio,
+  address: { '@type': 'PostalAddress', addressCountry: 'TW' },
+  email: 'mailto:aidan79225@gmail.com',
+  sameAs: author.links.map((l) => l.url),
+};
 ---
-<BaseLayout title="About" description="關於 Aidan —— 後端 / 資料工程,以及這個部落格在寫什麼。">
+<BaseLayout title="About" description="關於 Aidan —— Backend Lead,寫複雜系統與技術領導,以及這個部落格在寫什麼。">
+  <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
   <header class="flex items-center gap-5 mb-10">
     <img src="/assets/images/avatar.webp" alt="Aidan Wang" class="w-24 h-24 rounded-full flex-shrink-0" />
     <div>
