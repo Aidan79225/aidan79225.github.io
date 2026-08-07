@@ -9,20 +9,20 @@ const personLd = {
   name: author.name,
   url: new URL('/about/', Astro.site).href,
   image: new URL(author.avatar, Astro.site).href,
-  jobTitle: 'Backend Lead',
+  jobTitle: 'Engineering Manager',
   description: author.bio,
   address: { '@type': 'PostalAddress', addressCountry: 'TW' },
   email: 'mailto:aidan79225@gmail.com',
   sameAs: author.links.map((l) => l.url),
 };
 ---
-<BaseLayout title="About" description="關於 Aidan —— Backend Lead,寫複雜系統與技術領導,以及這個部落格在寫什麼。">
+<BaseLayout title="About" description="關於 Aidan —— Engineering Manager,寫複雜系統與技術領導,以及這個部落格在寫什麼。">
   <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
   <header class="flex items-center gap-5 mb-10">
     <img src="/assets/images/avatar.webp" alt="Aidan Wang" class="w-24 h-24 rounded-full flex-shrink-0" />
     <div>
       <h1 class="text-2xl font-bold mb-1">Aidan Wang</h1>
-      <p class="text-muted mb-2">Backend Lead · 全端 / 跨平台工程師</p>
+      <p class="text-muted mb-2">Engineering Manager · 資料工程 / 後端 / SRE</p>
       <p class="text-sm flex flex-wrap gap-x-3 gap-y-1">
         <a href="https://github.com/aidan79225" class="text-accent hover:underline">GitHub</a>
         <a href="https://www.linkedin.com/in/aidan79225/" class="text-accent hover:underline">LinkedIn</a>
@@ -35,7 +35,7 @@ const personLd = {
   <div class="prose prose-invert max-w-none">
     <h2>👋 簡介</h2>
     <p>
-      我是 Aidan,一名軟體工程師。早期投入高效能運算(GPGPU、CUDA Fortran),之後做了近 8 年 Android 開發,歷經 Grindr、AirDroid、YowooTech 等團隊;近年轉向後端,目前在 <strong>Vannise</strong> 帶領後端團隊，從零打造多套電商系統。專注於可擴展、可維護的系統設計與工程團隊協作。
+      我是 Aidan,一名軟體工程師。早期投入高效能運算(GPGPU、CUDA Fortran),之後做了近 8 年 Android 開發,歷經 Grindr、AirDroid、YowooTech 等團隊;近年轉向後端與資料,先在 Vannise 帶領後端團隊從零打造多套電商系統;目前在 <strong>thingnario</strong> 擔任 Engineering Manager(兼 interim SRE),帶領資料工程團隊開發智慧電表 IoT 的資料平台。專注於可擴展、可維護的系統設計與工程團隊協作。
     </p>
 
     <h2>📝 關於這個網站</h2>
@@ -48,7 +48,15 @@ const personLd = {
 
     <h2>🚀 經歷</h2>
 
-    <h3>Vannise — Backend Lead(2024/11–現在)</h3>
+    <h3>thingnario — Engineering Manager 兼 interim SRE(2026/06–現在)</h3>
+    <p><em>Python、Airflow、Spark、Kubernetes、Kafka cluster、Redis cluster、RabbitMQ cluster、Greenplum、SQL、dbt</em></p>
+    <ul>
+      <li>帶領六人資料工程團隊,開發智慧電表(IoT)相關的資料工程:電表資料的擷取、管線與建模。</li>
+      <li>資料管線與轉換:Airflow 編排、Spark 處理、dbt + Greenplum 建模與分析。</li>
+      <li>兼任 interim SRE,維運資料平台基礎設施:Kubernetes,以及 Kafka / Redis / RabbitMQ cluster。</li>
+    </ul>
+
+    <h3>Vannise — Backend Lead(2024/11–2026/06)</h3>
     <p><em>Python、Django、Django Ninja、PostgreSQL、Redis、Docker、GCP</em></p>
     <ul>
       <li>帶領三人後端團隊,從零打造多套電商系統:商品型錄、會員、物流、訂單管理,以及各事業單位的客製化分析報表。</li>
