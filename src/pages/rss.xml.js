@@ -6,7 +6,7 @@ export async function GET(context) {
   const posts = await getPublishedPosts();
   return rss({
     title: "Aidan's Blog",
-    description: 'Aidan 的部落格 —— 用圖像加精簡的文字,把資料工程與技術領導講清楚。',
+    description: 'Aidan 的部落格 —— 用一張圖加精簡的文字,把複雜的系統講清楚。',
     site: context.site,
     items: posts
       .sort(byDateDesc)
