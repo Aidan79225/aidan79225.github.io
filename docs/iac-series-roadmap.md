@@ -24,8 +24,8 @@
 
 | # | slug | 對應主題 | 內容 | 狀態 |
 |---|---|---|---|---|
-| 7 | `iac-stacks` | Stacks + Environments(已併篇) | stack=變更單位(repo/module/stack 三詞掰開);環境三解法(複製貼上✗/一包全裝✗/可重用 stack✓)、環境≠branch;參數化甜蜜點與准入審查 | 🔄 本批 PR |
-| 8 | `iac-servers` | Servers as code | server image pipeline(golden image)、組態同步 vs immutable server、烤進去 vs 開機再裝(bake vs fry) | ⬜ |
+| 7 | `iac-stacks` | Stacks + Environments(已併篇) | stack=變更單位(repo/module/stack 三詞掰開);環境三解法(複製貼上✗/一包全裝✗/可重用 stack✓)、環境≠branch;參數化甜蜜點與准入審查 | ✅ 已發布 |
+| 8 | `iac-servers` | Servers as code | 內容物分層(資料不屬於 server)、烘烤線(bake vs fry 取捨)、image pipeline、持續同步 vs immutable(前提之爭:狀態外移) | 🔄 本批 PR |
 | 9 | `iac-clusters` | Clusters as code | 應用執行環境層(K8s 等)的生命週期管理;cluster 本身也是 cattle——接 `[[k8s-intro]]` 系列 | ⬜ |
 
 ## 第三批 — Delivery 與設計(把變更安全送進正式環境)
