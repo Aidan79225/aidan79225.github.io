@@ -28,6 +28,7 @@ This blog is **Aidan's personal brand / professional image** (a Backend Lead's t
 |---|---|
 | `title` | Series posts use "領導力 - XXX"; standalone posts free-form. |
 | `date` | `YYYY-MM-DD`. |
+| `updated` | Optional `YYYY-MM-DD` — set on substantive revisions only (not typo fixes). Shows「更新於」on the post and feeds `dateModified` / `article:modified_time`. |
 | `category` | Currently `tech` / `food` only (coarse, drives topbar). |
 | `tags` | Cross-cutting topics, **ASCII slug** (e.g. `leadership`, `system-design`) for clean URLs. |
 | `series` | Series title — the **exact same string** is the grouping key (a typo splits the series). |

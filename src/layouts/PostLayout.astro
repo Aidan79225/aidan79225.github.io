@@ -13,7 +13,7 @@ import type { MarkdownHeading } from 'astro';
 import 'katex/dist/katex.min.css';
 interface Props { post: CollectionEntry<'blog'>; headings?: MarkdownHeading[]; }
 const { post, headings = [] } = Astro.props;
-const { title, date, category, tags = [], series, description } = post.data;
+const { title, date, updated, category, tags = [], series, description } = post.data;
 const metaDescription = description ?? excerpt(post.body ?? '', 140);
 
 let seriesPosts: CollectionEntry<'blog'>[] = [];
@@ -38,6 +38,7 @@ const showToc = tocHeadings.length >= 3;
   description={metaDescription}
   type="article"
   publishedTime={date.toISOString()}
+  modifiedTime={updated?.toISOString()}
   tags={tags}
   image={new URL(`/og/${post.id}.png`, Astro.site).href}
   contentLicense
@@ -45,7 +46,9 @@ const showToc = tocHeadings.length >= 3;
   <article>
     <h1 class="text-3xl font-bold mb-2">{title}</h1>
     <p class="text-muted text-sm mb-4">
-      <time datetime={date.toISOString()}>{date.toLocaleDateString('zh-TW')}</time> · {category}
+      <time datetime={date.toISOString()}>{date.toLocaleDateString('zh-TW')}</time>{updated && (
+        <Fragment> · 更新於 <time datetime={updated.toISOString()}>{updated.toLocaleDateString('zh-TW')}</time></Fragment>
+      )} · {category}
     </p>
     {tags.length > 0 && (
       <p class="flex flex-wrap gap-2 mb-6">

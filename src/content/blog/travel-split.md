@@ -1,6 +1,7 @@
 ---
 title: "旅遊分帳:把 Google Sheet 當後端,寫一個不會把帳弄丟的分帳工具"
 date: 2026-08-05
+updated: 2026-08-06
 category: tech
 tags:
   - side-project
