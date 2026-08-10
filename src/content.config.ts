@@ -6,6 +6,9 @@ const blog = defineCollection({
   schema: z.object({
     title: z.string(),
     date: z.coerce.date(),
+    // Optional date of the last substantive revision. Shown on the post and
+    // fed to dateModified / article:modified_time; omit for unrevised posts.
+    updated: z.coerce.date().optional(),
     category: z.enum(['tech', 'food']),
     // Optional hand-written SEO/social description. When omitted, an excerpt is
     // derived from the post body (see excerpt() in src/lib/post.ts).
