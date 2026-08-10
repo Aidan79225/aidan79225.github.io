@@ -62,6 +62,18 @@ export const seriesList: SeriesInfo[] = [
     color: '#d6a45c',
   },
   {
+    slug: 'iac',
+    name: 'Infrastructure as Code 讀書筆記',
+    blurb: '讀 Kief Morris 的 IaC(3rd ed.)——工具背後不會過期的原則:變更成本、爆炸半徑、宣告式思維與 pipeline 交付。',
+    color: '#d6a45c',
+  },
+  {
+    slug: 'ansible',
+    name: 'Ansible for DevOps 讀書筆記',
+    blurb: '把維運知識從人腦搬進版本控制:冪等、宣告式、可重跑、可審查的組態管理。',
+    color: '#d6a45c',
+  },
+  {
     slug: 'infra',
     name: '從 Infra 角度看資料工具',
     blurb: '換一個視角——把資料工具當 infra 養:部署、維運與平台化。',
