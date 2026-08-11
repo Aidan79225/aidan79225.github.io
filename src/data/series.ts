@@ -103,6 +103,12 @@ export const seriesList: SeriesInfo[] = [
     blurb: '讀《成為 Tech Leader》——寫給正在或即將帶人的工程師的筆記與反思。',
     color: '#9aa4b2',
   },
+  {
+    slug: 'ai-craft',
+    name: '帶 AI 的手藝(2026)',
+    blurb: '一個同時帶人也帶 AI 的 EM,把 AI 協作當一門手藝拆開:責任、規範、驗收、護欄與品味。掛上年份,因為這門手藝正在快速變形。',
+    color: '#9aa4b2',
+  },
 ];
 
 export const seriesBySlug = new Map(seriesList.map((s) => [s.slug, s]));
