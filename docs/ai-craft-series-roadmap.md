@@ -21,20 +21,22 @@
 | 1 | `responsibility-funnel` | 責任漏斗:AI 能做掉九成的事,為什麼剩下的一成是你 | 責任守恆(分流 vs 全反射)、漏斗模型、頸寬=驗收頻寬=Amdahl 上限、junior 三條路 | ✅ 已發布 |
 | 2 | `ai-incident-clock` | 頸上有時鐘:事故中的 AI | 從候補升位(素材最熟、鐵人賽存稿已完成故產能無虞、開賽前讓系列有兩篇)。重播毒藥訊息事故的**真實重演實驗**(分階段餵 on-call 已知資訊給乾淨的 AI,記錄真實回應);詳細素材見下方候補區原始筆記 | ✅ 已發布 |
 | 3 | `ai-responsibility-design` | 看板上的頸:工具怎麼設計人的責任——兩個開源專案的對照稽核 | 從候補升位(2026-08-13 討論定案,下一篇)。Multica(agent team 看板)與 Superpowers(spec-first 工作流)的 code-level 責任稽核對照;詳細素材見下方候補區筆記 | ✅ 已發布 |
-| 4 | `ai-spec-craft` | 規範即程式:CLAUDE.md 是新時代的 onboarding 文件 | 「把要求寫清楚」這門被低估的手藝;規範文件=給 AI 的護欄=給人的 onboarding;GitCrisp/本站 CLAUDE.md 實例解剖;寫不清楚要求的人帶 AI 跟帶人都會失敗 | ⬜ |
-| 5 | `ai-review-craft` | 驗收的手藝:怎麼 review AI 的 code | 風險分級(哪些全文讀、哪些抽查、哪些機器擋)、預測→驗證迴圈的實際操作、review 測試比 review feature 更重(護欄壞了是靜默的) | ⬜ |
-| 6 | `ai-guardrails` | 護欄工程:測試與規範在 AI 產線的新角色 | 護欄=把頸加寬;護欄的遞迴與止損點;GitCrisp 13.5k 行測試、本站 avoid-word/pre-commit 實例;護欄的投資報酬怎麼算 | ⬜ |
-| 7 | `ai-false-neck` | 假頸解剖:automation complacency 六十年的教訓 | 航空業自動化失能研究 → code review 的對應;「十次有九次是對的,第十次你已經不看了」;維持頸的材質要刻意練習 | ⬜ |
-| 8 | `ai-taste` | 品味經濟學:當產出免費,稀缺的是什麼 | taste 的工程定義(知道什麼是好、且能說出為什麼);品味怎麼練、怎麼寫進文件變成可傳承的;產出通膨時代的個人定價 | ⬜ |
+| 4 | `ai-responsibility-premium` | 責任的保費:AI 不收,也不賠 | 從討論定案(2026-08-13):雇用的本質=勞動+責任分擔;薪水裡的責任費(簽證費/on-call 津貼/主管加給);組織=再保險網(分層自留),AI fleet=垂直瀑布全反射;合約稽核實例(民法承攬瑕疵擔保 vs GitHub 條款演化+賠償上限);AI 不能承保的三條件(skin in the game/持續身分/社會承認);黑暗版:職業蓋章人。第一手:前職承保地圖(選標同仁/前端同仁/PM/CTO 對外含毒藥事故) | ✅ 已發布 |
+| 5 | `ai-spec-craft` | 規範即程式:CLAUDE.md 是新時代的 onboarding 文件 | 「把要求寫清楚」這門被低估的手藝;規範文件=給 AI 的護欄=給人的 onboarding;GitCrisp/本站 CLAUDE.md 實例解剖;寫不清楚要求的人帶 AI 跟帶人都會失敗 | ⬜ |
+| 6 | `ai-review-craft` | 驗收的手藝:怎麼 review AI 的 code | 風險分級(哪些全文讀、哪些抽查、哪些機器擋)、預測→驗證迴圈的實際操作、review 測試比 review feature 更重(護欄壞了是靜默的) | ⬜ |
+| 7 | `ai-guardrails` | 護欄工程:測試與規範在 AI 產線的新角色 | 護欄=把頸加寬;護欄的遞迴與止損點;GitCrisp 13.5k 行測試、本站 avoid-word/pre-commit 實例;護欄的投資報酬怎麼算 | ⬜ |
+| 8 | `ai-false-neck` | 假頸解剖:automation complacency 六十年的教訓 | 航空業自動化失能研究 → code review 的對應;「十次有九次是對的,第十次你已經不看了」;維持頸的材質要刻意練習 | ⬜ |
+| 9 | `ai-taste` | 品味經濟學:當產出免費,稀缺的是什麼 | taste 的工程定義(知道什麼是好、且能說出為什麼);品味怎麼練、怎麼寫進文件變成可傳承的;產出通膨時代的個人定價 | ⬜ |
 
 ## 每篇的實驗設計(實例優先的落地;寫作前可再調)
 
 - **#3 看板上的頸**:對照稽核——Multica 與 Superpowers 的 code-level 責任稽核(引用釘 commit,可查證);第一手補強:本站 `docs/superpowers/specs/` 的簽核紀錄與體感;可選的行動環節:回饋 issue 給 Multica。
-- **#4 規範即程式**:A/B 實驗——同一個開發任務,給乾淨的 AI 各跑一次「有 CLAUDE.md」vs「沒有 CLAUDE.md」,對照輸出的架構邊界、命名、測試習慣;把兩份 diff 的差異當文章主體。
-- **#5 驗收的手藝**:抓蟲實驗——在一個 AI 產出的 PR 裡刻意埋 2–3 個不同層次的 bug(邏輯邊界/靜默回歸/風格),記錄自己用「預測→驗證」流程 review 的過程與漏抓率;或反向:讓另一個乾淨的 AI 當 reviewer,對照人機各自抓到什麼。
-- **#6 護欄工程**:數據挖掘——GitCrisp repo 實測:統計測試攔下的回歸次數(CI 紅燈紀錄)、pre-commit/avoid-word 的攔截率;算一次護欄的投資報酬。
-- **#7 假頸解剖**:自我實驗——連續 N 個 AI PR 刻意記錄自己的 review 深度(全文讀/抽查/掃過),畫出注意力衰減曲線;對照航空業的警覺衰減研究。
-- **#8 品味經濟學**:對照實驗——同一需求讓 AI 生成三種實作,寫下自己選哪個、為什麼;再把「為什麼」寫成規則餵回去,看第二輪生成有沒有變好——品味能不能被文件化的實測。
+- **#4 責任的保費**:合約稽核(2026-08-13 已執行)——GitHub 條款演化實錄:2024 Copilot 版「You retain all responsibility for Your Code, including Suggestions」→ 2026-03 Generative AI Services 版「solely responsible for any application or agent you create」(產品越 agent 化,責任綁得越全面);General Terms 2025-03 賠償上限=12 個月費用。對照台灣民法承攬瑕疵擔保(法律預設綁在承攬人身上)。稽核限 GitHub 家族(egress 限制),文內如實聲明。
+- **#5 規範即程式**:A/B 實驗——同一個開發任務,給乾淨的 AI 各跑一次「有 CLAUDE.md」vs「沒有 CLAUDE.md」,對照輸出的架構邊界、命名、測試習慣;把兩份 diff 的差異當文章主體。
+- **#6 驗收的手藝**:抓蟲實驗——在一個 AI 產出的 PR 裡刻意埋 2–3 個不同層次的 bug(邏輯邊界/靜默回歸/風格),記錄自己用「預測→驗證」流程 review 的過程與漏抓率;或反向:讓另一個乾淨的 AI 當 reviewer,對照人機各自抓到什麼。
+- **#7 護欄工程**:數據挖掘——GitCrisp repo 實測:統計測試攔下的回歸次數(CI 紅燈紀錄)、pre-commit/avoid-word 的攔截率;算一次護欄的投資報酬。
+- **#8 假頸解剖**:自我實驗——連續 N 個 AI PR 刻意記錄自己的 review 深度(全文讀/抽查/掃過),畫出注意力衰減曲線;對照航空業的警覺衰減研究。
+- **#9 品味經濟學**:對照實驗——同一需求讓 AI 生成三種實作,寫下自己選哪個、為什麼;再把「為什麼」寫成規則餵回去,看第二輪生成有沒有變好——品味能不能被文件化的實測。
 
 ## #3 稽核素材:ai-responsibility-design(2026-08-13 入檔)
 
