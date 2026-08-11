@@ -1,0 +1,35 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getPublishedPosts, byDateDesc } from '../../lib/posts';
+
+// English landing page: lists every translated post. Translations are opt-in
+// (a handful of posts, not a mirror of the site), so this page stays a simple
+// index instead of replicating the zh home.
+const posts = (await getPublishedPosts('en')).sort(byDateDesc);
+---
+<BaseLayout
+  title="Aidan's Blog — English"
+  description="Selected posts from Aidan's blog, translated into English. Complex systems explained with one diagram and concise text."
+  locale="en"
+>
+  <header class="mb-10">
+    <h1 class="text-3xl font-bold mb-2">Aidan's Blog — English</h1>
+    <p class="text-muted mb-3">
+      Selected posts translated into English. The blog is written in Traditional
+      Chinese — these are the posts I've translated so far; in-post links may
+      point to Chinese originals.
+    </p>
+    <p class="text-sm">
+      <a href="/" class="text-accent hover:underline">← 回到中文首頁 / Back to the Chinese home page</a>
+    </p>
+  </header>
+
+  {posts.length > 0 ? (
+    <div class="grid gap-4">
+      {posts.map((post) => <PostCard post={post} />)}
+    </div>
+  ) : (
+    <p class="text-muted">No translations published yet — check back soon.</p>
+  )}
+</BaseLayout>

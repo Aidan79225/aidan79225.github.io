@@ -2,6 +2,7 @@
 import '../styles/global.css';
 import Nav from '../components/Nav.astro';
 import Seo from '../components/Seo.astro';
+import { HTML_LANG, OG_LOCALE, ui, type Locale } from '../lib/i18n';
 const {
   title = "Aidan's Blog",
   description,
@@ -11,7 +12,10 @@ const {
   modifiedTime,
   tags = [],
   contentLicense = false,
+  locale = 'zh-hant' as Locale,
+  alternates = [],
 } = Astro.props;
+const t = ui[locale as Locale];
 // Cloudflare Web Analytics beacon token (from the CF dashboard). Public by
 // design — it only identifies which site to attribute pageviews to. Set it
 // here or via the PUBLIC_CF_BEACON_TOKEN env var; empty = no beacon emitted.
@@ -26,7 +30,7 @@ const ogImage = new URL(image ?? '/og/default.png', Astro.site).href;
 const fullTitle = title === SITE_NAME ? SITE_NAME : `${title} · ${SITE_NAME}`;
 ---
 <!doctype html>
-<html lang="zh-Hant">
+<html lang={HTML_LANG[locale as Locale]}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -92,6 +96,8 @@ const fullTitle = title === SITE_NAME ? SITE_NAME : `${title} · ${SITE_NAME}`;
       publishedTime={publishedTime}
       modifiedTime={modifiedTime}
       tags={tags}
+      ogLocale={OG_LOCALE[locale as Locale]}
+      alternates={alternates}
     />
     <link rel="alternate" type="application/rss+xml" title={SITE_NAME} href={new URL('/rss.xml', Astro.site).href} />
   </head>
@@ -102,7 +108,7 @@ const fullTitle = title === SITE_NAME ? SITE_NAME : `${title} · ${SITE_NAME}`;
     </main>
     <footer class="max-w-3xl mx-auto px-4 py-8 mt-12 border-t border-line text-muted text-sm">
       © 2026 Aidan's Blog{contentLicense && (
-        <Fragment> · 本文採用 <a href="https://creativecommons.org/licenses/by/4.0/" rel="license" target="_blank" class="text-accent hover:underline">CC BY 4.0</a> 授權</Fragment>
+        <Fragment> · {t.licensePrefix}<a href="https://creativecommons.org/licenses/by/4.0/" rel="license" target="_blank" class="text-accent hover:underline">CC BY 4.0</a>{t.licenseSuffix}</Fragment>
       )}
     </footer>
     {CF_BEACON_TOKEN && (

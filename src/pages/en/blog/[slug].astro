@@ -1,0 +1,21 @@
+---
+import { render } from 'astro:content';
+import { getPublishedPosts } from '../../../lib/posts';
+import PostLayout from '../../../layouts/PostLayout.astro';
+
+// English translations live at /en/blog/<slug>/, mirroring the zh original's
+// slug (collection id `en/<slug>` → URL param without the prefix).
+export async function getStaticPaths() {
+  const posts = await getPublishedPosts('en');
+  return posts.map((post) => ({
+    params: { slug: post.id.replace(/^en\//, '') },
+    props: { post },
+  }));
+}
+
+const { post } = Astro.props;
+const { Content, headings } = await render(post);
+---
+<PostLayout post={post} headings={headings}>
+  <Content />
+</PostLayout>
