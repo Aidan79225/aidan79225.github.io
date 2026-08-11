@@ -5,6 +5,8 @@ category: tech
 tags:
   - ai
   - leadership
+series: "帶 AI 的手藝(2026)"
+seriesOrder: 1
 ---
 ## 前言
 
