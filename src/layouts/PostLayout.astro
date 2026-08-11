@@ -39,11 +39,6 @@ const alternates = translation
     ]
   : [];
 
-// English posts reuse the zh original's OG image — those are pre-rendered per
-// zh slug by scripts/gen-og.mjs, and a translation shouldn't require a
-// regeneration pass to ship.
-const ogId = lang === 'en' ? (post.data.translationOf ?? post.id) : post.id;
-
 let seriesPosts: CollectionEntry<'blog'>[] = [];
 let prevPost: CollectionEntry<'blog'> | null = null;
 let nextPost: CollectionEntry<'blog'> | null = null;
@@ -68,7 +63,7 @@ const showToc = tocHeadings.length >= 3;
   publishedTime={date.toISOString()}
   modifiedTime={updated?.toISOString()}
   tags={tags}
-  image={new URL(`/og/${ogId}.png`, Astro.site).href}
+  image={new URL(`/og/${post.id}.png`, Astro.site).href}
   contentLicense
   locale={lang}
   alternates={alternates}
