@@ -20,19 +20,46 @@
 |---|---|---|---|---|
 | 1 | `responsibility-funnel` | 責任漏斗:AI 能做掉九成的事,為什麼剩下的一成是你 | 責任守恆(分流 vs 全反射)、漏斗模型、頸寬=驗收頻寬=Amdahl 上限、junior 三條路 | ✅ 已發布 |
 | 2 | `ai-incident-clock` | 頸上有時鐘:事故中的 AI | 從候補升位(素材最熟、鐵人賽存稿已完成故產能無虞、開賽前讓系列有兩篇)。重播毒藥訊息事故的**真實重演實驗**(分階段餵 on-call 已知資訊給乾淨的 AI,記錄真實回應);詳細素材見下方候補區原始筆記 | ✅ 已發布 |
-| 3 | `ai-spec-craft` | 規範即程式:CLAUDE.md 是新時代的 onboarding 文件 | 「把要求寫清楚」這門被低估的手藝;規範文件=給 AI 的護欄=給人的 onboarding;GitCrisp/本站 CLAUDE.md 實例解剖;寫不清楚要求的人帶 AI 跟帶人都會失敗 | ⬜ |
-| 4 | `ai-review-craft` | 驗收的手藝:怎麼 review AI 的 code | 風險分級(哪些全文讀、哪些抽查、哪些機器擋)、預測→驗證迴圈的實際操作、review 測試比 review feature 更重(護欄壞了是靜默的) | ⬜ |
-| 5 | `ai-guardrails` | 護欄工程:測試與規範在 AI 產線的新角色 | 護欄=把頸加寬;護欄的遞迴與止損點;GitCrisp 13.5k 行測試、本站 avoid-word/pre-commit 實例;護欄的投資報酬怎麼算 | ⬜ |
-| 6 | `ai-false-neck` | 假頸解剖:automation complacency 六十年的教訓 | 航空業自動化失能研究 → code review 的對應;「十次有九次是對的,第十次你已經不看了」;維持頸的材質要刻意練習 | ⬜ |
-| 7 | `ai-taste` | 品味經濟學:當產出免費,稀缺的是什麼 | taste 的工程定義(知道什麼是好、且能說出為什麼);品味怎麼練、怎麼寫進文件變成可傳承的;產出通膨時代的個人定價 | ⬜ |
+| 3 | `ai-responsibility-design` | 看板上的頸:工具怎麼設計人的責任——兩個開源專案的對照稽核 | 從候補升位(2026-08-13 討論定案,下一篇)。Multica(agent team 看板)與 Superpowers(spec-first 工作流)的 code-level 責任稽核對照;詳細素材見下方候補區筆記 | 🔄 下一篇 |
+| 4 | `ai-spec-craft` | 規範即程式:CLAUDE.md 是新時代的 onboarding 文件 | 「把要求寫清楚」這門被低估的手藝;規範文件=給 AI 的護欄=給人的 onboarding;GitCrisp/本站 CLAUDE.md 實例解剖;寫不清楚要求的人帶 AI 跟帶人都會失敗 | ⬜ |
+| 5 | `ai-review-craft` | 驗收的手藝:怎麼 review AI 的 code | 風險分級(哪些全文讀、哪些抽查、哪些機器擋)、預測→驗證迴圈的實際操作、review 測試比 review feature 更重(護欄壞了是靜默的) | ⬜ |
+| 6 | `ai-guardrails` | 護欄工程:測試與規範在 AI 產線的新角色 | 護欄=把頸加寬;護欄的遞迴與止損點;GitCrisp 13.5k 行測試、本站 avoid-word/pre-commit 實例;護欄的投資報酬怎麼算 | ⬜ |
+| 7 | `ai-false-neck` | 假頸解剖:automation complacency 六十年的教訓 | 航空業自動化失能研究 → code review 的對應;「十次有九次是對的,第十次你已經不看了」;維持頸的材質要刻意練習 | ⬜ |
+| 8 | `ai-taste` | 品味經濟學:當產出免費,稀缺的是什麼 | taste 的工程定義(知道什麼是好、且能說出為什麼);品味怎麼練、怎麼寫進文件變成可傳承的;產出通膨時代的個人定價 | ⬜ |
 
 ## 每篇的實驗設計(實例優先的落地;寫作前可再調)
 
-- **#3 規範即程式**:A/B 實驗——同一個開發任務,給乾淨的 AI 各跑一次「有 CLAUDE.md」vs「沒有 CLAUDE.md」,對照輸出的架構邊界、命名、測試習慣;把兩份 diff 的差異當文章主體。
-- **#4 驗收的手藝**:抓蟲實驗——在一個 AI 產出的 PR 裡刻意埋 2–3 個不同層次的 bug(邏輯邊界/靜默回歸/風格),記錄自己用「預測→驗證」流程 review 的過程與漏抓率;或反向:讓另一個乾淨的 AI 當 reviewer,對照人機各自抓到什麼。
-- **#5 護欄工程**:數據挖掘——GitCrisp repo 實測:統計測試攔下的回歸次數(CI 紅燈紀錄)、pre-commit/avoid-word 的攔截率;算一次護欄的投資報酬。
-- **#6 假頸解剖**:自我實驗——連續 N 個 AI PR 刻意記錄自己的 review 深度(全文讀/抽查/掃過),畫出注意力衰減曲線;對照航空業的警覺衰減研究。
-- **#7 品味經濟學**:對照實驗——同一需求讓 AI 生成三種實作,寫下自己選哪個、為什麼;再把「為什麼」寫成規則餵回去,看第二輪生成有沒有變好——品味能不能被文件化的實測。
+- **#3 看板上的頸**:對照稽核——Multica 與 Superpowers 的 code-level 責任稽核(引用釘 commit,可查證);第一手補強:本站 `docs/superpowers/specs/` 的簽核紀錄與體感;可選的行動環節:回饋 issue 給 Multica。
+- **#4 規範即程式**:A/B 實驗——同一個開發任務,給乾淨的 AI 各跑一次「有 CLAUDE.md」vs「沒有 CLAUDE.md」,對照輸出的架構邊界、命名、測試習慣;把兩份 diff 的差異當文章主體。
+- **#5 驗收的手藝**:抓蟲實驗——在一個 AI 產出的 PR 裡刻意埋 2–3 個不同層次的 bug(邏輯邊界/靜默回歸/風格),記錄自己用「預測→驗證」流程 review 的過程與漏抓率;或反向:讓另一個乾淨的 AI 當 reviewer,對照人機各自抓到什麼。
+- **#6 護欄工程**:數據挖掘——GitCrisp repo 實測:統計測試攔下的回歸次數(CI 紅燈紀錄)、pre-commit/avoid-word 的攔截率;算一次護欄的投資報酬。
+- **#7 假頸解剖**:自我實驗——連續 N 個 AI PR 刻意記錄自己的 review 深度(全文讀/抽查/掃過),畫出注意力衰減曲線;對照航空業的警覺衰減研究。
+- **#8 品味經濟學**:對照實驗——同一需求讓 AI 生成三種實作,寫下自己選哪個、為什麼;再把「為什麼」寫成規則餵回去,看第二輪生成有沒有變好——品味能不能被文件化的實測。
+
+## #3 稽核素材:ai-responsibility-design(2026-08-13 入檔)
+
+兩份 code-level 稽核,引用皆釘在稽核當下的 commit(程式碼會變,發文前可重驗):
+
+**Multica(multica-ai/multica @ 6bce42b)——頸在下游,沒裝鎖:**
+- 「agent 交付停在 in_review」是 prompt 慣例,不是狀態機:agent runtime 說明書寫「deliver with in_review」,但同一份說明書列出 `multica issue status <id> <status>`,valid 值**含 `done`**(`runtime_config_sections.go:264`)。
+- 伺服器端零 actor 檢查:`PUT /api/issues/:id` 只驗 status 在 enum 內(`handler/issue.go` validIssueStatuses)。設計原則明文:「the default contract elsewhere (issues, chat, etc.) is **"agent and human are interchangeable"**」(`handler/actor_guards.go` 註解)。
+- **護頸機制存在但只鎖錢**:`X-Actor-Source` 由伺服器蓋章防篡改,`RequireHumanActor` middleware 現成——只掛在 billing 路由(理由:被 prompt injection 攻破的 agent 不能動錢)。讓 agent 拉不動 done 距離一行 `r.Use()`。錢有頸,Done 沒有。
+- **完成 = 沉默**:Inbox 通知掛在 in_review(notification_listeners:「in_review 是 this needs you now 的主要訊號」);agent 直接拉 done 會繞過整條人類注意力路徑——毒藥訊息「失敗=沉默」的組織版。
+- schema 無 accountable:issue 單一 assignee(member|agent)+ creator,RACI 的 A 不存在(`migrations/001_init.up.sql`)。
+- agent 對 agent 的權限(squad leader 才能動 parent 狀態)防得比 agent 對 done 嚴。
+- 公平面:真正的出貨頸外包給 GitHub PR merge;execution log 完整可回放;文案有意識(「nothing ships without a human saying so」)——**不是不懂,是按價值排序裝鎖:錢 > merge > 看板**。
+- 可能的行動:回饋 issue「optional human-only done transition」,附他們自己的 RequireHumanActor 當實作建議(是否執行、措辭,發文前與作者確認)。
+
+**Superpowers(obra/superpowers @ 44c9b2d)——頸在上游,裝了鎖:**
+- **HARD-GATE**:brainstorming skill 明文「未呈現設計並獲使用者批准前,不准任何實作動作」,並封死「這太簡單不用設計」的逃生口。AI 主動把人押到頸口。
+- **一次一題**是責任設計:逐題逼人做本來會默認委派的決策,人無法當乘客。
+- **簽名有物理形式**:設計分段批准 → 寫入 `docs/superpowers/specs/日期-主題-design.md` 並 commit——簽核進版本控制,可考古。
+- **判斷力前置**:writing-plans 把計畫寫給「熱情但品味差、無判斷力、討厭測試的 junior」——簽核後執行端被建模為零判斷;責任左移(shift-left),驗一份 spec 比驗十個 PR 便宜。
+- **verification-before-completion**:「NO COMPLETION CLAIMS WITHOUT FRESH VERIFICATION EVIDENCE」「skip any step = lying」——給 AI 自己的頸圈,管誠實聲明。
+- 弱點:前移的頸一樣磨損(**簽核疲勞**——第 1 份與第 15 份 spec 的閱讀深度);**簽了不等於簽對**(負責感 ≠ 正確性,瀑布老風險);HARD-GATE 仍是 prompt 不是機制。
+- 第一手素材:本站 `docs/superpowers/specs/` 十幾份已簽核 spec(wikilinks-backlinks、抽籤 RNG、Astro 遷移)——作者自己的簽名紀錄與體感。
+
+**對照表(文章骨架)**:頸的位置(下游 vs 上游)/有無裝鎖(慣例 vs HARD-GATE)/責任載體(看板狀態無簽名 vs spec 檔案+commit)/弱點(責任劇場 vs 簽核疲勞)。收尾:責任感是可以被工作流「設計」出來的——工具改變不了責任守恆,但決定了你在哪個時間點、以什麼粒度感受到自己正在簽名。
 
 ## 候補(第二季素材池)
 
