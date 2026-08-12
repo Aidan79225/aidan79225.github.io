@@ -5,6 +5,7 @@ Live at **https://aidan79225.github.io**.
 
 > Migrated from Jekyll to Astro; the blog is content-collection driven with a
 > three-layer taxonomy (category / tags / series), plus a few standalone tools.
+> Written in Traditional Chinese, with opt-in English translations under `/en/`.
 
 ## Tech stack
 
@@ -51,7 +52,7 @@ public/assets/images/     # static assets (avatar, …)
 
 Two collections (`src/content.config.ts`):
 
-- **`blog`** — `title`, `date`, `category` (`tech` | `food`), `tags?`, `series?`, `seriesOrder?`, `comments` (default `true`), `commentsIssue?`
+- **`blog`** — `title`, `date`, `category` (`tech` | `food`), `tags?`, `series?`, `seriesOrder?`, `comments` (default `true`), `commentsIssue?`, `translationOf?` (English posts only)
 - **`guides`** — `title`, `description`
 
 Three-layer taxonomy:
@@ -72,6 +73,7 @@ Three-layer taxonomy:
 - `/guides/`, `/guides/<slug>/` — guides (e.g. `/guides/odoo-usage-guide/`)
 - `/about/`
 - `/tools/` — landing for the interactive tools
+- `/en/`, `/en/blog/<slug>/` — English index + translated posts (see below)
 - `/rss.xml`, `/404`
 
 ### Tools
@@ -91,6 +93,17 @@ in the project skill `.claude/skills/writing-blog-post/SKILL.md`. In short:
 - Inline `<svg>` / raw HTML must contain **no blank lines** (a blank line breaks it
   into a code block).
 - Math: `$…$` / `$$…$$`. Verify with `npm run build`.
+
+## English translations (i18n)
+
+The site's native language is zh-Hant at unprefixed URLs; English is a per-post
+opt-in translation, not a full mirror. To translate a post, drop a same-named
+file in `src/content/blog/en/` with `translationOf: <original-slug>` in its
+front matter — it ships at `/en/blog/<slug>/`, gets listed on `/en/`, and the
+pair links to each other (switcher banner + `hreflang` alternates). Listings,
+tags, RSS, and search stay Chinese-only; `npm run og` (also run by the
+pre-commit hook) renders an English share image per translation. Full workflow
+and architecture notes: [`docs/i18n.md`](./docs/i18n.md).
 
 ## Deployment
 
