@@ -1,14 +1,18 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { excerpt, readingMinutes, coverFromBody } from '../lib/post';
-import { postLang, postUrl } from '../lib/posts';
-import { DATE_LOCALE, ui } from '../lib/i18n';
+import { postLang } from '../lib/posts';
+import { currentLocale, withLocale, DATE_LOCALE, ui } from '../lib/i18n';
 interface Props { post: CollectionEntry<'blog'>; }
 const { post } = Astro.props;
 const { title, date, category, tags = [], series, seriesOrder } = post.data;
 const lang = postLang(post);
 const t = ui[lang];
-const url = postUrl(post);
+// Links follow the page being rendered, not the post's language: a card on
+// /en/tech/ (zh fallback) links to /en/blog/<slug>/ so the reader stays in
+// the /en/ prefix. Every post URL exists there — translated or fallback.
+const locale = currentLocale(Astro.currentLocale);
+const url = withLocale(locale, `/blog/${post.id.replace(/^en\//, '')}/`);
 const summary = excerpt(post.body ?? '');
 const mins = readingMinutes(post.body ?? '');
 const cover = coverFromBody(post.body ?? '');
@@ -34,7 +38,7 @@ const cover = coverFromBody(post.body ?? '');
     {tags.length > 0 && (
       <p class="flex flex-wrap gap-2 m-0">
         {tags.map((t) => (
-          <a href={`/tags/${encodeURIComponent(t)}/`} class="text-xs bg-base border border-line rounded px-2 py-0.5 text-accent hover:underline no-underline">#{t}</a>
+          <a href={withLocale(locale, `/tags/${encodeURIComponent(t)}/`)} class="text-xs bg-base border border-line rounded px-2 py-0.5 text-accent hover:underline no-underline">#{t}</a>
         ))}
       </p>
     )}

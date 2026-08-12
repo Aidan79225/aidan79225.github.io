@@ -10,6 +10,10 @@
 export function shouldPrecache(relPath) {
   const p = relPath.replace(/\\/g, '/');
   if (p.startsWith('og/')) return false; // social share images: ~8.5MB, crawler-only
+  // /en/ is mostly i18n fallback pages — duplicates of the zh content at a
+  // second URL. Precaching them would double the HTML payload (~10MB) for
+  // little value, so the English side is online-only.
+  if (p.startsWith('en/')) return false;
   if (p.endsWith('.xml')) return false; // sitemap / rss
   if (p === 'robots.txt' || p === 'CNAME') return false;
   if (p === 'sw.js') return false; // never cache the worker itself

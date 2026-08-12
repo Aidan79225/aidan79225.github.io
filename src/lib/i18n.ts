@@ -14,6 +14,26 @@ export const HTML_LANG: Record<Locale, string> = { 'zh-hant': 'zh-Hant', en: 'en
 export const OG_LOCALE: Record<Locale, string> = { 'zh-hant': 'zh_TW', en: 'en_US' };
 export const DATE_LOCALE: Record<Locale, string> = { 'zh-hant': 'zh-TW', en: 'en-US' };
 
+// Narrow Astro.currentLocale (string | undefined) to our Locale union.
+export function currentLocale(astroLocale: string | undefined): Locale {
+  return astroLocale === 'en' ? 'en' : DEFAULT_LOCALE;
+}
+
+// Prefix an internal path with the locale segment, so links rendered under
+// /en/ stay inside /en/ (every route exists there via the i18n fallback).
+export function withLocale(locale: Locale, path: string): string {
+  return locale === 'en' ? `/en${path}` : path;
+}
+
+// Prefix internal links inside rendered markdown HTML with /en. Post bodies
+// are rendered once by remark (wiki-links resolve to /blog/<slug>/) and shared
+// across locales, so the English routes rewrite the finished HTML instead.
+// Every internal path exists under /en/ (translation or fallback), and
+// already-prefixed links are left alone.
+export function localizeHtml(html: string): string {
+  return html.replace(/href="\/(?!en\/|en")/g, 'href="/en/');
+}
+
 export const ui = {
   'zh-hant': {
     updatedOn: '更新於',

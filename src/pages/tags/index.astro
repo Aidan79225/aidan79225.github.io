@@ -1,6 +1,8 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getPublishedPosts } from '../../lib/posts';
+import { currentLocale, withLocale } from '../../lib/i18n';
+const locale = currentLocale(Astro.currentLocale);
 const posts = await getPublishedPosts();
 const counts = new Map();
 for (const p of posts) {
@@ -13,7 +15,7 @@ const tags = [...counts.entries()].sort((a, b) => b[1] - a[1]);
   <ul class="flex flex-wrap gap-2 list-none p-0">
     {tags.map(([tag, count]) => (
       <li>
-        <a href={`/tags/${encodeURIComponent(tag)}/`} class="text-sm bg-surface border border-line rounded px-2 py-1 text-accent hover:underline">#{tag} ({count})</a>
+        <a href={withLocale(locale, `/tags/${encodeURIComponent(tag)}/`)} class="text-sm bg-surface border border-line rounded px-2 py-1 text-accent hover:underline">#{tag} ({count})</a>
       </li>
     ))}
   </ul>

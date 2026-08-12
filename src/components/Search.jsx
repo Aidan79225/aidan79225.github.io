@@ -63,8 +63,16 @@ export default function Search() {
 
   useEffect(() => setActive(0), [q]);
 
+  // Keep search results inside /en/ when browsing the English side (every
+  // post URL exists there — translated or zh fallback). Dropdown only renders
+  // client-side, so reading location here is safe.
+  const localize = (url) => {
+    const path = window.location.pathname;
+    return path === '/en' || path.startsWith('/en/') ? `/en${url}` : url;
+  };
+
   const go = (p) => {
-    if (p) window.location.href = p.url;
+    if (p) window.location.href = localize(p.url);
   };
 
   const onKeyDown = (e) => {
@@ -111,7 +119,7 @@ export default function Search() {
             results.map((p, i) => (
               <li key={p.url}>
                 <a
-                  href={p.url}
+                  href={localize(p.url)}
                   onMouseEnter={() => setActive(i)}
                   className={`block px-3 py-2 rounded no-underline ${i === active ? 'bg-base' : ''}`}
                 >

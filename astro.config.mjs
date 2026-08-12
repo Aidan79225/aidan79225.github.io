@@ -13,12 +13,16 @@ export default defineConfig({
   // /series/ shipped briefly before being folded into /start/ — keep the URL alive.
   redirects: { '/series/': '/start/' },
   // zh-Hant stays unprefixed (all existing URLs unchanged); English lives
-  // under /en/. Routes are authored manually (src/pages/en/), this config
-  // just makes the locales official (Astro.currentLocale, sitemap, helpers).
+  // under /en/. Every route exists under /en/: real English pages are authored
+  // in src/pages/en/, and everything else falls back to a rewrite of the
+  // zh-Hant content — so navigation never drops out of the /en/ prefix.
+  // Fallback pages mark themselves with rel=canonical to the zh URL (see
+  // BaseLayout) to avoid duplicate-content SEO issues.
   i18n: {
     defaultLocale: 'zh-hant',
     locales: ['zh-hant', 'en'],
-    routing: { prefixDefaultLocale: false },
+    fallback: { en: 'zh-hant' },
+    routing: { prefixDefaultLocale: false, fallbackType: 'rewrite' },
   },
   integrations: [react(), sitemap()],
   markdown: {

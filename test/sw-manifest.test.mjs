@@ -30,6 +30,9 @@ test('skips OG images, feeds and machine files', () => {
     'robots.txt',
     'CNAME',
     'sw.js',
+    'en/index.html',
+    'en/tech/index.html',
+    'en/blog/pain-before-power/index.html',
   ]) {
     assert.equal(shouldPrecache(p), false, `${p} should be skipped`);
   }

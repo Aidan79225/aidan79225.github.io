@@ -9,7 +9,7 @@ import { getBacklinks } from '../lib/backlinks';
 import { groupBySection } from '../lib/group-backlinks.mjs';
 import { excerpt } from '../lib/post';
 import { seriesByName } from '../data/series';
-import { DATE_LOCALE, HTML_LANG, ui } from '../lib/i18n';
+import { currentLocale, withLocale, DATE_LOCALE, HTML_LANG, ui } from '../lib/i18n';
 import type { MarkdownHeading } from 'astro';
 import 'katex/dist/katex.min.css';
 interface Props { post: CollectionEntry<'blog'>; headings?: MarkdownHeading[]; }
@@ -20,6 +20,13 @@ const metaDescription = description ?? excerpt(post.body ?? '', 140);
 const lang = postLang(post);
 const t = ui[lang];
 const dateLocale = DATE_LOCALE[lang];
+
+// In-page links follow the URL locale, not the content language: a zh post
+// served as /en/blog/<slug>/ fallback keeps its tag/series/backlink links
+// inside /en/ (which always resolves — real translation or zh fallback).
+const locale = currentLocale(Astro.currentLocale);
+const l = (path: string) => withLocale(locale, path);
+const blogUrl = (p: CollectionEntry<'blog'>) => l(`/blog/${p.id.replace(/^en\//, '')}/`);
 
 // The same post in the other language, if published: powers the switcher
 // banner and the hreflang alternates. zh is x-default (site's native tongue).
@@ -78,7 +85,7 @@ const showToc = tocHeadings.length >= 3;
     {tags.length > 0 && (
       <p class="flex flex-wrap gap-2 mb-6">
         {tags.map((tag) => (
-          <a href={`/tags/${encodeURIComponent(tag)}/`} class="text-xs bg-surface border border-line rounded px-2 py-1 text-accent hover:underline">#{tag}</a>
+          <a href={l(`/tags/${encodeURIComponent(tag)}/`)} class="text-xs bg-surface border border-line rounded px-2 py-1 text-accent hover:underline">#{tag}</a>
         ))}
       </p>
     )}
@@ -94,7 +101,7 @@ const showToc = tocHeadings.length >= 3;
       <aside class="bg-surface border border-line rounded p-4 mb-6 text-sm">
         <p class="font-bold mb-2">
           {t.seriesLabel}{seriesByName.has(series)
-            ? <a href={`/start/#${seriesByName.get(series)!.slug}`} class="text-ink hover:text-accent no-underline">{series}</a>
+            ? <a href={l(`/start/#${seriesByName.get(series)!.slug}`)} class="text-ink hover:text-accent no-underline">{series}</a>
             : series}
         </p>
         <ol class="list-decimal list-inside space-y-1 m-0">
@@ -102,7 +109,7 @@ const showToc = tocHeadings.length >= 3;
             <li>
               {p.id === post.id
                 ? <span class="text-ink">{p.data.title}{t.thisPost}</span>
-                : <a href={postUrl(p)} class="text-accent hover:underline">{p.data.title}</a>}
+                : <a href={blogUrl(p)} class="text-accent hover:underline">{p.data.title}</a>}
             </li>
           ))}
         </ol>
@@ -117,8 +124,8 @@ const showToc = tocHeadings.length >= 3;
 
     {series && (prevPost || nextPost) && (
       <nav class="flex justify-between gap-4 mt-8 text-sm">
-        <span>{prevPost && <a href={postUrl(prevPost)} class="text-accent hover:underline">← {prevPost.data.title}</a>}</span>
-        <span>{nextPost && <a href={postUrl(nextPost)} class="text-accent hover:underline">{nextPost.data.title} →</a>}</span>
+        <span>{prevPost && <a href={blogUrl(prevPost)} class="text-accent hover:underline">← {prevPost.data.title}</a>}</span>
+        <span>{nextPost && <a href={blogUrl(nextPost)} class="text-accent hover:underline">{nextPost.data.title} →</a>}</span>
       </nav>
     )}
 
@@ -130,7 +137,7 @@ const showToc = tocHeadings.length >= 3;
             <p class="text-muted text-xs mb-1">{g.label}</p>
             <ul class="list-none p-0 m-0 space-y-1">
               {g.sources.map((s) => (
-                <li><a href={`/blog/${s.id}/`} class="text-accent hover:underline">{s.data.title}</a></li>
+                <li><a href={blogUrl(s)} class="text-accent hover:underline">{s.data.title}</a></li>
               ))}
             </ul>
           </div>

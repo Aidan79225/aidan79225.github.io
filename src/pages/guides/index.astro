@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
+import { currentLocale, withLocale } from '../../lib/i18n';
+const locale = currentLocale(Astro.currentLocale);
 import { getCollection } from 'astro:content';
 const guides = await getCollection('guides');
 ---
@@ -8,7 +10,7 @@ const guides = await getCollection('guides');
   <ul class="space-y-3 list-none p-0">
     {guides.map((g) => (
       <li>
-        <a href={`/guides/${g.id}/`} class="text-accent hover:underline">{g.data.title}</a>
+        <a href={withLocale(locale, `/guides/${g.id}/`)} class="text-accent hover:underline">{g.data.title}</a>
         {g.data.description && <span class="text-muted text-sm"> — {g.data.description}</span>}
       </li>
     ))}
