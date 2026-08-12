@@ -3,14 +3,25 @@ import { render } from 'astro:content';
 import { getPublishedPosts } from '../../../lib/posts';
 import PostLayout from '../../../layouts/PostLayout.astro';
 
-// English translations live at /en/blog/<slug>/, mirroring the zh original's
-// slug (collection id `en/<slug>` → URL param without the prefix).
+// Every post exists at /en/blog/<slug>/: the English translation when one is
+// published (collection id `en/<slug>` → URL param without the prefix), and
+// otherwise the zh original as a fallback — so /en/ navigation never 404s.
+// Fallback pages render as Chinese content (PostLayout keeps zh strings) and
+// BaseLayout marks them canonical → /blog/<slug>/ with a notice bar.
 export async function getStaticPaths() {
-  const posts = await getPublishedPosts('en');
-  return posts.map((post) => ({
-    params: { slug: post.id.replace(/^en\//, '') },
-    props: { post },
-  }));
+  const enPosts = await getPublishedPosts('en');
+  const translated = new Set(enPosts.map((p) => p.data.translationOf).filter(Boolean));
+  const zhFallbacks = (await getPublishedPosts()).filter((p) => !translated.has(p.id));
+  return [
+    ...enPosts.map((post) => ({
+      params: { slug: post.id.replace(/^en\//, '') },
+      props: { post },
+    })),
+    ...zhFallbacks.map((post) => ({
+      params: { slug: post.id },
+      props: { post },
+    })),
+  ];
 }
 
 const { post } = Astro.props;

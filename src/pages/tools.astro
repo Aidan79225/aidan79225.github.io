@@ -1,5 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { currentLocale, withLocale } from '../lib/i18n';
+const locale = currentLocale(Astro.currentLocale);
 
 // `post` links a card to its intro article on the blog (the tool's story:
 // what problem, how it's built); `source` to a public repo. Both optional —
@@ -35,7 +37,7 @@ const tools: Tool[] = [
             whole card clickable while footer links sit above it on z-10. */}
         <p class="font-bold text-ink mb-1">
           <a
-            href={t.href}
+            href={withLocale(locale, t.href)}
             {...(t.external ? { target: '_blank', rel: 'noopener' } : {})}
             class="text-ink no-underline after:absolute after:inset-0"
           ><span class="mr-2">{t.icon}</span>{t.title}</a>
@@ -43,7 +45,7 @@ const tools: Tool[] = [
         <p class="text-muted text-sm m-0">{t.desc}</p>
         {(t.post || t.source) && (
           <p class="relative z-10 flex gap-3 mt-2 mb-0 text-xs">
-            {t.post && <a href={t.post} class="text-accent hover:underline">📝 介紹文章</a>}
+            {t.post && <a href={withLocale(locale, t.post)} class="text-accent hover:underline">📝 介紹文章</a>}
             {t.source && <a href={t.source} target="_blank" rel="noopener" class="text-accent hover:underline">Source</a>}
           </p>
         )}

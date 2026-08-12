@@ -1,8 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
+import { currentLocale, withLocale } from '../lib/i18n';
 import { getPublishedPosts } from '../lib/posts';
 import { seriesList, seriesBySlug } from '../data/series';
 
+const locale = currentLocale(Astro.currentLocale);
 const all = await getPublishedPosts();
 const byId = new Map(all.map((p) => [p.id, p]));
 const bySeries = (name: string) =>
@@ -159,7 +161,7 @@ const layers = [
                 {g.posts.map((p, i) => (
                   <li class="flex gap-3">
                     <span class="text-accent text-sm font-mono shrink-0 w-5 text-right">{i + 1}</span>
-                    <a href={`/blog/${p.id}/`} class="text-ink hover:text-accent no-underline text-sm leading-relaxed">
+                    <a href={withLocale(locale, `/blog/${p.id}/`)} class="text-ink hover:text-accent no-underline text-sm leading-relaxed">
                       {p.data.title}
                     </a>
                   </li>
@@ -173,6 +175,6 @@ const layers = [
   </div>
 
   <p class="text-muted text-sm mt-8">
-    想找特定主題?用右上角的搜尋,或到 <a href="/tags/" class="text-accent hover:underline">標籤頁</a> 依主題瀏覽。
+    想找特定主題?用右上角的搜尋,或到 <a href={withLocale(locale, "/tags/")} class="text-accent hover:underline">標籤頁</a> 依主題瀏覽。
   </p>
 </BaseLayout>

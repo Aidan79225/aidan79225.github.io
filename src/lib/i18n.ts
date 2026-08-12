@@ -14,6 +14,17 @@ export const HTML_LANG: Record<Locale, string> = { 'zh-hant': 'zh-Hant', en: 'en
 export const OG_LOCALE: Record<Locale, string> = { 'zh-hant': 'zh_TW', en: 'en_US' };
 export const DATE_LOCALE: Record<Locale, string> = { 'zh-hant': 'zh-TW', en: 'en-US' };
 
+// Narrow Astro.currentLocale (string | undefined) to our Locale union.
+export function currentLocale(astroLocale: string | undefined): Locale {
+  return astroLocale === 'en' ? 'en' : DEFAULT_LOCALE;
+}
+
+// Prefix an internal path with the locale segment, so links rendered under
+// /en/ stay inside /en/ (every route exists there via the i18n fallback).
+export function withLocale(locale: Locale, path: string): string {
+  return locale === 'en' ? `/en${path}` : path;
+}
+
 export const ui = {
   'zh-hant': {
     updatedOn: '更新於',

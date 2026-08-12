@@ -73,7 +73,7 @@ Three-layer taxonomy:
 - `/guides/`, `/guides/<slug>/` — guides (e.g. `/guides/odoo-usage-guide/`)
 - `/about/`
 - `/tools/` — landing for the interactive tools
-- `/en/`, `/en/blog/<slug>/`, `/en/about/` — English index, translated posts, English about (see below)
+- `/en/…` — English side: every route exists (real translations, or the zh content as a canonical-tagged fallback; see below)
 - `/rss.xml`, `/404`
 
 ### Tools
@@ -100,10 +100,13 @@ The site's native language is zh-Hant at unprefixed URLs; English is a per-post
 opt-in translation, not a full mirror. To translate a post, drop a same-named
 file in `src/content/blog/en/` with `translationOf: <original-slug>` in its
 front matter — it ships at `/en/blog/<slug>/`, gets listed on `/en/`, and the
-pair links to each other (switcher banner + `hreflang` alternates). Listings,
-tags, RSS, and search stay Chinese-only; `npm run og` (also run by the
-pre-commit hook) renders an English share image per translation. Full workflow
-and architecture notes: [`docs/i18n.md`](./docs/i18n.md).
+pair links to each other (switcher banner + `hreflang` alternates). Every
+route also exists under `/en/`: untranslated pages fall back to the zh-Hant
+content with a notice bar and a canonical link to the zh URL, and in-page
+links keep the `/en/` prefix so navigation never drops out of the English
+side. `npm run og` (also run by the pre-commit hook) renders an English share
+image per translation. Full workflow and architecture notes:
+[`docs/i18n.md`](./docs/i18n.md).
 
 ## Deployment
 
