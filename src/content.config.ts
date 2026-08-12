@@ -19,6 +19,10 @@ const blog = defineCollection({
     draft: z.boolean().default(false),
     series: z.string().optional(),
     seriesOrder: z.number().optional(),
+    // English translations only (files under src/content/blog/en/): the slug
+    // of the zh-Hant original this post translates. Links the pair together
+    // for the language switcher and hreflang alternates.
+    translationOf: z.string().optional(),
   }),
 });
 

@@ -1,16 +1,21 @@
 ---
 import type { CollectionEntry } from 'astro:content';
 import { excerpt, readingMinutes, coverFromBody } from '../lib/post';
+import { postLang, postUrl } from '../lib/posts';
+import { DATE_LOCALE, ui } from '../lib/i18n';
 interface Props { post: CollectionEntry<'blog'>; }
 const { post } = Astro.props;
 const { title, date, category, tags = [], series, seriesOrder } = post.data;
+const lang = postLang(post);
+const t = ui[lang];
+const url = postUrl(post);
 const summary = excerpt(post.body ?? '');
 const mins = readingMinutes(post.body ?? '');
 const cover = coverFromBody(post.body ?? '');
 ---
 <article class="bg-surface border border-line rounded-lg hover:border-accent transition-colors overflow-hidden">
   {cover && (
-    <a href={`/blog/${post.id}/`} class="block no-underline" aria-label={title}>
+    <a href={url} class="block no-underline" aria-label={title}>
       <div class="card-cover bg-base border-b border-line">
         {cover.type === 'svg'
           ? <Fragment set:html={cover.svg} />
@@ -20,10 +25,10 @@ const cover = coverFromBody(post.body ?? '');
   )}
   <div class="p-4">
     <h2 class="text-lg font-bold mb-1">
-      <a href={`/blog/${post.id}/`} class="text-ink hover:text-accent no-underline">{title}</a>
+      <a href={url} class="text-ink hover:text-accent no-underline">{title}</a>
     </h2>
     <p class="text-muted text-xs mb-2">
-      <time datetime={date.toISOString()}>{date.toLocaleDateString('zh-TW')}</time> · {category} · 約 {mins} 分鐘{series ? ` · 📚 ${series} #${seriesOrder}` : ''}
+      <time datetime={date.toISOString()}>{date.toLocaleDateString(DATE_LOCALE[lang])}</time> · {category} · {t.minutes(mins)}{series ? ` · 📚 ${series} #${seriesOrder}` : ''}
     </p>
     {summary && <p class="text-muted text-sm mb-2">{summary}</p>}
     {tags.length > 0 && (

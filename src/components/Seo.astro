@@ -12,6 +12,9 @@ interface Props {
   publishedTime?: string;
   modifiedTime?: string;
   tags?: string[];
+  ogLocale?: string;
+  // Language alternates for translated pages; rendered as hreflang links.
+  alternates?: { hreflang: string; href: string }[];
 }
 const {
   title,
@@ -23,6 +26,8 @@ const {
   publishedTime,
   modifiedTime,
   tags = [],
+  ogLocale = 'zh_TW',
+  alternates = [],
 } = Astro.props;
 
 const jsonLd = type === 'article'
@@ -41,13 +46,14 @@ const jsonLd = type === 'article'
   : null;
 ---
 <link rel="canonical" href={canonical} />
+{alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
 <meta name="description" content={description} />
 <meta property="og:type" content={type} />
 <meta property="og:title" content={title} />
 <meta property="og:description" content={description} />
 <meta property="og:url" content={canonical} />
 <meta property="og:site_name" content={siteName} />
-<meta property="og:locale" content="zh_TW" />
+<meta property="og:locale" content={ogLocale} />
 <meta property="og:image" content={image} />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content={title} />

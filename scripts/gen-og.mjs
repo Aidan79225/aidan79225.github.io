@@ -140,18 +140,23 @@ async function main() {
     join(OUT_DIR, 'default.png'),
   );
 
-  const files = (await readdir(BLOG_DIR)).filter((f) => f.endsWith('.md'));
+  // Recursive: English translations live in en/ and get their own image
+  // (en/<slug>.png), so a shared /en/ link previews with the English title.
+  const files = (await readdir(BLOG_DIR, { recursive: true })).filter((f) => f.endsWith('.md'));
   let count = 0;
   for (const f of files) {
     const md = await readFile(join(BLOG_DIR, f), 'utf8');
     const fm = parseFrontMatter(md);
     if (!fm || fm.draft || !fm.title) continue;
     const slug = f.replace(/\.md$/, '');
-    const kicker = fm.category === 'food' ? '美食' : '技術';
+    const isEn = slug.startsWith('en/');
+    const kicker = fm.category === 'food' ? (isEn ? 'Food' : '美食') : (isEn ? 'Tech' : '技術');
     const footer = fm.series
-      ? `系列 · ${fm.series}`
+      ? `${isEn ? 'Series' : '系列'} · ${fm.series}`
       : (fm.tags || []).slice(0, 4).map((t) => `#${t}`).join('  ');
-    await render(template({ title: fm.title, kicker, footer }), join(OUT_DIR, `${slug}.png`));
+    const outPath = join(OUT_DIR, `${slug}.png`);
+    await mkdir(dirname(outPath), { recursive: true });
+    await render(template({ title: fm.title, kicker, footer }), outPath);
     count++;
   }
   console.log(`Generated ${count} post OG images + default.png in public/og/`);
