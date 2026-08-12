@@ -1,6 +1,7 @@
 ---
 import { render } from 'astro:content';
 import { getPublishedPosts } from '../../../lib/posts';
+import { localizeHtml } from '../../../lib/i18n';
 import PostLayout from '../../../layouts/PostLayout.astro';
 
 // Every post exists at /en/blog/<slug>/: the English translation when one is
@@ -25,8 +26,13 @@ export async function getStaticPaths() {
 }
 
 const { post } = Astro.props;
-const { Content, headings } = await render(post);
+// Post bodies are rendered once and shared across locales, so in-body links
+// (wiki-links, markdown links) point at unprefixed zh URLs. Rewrite the
+// rendered HTML so article-to-article jumps stay inside /en/ — for real
+// translations and zh fallbacks alike.
+const { headings } = await render(post);
+const html = localizeHtml(post.rendered?.html ?? '');
 ---
 <PostLayout post={post} headings={headings}>
-  <Content />
+  <Fragment set:html={html} />
 </PostLayout>

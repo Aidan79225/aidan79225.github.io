@@ -25,6 +25,15 @@ export function withLocale(locale: Locale, path: string): string {
   return locale === 'en' ? `/en${path}` : path;
 }
 
+// Prefix internal links inside rendered markdown HTML with /en. Post bodies
+// are rendered once by remark (wiki-links resolve to /blog/<slug>/) and shared
+// across locales, so the English routes rewrite the finished HTML instead.
+// Every internal path exists under /en/ (translation or fallback), and
+// already-prefixed links are left alone.
+export function localizeHtml(html: string): string {
+  return html.replace(/href="\/(?!en\/|en")/g, 'href="/en/');
+}
+
 export const ui = {
   'zh-hant': {
     updatedOn: '更新於',
