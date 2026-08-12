@@ -3,6 +3,12 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import { author } from '../data/author';
 
 // Person schema:讓搜尋引擎把「Aidan Wang」建成實體,sameAs 綁定 GitHub/LinkedIn 檔案。
+const alternates = [
+  { hreflang: 'zh-Hant', href: new URL('/about/', Astro.site).href },
+  { hreflang: 'en', href: new URL('/en/about/', Astro.site).href },
+  { hreflang: 'x-default', href: new URL('/about/', Astro.site).href },
+];
+
 const personLd = {
   '@context': 'https://schema.org',
   '@type': 'Person',
@@ -16,7 +22,7 @@ const personLd = {
   sameAs: author.links.map((l) => l.url),
 };
 ---
-<BaseLayout title="About" description="關於 Aidan —— Engineering Manager,資料工程 / 後端 / SRE,寫複雜系統與技術領導。">
+<BaseLayout title="About" description="關於 Aidan —— Engineering Manager,資料工程 / 後端 / SRE,寫複雜系統與技術領導。" alternates={alternates}>
   <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
   <header class="flex items-center gap-5 mb-10">
     <img src="/assets/images/avatar.webp" alt="Aidan Wang" class="w-24 h-24 rounded-full flex-shrink-0" />
@@ -28,6 +34,7 @@ const personLd = {
         <a href="https://www.linkedin.com/in/aidan79225/" class="text-accent hover:underline">LinkedIn</a>
         <a href="mailto:aidan79225@gmail.com" class="text-accent hover:underline">Email</a>
         <a href="https://blog.aidan.tw" class="text-accent hover:underline">Blog</a>
+        <a href="/en/about/" class="text-accent hover:underline" lang="en">English version</a>
       </p>
     </div>
   </header>
@@ -51,7 +58,7 @@ const personLd = {
     <h3>Vannise — Backend Lead(2024/11–2026/06)</h3>
     <p><em>Python、Django、Django Ninja、PostgreSQL、Redis、Docker、GCP</em></p>
     <ul>
-      <li>帶領三人後端團隊,從零打造多套電商系統:商品型錄、會員、物流、訂單管理,以及各事業單位的客製化分析報表;支撐金流月處理量達新台幣一億以上。</li>
+      <li>帶領三人後端團隊,從零打造多套電商系統:商品型錄、會員、物流、訂單管理,以及各事業單位的客製化分析報表;支撐金流月處理量破億(新台幣)。</li>
       <li>設計後端架構,主導技術選型、coding standards 與開發流程,兼顧可擴展性與程式品質。</li>
       <li>制定並落實 coding style、定期 code review、帶領 junior 工程師。</li>
       <li>以 Docker + GCP 部署與維運 production,優化 CI/CD pipeline。</li>

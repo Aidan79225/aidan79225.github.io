@@ -20,7 +20,8 @@ const posts = (await getPublishedPosts('en')).sort(byDateDesc);
       Chinese — these are the posts I've translated so far; in-post links may
       point to Chinese originals.
     </p>
-    <p class="text-sm">
+    <p class="text-sm flex flex-wrap gap-x-3 gap-y-1">
+      <a href="/en/about/" class="text-accent hover:underline">About me</a>
       <a href="/" class="text-accent hover:underline">← 回到中文首頁 / Back to the Chinese home page</a>
     </p>
   </header>

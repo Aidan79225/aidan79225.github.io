@@ -1,0 +1,130 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { author } from '../../data/author';
+
+// English counterpart of /about/ — maintained independently (résumé prose
+// doesn't translate sentence-for-sentence), linked via hreflang alternates.
+const alternates = [
+  { hreflang: 'zh-Hant', href: new URL('/about/', Astro.site).href },
+  { hreflang: 'en', href: new URL('/en/about/', Astro.site).href },
+  { hreflang: 'x-default', href: new URL('/about/', Astro.site).href },
+];
+
+const personLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Person',
+  name: author.name,
+  url: new URL('/en/about/', Astro.site).href,
+  image: new URL(author.avatar, Astro.site).href,
+  jobTitle: 'Engineering Manager',
+  description:
+    'Engineering Manager — explaining complex systems with one diagram and concise text.',
+  address: { '@type': 'PostalAddress', addressCountry: 'TW' },
+  email: 'mailto:aidan79225@gmail.com',
+  sameAs: author.links.map((l) => l.url),
+};
+---
+<BaseLayout
+  title="About"
+  description="About Aidan — Engineering Manager working across data engineering, backend, and SRE; writing about complex systems and tech leadership."
+  locale="en"
+  alternates={alternates}
+>
+  <script type="application/ld+json" set:html={JSON.stringify(personLd)} />
+  <header class="flex items-center gap-5 mb-10">
+    <img src="/assets/images/avatar.webp" alt="Aidan Wang" class="w-24 h-24 rounded-full flex-shrink-0" />
+    <div>
+      <h1 class="text-2xl font-bold mb-1">Aidan Wang</h1>
+      <p class="text-muted mb-2">Engineering Manager · Data Engineering / Backend / SRE</p>
+      <p class="text-sm flex flex-wrap gap-x-3 gap-y-1">
+        <a href="https://github.com/aidan79225" class="text-accent hover:underline">GitHub</a>
+        <a href="https://www.linkedin.com/in/aidan79225/" class="text-accent hover:underline">LinkedIn</a>
+        <a href="mailto:aidan79225@gmail.com" class="text-accent hover:underline">Email</a>
+        <a href="https://blog.aidan.tw" class="text-accent hover:underline">Blog</a>
+        <a href="/about/" class="text-accent hover:underline" lang="zh-Hant">中文版</a>
+      </p>
+    </div>
+  </header>
+
+  <div class="prose prose-invert max-w-none">
+    <h2>👋 Introduction</h2>
+    <p>
+      I'm Aidan, a software engineer. I started out in high-performance computing
+      (GPGPU, CUDA Fortran), then spent nearly 8 years in Android development
+      across teams including Grindr, AirDroid, and YowooTech. In recent years I
+      moved into backend and data: at Vannise I led a backend team building
+      multiple e-commerce systems from scratch, and I'm now an
+      <strong>Engineering Manager (and interim SRE) at thingnario</strong>,
+      leading a data engineering team building a data platform for smart-meter
+      IoT. I care about scalable, maintainable system design and how engineering
+      teams work well together.
+    </p>
+
+    <h2>🚀 Experience</h2>
+
+    <h3>thingnario — Engineering Manager &amp; interim SRE (Jun 2026–present)</h3>
+    <p><em>Python, Airflow, Spark, Kubernetes, Kafka cluster, Redis cluster, RabbitMQ cluster, Greenplum, SQL, dbt</em></p>
+    <ul>
+      <li>Lead a six-person data engineering team building the data side of smart-meter (IoT) systems: meter data ingestion, pipelines, and modeling.</li>
+      <li>Data pipelines and transformation: orchestration with Airflow, processing with Spark, modeling and analytics with dbt + Greenplum.</li>
+      <li>As interim SRE, operate the data platform's infrastructure: Kubernetes, plus Kafka / Redis / RabbitMQ clusters.</li>
+    </ul>
+
+    <h3>Vannise — Backend Lead (Nov 2024–Jun 2026)</h3>
+    <p><em>Python, Django, Django Ninja, PostgreSQL, Redis, Docker, GCP</em></p>
+    <ul>
+      <li>Led a three-person backend team building multiple e-commerce systems from scratch — product catalog, membership, logistics, order management, and custom analytics reporting per business unit — supporting a monthly payment volume of over NT$100 million.</li>
+      <li>Designed the backend architecture; drove technology selection, coding standards, and the development process, balancing scalability with code quality.</li>
+      <li>Established and enforced coding style, ran regular code reviews, and mentored junior engineers.</li>
+      <li>Deployed and operated production on Docker + GCP; improved the CI/CD pipeline.</li>
+      <li>Improved performance and reliability with Redis caching, PostgreSQL tuning, and asynchronous task processing.</li>
+    </ul>
+
+    <h3>AirDroid — Senior Software Engineer (Jul 2023–Nov 2024)</h3>
+    <p><em>Kotlin Multiplatform, Material Design 3, WebRTC, Koin</em></p>
+    <ul>
+      <li>Drove architecture hardening and tech-stack modernization on a cross-department lab team.</li>
+      <li>Introduced new technologies: Jetpack Compose, DDD, KMP &amp; CMP, Material Design.</li>
+      <li>Rebuilt the billing flow; redesigned login / sign-up with anti-fraud measures.</li>
+      <li>Redesigned the WebSocket connection for WebRTC signaling, cutting startup time by 25%.</li>
+      <li>Built internal productivity tools: a localization importer, a logger, and encryption/decryption processors.</li>
+    </ul>
+
+    <h3>Grindr — Senior Android Developer (Nov 2018–Jun 2023)</h3>
+    <p><em>Kotlin, Hilt, XMPP</em></p>
+    <ul>
+      <li><strong>Trust &amp; Safety (user data protection)</strong>: data-portability download system, photo-rejection explanations, ban warnings, Precog anti-bot integration, registration age gating.</li>
+      <li><strong>Platform (chat &amp; infrastructure)</strong>: messaging features over XMPP (delete / retract / translate / typing indicators / private video / replies), Grindr Lite (declarative UI with Litho), adoption of Jetpack Navigation and Dagger2 / Hilt DI; a translation-file importer (saving 80% of the time), Ktlint / Detekt + git hooks.</li>
+      <li><strong>Ads</strong>: banner / interstitial / reward video / native ads, a GDPR / CCPA compliance controller, and a Java bytecode injector for stability.</li>
+    </ul>
+
+    <h3>YowooTech — Android Engineering Manager (Jan 2016–Nov 2018)</h3>
+    <ul>
+      <li>Built a food-delivery app in the vein of UberEats / Foodpanda; introduced OKRs to grow the team; as system architect, designed backend services including Elasticsearch, order tracking, and alerting.</li>
+      <li>Improved search performance by 57% with Elasticsearch; integrated IM and sticker features; split the original app into DeliveryApp and CommunityApp; drove refactoring and unit testing.</li>
+    </ul>
+
+    <h3>SCCS Lab — HPC Software Engineer (Jan 2014–Oct 2015)</h3>
+    <ul>
+      <li>Accelerated computation with GPGPU, rewriting all of the lab's software in CUDA Fortran (a nearly two-year effort).</li>
+      <li>Implemented Maxwell's equations and Navier–Stokes solvers; optimized UPML; tuned GPU parallelism with shared-memory techniques.</li>
+    </ul>
+
+    <h3>Government technical consultant</h3>
+    <ul>
+      <li>Coached students to gold and silver medals at the WorldSkills international competition; helped organize competitions and selection events.</li>
+    </ul>
+
+    <h2>🎓 Education</h2>
+    <ul>
+      <li><strong>National Taiwan University</strong> (2013–2015) — M.S., Engineering Science and Ocean Engineering</li>
+      <li><strong>National Chung Cheng University</strong> (2008–2013) — B.S., Computer Science and Information Engineering</li>
+    </ul>
+
+    <h2>📄 Research</h2>
+    <ul>
+      <li>Simulation of Maxwell's Equations on GPU Using a High-Order Error-Minimized Scheme</li>
+      <li>Development of a DRE-preserving solver in CPU/GPU platform to simulate 3D waveguide propagation problem</li>
+    </ul>
+  </div>
+</BaseLayout>

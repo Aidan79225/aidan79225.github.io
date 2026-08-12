@@ -73,7 +73,7 @@ Three-layer taxonomy:
 - `/guides/`, `/guides/<slug>/` — guides (e.g. `/guides/odoo-usage-guide/`)
 - `/about/`
 - `/tools/` — landing for the interactive tools
-- `/en/`, `/en/blog/<slug>/` — English index + translated posts (see below)
+- `/en/`, `/en/blog/<slug>/`, `/en/about/` — English index, translated posts, English about (see below)
 - `/rss.xml`, `/404`
 
 ### Tools
