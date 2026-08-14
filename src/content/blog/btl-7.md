@@ -8,7 +8,6 @@ tags:
 series: "成為 Tech Leader 讀書筆記"
 seriesOrder: 7
 comments: true
-draft: true
 ---
 ## 發想力
 
