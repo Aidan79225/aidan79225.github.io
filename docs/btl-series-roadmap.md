@@ -23,7 +23,7 @@
 |---|---|---|---|---|
 | 5 | `btl-5` | Ch6 The Three Great Obstacles to Innovation | 創新三大障礙:看不到自己、沒問題綜合症、相信只有一個正解 | ✅ 已發布 |
 | 6 | `btl-6` | Ch7 A Tool for Developing Self-Awareness | 每天五分鐘日記:事實 → 感受 → 教訓,逼自己看見自己(接 btl-5 障礙一) | ✅ 已發布 |
-| 7 | `btl-7` | Ch8 Developing Idea Power | 發想力:點子怎麼生、怎麼偷(借用改良)、怎麼在團隊裡不被扼殺 | 📝 未寫 |
+| 7 | `btl-7` | Ch8 Developing Idea Power | 發想力:點子流五種貢獻(丟/偷/加工/放下/擋殺手);反思=訂單統計被殺 + 錯殺 clean architecture,分水嶺「殺之前看懂了沒」 | 🚧 草稿(`draft: true`,待發布) |
 | 8 | `btl-8` | Ch9 The Vision | 願景:創新的方向感從哪來,個人願景與團隊願景(Part Two 完結) | 📝 未寫 |
 
 ## Part Three — 激勵(Motivation)
