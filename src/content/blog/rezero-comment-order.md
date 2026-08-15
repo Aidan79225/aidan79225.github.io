@@ -2,7 +2,7 @@
 title: "留言即下單:把聊天室變成下單通道"
 date: 2026-07-25
 category: tech
-description: "直播代購主線第一戰:單一行程輪抓三個平台的留言、自適應節奏、清洗落地,再用一台自製 FSM 把「2601藍+1紅+2」解析成訂單——逐段拆解這台狀態機的設計與精妙處,以及「失敗直接略過」這個最痛的取捨。"
+description: "直播代購主線第一戰:三個平台的留言殊途同歸進同一條處理鏈、FB 輪詢的自適應節奏、清洗落地,再用一台自製 FSM 把「2601藍+1紅+2」解析成訂單——逐段拆解這台狀態機的設計與精妙處,以及「失敗直接略過」這個最痛的取捨。"
 tags:
   - war-story
   - live-commerce
@@ -16,19 +16,19 @@ draft: false
 
 ## 當年的管線:一條迴圈,吃下三個平台
 
-留言來自三個源:**FB、IG、自建直播間**,流量比例大約 **100:10:1**——FB 是絕對主戰場。當年的接法樸素到有點可愛:
+留言來自三個源:**FB、IG、自建直播間**,流量比例大約 **100:10:1**——FB 是絕對主戰場。三源的取得方式各不相同(全景篇提過的 webhook、輪詢、自家直推),但殊途同歸:**全部落進同一張 message 表,由同一條批次處理鏈消化**。所以這章的抓取故事以 FB 的輪詢為主——流量在這裡,坑也都在這裡。當年的接法樸素到有點可愛:
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 580 252" role="img" aria-label="當年的留言處理管線。左側三個來源:FB 流量占比一百、IG 十、自建一。單一行程的連續 job 依序輪抓三源,節奏自適應:一輪超過兩秒就帶著 paging key 立刻續抓,空閒就放慢。抓到的留言清洗成統一 message 格式後 append 進資料庫,但原文不保留。下游每批兩百筆,用 FSM 解析、查 bidding key、扣賣出數量並建立身分。兩個痛點以警示標出:原文不留等於無法重放修正;處理失敗直接略過、沒有補救路徑,尖峰時延遲可達幾分鐘。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
+  <svg viewBox="0 0 580 252" role="img" aria-label="當年的留言處理管線。左側三個來源,取得方式各不相同:FB 流量占比一百,靠自適應輪詢——連續 job 一輪超過兩秒就帶著 paging key 立刻續抓,空閒就放慢;IG 占比十,走 webhook;自建直播間占比一,自家直推。三源殊途同歸:清洗成統一 message 格式後 append 進同一張資料表,但原文不保留。下游是同一條批次處理鏈,每批兩百筆,用 FSM 解析、查 bidding key、扣賣出數量並建立身分。兩個痛點以警示標出:原文不留等於無法重放修正;處理失敗直接略過、沒有補救路徑,尖峰時延遲可達幾分鐘。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
     <defs><marker id="rcf" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#4f6df5"/></marker><marker id="rcp" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#e05a7d"/></marker></defs>
-    <rect x="16" y="24" width="88" height="24" rx="5" fill="#262b3a" stroke="#9aa4b2" stroke-width="1"/><text x="60" y="40" fill="#e6e6e6" font-size="7.6" text-anchor="middle">FB(100)</text>
-    <rect x="16" y="56" width="88" height="24" rx="5" fill="#262b3a" stroke="#9aa4b2" stroke-width="1"/><text x="60" y="72" fill="#e6e6e6" font-size="7.6" text-anchor="middle">IG(10)</text>
-    <rect x="16" y="88" width="88" height="24" rx="5" fill="#262b3a" stroke="#9aa4b2" stroke-width="1"/><text x="60" y="104" fill="#e6e6e6" font-size="7.6" text-anchor="middle">自建(1)</text>
+    <rect x="16" y="24" width="88" height="24" rx="5" fill="#262b3a" stroke="#9aa4b2" stroke-width="1"/><text x="60" y="40" fill="#e6e6e6" font-size="7.4" text-anchor="middle">FB(100)・輪詢</text>
+    <rect x="16" y="56" width="88" height="24" rx="5" fill="#262b3a" stroke="#9aa4b2" stroke-width="1"/><text x="60" y="72" fill="#e6e6e6" font-size="7.4" text-anchor="middle">IG(10)・webhook</text>
+    <rect x="16" y="88" width="88" height="24" rx="5" fill="#262b3a" stroke="#9aa4b2" stroke-width="1"/><text x="60" y="104" fill="#e6e6e6" font-size="7.4" text-anchor="middle">自建(1)・直推</text>
     <line x1="104" y1="68" x2="124" y2="68" stroke="#4f6df5" stroke-width="1.3" marker-end="url(#rcf)"/>
     <rect x="128" y="40" width="128" height="56" rx="6" fill="#26324a" stroke="#4f6df5" stroke-width="1.4"/>
-    <text x="192" y="60" fill="#4f6df5" font-size="8.6" text-anchor="middle" font-weight="bold">單一行程・依序輪抓</text>
-    <text x="192" y="75" fill="#9aa4b2" font-size="6.6" text-anchor="middle">超過 2 秒→帶 paging key 續抓</text>
-    <text x="192" y="87" fill="#9aa4b2" font-size="6.6" text-anchor="middle">空閒→把間隔放慢</text>
+    <text x="192" y="60" fill="#4f6df5" font-size="8.6" text-anchor="middle" font-weight="bold">取回:各源各自的接法</text>
+    <text x="192" y="75" fill="#9aa4b2" font-size="6.6" text-anchor="middle">FB 輪詢自適應:忙續抓、閒放慢</text>
+    <text x="192" y="87" fill="#9aa4b2" font-size="6.6" text-anchor="middle">殊途同歸進同一張表</text>
     <line x1="256" y1="68" x2="276" y2="68" stroke="#4f6df5" stroke-width="1.3" marker-end="url(#rcf)"/>
     <rect x="280" y="40" width="128" height="56" rx="6" fill="#262b3a" stroke="#9aa4b2" stroke-width="1"/>
     <text x="344" y="60" fill="#e6e6e6" font-size="8.6" text-anchor="middle" font-weight="bold">清洗 → 落地</text>
@@ -45,12 +45,12 @@ draft: false
     <text x="470" y="186" fill="#e05a7d" font-size="7.4" text-anchor="middle" font-weight="bold">處理失敗 → 直接略過,沒有補救路徑</text>
     <text x="290" y="222" fill="#9aa4b2" font-size="7.8" text-anchor="middle">一切為了主播眼中最新鮮的庫存狀態;代價:尖峰 lag 可達幾分鐘、掉單無聲</text>
   </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">當年的留言管線:單一行程輪抓三源、清洗落地、批次解析下單。兩處虛線是這章要算的帳。</figcaption>
+  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">當年的留言管線:三源各自取回、清洗落地,同一條批次鏈解析下單。兩處虛線是這章要算的帳。</figcaption>
 </figure>
 
 三個細節值得放大:
 
-- **自適應節奏其實是一個自調的速率控制器。** 一輪抓完看耗時:超過 2 秒代表留言正湧入,帶著 paging key 立刻接著抓;低於 2 秒代表場子冷,把間隔放慢一點。不用外部設定、不用監控儀表,迴圈自己感知流量、自己調速——小團隊憑直覺做出來的東西,事後看是很標準的 adaptive polling。它的缺點只有一個:**三個源綁在同一條迴圈上**,FB 爆量加速時,IG 和自建的新鮮度被拖著走;FB 被限流卡住時,另外兩源也一起等。
+- **FB 的輪詢,是一個自調的速率控制器。** 一輪抓完看耗時:超過 2 秒代表留言正湧入,帶著 paging key 立刻接著抓;低於 2 秒代表場子冷,把間隔放慢一點。不用外部設定、不用監控儀表,迴圈自己感知流量、自己調速——小團隊憑直覺做出來的東西,事後看是很標準的 adaptive polling。要付的代價在下游:三源殊途同歸之後**擠在同一條批次處理鏈上**,FB 爆量時,IG 和自建的單也跟著在佇列裡排隊——FB 的洪峰,是所有人的延遲。
 - **去重鍵選對了:`source + message id`。** 輪詢一定會抓到重疊區間,靠平台原生的留言 ID 當唯一鍵,重抓幾次都不會重複入庫——這是接入層的冪等,做對了後面全順。
 - **清洗完,原文就丟了。** 留言直接被轉成自訂的 message 格式落地,raw 不留。這個決定當年沒人多想,後來成了最貴的一筆學費——清洗規則漏接的留言,**連「漏接了什麼」都無從知道**,除錯只能用猜的。
 
@@ -110,7 +110,7 @@ class CommentsFSM:
             self.results.clear()                 # 中段壞掉:整則作廢
             self.state = self.State.ERROR
             return
-        self.state = self.State.STYLE
+        self.state = self.State.STYLE            # 收尾路徑用;途中結帳會被 _handle_number 蓋成 DETERMIN
         self.current_str = ""
         self.current_number = ""
 ```
@@ -180,7 +180,7 @@ class CommentsFSM:
 
 「同一人重複留言,以最後一筆為準」——[[ddia-replication|LWW]] 一句話就講完,但「最後」這個字要先回答三個問題:
 
-1. **以什麼時鐘為準?** 跨 FB/IG/自建三個源,各平台的時間戳基準不可比。當年的答案很務實:**以我們抓到的順序為主、平台時間戳為輔**——反正只有一條抓取迴圈,它進 DB 的順序就是全域順序。單一消費者的意外好處:**你自己就是時鐘**。
+1. **以什麼時鐘為準?** 跨 FB/IG/自建三個源,各平台的時間戳基準不可比。當年的答案很務實:**以我們落地的順序為主、平台時間戳為輔**——三源都寫進同一張 message 表,再由同一條批次處理鏈依序消化,入庫順序就是全域順序。單一消費者的意外好處:**你自己就是時鐘**。
 2. **覆蓋的粒度是什麼?** 是 key+style 級:後留的 `2601藍+1` 只蓋藍色,先前的 `2601紅+2` 還在。而且這是一個**帶副作用的 LWW**——蓋掉 `+2` 變 `+1`,購物車數量要改、賣出數量表要補回差額。一般系統的 LWW 丟掉舊值就完事,這裡的舊值佔著庫存,覆蓋即補償。
 3. **「最後」的邊界在哪一場?** 主播有**重喊**的需求——同一個 key 重新開賣,舊場次的單**全部清除、完整重算**,客人要重新留言。所以 LWW 的有效鍵其實是「人+場次+style」:重喊即斷代。被清單的客人沒有系統通知,純靠主播口播——這也是 feature:主播就是這個平台的通知系統,「現在不留就沒了」的急迫感,正是直播銷售的引擎。
 
@@ -190,7 +190,7 @@ class CommentsFSM:
 
 重來版不推翻這個優先序,只拆掉它的前提——當年之所以二選一,是因為「處理」和「事實」綁在同一條命脈上。拆開就好:
 
-- **每源一條抓取迴圈**,自適應節奏保留,但 FB 的洪峰不再拖累 IG 和自建;
+- **每源一條處理鏈**(取回端本來就各自獨立),FB 的洪峰不再拖著 IG 和自建的單一起排隊;
 - **raw 原文與統一事件都落地**([[ddia-streaming|事件流]]是唯一事實來源),清洗規則漏接,重放就能補;
 - **快路徑照樣跳過失敗**——但失敗的事件進 dead-letter 佇列留著,一條慢速補救路徑事後重放([[kafka-delivery|投遞語意]]那套在這裡全用得上);
 - 解析與扣庫存**拆成兩段**:解析是純函式、可以平行,扣庫存才需要排隊——當年它們擠在同一個 batch 迴圈裡,慢的拖著快的。

@@ -58,7 +58,7 @@ class CommentsFSM:
             self.results.clear()                 # 中段壞掉:整則作廢
             self.state = self.State.ERROR
             return
-        self.state = self.State.STYLE
+        self.state = self.State.STYLE            # 收尾路徑用;途中結帳會被 _handle_number 蓋成 DETERMIN
         self.current_str = ""
         self.current_number = ""
 ```
