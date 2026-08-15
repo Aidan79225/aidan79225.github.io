@@ -24,13 +24,13 @@
 | 5 | `btl-5` | Ch6 The Three Great Obstacles to Innovation | 創新三大障礙:看不到自己、沒問題綜合症、相信只有一個正解 | ✅ 已發布 |
 | 6 | `btl-6` | Ch7 A Tool for Developing Self-Awareness | 每天五分鐘日記:事實 → 感受 → 教訓,逼自己看見自己(接 btl-5 障礙一) | ✅ 已發布 |
 | 7 | `btl-7` | Ch8 Developing Idea Power | 發想力:點子流五種貢獻(丟/偷/加工/放下/擋殺手);反思=訂單統計被殺 + 錯殺 clean architecture,分水嶺「殺之前看懂了沒」 | ✅ 已發布 |
-| 8 | `btl-8` | Ch9 The Vision | 願景:個人願景/傳染=影響力/分辨重要與瑣碎;向量對齊圖;反思=實際挖出個人願景的過程(高峰→解剖→憤怒→認出)(Part Two 完結) | 🚧 草稿(`draft: true`,待發布) |
+| 8 | `btl-8` | Ch9 The Vision | 願景:個人願景/傳染=影響力/分辨重要與瑣碎;向量對齊圖;反思=實際挖出個人願景的過程(高峰→解剖→憤怒→認出)(Part Two 完結) | ✅ 已發布 |
 
 ## Part Three — 激勵(Motivation)
 
 | # | slug | 章 | 主題 | 狀態 |
 |---|---|---|---|---|
-| 9 | `btl-9` | Ch10–11 The First / Second Great Obstacle to Motivating Others | 激勵的兩大障礙:你說的話別人聽到的不一樣;把任務放在人前面 | 📝 未寫 |
+| 9 | `btl-9` | Ch10–11 The First / Second Great Obstacle to Motivating Others | 激勵的兩大障礙:別人是隱形的(明星工程師的 solo 敘事)/ 把人當電腦下指令(失真鏈 SVG、人=任務);反思=重讀「成員不理解」+ KPI 是鏈尾輸出 | 🚧 草稿(`draft: true`,待發布) |
 | 10 | `btl-10` | Ch12–13 The Problem of Helping People / Learning to Be a Motivator | 幫助人為什麼這麼難;怎麼練成一個激勵者 | 📝 未寫 |
 | 11 | `btl-11` | Ch14–15 Where Power Comes From / Power, Imperfection, and Congruence | 力量的來源;不完美與言行一致(congruence) | 📝 未寫 |
 
