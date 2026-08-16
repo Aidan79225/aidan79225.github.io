@@ -46,7 +46,7 @@ draft: false
     <rect x="28" y="196" width="230" height="52" rx="6" fill="#2e2a20" stroke="#d6a45c" stroke-width="1.4"/>
     <text x="143" y="216" fill="#d6a45c" font-size="8.8" text-anchor="middle" font-weight="bold">cart item(佔庫存)</text>
     <text x="143" y="232" fill="#9aa4b2" font-size="6.8" text-anchor="middle">掛在 fb user 上,不是 account 上</text>
-    <line x1="103" y1="68" x2="120" y2="194" stroke="#4f6df5" stroke-width="1.3" marker-end="url(#rif)"/>
+    <path d="M 28 62 C 4 95, 4 165, 26 210" fill="none" stroke="#4f6df5" stroke-width="1.3" marker-end="url(#rif)"/>
     <text x="66" y="172" fill="#4f6df5" font-size="6.6" text-anchor="middle">fbmsgtocartitem</text>
     <text x="66" y="183" fill="#9aa4b2" font-size="6.2" text-anchor="middle">msg id・bidding key id</text>
     <path d="M 486 118 Q 460 210 260 224" fill="none" stroke="#54b890" stroke-width="1.1" stroke-dasharray="4 3" marker-end="url(#rig)"/>
