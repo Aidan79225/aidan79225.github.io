@@ -53,7 +53,9 @@ draft: false
     <rect x="365" y="200" width="170" height="40" rx="6" fill="#233528" stroke="#54b890" stroke-width="1.2"/>
     <text x="450" y="216" fill="#54b890" font-size="7.8" text-anchor="middle" font-weight="bold">order(檔期 C)</text>
     <text x="450" y="231" fill="#9aa4b2" font-size="6.4" text-anchor="middle">跟著各自的出貨節奏</text>
+    <line x1="130" y1="240" x2="130" y2="256" stroke="#54b890" stroke-width="1.1" marker-end="url(#rco)"/>
     <line x1="290" y1="240" x2="290" y2="256" stroke="#54b890" stroke-width="1.1" marker-end="url(#rco)"/>
+    <line x1="450" y1="240" x2="450" y2="256" stroke="#54b890" stroke-width="1.1" marker-end="url(#rco)"/>
     <rect x="120" y="260" width="340" height="26" rx="6" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.1"/>
     <text x="290" y="277" fill="#e6e6e6" font-size="7.6" text-anchor="middle">order item —— 會計單位:成交時定格金額,發票/退款以它為準</text>
   </svg>
@@ -66,9 +68,11 @@ draft: false
 - **order 是履約的單位,按檔期切。** 代購的貨跟著檔期到、出貨跟著檔期走,售後的節奏天生以檔期為界;檔期限定的優惠券也記在這層。
 - **order item 是會計的單位。** 成交那一刻定格金額——發票、退款、對帳,全部站在這個不再變動的數字上。
 
+而「購物車**到**訂單」這個動作本身的形狀,已經預告了下一節:結帳不是去改 cart item 的狀態——付款當下**新增一筆 order item**,和庫存帳本上「購物車數量轉訂單數量」在**同一筆交易**內完成。狀態轉移用**新增記錄**表達,溯源鏈因此自然多接一段:**msg → cart item → order item**,任何一筆成交都能一路回溯到當初那則留言。
+
 ## 訂單的「狀態」:五個欄位,零個狀態機
 
-教科書會教你給訂單畫一張漂亮的狀態機:建立 → 待付款 → 已付款 → 備貨 → 出貨 → 完成。當年的系統不是這樣——訂單的「狀態」是**五個各自獨立的欄位**:付款狀態、開發票狀態、退款狀態、物流狀態、客服標記。大部分**跟著事實更新,沒有轉移限制**。
+教科書會教你給訂單畫一張漂亮的狀態機:建立 → 待付款 → 已付款 → 備貨 → 出貨 → 完成。當年的系統不是這樣——訂單的「狀態」是**五個各自獨立的欄位**:付款狀態、開發票狀態、退款狀態、物流狀態、客服標記——每一個都**跟著事實更新,沒有轉移限制**。
 
 <figure style="margin:1.5rem 0;text-align:center;">
   <svg viewBox="0 0 580 252" role="img" aria-label="單一狀態機與多欄位狀態的對比。左側打叉:把付款、發票、退款、物流、客服五個維度塞進一台狀態機,狀態數是五個維度的笛卡兒積,數百個組合各需定義轉移規則,而現實中主播想改就改,模型必輸。右側打勾:一張 order 上五個正交的狀態欄位,各自跟著自己的事實來源更新——付款狀態跟付款事實、發票狀態跟開票回執、退款狀態跟退款事實、物流狀態跟物流商回報、客服標記跟客服操作;只記錄、不強制。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
