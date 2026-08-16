@@ -19,8 +19,8 @@ draft: false
 留言來自三個源:**FB、IG、自建直播間**,流量比例大約 **100:10:1**——FB 是絕對主戰場。三源的取得方式各不相同(全景篇提過的 webhook、輪詢、自家直推),但殊途同歸:**全部落進同一張 message 表,由同一條批次處理鏈消化**。所以這章的抓取故事以 FB 的輪詢為主——流量在這裡,坑也都在這裡。當年的接法樸素到有點可愛:
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 580 252" role="img" aria-label="當年的留言處理管線。左側三個來源,取得方式各不相同:FB 流量占比一百,靠自適應輪詢——連續 job 一輪超過兩秒就帶著 paging key 立刻續抓,空閒就放慢;IG 占比十,走 webhook;自建直播間占比一,自家直推。三源殊途同歸:清洗成統一 message 格式後 append 進同一張資料表,但原文不保留。下游是同一條批次處理鏈,每批兩百筆,用 FSM 解析、查 bidding key、扣賣出數量並建立身分。兩個痛點以警示標出:原文不留等於無法重放修正;處理失敗直接略過、沒有補救路徑,尖峰時延遲可達幾分鐘。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
-    <defs><marker id="rcf" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#4f6df5"/></marker><marker id="rcp" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#e05a7d"/></marker></defs>
+  <svg viewBox="0 0 580 252" role="img" aria-label="當年的留言處理管線。左側三個來源,取得方式各不相同:FB 流量占比一百,靠自適應輪詢——連續 job 一輪超過兩秒就帶著 paging key 立刻續抓,空閒就放慢;IG 占比十,走 webhook;自建直播間占比一,自家直推。三源殊途同歸:清洗成統一 message 格式後 append 進同一張資料表,raw 原文也留了下來。下游是同一條批次處理鏈,每批兩百筆,用 FSM 解析、查 bidding key、扣賣出數量並建立身分。兩處虛線標註:raw 有落地、FB 還能事後整場重抓,但沒有任何重放路徑去用它;處理失敗直接略過、沒有補救路徑,尖峰時延遲可達幾分鐘——事實都在,救援不在。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
+    <defs><marker id="rcf" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#4f6df5"/></marker><marker id="rcp" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#e05a7d"/></marker><marker id="rca" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#d6a45c"/></marker></defs>
     <rect x="16" y="24" width="88" height="24" rx="5" fill="#262b3a" stroke="#9aa4b2" stroke-width="1"/><text x="60" y="40" fill="#e6e6e6" font-size="7.4" text-anchor="middle">FB(100)・輪詢</text>
     <rect x="16" y="56" width="88" height="24" rx="5" fill="#262b3a" stroke="#9aa4b2" stroke-width="1"/><text x="60" y="72" fill="#e6e6e6" font-size="7.4" text-anchor="middle">IG(10)・webhook</text>
     <rect x="16" y="88" width="88" height="24" rx="5" fill="#262b3a" stroke="#9aa4b2" stroke-width="1"/><text x="60" y="104" fill="#e6e6e6" font-size="7.4" text-anchor="middle">自建(1)・直推</text>
@@ -39,20 +39,20 @@ draft: false
     <text x="498" y="60" fill="#d6a45c" font-size="8.6" text-anchor="middle" font-weight="bold">batch 200・FSM</text>
     <text x="498" y="75" fill="#9aa4b2" font-size="6.6" text-anchor="middle">解析 → 查 bidding key</text>
     <text x="498" y="87" fill="#9aa4b2" font-size="6.6" text-anchor="middle">扣賣出數量+建立身分</text>
-    <line x1="344" y1="96" x2="344" y2="130" stroke="#e05a7d" stroke-width="1" stroke-dasharray="3 3" marker-end="url(#rcp)"/>
-    <text x="344" y="146" fill="#e05a7d" font-size="7.4" text-anchor="middle" font-weight="bold">raw 原文不留 → 清洗漏了就無法重放</text>
+    <line x1="344" y1="96" x2="344" y2="130" stroke="#d6a45c" stroke-width="1" stroke-dasharray="3 3" marker-end="url(#rca)"/>
+    <text x="344" y="146" fill="#d6a45c" font-size="7.4" text-anchor="middle" font-weight="bold">raw 有落地・FB 可整場重抓——但沒有路徑用它</text>
     <line x1="498" y1="96" x2="498" y2="170" stroke="#e05a7d" stroke-width="1" stroke-dasharray="3 3" marker-end="url(#rcp)"/>
     <text x="470" y="186" fill="#e05a7d" font-size="7.4" text-anchor="middle" font-weight="bold">處理失敗 → 直接略過,沒有補救路徑</text>
     <text x="290" y="222" fill="#9aa4b2" font-size="7.8" text-anchor="middle">一切為了主播眼中最新鮮的庫存狀態;代價:尖峰 lag 可達幾分鐘、掉單無聲</text>
   </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">當年的留言管線:三源各自取回、清洗落地,同一條批次鏈解析下單。兩處虛線是這章要算的帳。</figcaption>
+  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">當年的留言管線:三源各自取回、清洗落地,同一條批次鏈解析下單。虛線是這章要算的帳:事實都在,救援不在。</figcaption>
 </figure>
 
 三個細節值得放大:
 
 - **FB 的輪詢,是一個自調的速率控制器。** 一輪抓完看耗時:超過 2 秒代表留言正湧入,帶著 paging key 立刻接著抓;低於 2 秒代表場子冷,把間隔放慢一點。不用外部設定、不用監控儀表,迴圈自己感知流量、自己調速——小團隊憑直覺做出來的東西,事後看是很標準的 adaptive polling。要付的代價在下游:三源殊途同歸之後**擠在同一條批次處理鏈上**,FB 爆量時,IG 和自建的單也跟著在佇列裡排隊——FB 的洪峰,是所有人的延遲。
 - **去重鍵選對了:`source + message id`。** 輪詢一定會抓到重疊區間,靠平台原生的留言 ID 當唯一鍵,重抓幾次都不會重複入庫——這是接入層的冪等,做對了後面全順。
-- **清洗完,原文就丟了。** 留言直接被轉成自訂的 message 格式落地,raw 不留。這個決定當年沒人多想,後來成了最貴的一筆學費——清洗規則漏接的留言,**連「漏接了什麼」都無從知道**,除錯只能用猜的。
+- **raw 有留、FB 還能重抓——但沒有一條路用它。** 留言清洗成自訂 message 格式落地,raw 原文其實也留了下來;真要追究,FB 的直播留言就是貼文底下的留言,事後還能整場重抓(順序會和直播中抓到的稍有出入)。事實層的保險,當年其實買齊了——但下游沒有任何一條系統化的路徑去動用:失敗的單沒人拿 raw 重放,清洗規則漏接也沒有回測管線。保險買了,理賠流程沒建。
 
 ## 解析:一個為拇指設計的迷你語言
 
@@ -172,7 +172,7 @@ class CommentsFSM:
 
 - **把文法的邊界寫成測試。** 款式名不能以數字開頭——`2XL` 這種尺寸,開頭的 `2` 會被 DETERMIN 判成新 key 的起點,解出錯的複合字串。當年的逃生門是建檔時把 keyword 留空、完整字串放款式欄,配對照樣成立;但這條規則只活在大家的默契裡。重來,它要變成建檔時的驗證與解析器的固定測試案例——**默契不會隨團隊擴編而複製,測試會**。
 - **語法與語意分層。** `+0` 濾掉(禁止取消)、中段作廢(可疑不下)是**產品規則**,現在埋在 `_add_result` 的 try/except 裡——改產品規則得動解析器。重來會讓 FSM 只負責解析出「意圖列表」,產品裁決放在下一層,各自可測、各自可改。
-- **拿真實流量餵它。** 解析器最怕的是改版 regression。raw 留下來之後(下一節),歷史留言就能離線重放:新舊解析器並排跑、diff 結果,改文法之前先知道會影響幾筆。再加一層 property-based testing——隨機字串灌進去,唯一要求的不變量是「絕不 crash、永遠回 dict」。
+- **拿真實流量餵它。** 解析器最怕的是改版 regression。raw 當年就留了,歷史留言本來就能離線重放:新舊解析器並排跑、diff 結果,改文法之前先知道會影響幾筆——缺的只是把這條回測管線真的建起來(後面的重來版會補)。再加一層 property-based testing——隨機字串灌進去,唯一要求的不變量是「絕不 crash、永遠回 dict」。
 
 一句話收:**好程式碼的標準不是聰明,是改它的人知道會發生什麼。** 這台 FSM 當年已經及格了,重來補的不是重寫,是讓它「可以放心改」的那圈外圍。
 
@@ -180,7 +180,7 @@ class CommentsFSM:
 
 「同一人重複留言,以最後一筆為準」——[[ddia-replication|LWW]] 一句話就講完,但「最後」這個字要先回答三個問題:
 
-1. **以什麼時鐘為準?** 跨 FB/IG/自建三個源,各平台的時間戳基準不可比。當年的答案很務實:**以我們落地的順序為主、平台時間戳為輔**——三源都寫進同一張 message 表,再由同一條批次處理鏈依序消化,入庫順序就是全域順序。單一消費者的意外好處:**你自己就是時鐘**。
+1. **以什麼時鐘為準?** 跨 FB/IG/自建三個源,各平台的時間戳基準不可比。當年的答案很務實:**以我們落地的順序為主、平台時間戳為輔**——三源都寫進同一張 message 表,再由同一條批次處理鏈依序消化,入庫順序就是全域順序。單一消費者的意外好處:**你自己就是時鐘**。這條時間線的權威性有個旁證:同一場直播的留言,事後當成貼文留言整場重抓,順序會和直播中抓到的不完全一樣——平台自己都不給你一個穩定的順序,你落地的那份,就是唯一的那份。
 2. **覆蓋的粒度是什麼?** 是 key+style 級:後留的 `2601藍+1` 只蓋藍色,先前的 `2601紅+2` 還在。而且這是一個**帶副作用的 LWW**——蓋掉 `+2` 變 `+1`,購物車數量要改、賣出數量表要補回差額。一般系統的 LWW 丟掉舊值就完事,這裡的舊值佔著庫存,覆蓋即補償。
 3. **「最後」的邊界在哪一場?** 主播有**重喊**的需求——同一個 key 重新開賣,舊場次的單**全部清除、完整重算**,客人要重新留言。所以 LWW 的有效鍵其實是「人+場次+style」:重喊即斷代。被清單的客人沒有系統通知,純靠主播口播——這也是 feature:主播就是這個平台的通知系統,「現在不留就沒了」的急迫感,正是直播銷售的引擎。
 
@@ -188,14 +188,14 @@ class CommentsFSM:
 
 當年最痛的取捨在管線末端:batch 沒有進度記錄,**處理失敗的留言直接略過**——那位客人的單無聲消失。這是刻意的:停下來救單,主播眼中的庫存就舊了;跳過,數字永遠最新。**為了主播的新鮮度,犧牲顧客的完整性。**
 
-重來版不推翻這個優先序,只拆掉它的前提——當年之所以二選一,是因為「處理」和「事實」綁在同一條命脈上。拆開就好:
+重來版不推翻這個優先序,要補的是它缺的另一半。當年「留下事實」這一半其實做對了——raw 有落地、message 有留、FB 還能整場重抓;缺的是**用事實救人的那一半**,一條不擋快路徑的慢速補救線:
 
 - **每源一條處理鏈**(取回端本來就各自獨立),FB 的洪峰不再拖著 IG 和自建的單一起排隊;
-- **raw 原文與統一事件都落地**([[ddia-streaming|事件流]]是唯一事實來源),清洗規則漏接,重放就能補;
+- **把留著的 raw 升格為正式的[[ddia-streaming|事件流]]資產**——不只是存著,而是接上重放與回測的入口:清洗規則漏接,重放就能補;
 - **快路徑照樣跳過失敗**——但失敗的事件進 dead-letter 佇列留著,一條慢速補救路徑事後重放([[kafka-delivery|投遞語意]]那套在這裡全用得上);
 - 解析與扣庫存**拆成兩段**:解析是純函式、可以平行,扣庫存才需要排隊——當年它們擠在同一個 batch 迴圈裡,慢的拖著快的。
 
-一句話:**快用「晚點處理」換,不用「丟掉事實」換。** 主播照樣看到最新的數字,而那位失敗的客人,幾秒後會被補救路徑撈回來。
+一句話:**快用「晚點處理」換,不用「放棄客人」換。** 主播照樣看到最新的數字,而那位失敗的客人,幾秒後會被補救路徑撈回來。
 
 ## 反思
 
@@ -209,4 +209,4 @@ class CommentsFSM:
 
 ### 誠實面對那條虛線
 
-但我不想把當年美化成處處是智慧。圖上那兩條粉紅虛線——raw 不留、失敗略過——是真實傷過客人的:漏接的留言無從得知、失敗的單無聲消失,而我們**連道歉都不知道要跟誰道**。這兩刀都不是技術難題,是當年沒把「事實」當成需要被保護的資產。如果這系列只能帶走一句話,我希望是這句:**功能可以慢慢長,事實一開始就要留下來**——因為功能寫錯了可以改,事實丟掉了,神仙也救不回。
+但我不想把當年美化成處處是智慧。圖上那條紅色虛線——失敗直接略過——是真實傷過客人的:失敗的單無聲消失,而我們**連道歉都不知道要跟誰道**。最不甘心的是,這不是「事實丟了救不回」的悲劇:raw 有落地、FB 還能整場重抓,**救援需要的每一分事實都在**,缺的只是一條把它們接回系統的路徑——沒有 dead-letter、沒有重放、沒有回測。這一刀不是技術難題,是當年把「留下事實」當成了終點。如果這系列只能帶走一句話,我希望是這句:**留下事實只是上半場,接上用它的路徑才是下半場**——對掉單的客人來說,躺在倉庫裡的 raw,和不存在的 raw,是同一回事。
