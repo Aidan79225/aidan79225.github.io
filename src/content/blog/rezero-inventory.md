@@ -55,7 +55,6 @@ draft: false
     <line x1="360" y1="196" x2="390" y2="150" stroke="#4f6df5" stroke-width="1" marker-end="url(#rvf)"/>
     <line x1="500" y1="196" x2="450" y2="150" stroke="#4f6df5" stroke-width="1" marker-end="url(#rvf)"/>
     <text x="290" y="264" fill="#9aa4b2" font-size="7.4" text-anchor="middle">寫入者有四方——但每小時會從 cart/order items 全量重算兩個計數(派生值的自我修復)</text>
-    <line x1="290" y1="270" x2="393" y2="150" stroke="#9aa4b2" stroke-width="0.9" stroke-dasharray="3 3" opacity="0"/>
   </svg>
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">帳本三個數字:上限只被追加貨調整、兩個消耗各自累積;「剩餘」永遠用算的,不用存的。</figcaption>
 </figure>
@@ -133,6 +132,8 @@ if updated == 0:
   </svg>
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">殺死不變量的不是併發:migration 把過去的「意向」一夜之間全部升格成「佔用」,歷史不會替新定義騰出空間。</figcaption>
 </figure>
+
+當年的收拾很務實:**新語意保留下來**——業務要的就是它;溢出的量兩條路消化——跟廠商**追貨**、把上限抬上去,追不到的由客服**清購物車**、逐一跟客人說明。一個從上限端修、一個從佔用端修,把帳擠回不變量裡。代購的地形這裡幫了忙:上限本來就不是倉庫裡的死數字,是「跟廠商還要得到多少」的承諾——有得談。
 
 事後拆解,這裡有兩個獨立的錯誤疊在一起:
 
