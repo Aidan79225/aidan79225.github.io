@@ -26,10 +26,10 @@ draft: false
     <rect x="130" y="16" width="320" height="46" rx="8" fill="#26324a" stroke="#4f6df5" stroke-width="1.6"/>
     <text x="290" y="35" fill="#4f6df5" font-size="9.2" text-anchor="middle" font-weight="bold">orders payment</text>
     <text x="290" y="52" fill="#9aa4b2" font-size="7" text-anchor="middle">狀態不儲存,讀取時聚合:已付 = SUM(入帳事實) ≥ 應付</text>
-    <line x1="150" y1="112" x2="220" y2="64" stroke="#4f6df5" stroke-width="1.1" marker-end="url(#rpu)"/>
-    <line x1="245" y1="112" x2="268" y2="64" stroke="#4f6df5" stroke-width="1.1" marker-end="url(#rpu)"/>
-    <line x1="335" y1="112" x2="312" y2="64" stroke="#4f6df5" stroke-width="1.1" marker-end="url(#rpu)"/>
-    <line x1="430" y1="112" x2="360" y2="64" stroke="#4f6df5" stroke-width="1.1" marker-end="url(#rpu)"/>
+    <line x1="147" y1="112" x2="220" y2="64" stroke="#4f6df5" stroke-width="1.1" marker-end="url(#rpu)"/>
+    <line x1="275" y1="112" x2="268" y2="64" stroke="#4f6df5" stroke-width="1.1" marker-end="url(#rpu)"/>
+    <line x1="403" y1="112" x2="312" y2="64" stroke="#4f6df5" stroke-width="1.1" marker-end="url(#rpu)"/>
+    <line x1="520" y1="112" x2="360" y2="64" stroke="#4f6df5" stroke-width="1.1" marker-end="url(#rpu)"/>
     <rect x="88" y="116" width="118" height="44" rx="6" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.1"/>
     <text x="147" y="134" fill="#e6e6e6" font-size="7.2" text-anchor="middle" font-weight="bold">銀行 A・智慧轉帳</text>
     <text x="147" y="149" fill="#9aa4b2" font-size="6.4" text-anchor="middle">事實表</text>
@@ -106,7 +106,7 @@ draft: false
 - **亂序?** 五筆部分付款誰先到誰後到,根本不重要——事實各自落地,`SUM` 是讀的時候算的。
 - **沒來?** polling 排程會把漏掉的事實補上——而且因為冪等,polling 和 webhook 重疊也無害,雙通道互為備援。
 
-三套防禦的成本歸零,因為**沒有可以被打壞的狀態**。這是整個系列「事實 append、狀態派生」主旋律的最終回收:同一個原則,在[[rezero-comment-order|留言層]]給了你重放、在[[rezero-inventory|庫存層]]給了你對帳、在金流層直接讓最兇的一類 bug 絕種。
+三套防禦的成本歸零,因為**沒有可以被打壞的狀態**。這是整個系列「事實 append、狀態派生」主旋律的最終回收:同一個原則,在[[rezero-comment-order|留言層]]用缺席教過你重放的價值(當年 raw 沒留、重放做不到)、在[[rezero-inventory|庫存層]]給了你對帳、在金流層直接讓最兇的一類 bug 絕種。
 
 對帳也順著這個結構分了級:某家銀行的付款記錄會帶 orders payment id,**自動對回**;現金靠營運標記——又是一個「自動收大宗、人工收殘量」的漏斗,跟[[rezero-identity|身分章]]的綁定漏斗同構。
 
