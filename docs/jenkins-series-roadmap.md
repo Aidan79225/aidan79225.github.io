@@ -70,7 +70,7 @@
 
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
-| 1 | `jenkins-intro` | Jenkins 是什麼:CI 不是「有跑測試」,是「頻繁合回主幹」 | **【可回滾】** CI/CD 三個詞掰開(CI / Continuous Delivery / Continuous Deployment);持續整合的真義=小步、頻繁合回 trunk,不是「裝了一台 build server」——批次越小,錯了越好退;Jenkins 的定位(自架、外掛生態、什麼都能接的代價);controller/agent 架構速覽;為什麼 2026 還學它——接 `[[sre-automation-release]]`、`[[iac-intro]]` | ⬜ ★ |
+| 1 | `jenkins-intro` | Jenkins 是什麼:CI 不是「有跑測試」,是「頻繁合回主幹」 | **【可回滾】** CI/CD 三個詞掰開(CI / Continuous Delivery / Continuous Deployment);持續整合的真義=小步、頻繁合回 trunk,不是「裝了一台 build server」——批次越小,錯了越好退;Jenkins 的定位(自架、外掛生態、什麼都能接的代價);controller/agent 架構速覽;為什麼 2026 還學它——接 `[[sre-automation-release]]`、`[[iac-intro]]` | ✅ 已發布 ★ |
 | 2 | `jenkins-first-pipeline` | 第一個 Jenkinsfile:pipeline as code 為什麼贏過 UI 點按鈕 | **【可審查】** Freestyle job 的原罪(設定躺在 UI、不能 review、不能複製、不能回滾);Jenkinsfile 進 repo=跟著程式碼一起版本控制/review/回滾;declarative vs scripted(先學 declarative);`pipeline / agent / stages / stage / steps` 骨架;第一條 build→test→archive——接 `[[iac-everything-as-code]]` | ⬜ ★ |
 | 3 | `jenkins-controller-agent` | Controller 與 Agent:工作到底在哪台機器上跑 | **【可重現】** controller 只調度不 build(跑 build 的 controller 遲早倒);agent 連線方式(SSH / inbound JNLP / 容器);executor 與佇列(排隊等的是 executor 不是機器);**label 決定工作去哪台**(對照 `[[k8s-scheduling-advanced]]` 的 node selector);**手養的 agent 就是飄移的溫床**——agent 該是可拋棄的,接 `[[iac-principles]]` cattle not pets | ⬜ |
 | 4 | `jenkins-workspace-artifact` | Workspace 與 Artifact:build 出來的東西去哪了 | **【可重現】** workspace 生命週期(髒 workspace = 最常見的「在我機器上可以」);archiveArtifacts 與 fingerprint(這顆 jar 是哪次 build 出來的=可稽核);快取 vs 乾淨建置的取捨(快取是拿可重現換速度,要知道自己在換什麼);**hermetic build 在 Jenkins 上能做到幾分**;artifact repository(Nexus/Artifactory)的分工——接 `[[sre-automation-release]]` | ⬜ |
