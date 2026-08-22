@@ -14,7 +14,9 @@
 | **可審查** | 這條路上的每一步,都攤在別人看得到、改得動、能 review 的地方嗎? | 流程躺在 UI 或某個人腦裡;他請假那天全公司不能上線 |
 | **可回滾** | 出事的時候,退回去跟送上去一樣快、一樣有把握嗎? | 只能往前修;每次上線都是一場豪賭,於是大家越發越少、批次越大 |
 
-**「pipeline 是程式碼、要進版控」是達成「可審查」的手段,不是主軸本身。** 這件事在 2026 年已經是常識,拿它當 14 篇的貫穿命題會太薄——它是 #2 那一篇的論點。真正撐起全系列的,是上面三個性質,再加上兩個會讓它們整組失效的前提:**這條路本身要夠安全**(機密不外洩、Jenkins 自己不會倒),以及**它要夠快**(慢到大家開始繞過流程,前面全白做)。
+三個性質之上,有一條全系列不打折的**紀律**:**這條路上凡是能寫成程式碼的,就寫成程式碼、進 git。**build 步驟、部署動作、品質關卡、通知、甚至 Jenkins 自己的設定(JCasC)——只要它進了 repo,就同時買到三件事:**可審查**(能 review、能 blame、能問「這行為什麼在」)、**可重現**(build 的行為由簽入的內容決定,不是由某台機器當下的狀態決定)、**可回滾**(流程壞了就 `git revert`,跟回滾程式碼是同一個動作)。所以它不是三個性質之外的第四項,而是**同時服務三項的那一招**——這也是為什麼它值得當成預設立場,每篇都在做,而不是只在某一篇喊口號。
+
+但**主軸不等於口號**:「要程式碼化、要版控」這句話本身在 2026 年已經沒有資訊量,讀者要的是**那段程式碼長什麼樣、放在 repo 哪裡、review 的人該看什麼**。所以本系列的作法是——**精神每篇都在,但用範例呈現,不用口號重複**(見下面〈每篇的程式碼範例〉,那是硬性要求)。
 
 每篇扣哪一項(寫的時候用來檢查「這篇到底在服務什麼」):
 
@@ -35,6 +37,34 @@
 **為什麼 2026 年還寫 Jenkins?** 因為現實裡它還在跑——舊系統、地端環境、有合規要求的機房,GitHub Actions 進不去的地方 Jenkins 都在。而且 Jenkins 的概念(controller/agent、workspace、credential、shared library)幾乎是所有 CI 工具的共同祖先,學會它再看別家會很快。最後一篇(#14)會誠實談「什麼時候該搬走」。
 
 ★ = 框架 / 最高投報(1、2、6、10、12)。邊寫邊發:`draft: true` → `false`。`seriesOrder` = 寫作順序。
+
+## 每篇的程式碼範例(硬性要求)
+
+**跟 code 有關的篇,一律要有能貼進 repo 的範例**——不是截圖、不是外掛設定畫面,是一段**最小可跑、標明檔名與路徑**的程式碼。這是「pipeline 是程式碼」這條紀律在寫作上的具體要求:與其在結尾喊一句,不如讓讀者每篇都看到它長什麼樣。
+
+| # | 必附的範例(至少) | 檔案 / 形式 |
+|---|---|---|
+| 1 | 三十行內的最小 pipeline(build → test),外加「它躺在 repo 根目錄」這件事本身 | `Jenkinsfile` |
+| 2 | Freestyle 的 `config.xml` 片段 vs 同一件事的 Jenkinsfile 對照;declarative 完整骨架 + scripted 對照 | `Jenkinsfile`、`config.xml`(反例) |
+| 3 | `agent { label 'linux && docker' }`、`agent none` + 各 stage 各自 agent | `Jenkinsfile` 片段 |
+| 4 | `archiveArtifacts` + `fingerprint`、`stash` / `unstash`、`cleanWs`、快取目錄的掛法 | `Jenkinsfile` 片段 |
+| 5 | `parallel` / `matrix` / `when` / `post` / `retry` + `timeout` / `input` 各一段 | `Jenkinsfile` 片段 |
+| 6 | `withCredentials` 正確綁定 **+ 會洩漏的反例**(`echo`、`set -x`、artifact 夾帶);外部 secret manager 取用 | `Jenkinsfile` 片段(正例/反例並列) |
+| 7 | 一支 `vars/` 步驟 + 呼叫端 `@Library('pipeline-lib@1.4.0')`;`src/` class 一例;函式庫的單元測試片段 | `vars/deployApp.groovy`、`src/...groovy`、`Jenkinsfile` |
+| 8 | `when { branch 'main' }` 的部署閘門;Multibranch 的 job 設定(以 JCasC 表示,不用 UI 截圖) | `Jenkinsfile`、`jenkins.yaml` |
+| 9 | `junit` 報告、覆蓋率門檻擋下 build 的那段、靜態分析接入 | `Jenkinsfile` 片段 |
+| 10 | build once deploy many 的兩段式(promote 既有 artifact,不重 build);呼叫 `ansible-playbook` / `helm upgrade`;**rollback stage** | `Jenkinsfile` 片段 |
+| 11 | kubernetes plugin 的 `podTemplate` YAML + `container('maven') { ... }`;快取用 PVC 的掛法 | `Jenkinsfile`(內嵌 pod YAML) |
+| 12 | JCasC 設定(含權限與 job 定義)、外掛版本鎖定清單、`JENKINS_HOME` 備份腳本 | `jenkins.yaml`、`plugins.txt`、`backup.sh` |
+| 13 | 量測各 stage 耗時的作法、把測試切成 `parallel` 分片、相依快取設定 | `Jenkinsfile` 片段 |
+| 14 | **同一條 pipeline 的三種寫法對照**:Jenkinsfile vs GitHub Actions workflow vs GitLab CI | `Jenkinsfile`、`.github/workflows/ci.yml`、`.gitlab-ci.yml` |
+
+範例的規矩:
+- **標檔名與路徑**(`Jenkinsfile`、`vars/deployApp.groovy`、`jenkins.yaml`),讀者要知道這段東西在 repo 的哪裡。
+- **最小可跑**——砍到只剩要講的那個概念,但不要砍到貼上去會壞;不逐一抄外掛的所有參數。
+- 以 **declarative** 為主,需要 scripted 才做得到的地方明講「為什麼這裡得逃出去」。
+- 有反例的地方就並列正反(#6 的機密洩漏最需要),比純文字警告有用十倍。
+- 每段範例心裡都要能回答一句:**這段進了 git 之後,review 的人該看什麼?**
 
 ## 第一批 — 地基(Jenkins 是什麼、pipeline 長什麼樣)
 
@@ -81,8 +111,8 @@
 - front matter:`series: "Jenkins 學習筆記"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
 - tags 用 ASCII:`jenkins` + `ci-cd` + 該篇主題(如 `pipeline`、`devops`、`security`、`deployment`、`kubernetes`、`automation`)。
 - 依 `.claude/skills/writing-blog-post`:一張招牌深色 SVG(SVG 內不可有空行;wikilink label 內不可放 inline code / 反引號;figcaption 內不放 wikilink,要連結用 `<a href>`)+ 比官方文件更清楚的摘要 + 一段真實反思。
-- 台灣用語(見 `docs/zh-tw-style-guide.md`);Jenkinsfile / shell 用 code block,**每篇至少一段能看懂的最小可跑骨架**,但不逐一抄外掛設定——抓「為什麼這樣設計」。
+- 台灣用語(見 `docs/zh-tw-style-guide.md`);Jenkinsfile / Groovy / YAML / shell 一律用 code block 並標語言,**每篇至少一段能看懂的最小可跑骨架**(對照上面的範例表),但不逐一抄外掛設定——抓「為什麼這樣設計」。
 - **貫穿主軸**:每篇結尾扣回「一次提交要能被信任地送上線」,並明確指出這篇服務的是**可重現 / 可審查 / 可回滾**哪一項(或哪個前提)。表格裡的 **【】** 標記就是這個用途——寫之前先確認,免得每篇結尾變成硬套同一句話。
-- **不要每篇都喊「要程式碼化、要版控」**:那是 #2、#7、#12 的論點(服務「可審查」),其他篇有自己的角度。
+- **「pipeline 是程式碼、要版控」的精神每篇都在,但用範例做、不用口號喊**:每篇至少一段標明檔名路徑的最小可跑程式碼(見〈每篇的程式碼範例〉);該講「為什麼這段值得進 git、review 的人該看什麼」的時候就明講(#2、#7、#12 是主場),其餘篇章讓範例自己說話,不要每篇結尾硬套同一句口號。
 - **cross-link 是重點**:發布工程/自動化 ↔ `[[sre-automation-release]]`、`[[sre-toil]]`、`[[sre-testing]]`;交付原則 ↔ `[[iac-test-deliver]]`、`[[iac-everything-as-code]]`;實際執行 ↔ `[[ansible-playbooks]]`、`[[k8s-packaging]]`、`[[k8s-scheduling-advanced]]`;觀測 ↔ `[[obs-metrics-prometheus]]`;排程/重跑對照 ↔ `[[airflow-intro]]`(工作流引擎 vs CI 引擎的界線,#1 或 #10 點一下)。
 - Git:開 branch → push → PR,不直接動 master(CLAUDE.md 硬規矩)。
