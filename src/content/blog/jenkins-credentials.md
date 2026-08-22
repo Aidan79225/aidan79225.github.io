@@ -10,7 +10,7 @@ tags:
 series: "Jenkins 學習筆記"
 seriesOrder: 6
 comments: true
-draft: true
+draft: false
 ---
 第 2 篇的結論是:pipeline 要寫成程式碼、進 git、讓每個人都能 review。這是整個系列的立場,但它有一個必須同時付的代價——**這條路上的每一行,所有能讀這個 repo 的人都看得到。**
 

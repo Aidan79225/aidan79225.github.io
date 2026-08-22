@@ -10,7 +10,7 @@ tags:
 series: "Jenkins 學習筆記"
 seriesOrder: 4
 comments: true
-draft: true
+draft: false
 ---
 上一篇解決了「在哪台機器上跑」。這一篇往下挖一層:**跑起來之後,檔案到底放在哪、留多久、誰看得到。**
 
