@@ -10,7 +10,7 @@ tags:
 series: "Jenkins 學習筆記"
 seriesOrder: 5
 comments: true
-draft: true
+draft: false
 ---
 前面四篇處理的是「在哪跑」與「東西放哪」。這一篇回到 Jenkinsfile 本身:同樣一條會動的 pipeline,怎麼讓它**跑得快、失敗得清楚、而且不會在半夜卡住一台機器**。
 
