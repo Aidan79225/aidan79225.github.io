@@ -25,18 +25,18 @@
 | **可重現** | #3 agent 是 cattle、#4 artifact 與 hermetic build、#10 build once deploy many、#11 每次 build 開一顆乾淨 pod |
 | **可審查** | #2 Jenkinsfile 進 repo、#7 Shared Library、#8 PR check、#12 JCasC |
 | **可回滾** | #1 小步合回主幹、#8 短命分支、#9 品質關卡擋在前面、#10 回滾要一鍵 |
-| **路要安全**(前提) | #6 憑證與遮蔽的極限、#12 備份、權限、外掛升級 |
-| **路要夠快**(前提) | #5 平行化、#13 build 慢是一種 toil、#11 動態 agent 的容量 |
+| **路要安全**(前提) | #6 憑證與遮蔽的極限、#12 備份、權限、外掛升級、#13 硬碟滿與殘留的 token |
+| **路要夠快**(前提) | #5 平行化、#14 build 慢是一種 toil、#11 動態 agent 的容量、#13 清理與容量規劃 |
 
 **與既有系列的關係(差異化)**:
 - ↔ **Google SRE 系列**(`[[sre-automation-release]]`、`[[sre-toil]]`、`[[sre-testing]]`):那邊講「為什麼變更要又快又安全」的哲學與文化,這裡講**拿 Jenkins 怎麼真的做到**。互連、不重複。
 - ↔ **Infrastructure as Code 系列**(`[[iac-test-deliver]]`、`[[iac-everything-as-code]]`):那邊講 pipeline 晉級制、宣告式的通則,這裡把 declarative pipeline 的語法與陷阱講透。
 - ↔ **Ansible / Kubernetes 系列**:Jenkins 是「誰來按下按鈕」,Ansible/K8s 是「按下去之後誰去做」——部署那批(#10、#11)明確接 `[[ansible-playbooks]]`、`[[k8s-packaging]]`。
-- ↔ **Grafana LGTM 系列**:#12、#13 把 Jenkins 自己當成一個要被觀測的正式服務,接 `[[obs-metrics-prometheus]]`。
+- ↔ **Grafana LGTM 系列**:#12~#14 把 Jenkins 自己當成一個要被觀測的正式服務(磁碟、佇列、build 時間都是指標),接 `[[obs-metrics-prometheus]]`。
 
-**為什麼 2026 年還寫 Jenkins?** 因為現實裡它還在跑——舊系統、地端環境、有合規要求的機房,GitHub Actions 進不去的地方 Jenkins 都在。而且 Jenkins 的概念(controller/agent、workspace、credential、shared library)幾乎是所有 CI 工具的共同祖先,學會它再看別家會很快。最後一篇(#14)會誠實談「什麼時候該搬走」。
+**為什麼 2026 年還寫 Jenkins?** 因為現實裡它還在跑——舊系統、地端環境、有合規要求的機房,GitHub Actions 進不去的地方 Jenkins 都在。而且 Jenkins 的概念(controller/agent、workspace、credential、shared library)幾乎是所有 CI 工具的共同祖先,學會它再看別家會很快。最後一篇(#15)會誠實談「什麼時候該搬走」。
 
-★ = 框架 / 最高投報(1、2、6、10、12)。邊寫邊發:`draft: true` → `false`。`seriesOrder` = 寫作順序。
+★ = 框架 / 最高投報(1、2、6、10、12、13)。邊寫邊發:`draft: true` → `false`。`seriesOrder` = 寫作順序。
 
 ## 每篇的程式碼範例(硬性要求)
 
@@ -56,8 +56,9 @@
 | 10 | build once deploy many 的兩段式(promote 既有 artifact,不重 build);呼叫 `ansible-playbook` / `helm upgrade`;**rollback stage** | `Jenkinsfile` 片段 |
 | 11 | kubernetes plugin 的 `podTemplate` YAML + `container('maven') { ... }`;快取用 PVC 的掛法 | `Jenkinsfile`(內嵌 pod YAML) |
 | 12 | JCasC 設定(含權限與 job 定義)、外掛版本鎖定清單、`JENKINS_HOME` 備份腳本 | `jenkins.yaml`、`plugins.txt`、`backup.sh` |
-| 13 | 量測各 stage 耗時的作法、把測試切成 `parallel` 分片、相依快取設定 | `Jenkinsfile` 片段 |
-| 14 | **同一條 pipeline 的三種寫法對照**:Jenkinsfile vs GitHub Actions workflow vs GitLab CI | `Jenkinsfile`、`.github/workflows/ci.yml`、`.gitlab-ci.yml` |
+| 13 | `options { buildDiscarder(logRotator(...)) }`(紀錄留久、產物留短)、multibranch 的 orphaned item 策略、JCasC 的全域保留預設、磁碟用量檢查與清理排程 | `Jenkinsfile`、`jenkins.yaml`、`housekeeping.sh` |
+| 14 | 量測各 stage 耗時的作法、把測試切成 `parallel` 分片、相依快取設定 | `Jenkinsfile` 片段 |
+| 15 | **同一條 pipeline 的三種寫法對照**:Jenkinsfile vs GitHub Actions workflow vs GitLab CI | `Jenkinsfile`、`.github/workflows/ci.yml`、`.gitlab-ci.yml` |
 
 範例的規矩:
 - **標檔名與路徑**(`Jenkinsfile`、`vars/deployApp.groovy`、`jenkins.yaml`),讀者要知道這段東西在 repo 的哪裡。
@@ -70,16 +71,16 @@
 
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
-| 1 | `jenkins-intro` | Jenkins 是什麼:CI 不是「有跑測試」,是「頻繁合回主幹」 | **【可回滾】** CI/CD 三個詞掰開(CI / Continuous Delivery / Continuous Deployment);持續整合的真義=小步、頻繁合回 trunk,不是「裝了一台 build server」——批次越小,錯了越好退;Jenkins 的定位(自架、外掛生態、什麼都能接的代價);controller/agent 架構速覽;為什麼 2026 還學它——接 `[[sre-automation-release]]`、`[[iac-intro]]` | 🔄 草稿完成(`draft: true`)★ |
-| 2 | `jenkins-first-pipeline` | 第一個 Jenkinsfile:pipeline as code 為什麼贏過 UI 點按鈕 | **【可審查】** Freestyle job 的原罪(設定躺在 UI、不能 review、不能複製、不能回滾);Jenkinsfile 進 repo=跟著程式碼一起版本控制/review/回滾;declarative vs scripted(先學 declarative);`pipeline / agent / stages / stage / steps` 骨架;第一條 build→test→archive;`options`(timeout / disableConcurrentBuilds);PR diff 長什麼樣;`script { }` 逃生門——接 `[[iac-everything-as-code]]` | 🔄 草稿完成(`draft: true`)★ |
-| 3 | `jenkins-controller-agent` | Controller 與 Agent:工作到底在哪台機器上跑 | **【可重現】** controller 只調度不 build(跑 build 的 controller 遲早倒);agent 連線方式(SSH / inbound JNLP / 容器);executor 與佇列(排隊等的是 executor 不是機器);**label 決定工作去哪台**(對照 `[[k8s-scheduling-advanced]]` 的 node selector);**手養的 agent 就是飄移的溫床**——agent 該是可拋棄的,接 `[[iac-principles]]` cattle not pets、`[[ansible-intro]]`(從寵物到牛的三階段);`numExecutors: 0` 的 JCasC 片段;label 寫機器名是反模式 | 🔄 草稿完成(`draft: true`) |
-| 4 | `jenkins-workspace-artifact` | Workspace 與 Artifact:build 出來的東西去哪了 | **【可重現】** workspace 生命週期(髒 workspace = 最常見的「在我機器上可以」);archiveArtifacts 與 fingerprint(這顆 jar 是哪次 build 出來的=可稽核);快取 vs 乾淨建置的取捨(快取是拿可重現換速度,要知道自己在換什麼);**hermetic build 在 Jenkins 上能做到幾分**;artifact repository(Nexus/Artifactory)的分工——接 `[[sre-automation-release]]` | ⬜ |
+| 1 | `jenkins-intro` | Jenkins 是什麼:CI 不是「有跑測試」,是「頻繁合回主幹」 | **【可回滾】** CI/CD 三個詞掰開(CI / Continuous Delivery / Continuous Deployment);持續整合的真義=小步、頻繁合回 trunk,不是「裝了一台 build server」——批次越小,錯了越好退;Jenkins 的定位(自架、外掛生態、什麼都能接的代價);controller/agent 架構速覽;為什麼 2026 還學它——接 `[[sre-automation-release]]`、`[[iac-intro]]` | ✅ 已發布 ★ |
+| 2 | `jenkins-first-pipeline` | 第一個 Jenkinsfile:pipeline as code 為什麼贏過 UI 點按鈕 | **【可審查】** Freestyle job 的原罪(設定躺在 UI、不能 review、不能複製、不能回滾);Jenkinsfile 進 repo=跟著程式碼一起版本控制/review/回滾;declarative vs scripted(先學 declarative);`pipeline / agent / stages / stage / steps` 骨架;第一條 build→test→archive;`options`(timeout / disableConcurrentBuilds);PR diff 長什麼樣;`script { }` 逃生門——接 `[[iac-everything-as-code]]` | ✅ 已發布 ★ |
+| 3 | `jenkins-controller-agent` | Controller 與 Agent:工作到底在哪台機器上跑 | **【可重現】** controller 只調度不 build(跑 build 的 controller 遲早倒);agent 連線方式(SSH / inbound JNLP / 容器);executor 與佇列(排隊等的是 executor 不是機器);**label 決定工作去哪台**(對照 `[[k8s-scheduling-advanced]]` 的 node selector);**手養的 agent 就是飄移的溫床**——agent 該是可拋棄的,接 `[[iac-principles]]` cattle not pets、`[[ansible-intro]]`(從寵物到牛的三階段);`numExecutors: 0` 的 JCasC 片段;label 寫機器名是反模式 | ✅ 已發布 |
+| 4 | `jenkins-workspace-artifact` | Workspace 與 Artifact:build 出來的東西去哪了 | **【可重現】** workspace 生命週期(髒 workspace = 最常見的「在我機器上可以」);archiveArtifacts 與 fingerprint(這顆 jar 是哪次 build 出來的=可稽核);快取 vs 乾淨建置的取捨(快取是拿可重現換速度,要知道自己在換什麼);**hermetic build 在 Jenkins 上能做到幾分**;artifact repository(Nexus/Artifactory)的分工(archive 給人看、repository 給機器取)——接 `[[sre-automation-release]]` | 🔄 草稿完成(`draft: true`) |
 
 ## 第二批 — Pipeline 進階(把 Jenkinsfile 寫成能維護的程式碼)
 
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
-| 5 | `jenkins-pipeline-advanced` | 進階 pipeline:平行、條件、失敗處理與人工關卡 | **【路要夠快】** `parallel` 與 `matrix`(縮短 build 時間最直接的一招);`when` 條件執行;`post`(always/success/failure)把通知與清理收在一處;`retry` / `timeout` / `catchError` 的正確用法——**retry 用在網路,不該用來蓋 flaky test**;`input` 人工核准關卡與它的代價(卡住 executor);環境變數與參數化 build | ⬜ |
+| 5 | `jenkins-pipeline-advanced` | 進階 pipeline:平行、條件、失敗處理與人工關卡 | **【路要夠快】** `parallel` 與 `matrix`(縮短 build 時間最直接的一招);`when` 條件執行;`post`(always/success/failure)把通知與清理收在一處;`retry` / `timeout` / `catchError` 的正確用法——**retry 用在網路,不該用來蓋 flaky test**;`input` 人工核准關卡與它的代價(卡住 executor + workspace,解法:`agent none` + timeout + milestone);`when` 的 `beforeAgent true`;`post` 的 `changed`(狀態翻轉才通知);參數化與「別拿參數當跳過檢查的開關」 | 🔄 草稿完成(`draft: true`) |
 | 6 | `jenkins-credentials` | 憑證管理:機密怎麼進 pipeline 又不外洩 | **【路要安全】** Credentials store 與 scope(global/folder/job);`withCredentials` 綁定與自動遮蔽;**遮蔽不等於安全**(echo 進 log、子行程、`set -x`、artifact 夾帶的洩漏路徑);最小權限與短命 token;外部 secret manager(Vault/雲端 KMS)的接法;不要把 secret 寫進 Jenkinsfile——一條可審查的 pipeline 的代價是「什麼都看得到」,所以機密必須從一開始就不在裡面。接 `[[k8s-config-secret]]`、`[[ansible-playbooks-advanced]]` | ⬜ ★ |
 | 7 | `jenkins-shared-library` | Shared Library:把重複的 pipeline 變成公司資產 | **【可審查】** 十個專案十份幾乎一樣的 Jenkinsfile = 十份技術債,而且沒人知道哪份才是對的;`vars/` / `src/` / `resources/` 結構;`@Library` 版本釘選(共用函式庫也要語意化版本,不然一改全炸);抽象的甜蜜點——別做出「另一個沒人看得懂的 DSL」,那是把可審查性又藏回去;treat pipeline code as code(要測試、要 review)——接 `[[iac-codebase-design]]`、`[[ansible-roles]]` | ⬜ |
 | 8 | `jenkins-multibranch` | Multibranch 與 PR 觸發:讓每個分支都有自己的 pipeline | **【可回滾 + 可審查】** Multibranch Pipeline 與 Organization Folder(自動發現分支/PR);webhook vs polling(polling 是 toil 也是延遲);PR check 與 required status(把審查變成擋得住的門);**trunk-based 與短命分支**才是 CI 的前提——長命分支再多 CI 也救不了合併地獄,而且大批次=不好退;branch 條件(只有 main 才部署)——接 `[[sre-automation-release]]` | ⬜ |
@@ -97,15 +98,16 @@
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
 | 12 | `jenkins-ops` | 維運 Jenkins 自己:JCasC、備份與外掛地獄 | **【路要安全 + 可審查】** `JENKINS_HOME` 是唯一的真相(備份什麼、還原演練過沒);**Configuration as Code(JCasC)**——連 Jenkins 本身的設定都進 git,把「可審查」從 pipeline 推到平台自己,對照 `[[iac-everything-as-code]]`;外掛升級地獄與版本鎖定;權限(Role Strategy / folder 層級授權,對照 `[[k8s-rbac]]`);升級與災難復原;**Jenkins 掛掉=全公司不能上線,它就是 tier-1 服務**——接 `[[sre-production-readiness]]` | ⬜ ★ |
-| 13 | `jenkins-performance` | Build 慢是一種 toil:pipeline 效能與開發者體感 | **【路要夠快】** 從「提交到綠燈」的時間拆解(排隊 / checkout / 相依下載 / 測試 / 打包);瓶頸在哪要先量再改(接 `[[obs-metrics-prometheus]]`、`[[sre-monitoring]]`);平行化、切分測試、快取相依、增量 build;**慢 CI 的真正代價是行為改變**——大家開始少 commit、批次變大、跳過測試、繞過流程,於是可重現/可審查/可回滾三個性質一起失效;排隊等 executor 的容量規劃——接 `[[sre-toil]]` | ⬜ |
-| 14 | `jenkins-vs-alternatives` | Jenkins vs GitHub Actions / GitLab CI / Argo:什麼時候該留、什麼時候該搬 | **【總結】** 三種模型對照(自架萬能型 / SaaS 內建型 / K8s 原生 GitOps 型);維運成本 vs 控制權;搬遷該怎麼分批(先搬新專案、shared library 抽象是搬家的槓桿);留下來的理由(地端、合規、非典型 build);**用三個性質當評分表去比工具**,而不是比外掛數量;系列回顧:一張圖把可重現 × 可審查 × 可回滾 串起來,以及我因此改掉的做法 | ⬜ |
+| 13 | `jenkins-housekeeping` | Jenkins 會堆積什麼:build 紀錄、產物、workspace 與孤兒 job 的清理 | **【路要安全 + 路要夠快】** 盤點會長大的東西:build 紀錄與日誌、archive 的產物(最吃硬碟)、每個分支一份的 workspace、multibranch 刪了分支卻留下的孤兒 job、fingerprint 的海量小檔、外掛升級留下的 `.bak`、離線 agent 與卡住的佇列、以及離職者還活著的 token;**保留策略要寫進 Jenkinsfile 的 `options { buildDiscarder(...) }` 與 JCasC**——保留多久也是程式碼,不是誰在 UI 上點的;**紀錄留久、產物留短**(正式產物在 repository,見 #4);磁碟用量要監控與告警(接 `[[obs-metrics-prometheus]]`);判準是「要回答什麼問題」而不是「硬碟還剩多少」;**硬碟滿 = 全公司不能上線**,清理是容量規劃不是打掃 | ⬜ ★ |
+| 14 | `jenkins-performance` | Build 慢是一種 toil:pipeline 效能與開發者體感 | **【路要夠快】** 從「提交到綠燈」的時間拆解(排隊 / checkout / 相依下載 / 測試 / 打包);瓶頸在哪要先量再改(接 `[[obs-metrics-prometheus]]`、`[[sre-monitoring]]`);平行化、切分測試、快取相依、增量 build;**慢 CI 的真正代價是行為改變**——大家開始少 commit、批次變大、跳過測試、繞過流程,於是可重現/可審查/可回滾三個性質一起失效;排隊等 executor 的容量規劃——接 `[[sre-toil]]` | ⬜ |
+| 15 | `jenkins-vs-alternatives` | Jenkins vs GitHub Actions / GitLab CI / Argo:什麼時候該留、什麼時候該搬 | **【總結】** 三種模型對照(自架萬能型 / SaaS 內建型 / K8s 原生 GitOps 型);維運成本 vs 控制權;搬遷該怎麼分批(先搬新專案、shared library 抽象是搬家的槓桿);留下來的理由(地端、合規、非典型 build);**用三個性質當評分表去比工具**,而不是比外掛數量;系列回顧:一張圖把可重現 × 可審查 × 可回滾 串起來,以及我因此改掉的做法 | ⬜ |
 
 ## 建議閱讀順序
 1. **地基**(1→2→3→4):先弄懂「CI 是什麼」與「pipeline 進 repo」這兩件事;3、4 解釋 build 到底在哪跑、產物去哪(可重現的地基)。
 2. **寫得好維護**(5→6→7→8):語法進階 → 機密 → 抽成 library → 分支策略。6 是踩雷成本最高的一篇。
 3. **交付**(9→10→11):品質關卡 → 部署 → 跑在 K8s 上。10 是整個系列的重點。
-4. **養它**(12→13):Jenkins 自己也是要備份、要監控、要調效能的正式服務。
-5. **收尾**(14):誠實比較,並回顧整條線。
+4. **養它**(12→13→14):備份與設定進 git → 清掉會堆積的東西 → 調效能。Jenkins 自己就是一個要備份、要監控、要做容量規劃的正式服務。
+5. **收尾**(15):誠實比較,並回顧整條線。
 
 ## 寫每篇時的慣例
 - front matter:`series: "Jenkins 學習筆記"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。

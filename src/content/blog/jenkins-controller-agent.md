@@ -10,7 +10,7 @@ tags:
 series: "Jenkins 學習筆記"
 seriesOrder: 3
 comments: true
-draft: true
+draft: false
 ---
 上一篇那份 Jenkinsfile 裡有一行 `sh './scripts/ci-build.sh'`。它到底在**哪台機器**上執行?
 

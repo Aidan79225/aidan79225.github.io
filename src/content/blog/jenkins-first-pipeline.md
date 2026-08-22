@@ -10,7 +10,7 @@ tags:
 series: "Jenkins 學習筆記"
 seriesOrder: 2
 comments: true
-draft: true
+draft: false
 ---
 上一篇最後那份 Jenkinsfile 只有二十行,語法簡單到不需要解釋。但我還是要為它寫一整篇——因為這二十行真正的價值不在語法,而在**它躺在哪裡**。
 
