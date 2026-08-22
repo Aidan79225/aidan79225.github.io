@@ -10,7 +10,7 @@ tags:
 series: "Jenkins 學習筆記"
 seriesOrder: 1
 comments: true
-draft: true
+draft: false
 ---
 大部分人第一次碰 Jenkins,情境都差不多:公司有一台跑很久的 Jenkins,你要在上面「加一個 job」。點進去、複製隔壁專案的設定、改幾個欄位、按存檔——會動了,收工。這樣用了兩年,你會很熟練,但你對 CI 的理解可能還是零。
 
