@@ -1,6 +1,6 @@
 ---
 title: "Shared Library:把十份幾乎一樣的 Jenkinsfile,變成公司資產"
-date: 2026-08-24
+date: 2026-08-25
 category: tech
 description: "十個專案十份用複製貼上長出來的 Jenkinsfile,是十份技術債——沒人知道哪份才是對的,一個安全性修補要改十次。Shared Library 是收斂的答案,但它同時帶來兩個新問題:改一次會同時影響所有專案(所以必須釘版本,不然半年前的 build 再也重現不了),以及抽象很容易做過頭——當 Jenkinsfile 只剩一行 standardPipeline(),你就把可審查性又藏回去了,那跟在 UI 上點按鈕沒兩樣。"
 tags:
@@ -10,7 +10,7 @@ tags:
 series: "Jenkins 學習筆記"
 seriesOrder: 7
 comments: true
-draft: true
+draft: false
 ---
 [[jenkins-first-pipeline|第 2 篇]]的結論是:把 pipeline 寫成程式碼、放進 repo。這件事在一個專案上是純粹的勝利,但當公司有十個、三十個專案之後,會長出一個新問題——**十份幾乎一樣、但又不完全一樣的 Jenkinsfile。**
 
