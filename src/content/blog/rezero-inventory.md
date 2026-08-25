@@ -19,7 +19,7 @@ draft: false
 最直覺的庫存設計,是存一個「剩餘庫存」欄位,賣一件減一、退一件加一。當年沒有這樣做,而是把帳本拆成**一個上限、兩個消耗**:
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 580 300" role="img" aria-label="庫存帳本的模型。左側是 product 表,放價格與商品資訊,直播中會變動。右側是與它一對一的庫存表,存三個數字:庫存上限(主播追加貨就是調這裡)、購物車數量(預留)、訂單數量(成交);付款時購物車數量轉為訂單數量,在同一筆交易內完成。中間標出不變量:購物車加訂單必須小於等於上限;可賣是導出值,不另外儲存。下方四個寫入者:FSM batch 下單與改單、客人調數量、客服清除調整、營運追加貨與結束檔期,全部指向這張庫存表。最底下標註每小時從 cart items 與 order items 全量重算兩個計數,作為派生值的自我修復。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
+  <svg viewBox="0 0 580 300" role="img" aria-label="庫存帳本的模型。左側是 product 表,放價格與商品資訊,直播中會變動。右側是與它一對一的庫存表,存三個數字:庫存上限(主播追加貨就是調這裡)、購物車數量(預留)、訂單數量(成交);付款時購物車數量轉為訂單數量,在同一筆交易內完成。中間標出不變量:購物車加訂單必須小於等於上限;可賣是導出值,不另外儲存。下方四個寫入者:FSM batch 下單與改單、客人調數量、客服清除調整、助理追加貨與營運結束檔期,全部指向這張庫存表。最底下標註每小時從 cart items 與 order items 全量重算兩個計數,作為派生值的自我修復。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
     <defs><marker id="rvf" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#4f6df5"/></marker><marker id="rvm" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#9aa4b2"/></marker></defs>
     <rect x="20" y="46" width="170" height="58" rx="6" fill="#262b3a" stroke="#9aa4b2" stroke-width="1"/>
     <text x="105" y="66" fill="#e6e6e6" font-size="8.8" text-anchor="middle" font-weight="bold">product</text>
@@ -48,7 +48,7 @@ draft: false
     <text x="360" y="212" fill="#e6e6e6" font-size="7.4" text-anchor="middle">客服</text>
     <text x="360" y="226" fill="#9aa4b2" font-size="6.2" text-anchor="middle">清除・調整購物車</text>
     <rect x="440" y="196" width="120" height="40" rx="6" fill="#262b3a" stroke="#9aa4b2" stroke-width="1"/>
-    <text x="500" y="212" fill="#e6e6e6" font-size="7.4" text-anchor="middle">營運</text>
+    <text x="500" y="212" fill="#e6e6e6" font-size="7.4" text-anchor="middle">助理/營運</text>
     <text x="500" y="226" fill="#9aa4b2" font-size="6.2" text-anchor="middle">追加貨・結束檔期</text>
     <line x1="80" y1="196" x2="290" y2="150" stroke="#4f6df5" stroke-width="1" marker-end="url(#rvf)"/>
     <line x1="220" y1="196" x2="340" y2="150" stroke="#4f6df5" stroke-width="1" marker-end="url(#rvf)"/>
@@ -69,7 +69,7 @@ draft: false
 
 併發扣庫存的標準選項有三條路:資料庫鎖、[[redis-distributed-lock|Redis 原子操作]]、單一寫入者排隊。當年的組合是第一條的重裝版:**ORM + transaction、先查再扣、Serializable 隔離、噴錯就重試**。[[ddia-transactions|Serializable]] 保證「先查再扣」的間隙不會被人插隊——擠進來的交易會直接失敗,重試,重試再失敗⋯⋯然後,**那位顧客就被略過了**。
 
-先講公道話:這套當年**沒有超賣過**(超賣另有兇手,下一節)。單一 batch 消費者本來就把大部分的寫入天然序列化了,Serializable 是對付其餘寫入者(客人調數量、客服調整、營運追加)的保險帶,邏輯上無懈可擊。
+先講公道話:這套當年**沒有超賣過**(超賣另有兇手,下一節)。單一 batch 消費者本來就把大部分的寫入天然序列化了,Serializable 是對付其餘寫入者(客人調數量、客服調整、助理追加貨)的保險帶,邏輯上無懈可擊。
 
 問題出在失敗的**分佈**。重試耗盡的顧客不是隨機掉的:衝突集中在哪裡,犧牲就集中在哪裡——衝突永遠集中在**最搶手的商品**。也就是說:**你賣得越好的商品,無聲消失的客人越多。** 這個偏差安靜、不報錯、不進任何儀表板,是我現在回看最想修的一刀。
 
@@ -149,7 +149,7 @@ if updated == 0:
 另外兩道防線:
 
 - **每小時全量重算。** 兩個計數的真相是 cart items 和 order items,計數只是它們的快取;每小時從真相重建一次,漂移的上界被壓在一小時內——最終一致性的自我修復,也是三本帳那章的迷你預告。重來只補一件事:**重算出的差異要記錄、要告警**——差異不為零代表某條增量路徑有 bug,默默蓋掉等於把 bug 的訊號一起擦掉。
-- **追加貨改走調整帳。** 當年直播中追加庫存的 API 會打失敗——開賣瞬間幾百個下單交易在同一列上排隊,營運的 UPDATE 擠不進去,現場只能人工重打,等於讓營運當了重試機制。重來把追加貨改成 append 的**調整帳(adjustments ledger)**:`上限 = 初始 + SUM(調整)`,營運寫入永遠是 insert 新列、不碰熱列,而且自帶「誰、何時、加了多少」的 audit——後台章要的操作留痕,順便解決。
+- **追加貨改走調整帳。** 當年直播中追加庫存的 API 會打失敗——開賣瞬間幾百個下單交易在同一列上排隊,助理的 UPDATE 擠不進去,現場只能人工重打,等於讓直播助理當了重試機制。重來把追加貨改成 append 的**調整帳(adjustments ledger)**:`上限 = 初始 + SUM(調整)`,追加寫入永遠是 insert 新列、不碰熱列,而且自帶「誰、何時、加了多少」的 audit——後台章要的操作留痕,順便解決。
 
 ## 反思
 
