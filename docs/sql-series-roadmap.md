@@ -46,15 +46,17 @@
 
 主幹已收完整;這幕是「還很值得寫、但缺了不影響完整性」的進階題,依興趣挑寫。★ = 缺口大、aha 強、圖好畫。
 
+**2026-08-27 調整**:原本掛在這幕的 `sql-skip-locked` / `sql-jsonb` / `sql-upsert`(皆未動筆)**移轉到新開的 `PostgreSQL 學習筆記` 系列幕二**——它們是 **PG 專屬能力**,不是通用 SQL 心智模型;`sql-upsert` 與 `sql-skip-locked` 在那邊合併成一篇 `pg-as-queue`。本系列維持「寫查詢的人」這條軸,PG 的引擎與維運交給 `docs/pg-series-roadmap.md`。
+
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
 | 13 | `sql-recursive-cte` | 遞迴 CTE:用 SQL 走樹與圖 | `WITH RECURSIVE` 展開;組織圖/分類樹/BOM/找路徑;anchor + recursive 兩段;CTE 物化 vs inline(PG12 fence) | ⬜ ★ 先寫 |
 | 14 | `sql-keyset-pagination` | 分頁的正確姿勢:別用 OFFSET | OFFSET 為何越後面越慢;keyset / seek 分頁(`WHERE id > 上頁最後一筆`)+ 複合排序鍵;呼應站上 paging 討論 | ⬜ ★ |
-| 15 | `sql-skip-locked` | 用 SQL 做工作佇列:FOR UPDATE SKIP LOCKED | 資料庫當任務佇列;`SELECT … FOR UPDATE SKIP LOCKED` 讓多 worker 各搶各的;接第 11 篇鎖/交易 | ⬜ ★ |
-| 16 | `sql-jsonb` | PostgreSQL 的 JSONB:半結構化也能查得快 | `->`/`->>`/`@>` operators;GIN 索引;何時該用、何時別用;接第 9 篇索引 | ⬜ |
-| 17 | `sql-upsert` | Upsert:ON CONFLICT 與冪等寫入 | `INSERT … ON CONFLICT DO UPDATE`;一句話做到「有就更新、沒有就插入」;接資料 pipeline 冪等 | ⬜ |
+| ~~15~~ | ~~`sql-skip-locked`~~ | 用 SQL 做工作佇列:FOR UPDATE SKIP LOCKED | **已移轉** → `PostgreSQL 學習筆記` #15 `pg-as-queue`(與 upsert 合併成一篇) | ➡️ 移轉 |
+| ~~16~~ | ~~`sql-jsonb`~~ | PostgreSQL 的 JSONB:半結構化也能查得快 | **已移轉** → `PostgreSQL 學習筆記` #13 `pg-jsonb` | ➡️ 移轉 |
+| ~~17~~ | ~~`sql-upsert`~~ | Upsert:ON CONFLICT 與冪等寫入 | **已移轉** → `PostgreSQL 學習筆記` #15 `pg-as-queue`(與 SKIP LOCKED 合併成一篇) | ➡️ 移轉 |
 
-★(主幹)= 投報率最高的四篇(5、7、9、10)。第一幕五篇是地基,優先寫;二三四幕可依興趣調順序。第五幕是加碼,13/14/15 三篇最值得先寫。
+★(主幹)= 投報率最高的四篇(5、7、9、10)。第一幕五篇是地基,優先寫;二三四幕可依興趣調順序。第五幕是加碼,**移轉後剩 13、14 兩篇**,兩篇都值得寫(13 遞迴 CTE 缺口最大)。
 
 ## 寫每篇時的慣例
 - front matter:`series: "SQL 我以為我懂"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
@@ -63,3 +65,4 @@
 - 每篇一張以上站台深色 SVG(SVG 內不可有空行);概念圖要能「只看圖就懂大意」。
 - 基準 PostgreSQL;跨引擎差異(MySQL / GP / Cloudberry)用附註,不打斷主線。
 - 效能/計畫類扣回 `[[spark-explain]]`、`[[spark-shuffle]]`;MPP 收尾扣回 `[[fode-6]]` 運算與儲存分離。
+- **與 `PostgreSQL 學習筆記` 的分工**:這裡是**寫查詢的人**(執行順序、索引為何失效、`EXPLAIN` 怎麼讀、隔離層級的定義與現象);那邊是**顧資料庫的人**(MVCC 怎麼實作、vacuum 與膨脹、WAL/複寫/PITR、連線池、參數與監控)。同一個 PG 的兩張臉,互指、不重講定義。
