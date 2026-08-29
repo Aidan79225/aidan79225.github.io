@@ -19,19 +19,35 @@ Four things carry a translation. In order of how often they get botched:
 
 **Calibration sample: `src/content/blog/en/pain-before-power.md` against `src/content/blog/pain-before-power.md`.** Read both side by side before your first translation of a session. That pair is the bar: notice it renders 土法煉鋼 as "duct tape", 刀口上 as "where it cuts", and keeps every em-dash aside intact.
 
-## Workflow: series first, then post by post
+## Scope: what are you translating?
 
-Translations are driven **one series at a time**, because the long series (rezero 21 posts, sre 19, k8s 14) are where inconsistent terminology destroys quality.
+**The unit of work is one post.** A series glossary is a prerequisite that scales with the situation, not a gate you must clear before touching anything. Pick the mode that matches:
 
-1. **Before the first post of a series**, settle the glossary:
-   - Take the English `series:` string from section A of `docs/en-translation-glossary.md` — never invent one.
-   - Skim the whole series (`grep -l 'series: "<name>"' src/content/blog/*.md`) and pull out the terms that recur: the domain nouns, the series' 貫穿主軸 phrasing, any coined metaphor. Fix an English rendering for each and **append them to section C of the glossary**.
-   - For a reading-notes series, get the **source book's own wording** — DDIA's *fan-out on write*, SRE's *error budget*, FoDE's *the data engineering lifecycle*. Back-translating the Chinese into your own English is the single biggest tell of a machine translation of a book note.
-   - Check `docs/<key>-series-roadmap.md` for the series' positioning and 主軸 — the recurring sentence that ends each post has to land the same way every time.
-2. **Then translate post by post**, consulting the glossary rather than re-deciding.
-3. When the author corrects your English, **append it to section D of the glossary** so the next post inherits the fix.
+### A. A standalone post (no `series:`)
+`pain-before-power`, `dbt-intro`, `medallion-architecture`, `blog-as-a-product`, `gitcrisp`, `zookeeper`, `lottery`, `travel-split`, and the food posts. **Just translate it** — glossary section B covers the shared terms, and there's no cross-post consistency to protect. These are also the best place to start: concept notes get linked from everywhere, so their titles become link labels across the whole English site.
 
-Ordering within a series: follow `seriesOrder`. Concept notes that many posts link to (e.g. `pain-before-power`) are worth doing early — their titles show up as link labels everywhere.
+### B. One post from a finished series
+Settle the glossary once, then translate:
+- Take the English `series:` string from glossary section A — never invent one.
+- Skim the series (`grep -l 'series: "<name>"' src/content/blog/*.md`) for the terms that recur: domain nouns, the 貫穿主軸 phrasing, any coined metaphor. Fix an English rendering for each and **append to glossary section C**.
+- For reading notes, get the **source book's own wording** — DDIA's *fan-out on write*, SRE's *error budget*, FoDE's *the data engineering lifecycle*. Back-translating the Chinese into your own English is the biggest tell of a machine-translated book note.
+- `docs/<key>-series-roadmap.md` states the series' 定位 and 貫穿主軸 — the recurring sentence that closes each post has to land the same way every time.
+
+### C. One post from a series still being serialized
+Common — most series here are mid-flight (Jenkins: 9 published, 6 unwritten). You **can't** skim the whole series, and you shouldn't wait for it to finish.
+
+- **Build the glossary from the roadmap, not from the published posts.** `docs/<key>-series-roadmap.md` already carries the full 章節表 with each post's 主題, the 貫穿主軸, and the cross-link 分工 — including posts not yet written. That's exactly what it's for. Terms you'd otherwise discover in part 12 are already visible there.
+- Mark those glossary-C rows **provisional**. When a later post lands and introduces or reshapes a term, update the row *and* re-check the translations already shipped.
+- **The best cadence is to translate a post right after its Chinese version publishes** — the terminology is freshest, and the series never accumulates a translation backlog.
+
+### Ordering within a series: translate a contiguous run from part 1
+
+This matters more than it looks. The English series box lists **only the translated siblings**, in an auto-numbered `<ol>` — so translating parts 3 and 7 renders them as "**1.**" and "**2.**", and prev/next jumps 3 → 7 with nothing marking the gap. Verified against a build; it's not a bug to fix in the post, it's a reason to sequence the work.
+
+So: **start at `seriesOrder: 1` and go in order.** If you must cherry-pick one post out of the middle (the author wants that specific one in English now), that's fine — just know its English series box will show it as part 1 of 1 until the earlier parts land.
+
+### Feedback loop (all three modes)
+When the author corrects your English — a term, a title, a turn of phrase — **append it to glossary section D** before moving on. That's what makes the next post better instead of repeating the same correction; same discipline as the zh style guide's D 區.
 
 ## Frontmatter
 
@@ -131,6 +147,7 @@ npm run dev       # then open /en/blog/<slug>/ — READ IT, and look at the diag
 - Re-translating terms the original already wrote in English (Production, throughput, fan out) → contradicts the zh style guide's D 區 rulings.
 - Copying `commentsIssue` → English comments land in the Chinese thread.
 - Blank line inside the inline `<svg>` → the diagram renders as a code block.
+- Cherry-picking scattered parts of a series → the English series box renumbers them 1, 2, 3 and prev/next skips the untranslated gap. Go in `seriesOrder` order from part 1.
 - Quietly "improving" structure or adding explanation the original doesn't have → the two versions drift and can't be maintained as a pair.
 
 ## Copy-paste skeleton

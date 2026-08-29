@@ -101,6 +101,9 @@
 例:DDIA 的「扇出」是書上的 *fan-out on write*;SRE 的「錯誤預算」是 *error budget*;
 FoDE 的「資料工程生命週期」是 *the data engineering lifecycle*。翻之前先確認原書怎麼寫。
 
+**連載中的系列**:術語從 `docs/<key>-series-roadmap.md` 的章節表先定(roadmap 已經寫好還沒發的篇目),
+在備註欄標 **provisional**;等該篇真的發布再確認。新篇引入或改動術語時,回頭檢查已翻好的篇。
+
 | 系列 | 中文 | 英文 | 出處 / 備註 |
 |---|---|---|---|
 | *(待補)* | | | |
