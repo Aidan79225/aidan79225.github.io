@@ -7,11 +7,16 @@
 // Astro already stamps matching `id`s on rendered markdown headings, so the
 // slugs here anchor-link directly.
 import type { MarkdownHeading } from 'astro';
-interface Props { headings: MarkdownHeading[] }
-const { headings } = Astro.props;
+import { ui, DEFAULT_LOCALE, type Locale } from '../lib/i18n';
+// `locale` is the post's content language (not the URL's): the headings listed
+// here come from the body, so a zh post served as an /en/ fallback keeps its
+// Chinese label alongside its Chinese headings.
+interface Props { headings: MarkdownHeading[]; locale?: Locale }
+const { headings, locale = DEFAULT_LOCALE } = Astro.props;
+const t = ui[locale];
 ---
 <details class="xl:hidden bg-surface border border-line rounded p-4 mb-6 text-sm">
-  <summary class="font-bold cursor-pointer">📑 目錄</summary>
+  <summary class="font-bold cursor-pointer">📑 {t.tocLabel}</summary>
   <ul class="list-none m-0 mt-2 p-0 space-y-1">
     {headings.map((h) => (
       <li style={`padding-left:${(h.depth - 2)}rem`}>
@@ -24,9 +29,9 @@ const { headings } = Astro.props;
 <aside
   class="hidden xl:block fixed w-56 text-sm"
   style="left:calc(50% + 25rem);top:6rem;max-height:calc(100vh - 8rem);overflow-y:auto"
-  aria-label="目錄"
+  aria-label={t.tocLabel}
 >
-  <p class="font-bold text-muted text-xs mb-2 mt-0">目錄</p>
+  <p class="font-bold text-muted text-xs mb-2 mt-0">{t.tocLabel}</p>
   <ul class="list-none m-0 p-0 space-y-1.5 border-l border-line">
     {headings.map((h) => (
       <li style={`padding-left:${(h.depth - 1) * 0.75}rem`}>
