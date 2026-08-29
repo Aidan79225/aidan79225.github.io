@@ -37,6 +37,7 @@ export function localizeHtml(html: string): string {
 export const ui = {
   'zh-hant': {
     updatedOn: '更新於',
+    tocLabel: '目錄',
     seriesLabel: '📚 系列:',
     thisPost: '(本篇)',
     referencedIn: '🔗 被引用於',
@@ -50,6 +51,7 @@ export const ui = {
   },
   en: {
     updatedOn: 'Updated',
+    tocLabel: 'Contents',
     seriesLabel: '📚 Series: ',
     thisPost: ' (this post)',
     referencedIn: '🔗 Referenced in',

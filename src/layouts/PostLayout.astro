@@ -116,7 +116,7 @@ const showToc = tocHeadings.length >= 3;
       </aside>
     )}
 
-    {showToc && <Toc headings={tocHeadings} />}
+    {showToc && <Toc headings={tocHeadings} locale={lang} />}
 
     <div class="prose prose-invert max-w-none">
       <slot />
