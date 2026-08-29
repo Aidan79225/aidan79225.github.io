@@ -24,7 +24,7 @@ Four things carry a translation. In order of how often they get botched:
 **The unit of work is one post.** A series glossary is a prerequisite that scales with the situation, not a gate you must clear before touching anything. Pick the mode that matches:
 
 ### A. A standalone post (no `series:`)
-`pain-before-power`, `dbt-intro`, `medallion-architecture`, `blog-as-a-product`, `gitcrisp`, `zookeeper`, `lottery`, `travel-split`, and the food posts. **Just translate it** — glossary section B covers the shared terms, and there's no cross-post consistency to protect. These are also the best place to start: concept notes get linked from everywhere, so their titles become link labels across the whole English site.
+`pain-before-power`, `dbt-intro`, `medallion-architecture`, `blog-as-a-product`, `gitcrisp`, `zookeeper`, `lottery`, `travel-split`, and the food posts. **Just translate it** — `docs/ubiquitous-language.md` (the site-wide table) covers the shared terms, and there's no cross-post consistency to protect. These are also the best place to start: concept notes get linked from everywhere, so their titles become link labels across the whole English site.
 
 ### B. One post from a finished series
 Settle the glossary once, then translate:
@@ -120,7 +120,7 @@ What that means in English:
 
 - **Diagram**: all `<text>`, `aria-label` and `<figcaption>` translated? **Nothing overflowing its box or colliding?** Would a reader who only looks at the picture still get the gist?
 - **Voice**: first person and stance intact? Em-dashes preserved? Closing verdicts still punchy? Sentence length varied? Reads like a person, not a vendor blog?
-- **Terminology**: matches the series' 術語表 in its roadmap? New terms you hit added back to that table? Already-English terms in the original (Production, throughput, backpressure) left alone?
+- **Terminology**: matches the series' 術語表 in its roadmap, and `docs/ubiquitous-language.md` for shared terms? New terms you hit added back to the right table? Already-English terms in the original (Production, throughput, backlog, backpressure, fan out — the table's §1) left alone?
 - **Links**: every `[[slug]]` target unchanged and still resolving? Labels translated?
 - **Frontmatter**: `translationOf` present? `date` identical? `series` byte-identical to glossary A? tags untouched? `commentsIssue` dropped?
 - **Fidelity**: nothing silently dropped, nothing invented. If a paragraph was hard, it got translated — not summarized.
@@ -170,4 +170,4 @@ translationOf: <same-slug>
 
 Body: translate straight through, section by section, keeping every heading level, list, table, figure and code block in place.
 
-**Related:** `docs/i18n.md` (mechanics) · `docs/en-translation-glossary.md` (series names, terms, correction log) · `docs/zh-tw-style-guide.md` §B–C (the voice being preserved) · `writing-blog-post` skill (what makes a post good in the first place).
+**Related:** `docs/i18n.md` (mechanics) · **`docs/ubiquitous-language.md` (site-wide terms — the single source for shared vocabulary, English column included)** · `docs/<key>-series-roadmap.md` 〈術語表〉 (per-series terms) · `docs/en-translation-glossary.md` (series-name translations) · `docs/zh-tw-style-guide.md` §B–C (the voice being preserved) · `writing-blog-post` skill.

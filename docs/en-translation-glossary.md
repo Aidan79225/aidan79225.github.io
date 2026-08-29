@@ -37,61 +37,14 @@
 > **Jenkins 系列還沒登記進 `src/data/series.ts`**——中英文都拿不到 `/start/` 連結。
 > 要補的話兩邊(`name` + `enName`)一起加。
 
-## B. 通用技術詞:中 → 英
+## B. 通用技術詞 → 看 `docs/ubiquitous-language.md`
 
-中文原文裡**已經是英文的技術詞照抄**(Production、throughput、backpressure、fan out、Error Budget…)——
-`docs/zh-tw-style-guide.md` D 區規定這些一律寫英文,翻譯時不要再動它們。
+**跨系列共用詞的單一真相在 `docs/ubiquitous-language.md`(全站術語表)。**
+那張表的英文欄就是這裡原本 B 區的內容,而且多了「避免」欄(中國用語變體),
+所以中文寫作與英文翻譯查同一張表,不會分岔。
 
-以下是中文寫的技術詞回到標準英文(**不是**逐字直譯):
-
-| 中文 | 英文 | 陷阱 |
-|---|---|---|
-| 快取 | cache / caching | |
-| 佇列 | queue | |
-| 陣列 | array | |
-| 字串 | string | |
-| 執行緒 / 行程 | thread / process | 兩個別搞混 |
-| 記憶體 | memory | |
-| 資料庫 | database | |
-| 儲存庫 | repository | |
-| 映像檔 | image | container image |
-| 元件 | component | |
-| 介面 | interface | |
-| 函式庫 / 套件 | library / package | |
-| 專案 | project | |
-| 設定 | configuration / config | |
-| 效能 | performance | |
-| 並行 | concurrency | 平行 = parallelism,別混用 |
-| 非同步 | asynchronous / async | |
-| 相依 | dependency | |
-| 稽核 | audit | |
-| 重建 | rebuild / backfill | 資料語境常是 backfill |
-| 編排 | orchestration | Airflow 語境;不是 arrangement |
-| 分區 | partition | |
-| 複寫 | replication | 不是 rewriting |
-| 交易 | transaction | 不是 trading |
-| 一致性 | consistency | |
-| 隔離等級 | isolation level | |
-| 值班 / 待命 | on-call | |
-| 告警 | alert / alerting | 不是 warning |
-| 事故 | incident | 不是 accident |
-| 事後檢討 | postmortem | |
-| 可觀測性 | observability | |
-| 維運 | operations / ops | |
-| 部署 | deployment | |
-| 回滾 | rollback | |
-| 灰度 / 漸進發布 | progressive rollout | |
-| 冪等 | idempotent | |
-| 節流 / 限流 | throttling / rate limiting | |
-| 熔斷 | circuit breaking | |
-| 重試 | retry | |
-| 退避 | backoff | |
-| 資料湖 / 倉儲 | data lake / warehouse | |
-| 血緣 | lineage | |
-| 資料管線 | data pipeline | |
-| 技術債 | technical debt | |
-| 護欄 | guardrail | |
-| 驗收 | acceptance / sign-off | |
+翻譯時特別注意那份的 **§1 一律寫英文**:原文裡的 Production、throughput、backlog、
+backpressure、fan out 本來就是英文,**照抄不要動**。
 
 ## C. 各系列專有名詞 → 看該系列的 roadmap
 

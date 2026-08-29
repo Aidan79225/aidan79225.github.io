@@ -47,12 +47,18 @@ The series box, tag chips, and prev/next are generated automatically by `src/lay
 ## 台灣用詞 & 口吻
 寫這個部落格的文章用**繁體中文、台灣用語**,而且要像作者本人(口吻範本:`btl-*` 的「## 反思」)。
 
-**高頻台灣用詞**(完整對照表 + 修正記錄見 `docs/zh-tw-style-guide.md`):
-代碼→程式碼、變量→變數、對象→物件、默認→預設、緩存→快取、返回→回傳、運行→執行、實現→實作、調用→呼叫、用戶→使用者、項目→專案、配置→設定、**文件(指 file)→檔案**(陷阱:台灣「文件」=document)。
+**用詞的單一真相是 `docs/ubiquitous-language.md`(全站術語表)** —— 四欄:中文用詞 / 英文 / 避免 / 備註。口吻與修正記錄在 `docs/zh-tw-style-guide.md`。
+
+高頻:代碼→程式碼、變量→變數、對象→物件、默認→預設、緩存→快取、返回→回傳、運行→執行、實現→實作、調用→呼叫、用戶→使用者、項目→專案、配置→設定、**文件(指 file)→檔案**(陷阱:台灣「文件」=document)。
+
+**一律寫英文**(術語表 §1):Production、throughput、backlog、backpressure、fan out —— 不要寫成生產環境 / 吞吐 / 堆積 / 背壓 / 扇出。
+**不要無腦替換**(§2):數據、依賴、函式=函數、優化、支持、通過 —— 這些是作者慣用或依語境。
 
 **口吻**:第一人稱有主張、用真實例子/數字佐證、轉折用破折號「——」、結尾收一句判斷;避免 AI 腔(首先/其次/綜上所述/值得一提的是)。
 
-**收稿前掃描**:完成 draft、回報前,拿上面(及 doc A 區)的「避免詞」grep 一遍內文,抓到就改 —— 但 `支持 / 通過 / 優化` 這類依語境的別無腦替換。系列文再多掃一輪**術語表**:表上列了「不寫 X」的變體有沒有混進來,以及這篇有沒有新術語該回填。
+**收稿前掃描**:完成 draft、回報前,拿全站術語表的**「避免」欄**grep 一遍內文,抓到就改 —— 但 §2 那些依語境的別無腦替換。系列文再多掃一輪該系列 roadmap 的術語表(「不寫 X」的變體有沒有混進來、有沒有新術語該回填)。
+
+**SVG `<text>` 裡的字也要掃** —— 目前全站的用詞殘留有一半躲在圖裡。
 
 ## Technical gotchas
 - **No blank lines inside inline `<svg>` / raw HTML.** A blank line ends the markdown HTML block; the indented lines after become a code block (broke `btl-4`). Keep the whole `<svg>` contiguous.
