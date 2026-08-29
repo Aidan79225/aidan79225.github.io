@@ -36,6 +36,45 @@
 | 11 | `ddia-streaming` | Ch11 Stream Processing | 與 Kafka/Spark 系列分工(log/offset/exactly-once/視窗在那);雙寫陷阱(部分失敗+亂序→永久分歧)→ log 先行=leader-follower 推廣到異質系統;CDC=把 DB 複製 log 開放成公共事件流(Debezium 偽裝 follower);流表二象性(表=流的積分、流=表的微分;compaction/materialized view/複製串流/狀態機複製全是化身);只要 log 還在一切狀態都是快取(批次人為容錯帶進串流)—— 接 `[[kafka-intro]]`、`[[kafka-delivery]]`、`[[kafka-ecosystem]]`、`[[spark-streaming]]`、`[[redis-replication]]`、`[[infra-rabbitmq]]`、`[[medallion-architecture]]` | ✅ 已發布 ★ |
 | 12 | `ddia-future` | Ch12 The Future of Data Systems | unbundling=平台是一台由內翻外的資料庫(ES=索引、Redis=快取、數倉=mat. view、log 當膠水,呼應 infra-platform);lambda(兩套邏輯)vs kappa(一條 log、重算=重放);end-to-end 正確性(exactly-once 有邊界、request id 冪等鍵、稽核:沒報錯≠資料對→DQ 系列引言);倫理收尾 —— 接 `[[ddia-streaming]]`、`[[infra-platform]]`、`[[kafka-delivery]]`、`[[airflow-reliability]]`、`[[spark-streaming]]`、`[[sre-monitoring]]`、`[[pain-before-power]]`、`[[ddia-batch]]` | ✅ 已發布(全書完結 1-12) |
 
+## 術語表(Ubiquitous Language)
+
+書:*Designing Data-Intensive Applications*(Martin Kleppmann,O'Reilly 2017)。**英文欄填原書用字**。
+
+全系列同一個概念只准一個中文寫法;英文欄是翻譯時直接照抄的來源。
+寫到表上沒有的術語就補一列。跨系列共用的通用詞(快取、佇列、可觀測性)在
+`docs/en-translation-glossary.md` B 區,這裡只放本系列特有的。
+
+| 中文用詞 | 英文 | 備註 |
+|---|---|---|
+| 可靠性 / 可擴展性 / 可維護性 | reliability / scalability / maintainability | Ch1 三個 -ility,順序固定 |
+| 尾延遲 | tail latency | Ch1;百分位用 p95 / p99,不寫「長尾延遲」 |
+| 讀時綱要 / 寫時綱要 | schema-on-read / schema-on-write | Ch2 |
+| 向後相容 / 向前相容 | backward / forward compatibility | Ch4;兩個方向別寫反 |
+| 複寫 | replication | 不寫「複製 / 副本同步」 |
+| 單主 / 多主 / 無主 | single-leader / multi-leader / leaderless | Ch5 三種拓撲 |
+| 讀己之寫 | read-your-writes consistency | Ch5 |
+| 分區 | partitioning | Ch6;不寫「分片」,sharding 只在提書上同義詞時出現 |
+| 熱點 | hot spot | Ch6 |
+| 交易 | transaction | 不寫「事務」 |
+| 快照隔離 | snapshot isolation | Ch7 |
+| 更新遺失 | lost update | Ch7 |
+| 寫入偏斜 | write skew | Ch7;讀取偏斜 = read skew,兩者不可混用 |
+| 可序列化 | serializability | Ch7;與 linearizability 是兩件事,別互換 |
+| 線性一致性 | linearizability | Ch9;不寫「線性化」 |
+| 全序廣播 | total order broadcast | Ch9 |
+| 共識 | consensus | Ch9 |
+| 兩階段提交 | two-phase commit (2PC) | Ch9 |
+| 腦裂 | split brain | Ch8/Ch9 |
+| 圍欄令牌 | fencing token | Ch8 |
+| 拜占庭故障 | Byzantine fault | Ch8 |
+| fan-out on write / fan-out on read | fan-out on write / fan-out on read | Ch1 推特案例;書上專有名,中文照用英文(見 zh style guide D 區) |
+| 衍生資料 | derived data | Part III 標題 |
+| 真實來源 | source of truth / system of record | Ch10;不寫「唯一真相來源」 |
+| 事件溯源 | event sourcing | Ch11 |
+| 拆解資料庫 | unbundling the database | Ch12;系列反覆扣的視角 |
+| Lambda / Kappa 架構 | Lambda / Kappa architecture | Ch11 |
+| 表是流的積分 | a table is the integral of a stream | Ch11 的等價關係,措辭固定 |
+
 ## 寫每篇時的慣例
 - front matter:`series: "Designing Data-Intensive Applications 讀書筆記"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
 - tags 用 ASCII:`distributed-systems` + `book-notes` + 該章主題(如 `replication`、`consistency`、`storage`)。

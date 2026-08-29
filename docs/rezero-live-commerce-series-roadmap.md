@@ -314,6 +314,33 @@
   - **終章情緒:停在「繼續往前」**。
 - **時間線定案(2026-08-02 作者確認,全系列時間敘述以此為準)**:**2024/11 作者加入(單人後端起步)→ 2026/03 暫停開發 → 約一個月後剩三人 → 2026/06 作者離開,EM 新工作無縫接軌(先兼 interim SRE)——整趟旅程約一年半**。系列內「兩年」已全數修正為「一年半」;「半年後成 EM」已修正為「離開之後成 EM」。
 
+## 術語表(Ubiquitous Language)
+
+**自創系列**:這些術語是作者自己造的,沒有原書可以對 —— 所以中英文都要在這裡定死,之後每篇照抄。
+
+戰爭故事系列另一條紀律:**「當年」聲部必須是真的**,術語也一樣 —— 當年系統實際叫什麼名字,就照當年的叫法記在這裡,不要用現在的詞回頭美化。
+
+全系列同一個概念只准一個中文寫法;英文欄是翻譯時直接照抄的來源。
+寫到表上沒有的術語就補一列。跨系列共用的通用詞(快取、佇列、可觀測性)在
+`docs/en-translation-glossary.md` B 區,這裡只放本系列特有的。
+
+| 中文用詞 | 英文 | 備註 |
+|---|---|---|
+| 直播代購 | live-stream personal shopping | 英文第一次出現時給這個 gloss,之後用 live commerce;台灣特有情境,不能只寫 live streaming |
+| 不變量 | invariant | **系列貫穿主軸**(「難不在功能,在不變量」);不寫「不變條件 / 恆定式」 |
+| 語意契約 | semantic contract | 不變量是語意契約,寫在程式碼之前 |
+| 當年 / 重來 | then / now | 雙聲部;英文用 "How we actually did it" / "How I'd design it now" |
+| 留言下單 | comment-to-order | 直播留言直接成單,台灣直播電商的核心玩法 |
+| 一筆訂單的旅程 | the journey of an order | 系列反覆用的骨架,措辭固定 |
+| 三本帳 | the three ledgers | 庫存 / 金流 / 物流;會漂的那三本 |
+| 對帳 | reconciliation | 不寫「核帳」 |
+| 超賣 | overselling | |
+| 庫存預扣 | inventory reservation | 不寫「鎖庫存」除非確指 DB lock |
+| 冪等 | idempotent | 與 IaC / Ansible 對齊 |
+| 一台拆開的資料庫 | an unbundled database | 借 DDIA Ch12 的 unbundling,cross-link 要指回去 |
+| 主播 | host / streamer | 固定用 host,dashboard 情境才用 streamer |
+| 自留額 | retention (insurance) | 保險用語,ai-responsibility 那條線共用 |
+
 ## 寫每篇時的慣例
 - **每章動筆前,先與作者討論當年的實際做法**,把口述記錄到上面「當年實際做法」段落,再開寫——當年聲部必須是真的,不能腦補。
 - front matter:`series: "Re:從零開始做直播代購電商平台"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。

@@ -43,6 +43,37 @@
 | 13 | `iac-org` | 團隊與治理 | 平台團隊產品思維、self-service 的權限與 guardrail、governance as code——接 `[[infra-platform]]` | ⬜ |
 | 14 | `iac-retro` | 系列回顧 | 全書一張圖總結 + 三條線(Ansible/SRE/K8s)的匯流;讀完之後我改變了哪些做法 | ⬜ |
 
+## 術語表(Ubiquitous Language)
+
+書:*Infrastructure as Code*(Kief Morris,O'Reilly;2nd ed. 2020)。**英文欄填原書用字**。
+
+全系列同一個概念只准一個中文寫法;英文欄是翻譯時直接照抄的來源。
+寫到表上沒有的術語就補一列。跨系列共用的通用詞(快取、佇列、可觀測性)在
+`docs/en-translation-glossary.md` B 區,這裡只放本系列特有的。
+
+| 中文用詞 | 英文 | 備註 |
+|---|---|---|
+| 一切皆程式碼 | everything as code | 全系列核心紀律 |
+| 基礎設施即程式碼 | infrastructure as code | 系列名;縮寫 IaC |
+| 鐵器時代 / 雲時代 | the iron age / the cloud age | Ch1;「有 API 的鐵器時代」是本系列說法 |
+| 牛,不是寵物 | cattle, not pets | 不寫「牲畜 vs 寵物」 |
+| 可拋棄性 | disposability | 搭配 cattle not pets |
+| 不可變基礎設施 | immutable infrastructure | 門檻在狀態,不在 image |
+| 設定飄移 | configuration drift | 不寫「配置漂移」 |
+| 雪花伺服器 | snowflake server | Ch1 反模式 |
+| 自動化恐懼螺旋 | automation fear spiral | Ch1;半自動化比全手動更危險 |
+| 爆炸半徑 | blast radius | 單體 stack 的真正問題 |
+| 堆疊 | stack | 基礎設施的變更單位,書上是 infrastructure stack |
+| 資源原語 | infrastructure resources | 運算 / 儲存 / 網路三樣 = compute / storage / networking |
+| 烘烤 vs 現炸 | bake vs fry | image 先做好 vs 開機才裝 |
+| 宣告式 / 命令式 | declarative / imperative | 宣告式 = 寫終點 |
+| 冪等 | idempotent | 「敢常跑」的地基 |
+| 測試金字塔 | test pyramid | Ch9 基礎設施版 |
+| 策略即程式碼 | policy as code | 性價比之王那篇 |
+| 晉級 | promotion | 一條 pipeline 一路晉級到 Production |
+| 可重現 | reproducibility | 靠演習維持,不靠信仰 |
+| 參數 | parameter | 參數是介面,不是垃圾抽屜 |
+
 ## 寫每篇時的慣例
 - front matter:`series: "Infrastructure as Code 讀書筆記"`、`seriesOrder: <#>`、`category: tech`、tags:`iac` + `devops` + `book-notes`。
 - 依 `.claude/skills/writing-blog-post`:每篇至少一張深色 SVG 招牌圖(SVG 內不可有空行)、摘要比原書清楚、反思要具體有立場。

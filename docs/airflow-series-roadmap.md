@@ -19,6 +19,33 @@
 | 8 | `airflow-testing-deploy` | Airflow 測試與部署:別讓一個 typo 弄垮整包 DAG | top-level parse 陷阱(scheduler 反覆解析→重活進 task)、測試三層(DagBag import 驗證/邏輯抽純函數單元測/dag.test())、CI 擋在 merge 前、部署 git-sync/S3/image、self-host vs managed(算維運人力)——接 `[[airflow-reliability]]`、`[[infra-airflow]]`、`[[pain-before-power]]` | ✅ 已發布 |
 | 9 | `airflow-advanced` | Airflow 進階:Datasets、deferrable operators 與 executor 選型 | Datasets(時間驅動→資料驅動、outlets/schedule=[dataset])、deferrable operators(sensor 佔 slot 空等→triggerer async 等)、executor 選型速查(Local/Celery/K8s)——接 `[[airflow-providers]]`、`[[infra-airflow]]`、`[[infra-spark]]`、`[[redis-pubsub-stream]]`、`[[pain-before-power]]` | ✅ 已發布(系列完成 1-9) |
 
+## 術語表(Ubiquitous Language)
+
+工具系列:API 名稱、設定鍵、CLI 參數**一律不譯**(照原文寫)。這張表管的是「用中文寫的那些概念」怎麼統一。
+
+全系列同一個概念只准一個中文寫法;英文欄是翻譯時直接照抄的來源。
+寫到表上沒有的術語就補一列。跨系列共用的通用詞(快取、佇列、可觀測性)在
+`docs/en-translation-glossary.md` B 區,這裡只放本系列特有的。
+
+| 中文用詞 | 英文 | 備註 |
+|---|---|---|
+| DAG | DAG | 不譯、不展開成「有向無環圖」除非第一次解釋 |
+| 任務 | task | |
+| 運算子 | operator | 內文多直接用 Operator |
+| 感測器 | sensor | 等待外部條件;背後會吃 slot |
+| 掛鉤 | hook | 內文多直接用 Hook |
+| 排程器 / 執行器 | scheduler / executor | |
+| 回補 | backfill | **刻意回補**,與 catchup 是兩件事,不可混用 |
+| catchup | catchup | 不譯;預設 True 是甜蜜陷阱 |
+| XCom | XCom | 不譯;不是資料管道 |
+| 連線 | connection | 把帳密從程式碼抽出來 |
+| 變數 | variable | 與 params 用途不同,別混 |
+| 觸發規則 | trigger rule | 與 branching 綁在一起 |
+| 任務群組 | TaskGroup | 解決的是「人」的問題 |
+| 動態映射 | dynamic task mapping | |
+| 資料區間 | data interval | 不寫「執行區間」 |
+| 編排 | orchestration | 與 FoDE 的 orchestration undercurrent 對齊 |
+
 ## 寫每篇時的慣例
 - front matter:`series: "Airflow 學習筆記"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
 - tags 沿用 ASCII:`airflow` + 該篇主題(如 `scheduling`、`testing`)。

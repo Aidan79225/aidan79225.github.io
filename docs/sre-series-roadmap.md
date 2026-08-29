@@ -54,6 +54,39 @@
 
 ★ = 投報率最高(1、2、4、7、10、11)。第一批七篇是地基,優先寫;第三、四批依興趣調順序。34 章全數涵蓋(部分併篇)。
 
+## 術語表(Ubiquitous Language)
+
+書:*Site Reliability Engineering*(Beyer, Jones, Petoff, Murphy;O'Reilly 2016,線上版 sre.google/books)。**英文欄填原書用字**。
+
+全系列同一個概念只准一個中文寫法;英文欄是翻譯時直接照抄的來源。
+寫到表上沒有的術語就補一列。跨系列共用的通用詞(快取、佇列、可觀測性)在
+`docs/en-translation-glossary.md` B 區,這裡只放本系列特有的。
+
+| 中文用詞 | 英文 | 備註 |
+|---|---|---|
+| SLI / SLO / SLA | SLI / SLO / SLA | 三個縮寫中英文都不展開翻譯 |
+| 錯誤預算 | error budget | 全系列主軸詞,不寫「容錯預算」 |
+| 雜務 | toil | Ch5;書上定義嚴格(手動、重複、可自動化、無持久價值),不泛稱「瑣事」 |
+| 四個黃金訊號 | the four golden signals | 延遲 / 流量 / 錯誤 / 飽和度 = latency / traffic / errors / saturation |
+| 待命 | on-call | 內文多直接用 on-call |
+| 事故指揮官 | Incident Commander (IC) | Ch14;IC 不動手是重點 |
+| 事後檢討 | postmortem | 不寫「覆盤 / 事後剖析」 |
+| 無咎責 | blameless | blameless postmortem;不等於不負責 |
+| 上線就緒審查 | Production Readiness Review (PRR) | Ch32 |
+| 級聯故障 | cascading failure | Ch22 |
+| 過載 | overload | Ch21;搭配 graceful degradation |
+| 節流 | throttling | Ch21 |
+| 驚群 | thundering herd | Ch24 cron 章 |
+| 退避與抖動 | backoff and jitter | Ch22 |
+| 密封建置 | hermetic build | Ch8;「在我機器上可以」的解法 |
+| 不穩定測試 | flaky test | Ch17;不寫「不穩定的測試案例」 |
+| 中斷防護 | interrupt shield | Ch29 |
+| 分散式共識 | distributed consensus | Ch23;Paxos / Raft / Zab 人名演算法照原文 |
+| 腦裂 | split brain | Ch23 |
+| 負載平衡 | load balancing | Ch19–20;先選機房再選機器 |
+| 維運工程化 | treating operations as a software problem | SRE 的內核,全書第一句 |
+| 服務等級 | service level | 別跟 SLA 混用 |
+
 ## 寫每篇時的慣例
 - front matter:`series: "Google SRE 讀書筆記"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
 - tags 用 ASCII:`sre` + 該篇主題(如 `reliability`、`monitoring`、`incident`、`culture`)。

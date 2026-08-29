@@ -111,6 +111,36 @@
 4. **養它**(13→14→15):備份與設定進 git → 清掉會堆積的東西 → 調效能。Jenkins 自己就是一個要備份、要監控、要做容量規劃的正式服務。
 5. **收尾**(16):誠實比較,並回顧整條線。
 
+## 術語表(Ubiquitous Language)
+
+工具系列:API 名稱、資源型別、設定鍵、CLI 參數**一律不譯**(照原文寫)。這張表管的是「用中文寫的那些概念」怎麼統一。
+
+**注**:Jenkins 系列尚未登記進 `src/data/series.ts`,首篇發布落地檢查清單那一步要補(`name` + `enName` 一起加)。
+
+全系列同一個概念只准一個中文寫法;英文欄是翻譯時直接照抄的來源。
+寫到表上沒有的術語就補一列。跨系列共用的通用詞(快取、佇列、可觀測性)在
+`docs/en-translation-glossary.md` B 區,這裡只放本系列特有的。
+
+| 中文用詞 | 英文 | 備註 |
+|---|---|---|
+| 持續整合 | continuous integration (CI) | 真義是「頻繁合回主幹」,不是「有跑測試」 |
+| 持續交付 / 持續部署 | continuous delivery / continuous deployment | 兩個 CD 別混用 |
+| 主幹開發 | trunk-based development | 短命分支是 CI 的前提 |
+| 控制器 / 代理 | controller / agent | 不寫「主節點 / 從節點」(master/slave 已淘汰) |
+| 執行槽 | executor | 排隊等的是 executor 不是機器 |
+| 標籤 | label | 一份介面契約:Jenkinsfile 開需求,平台供給 |
+| 工作區 | workspace | 會被重複使用;髒 workspace = 「在我機器上可以」 |
+| 產物 | artifact | archive 給人看、repository 給機器取 |
+| 指紋 | fingerprint | 這顆 jar 是哪次 build 出來的 |
+| 憑證 | credentials | 遮蔽不等於安全 |
+| 品質關卡 | quality gate | 「擋得住的門」 |
+| 人工核准 | input | 照原文;卡住 executor 是它的代價 |
+| 共用函式庫 | Shared Library | 照原文;pipeline code 也是 code |
+| 密封建置 | hermetic build | 與 SRE 系列對齊,同一個中文詞 |
+| 功能旗標 | feature flag | 搭配 kill switch(預設 on)/ feature flag(預設 off)之分 |
+| 爆炸半徑 | blast radius | 與 IaC 系列對齊 |
+| 可重現 / 可審查 / 可回滾 | reproducible / reviewable / revertible | **貫穿主軸三性質**,三個中文詞固定不可換 |
+
 ## 寫每篇時的慣例
 - front matter:`series: "Jenkins 學習筆記"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
 - tags 用 ASCII:`jenkins` + `ci-cd` + 該篇主題(如 `pipeline`、`devops`、`security`、`deployment`、`kubernetes`、`automation`)。

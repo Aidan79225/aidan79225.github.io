@@ -35,6 +35,32 @@
 
 ★ = 投報率最高、圖最好畫(1、2、3、6、7、10)。第一批四篇是地基,優先寫;第二批最貼後端日常;第三批 Cluster 是重頭戲。
 
+## 術語表(Ubiquitous Language)
+
+工具系列:API 名稱、設定鍵、CLI 參數**一律不譯**(照原文寫)。這張表管的是「用中文寫的那些概念」怎麼統一。
+
+全系列同一個概念只准一個中文寫法;英文欄是翻譯時直接照抄的來源。
+寫到表上沒有的術語就補一列。跨系列共用的通用詞(快取、佇列、可觀測性)在
+`docs/en-translation-glossary.md` B 區,這裡只放本系列特有的。
+
+| 中文用詞 | 英文 | 備註 |
+|---|---|---|
+| 鍵 | key | 內文多直接用 key |
+| 過期 | expiration / TTL | TTL 不譯 |
+| 逐出策略 | eviction policy | 不寫「淘汰策略」;`maxmemory-policy` 值照原文 |
+| 持久化 | persistence | RDB / AOF 照原文 |
+| 管線化 | pipelining | 省 RTT,與原子性是兩個問題 |
+| 交易 | transaction | MULTI/EXEC;「別叫它 ACID」。⚠ **既有文章有 21 處寫成「事務」**(全站其餘一律「交易」),待一次清理 |
+| 複寫 | replication | 與 DDIA 對齊,不寫「複製」 |
+| 哨兵 | Sentinel | 內文多直接用 Sentinel;解可用性不解容量 |
+| 叢集 | cluster | 不寫「集群」 |
+| 槽 | slot | 16384 個固定 slot;CRC16 → slot → node |
+| 故障轉移 | failover | 不寫「容災切換」 |
+| 分散式鎖 | distributed lock | Redlock 照原文,爭議要一起講 |
+| 串流 | Stream | Redis 的 Stream 型別,首字大寫以免與泛稱串流混淆 |
+| 發布 / 訂閱 | Pub/Sub | 漏了也沒差的即時通知 |
+| 寫時複製 | copy-on-write | fork + COW |
+
 ## 寫每篇時的慣例
 - front matter:`series: "Redis 學習筆記"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
 - tags 用 ASCII:`redis` + 該篇主題(如 `cache`、`data-structures`、`distributed-systems`、`high-availability`)。

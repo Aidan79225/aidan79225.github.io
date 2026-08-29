@@ -58,6 +58,31 @@
 
 ★(主幹)= 投報率最高的四篇(5、7、9、10)。第一幕五篇是地基,優先寫;二三四幕可依興趣調順序。第五幕是加碼,**移轉後剩 13、14 兩篇**,兩篇都值得寫(13 遞迴 CTE 缺口最大)。
 
+## 術語表(Ubiquitous Language)
+
+「優化 / 通過 / 支持」依 zh style guide A 區保留,不要無腦換成「最佳化」。SQL 關鍵字一律大寫照原文。
+
+全系列同一個概念只准一個中文寫法;英文欄是翻譯時直接照抄的來源。
+寫到表上沒有的術語就補一列。跨系列共用的通用詞(快取、佇列、可觀測性)在
+`docs/en-translation-glossary.md` B 區,這裡只放本系列特有的。
+
+| 中文用詞 | 英文 | 備註 |
+|---|---|---|
+| 執行順序 | logical query processing order | 系列開篇的骨架 |
+| 收合 | collapsing | GROUP BY 做的事;系列自造的中文說法,固定用「收合」 |
+| 去重 | deduplication | DISTINCT 不是「某欄去重」 |
+| 裸欄位 | bare column | 照系列說法,不寫「裸列」 |
+| 視窗函式 | window function | 「不收合的聚合」;不寫「開窗函數」 |
+| 框架 | frame | OVER 的三個旋鈕之一;預設值是最多人踩的坑 |
+| 分區 | PARTITION BY | SQL 語境指 window 的分組,與 DDIA/Kafka 的 partition 是兩件事,備註要點明 |
+| 優化器 | optimizer | **zh style guide 保留「優化」不換**;cost 是估計,ANALYZE 才是事實 |
+| 執行計畫 | execution plan | EXPLAIN 攤開的東西;與 Spark 系列對齊 |
+| 隔離等級 | isolation level | ACID 的重點是 I |
+| 多版本並行控制 | MVCC | 內文用縮寫;讀不擋寫 |
+| 緩慢變動維度 | SCD Type 2 | 資料的「版本控制」;型別編號照原文 |
+| 小計 | ROLLUP / CUBE / GROUPING SETS | 關鍵字照原文 |
+| 大規模平行處理 | MPP | 內文用縮寫;一切難題都回到「少搬資料」 |
+
 ## 寫每篇時的慣例
 - front matter:`series: "SQL 我以為我懂"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
 - tags 用 ASCII:`sql` + 該篇主題(如 `performance`、`data-modeling`、`window-function`)。
