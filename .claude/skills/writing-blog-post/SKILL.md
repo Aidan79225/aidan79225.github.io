@@ -12,6 +12,11 @@ This blog is **Aidan's personal brand / professional image** (a Backend Lead's t
 - The summary is NOT a commodity: sources are often verbose and most people don't read them. A 5-minute distillation that surfaces what the source buries is itself a service — and shows the ability to read deeply and condense.
 - The reflection is the differentiator: it proves you actually applied the idea and have a view nobody can copy.
 
+## 系列文:動筆前先查術語表
+這篇如果屬於某個系列,**動筆前先看 `docs/<key>-series-roadmap.md` 的〈術語表(Ubiquitous Language)〉**,反覆出現的概念照表上的中文用詞寫。一個概念在第 3 篇叫「分區」、第 11 篇叫「分片」,讀者會以為是兩件事。
+
+寫作中第一次用到表上沒有的概念名詞,**寫完這篇就回填一列**(中文、英文、備註)。英文欄一律填 —— 讀書筆記的原書用字寫作當下就在眼前,事後回頭找那一段成本高得多。
+
 ## Structure
 1. **Diagram(s)** (inline `<svg>`): for any post explaining a non-trivial concept, a diagram is **expected, not optional** — it should carry the central model so a reader who only looks at the picture already gets the gist. Add more than one when there are distinct ideas (e.g. `kafka-topics` has partition + consumer-group; `kafka-delivery` has the journey + per-key compaction). The only posts that legitimately skip it are pure reflection/reading-notes with no spatial structure to show (some `btl-*`) and food photo posts. **If a concept is complex and you can't picture it, that's a signal you haven't distilled it enough yet — not a reason to ship text-only.**
 2. **Summary** (`##` / `###`): distill the source into clear **models, lists, contrasts** — aim for "clearer and more salient than the original," not paragraph-by-paragraph retelling. The prose orbits the diagram; keep it lean.
@@ -47,7 +52,7 @@ The series box, tag chips, and prev/next are generated automatically by `src/lay
 
 **口吻**:第一人稱有主張、用真實例子/數字佐證、轉折用破折號「——」、結尾收一句判斷;避免 AI 腔(首先/其次/綜上所述/值得一提的是)。
 
-**收稿前掃描**:完成 draft、回報前,拿上面(及 doc A 區)的「避免詞」grep 一遍內文,抓到就改 —— 但 `支持 / 通過 / 優化` 這類依語境的別無腦替換。
+**收稿前掃描**:完成 draft、回報前,拿上面(及 doc A 區)的「避免詞」grep 一遍內文,抓到就改 —— 但 `支持 / 通過 / 優化` 這類依語境的別無腦替換。系列文再多掃一輪**術語表**:表上列了「不寫 X」的變體有沒有混進來,以及這篇有沒有新術語該回填。
 
 ## Technical gotchas
 - **No blank lines inside inline `<svg>` / raw HTML.** A blank line ends the markdown HTML block; the indented lines after become a code block (broke `btl-4`). Keep the whole `<svg>` contiguous.
@@ -101,6 +106,7 @@ Inline diagram — for concept posts this is expected, not optional (whole block
 - A diagram that just decorates (a logo, a vague box) instead of explaining → it must encode the actual mental model (flow, contrast, structure), or it's noise.
 - Reflection too short or generic → it's the selling point; go deeper with real specifics.
 - Summary just paraphrases the source → restructure it to be clearer than the original.
+- 系列文用詞跟前幾篇不一致(同一個概念兩個名字)→ 動筆前查 roadmap 的術語表,寫完回填新詞。
 - CJK / spaced tag slugs → use ASCII slugs.
 - Blank lines inside an inline SVG → diagram breaks into a code block.
 

@@ -14,7 +14,7 @@ Four things carry a translation. In order of how often they get botched:
 
 1. **The diagram** — the blog's signature. SVG text is content, and English overflows the boxes Chinese fit in.
 2. **The voice** — first-person, opinionated, em-dash, closing verdict. Translate the *stance*, not the words.
-3. **The terminology** — consistent within a series, and faithful to the source book's own English.
+3. **The terminology** — taken from the series' 術語表, not re-invented per post.
 4. **The links** — `[[slug]]` targets must survive; labels must be translated.
 
 **Calibration sample: `src/content/blog/en/pain-before-power.md` against `src/content/blog/pain-before-power.md`.** Read both side by side before your first translation of a session. That pair is the bar: notice it renders 土法煉鋼 as "duct tape", 刀口上 as "where it cuts", and keeps every em-dash aside intact.
@@ -29,15 +29,15 @@ Four things carry a translation. In order of how often they get botched:
 ### B. One post from a finished series
 Settle the glossary once, then translate:
 - Take the English `series:` string from glossary section A — never invent one.
-- Skim the series (`grep -l 'series: "<name>"' src/content/blog/*.md`) for the terms that recur: domain nouns, the 貫穿主軸 phrasing, any coined metaphor. Fix an English rendering for each and **append to glossary section C**.
-- For reading notes, get the **source book's own wording** — DDIA's *fan-out on write*, SRE's *error budget*, FoDE's *the data engineering lifecycle*. Back-translating the Chinese into your own English is the biggest tell of a machine-translated book note.
-- `docs/<key>-series-roadmap.md` states the series' 定位 and 貫穿主軸 — the recurring sentence that closes each post has to land the same way every time.
+- **Read the 〈術語表(Ubiquitous Language)〉 in `docs/<key>-series-roadmap.md` — that's the source of truth, and it already carries the English column.** It's written when the series is planned, not derived at translation time, so use it rather than re-deriving your own renderings. For reading notes the English column is the source book's own wording (DDIA's *fan-out on write*, SRE's *error budget*), which is exactly what you want.
+- If a term you hit isn't in the table, add it there (not just to your draft) — the next post in the series needs the same decision.
+- The same roadmap states the series' 定位 and 貫穿主軸 — the recurring sentence that closes each post has to land the same way every time.
 
 ### C. One post from a series still being serialized
 Common — most series here are mid-flight (Jenkins: 9 published, 6 unwritten). You **can't** skim the whole series, and you shouldn't wait for it to finish.
 
-- **Build the glossary from the roadmap, not from the published posts.** `docs/<key>-series-roadmap.md` already carries the full 章節表 with each post's 主題, the 貫穿主軸, and the cross-link 分工 — including posts not yet written. That's exactly what it's for. Terms you'd otherwise discover in part 12 are already visible there.
-- Mark those glossary-C rows **provisional**. When a later post lands and introduces or reshapes a term, update the row *and* re-check the translations already shipped.
+- **The roadmap's 術語表 covers this case by design** — it's opened before the series is written, so terms from posts that don't exist yet are already decided there, English column included. Read it; don't reverse-engineer terminology from the handful of posts that happen to be published.
+- If a later post reshapes a term, the roadmap row gets updated — then re-check the translations already shipped against it.
 - **The best cadence is to translate a post right after its Chinese version publishes** — the terminology is freshest, and the series never accumulates a translation backlog.
 
 ### Ordering within a series: translate a contiguous run from part 1
@@ -120,7 +120,7 @@ What that means in English:
 
 - **Diagram**: all `<text>`, `aria-label` and `<figcaption>` translated? **Nothing overflowing its box or colliding?** Would a reader who only looks at the picture still get the gist?
 - **Voice**: first person and stance intact? Em-dashes preserved? Closing verdicts still punchy? Sentence length varied? Reads like a person, not a vendor blog?
-- **Terminology**: consistent with glossary sections A–C? Reading-notes terms match the source book's own English? Already-English terms in the original (Production, throughput, backpressure) left alone?
+- **Terminology**: matches the series' 術語表 in its roadmap? New terms you hit added back to that table? Already-English terms in the original (Production, throughput, backpressure) left alone?
 - **Links**: every `[[slug]]` target unchanged and still resolving? Labels translated?
 - **Frontmatter**: `translationOf` present? `date` identical? `series` byte-identical to glossary A? tags untouched? `commentsIssue` dropped?
 - **Fidelity**: nothing silently dropped, nothing invented. If a paragraph was hard, it got translated — not summarized.
