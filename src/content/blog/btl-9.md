@@ -1,6 +1,6 @@
 ---
 title: "領導力 - 激勵的兩大障礙"
-date: 2026-08-15
+date: 2026-08-19
 category: tech
 tags:
   - leadership
@@ -8,7 +8,6 @@ tags:
 series: "成為 Tech Leader 讀書筆記"
 seriesOrder: 9
 comments: true
-draft: true
 ---
 ## 激勵的兩大障礙
 
