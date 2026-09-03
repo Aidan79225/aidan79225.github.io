@@ -28,6 +28,13 @@ export default defineConfig({
   markdown: {
     remarkPlugins: [remarkCjkFriendly, remarkMath, remarkWikiLink],
     rehypePlugins: [rehypeKatex],
+    // Highlight every block twice and emit both palettes as CSS variables
+    // (--shiki-light / --shiki-dark); global.css picks one per theme, so code
+    // blocks switch with the rest of the page and need no re-render.
+    shikiConfig: {
+      themes: { light: 'github-light', dark: 'github-dark' },
+      defaultColor: false,
+    },
   },
   vite: {
     plugins: [tailwindcss()],

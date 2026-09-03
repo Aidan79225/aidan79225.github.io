@@ -1,5 +1,6 @@
 ---
 import Search from './Search.jsx';
+import ThemeToggle from './ThemeToggle.astro';
 import { currentLocale, withLocale } from '../lib/i18n';
 // Under /en/ every route exists (real page or zh fallback), so nav links keep
 // the visitor inside the /en/ prefix.
@@ -22,8 +23,9 @@ const items = [
         <li><a href={withLocale(locale, i.url)} class="text-ink hover:text-accent no-underline">{i.title}</a></li>
       ))}
     </ul>
-    <div class="w-full sm:w-auto sm:ml-auto">
+    <div class="w-full sm:w-auto sm:ml-auto flex items-center gap-2">
       <Search client:load />
+      <ThemeToggle />
     </div>
   </div>
 </nav>

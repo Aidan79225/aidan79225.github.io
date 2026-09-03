@@ -1,6 +1,10 @@
 @import "tailwindcss";
+@import "./diagram-light.css";
 @plugin "@tailwindcss/typography";
 
+/* Dark is the site's default skin; `data-theme="light"` on <html> (set by the
+   toggle in the nav, persisted in localStorage) swaps the six tokens below and
+   everything downstream — Tailwind utilities, prose, diagrams — follows. */
 @theme {
   --color-base: #1f2330;
   --color-surface: #262b3a;
@@ -10,10 +14,87 @@
   --color-line: #3a4154;
 }
 
-/* Declare the site as dark so mobile browsers' "auto dark theme" don't
-   re-invert our already-dark colours (which turned diagram SVGs white). */
+/* Declare the skin so mobile browsers' "auto dark theme" doesn't re-invert our
+   already-dark colours (which turned diagram SVGs white). */
 :root {
   color-scheme: dark;
+}
+
+:root[data-theme="light"] {
+  color-scheme: light;
+  --color-base: #ffffff;
+  --color-surface: #eff2f8;
+  --color-ink: #1b1f2a;
+  --color-muted: #59647a;
+  --color-accent: #3550cc;
+  --color-line: #d3dae8;
+}
+
+/* Series / layer hues. These label content rather than paint chrome, so they
+   keep their identity across skins — only the luminance moves, enough to stay
+   readable on a white page. Anything that colours by series (the /start/
+   layers, the homepage cards, the graph legend) reads these, never a literal. */
+:root {
+  --hue-blue: #4f6df5;
+  --hue-cyan: #2fb6c0;
+  --hue-indigo: #6a6fd0;
+  --hue-orange: #e0733a;
+  --hue-purple: #9b6ff0;
+  --hue-green: #54b890;
+  --hue-amber: #d6a45c;
+  --hue-red: #dc4c3f;
+  --hue-teal: #26a69a;
+  --hue-rose: #d95757;
+  --hue-magenta: #c264c2;
+  --hue-lime: #9ccc65;
+  --hue-pink: #e05a7d;
+  --hue-grey: #9aa4b2;
+}
+
+:root[data-theme="light"] {
+  --hue-blue: #3550cc;
+  --hue-cyan: #12808a;
+  --hue-indigo: #4c51b0;
+  --hue-orange: #b95214;
+  --hue-purple: #7040d0;
+  --hue-green: #2c8a64;
+  --hue-amber: #9c6a15;
+  --hue-red: #b93527;
+  --hue-teal: #14827a;
+  --hue-rose: #b83a3a;
+  --hue-magenta: #9a3a9a;
+  --hue-lime: #5d9130;
+  --hue-pink: #bf3058;
+  --hue-grey: #59647a;
+}
+
+/* Tailwind Typography ships fixed light/dark palettes (`prose` / `prose-invert`),
+   neither of which can follow a runtime token swap — so drive its variables
+   from our own tokens instead and skip both presets. */
+.prose {
+  --tw-prose-body: var(--color-ink);
+  --tw-prose-headings: var(--color-ink);
+  --tw-prose-lead: var(--color-muted);
+  --tw-prose-links: var(--color-accent);
+  --tw-prose-bold: var(--color-ink);
+  --tw-prose-counters: var(--color-muted);
+  --tw-prose-bullets: var(--color-line);
+  --tw-prose-hr: var(--color-line);
+  --tw-prose-quotes: var(--color-ink);
+  --tw-prose-quote-borders: var(--color-line);
+  --tw-prose-captions: var(--color-muted);
+  --tw-prose-kbd: var(--color-ink);
+  --tw-prose-code: var(--color-ink);
+  --tw-prose-pre-code: var(--color-ink);
+  --tw-prose-pre-bg: var(--color-surface);
+  --tw-prose-th-borders: var(--color-line);
+  --tw-prose-td-borders: var(--color-line);
+}
+
+/* Diagram captions are authored with an inline `color:#9aa4b2`, which outranks
+   any stylesheet — normalise them onto the token so they follow the theme. */
+.prose figcaption {
+  color: var(--color-muted) !important;
 }
 
 /* Inline code: Tailwind Typography wraps it in literal backtick characters
@@ -38,4 +119,19 @@
   border-radius: 0;
   padding: 0;
   font-weight: inherit;
+}
+
+/* Fenced code blocks carry both Shiki themes as custom properties (see
+   `shikiConfig.themes` in astro.config.mjs); pick one per skin. */
+.astro-code,
+.astro-code span {
+  color: var(--shiki-dark);
+  background-color: var(--shiki-dark-bg);
+  font-style: var(--shiki-dark-font-style);
+}
+:root[data-theme="light"] .astro-code,
+:root[data-theme="light"] .astro-code span {
+  color: var(--shiki-light);
+  background-color: var(--shiki-light-bg);
+  font-style: var(--shiki-light-font-style);
 }

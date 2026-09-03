@@ -1,8 +1,47 @@
 /* 共用工具控件樣式 — 全部 scope 在 .tool-page 下,不影響文章/內容頁。 */
-/* 顏色與 minimal-mistakes dark skin 協調。 */
+/* 結構顏色沿用全站 token(--color-*),因此深色/淺色主題自動跟著切換;
+   下面這組 --t-* 是工具頁自己的語意色(成功/錯誤/警告/按鈕),兩套主題
+   各給一組值。 */
+.tool-page {
+  --t-btn: #2563eb;
+  --t-btn-hover: #1d4ed8;
+  --t-neutral-btn: #374151;
+  --t-neutral-btn-hover: #4b5563;
+  --t-danger: #f87171;
+  --t-danger-strong: #ef4444;
+  --t-danger-btn: #7f1d1d;
+  --t-danger-btn-hover: #991b1b;
+  --t-ok: #4ade80;
+  --t-info: #93c5fd;
+  --t-link: #60a5fa;
+  --t-lock: #6b7280;
+  --t-warn-bg: #422006;
+  --t-warn-border: #b45309;
+  --t-warn-ink: #fcd34d;
+  --t-warn-btn: #b45309;
+  --t-warn-btn-hover: #92400e;
+}
+
+:root[data-theme="light"] .tool-page {
+  --t-neutral-btn: #4b5563;
+  --t-neutral-btn-hover: #374151;
+  --t-danger: #dc2626;
+  --t-danger-strong: #b91c1c;
+  --t-danger-btn: #b91c1c;
+  --t-danger-btn-hover: #991b1b;
+  --t-ok: #15803d;
+  --t-info: #1d4ed8;
+  --t-link: #1d4ed8;
+  --t-warn-bg: #fef3c7;
+  --t-warn-border: #d97706;
+  --t-warn-ink: #92400e;
+  --t-warn-btn: #d97706;
+  --t-warn-btn-hover: #b45309;
+}
+
 .tool-page {
   button {
-    background: #2563eb;
+    background: var(--t-btn);
     color: #fff;
     border: none;
     border-radius: 6px;
@@ -11,16 +50,16 @@
     font-size: 0.95rem;
     margin: 0.25rem;
   }
-  button:hover { background: #1d4ed8; }
-  button:disabled { background: #3a4154; cursor: not-allowed; }
+  button:hover { background: var(--t-btn-hover); }
+  button:disabled { background: var(--color-line); cursor: not-allowed; }
 
   input[type="text"],
   input[type="number"],
   textarea,
   select {
-    background: #1f2330;
-    color: #e6e6e6;
-    border: 1px solid #3a4154;
+    background: var(--color-base);
+    color: var(--color-ink);
+    border: 1px solid var(--color-line);
     border-radius: 6px;
     padding: 0.5em;
     font-family: inherit;
@@ -37,11 +76,11 @@
 .tool-page.travel-split {
   h3 { margin-top: 1.6rem; }
 
-  .ts-intro { color: #9aa4b2; font-size: 0.95rem; line-height: 1.6; }
+  .ts-intro { color: var(--color-muted); font-size: 0.95rem; line-height: 1.6; }
 
   .ts-card {
-    background: #1f2330;
-    border: 1px solid #3a4154;
+    background: var(--color-base);
+    border: 1px solid var(--color-line);
     border-radius: 8px;
     padding: 0.9rem 1rem;
     margin-top: 0.75rem;
@@ -54,17 +93,17 @@
     align-items: flex-end;
   }
   .ts-field { display: flex; flex-direction: column; gap: 0.25rem; }
-  .ts-field > span { font-size: 0.8rem; color: #9aa4b2; }
+  .ts-field > span { font-size: 0.8rem; color: var(--color-muted); }
   .ts-field input, .ts-field select { min-width: 0; }
   .ts-grow { flex: 1 1 12rem; }
   .ts-grow input, .ts-grow select { width: 100%; }
   .ts-w6 { width: 6.5rem; }
   .ts-w9 { width: 9rem; }
 
-  .ts-muted { color: #9aa4b2; font-size: 0.85rem; }
-  .ts-conv { color: #93c5fd; font-variant-numeric: tabular-nums; min-height: 1em; }
-  .ts-lock { color: #6b7280; font-size: 1rem; }
-  .ts-by { color: #9aa4b2; font-size: 0.78rem; }
+  .ts-muted { color: var(--color-muted); font-size: 0.85rem; }
+  .ts-conv { color: var(--t-info); font-variant-numeric: tabular-nums; min-height: 1em; }
+  .ts-lock { color: var(--t-lock); font-size: 1rem; }
+  .ts-by { color: var(--color-muted); font-size: 0.78rem; }
 
   .ts-lockbar {
     display: flex;
@@ -72,16 +111,16 @@
     justify-content: space-between;
     gap: 0.75rem;
     flex-wrap: wrap;
-    background: #422006;
-    border: 1px solid #b45309;
-    color: #fcd34d;
+    background: var(--t-warn-bg);
+    border: 1px solid var(--t-warn-border);
+    color: var(--t-warn-ink);
     border-radius: 8px;
     padding: 0.7rem 1rem;
     margin-bottom: 0.75rem;
     font-weight: 600;
   }
-  .ts-lockbar button { background: #b45309; margin: 0; }
-  .ts-lockbar button:hover { background: #92400e; }
+  .ts-lockbar button { background: var(--t-warn-btn); margin: 0; }
+  .ts-lockbar button:hover { background: var(--t-warn-btn-hover); }
 
   .ts-toast {
     position: fixed;
@@ -93,9 +132,9 @@
     gap: 12px;
     padding: 10px 14px;
     border-radius: 10px;
-    background: #262b3a;
-    border: 1px solid #3a4154;
-    color: #e6e6e6;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    color: var(--color-ink);
     font-size: 0.9rem;
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
     opacity: 0;
@@ -106,30 +145,30 @@
   .ts-toast.show { opacity: 1; transform: none; pointer-events: auto; }
   .ts-toast button { margin: 0; padding: 0.35em 0.9em; }
   .ts-status { min-height: 1.2em; }
-  .ts-status.err { color: #f87171; }
-  .ts-status.ok { color: #4ade80; }
+  .ts-status.err { color: var(--t-danger); }
+  .ts-status.ok { color: var(--t-ok); }
 
   .ts-chip {
     display: inline-flex;
     align-items: center;
     gap: 0.4rem;
-    background: #262b3a;
-    border: 1px solid #3a4154;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
     border-radius: 999px;
     padding: 0.25rem 0.7rem;
     margin: 0.2rem;
     font-size: 0.9rem;
   }
   .ts-chip button {
-    background: none; border: none; color: #f87171;
+    background: none; border: none; color: var(--t-danger);
     padding: 0; margin: 0; font-size: 1rem; line-height: 1; cursor: pointer;
   }
-  .ts-chip button:hover { background: none; color: #ef4444; }
+  .ts-chip button:hover { background: none; color: var(--t-danger-strong); }
 
   .ts-split-list { display: grid; gap: 0.35rem; margin: 0.4rem 0; }
   .ts-split-item {
     display: flex; align-items: center; gap: 0.6rem;
-    background: #262b3a; border: 1px solid #3a4154;
+    background: var(--color-surface); border: 1px solid var(--color-line);
     border-radius: 6px; padding: 0.3rem 0.6rem;
   }
   .ts-split-item label { display: flex; align-items: center; gap: 0.5rem; flex: 1; cursor: pointer; }
@@ -137,26 +176,26 @@
 
   table.ts-table { width: 100%; border-collapse: collapse; margin-top: 0.5rem; font-size: 0.9rem; }
   table.ts-table th, table.ts-table td {
-    text-align: left; padding: 0.45rem 0.5rem; border-bottom: 1px solid #3a4154; vertical-align: top;
+    text-align: left; padding: 0.45rem 0.5rem; border-bottom: 1px solid var(--color-line); vertical-align: top;
   }
-  table.ts-table th { color: #9aa4b2; font-weight: 600; }
+  table.ts-table th { color: var(--color-muted); font-weight: 600; }
   table.ts-table td.num, table.ts-table th.num { text-align: right; font-variant-numeric: tabular-nums; }
-  table.ts-table .ts-mini { background: #374151; padding: 0.2em 0.6em; font-size: 0.8rem; margin: 0 0.15rem; }
-  table.ts-table .ts-mini.del { background: #7f1d1d; }
-  table.ts-table .ts-mini.del:hover { background: #991b1b; }
+  table.ts-table .ts-mini { background: var(--t-neutral-btn); padding: 0.2em 0.6em; font-size: 0.8rem; margin: 0 0.15rem; }
+  table.ts-table .ts-mini.del { background: var(--t-danger-btn); }
+  table.ts-table .ts-mini.del:hover { background: var(--t-danger-btn-hover); }
 
-  .ts-balance { display: flex; justify-content: space-between; padding: 0.4rem 0.2rem; border-bottom: 1px solid #3a4154; }
-  .ts-pos { color: #4ade80; font-variant-numeric: tabular-nums; }
-  .ts-neg { color: #f87171; font-variant-numeric: tabular-nums; }
-  .ts-settle { padding: 0.45rem 0.2rem; border-bottom: 1px solid #3a4154; }
+  .ts-balance { display: flex; justify-content: space-between; padding: 0.4rem 0.2rem; border-bottom: 1px solid var(--color-line); }
+  .ts-pos { color: var(--t-ok); font-variant-numeric: tabular-nums; }
+  .ts-neg { color: var(--t-danger); font-variant-numeric: tabular-nums; }
+  .ts-settle { padding: 0.45rem 0.2rem; border-bottom: 1px solid var(--color-line); }
   .ts-settle b { font-variant-numeric: tabular-nums; }
 
   details.ts-guide { margin-top: 1rem; }
-  details.ts-guide summary { cursor: pointer; color: #60a5fa; }
+  details.ts-guide summary { cursor: pointer; color: var(--t-link); }
   details.ts-guide pre {
-    background: #11141c; border: 1px solid #3a4154; border-radius: 6px;
+    background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 6px;
     padding: 0.8rem; overflow-x: auto; font-size: 0.8rem; line-height: 1.5;
   }
   details.ts-guide ol { padding-left: 1.3rem; line-height: 1.7; }
-  .ts-empty { color: #9aa4b2; padding: 0.6rem 0.2rem; }
+  .ts-empty { color: var(--color-muted); padding: 0.6rem 0.2rem; }
 }

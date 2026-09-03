@@ -53,6 +53,8 @@ The series box, tag chips, and prev/next are generated automatically by `src/lay
 - **No blank lines inside inline `<svg>` / raw HTML.** A blank line ends the markdown HTML block; the indented lines after become a code block (broke `btl-4`). Keep the whole `<svg>` contiguous.
 - Math: `$...$` / `$$...$$` (KaTeX is configured).
 - Diagram colors: site dark-theme literals — accent `#4f6df5`, muted `#9aa4b2`, line `#3a4154`, surface `#262b3a`, ink `#e6e6e6`.
+  Reuse these (or another colour already in `scripts/theme-map.mjs`); the light theme repaints diagrams by matching on the literal, so a brand-new hex
+  would stay dark on a white page. `npm test` fails on an unmapped colour — add it to that map and run `npm run theme:css`.
 - Remote images: plain markdown `![](url)` renders as-is.
 - Verify with `npm run build`; preview with `npm run dev`.
 
