@@ -27,7 +27,7 @@ const sGroup = (slug: string, prefix = '') => {
 const layers = [
   {
     tag: '核心 · Domain',
-    color: '#54b890',
+    color: 'var(--hue-green)',
     title: '核心觀念:最穩、最能遷移的一層',
     blurb:
       '這一層是換幾份工作都還在用的東西——查詢語言、資料工程的心智地圖、資料密集系統的原理。工具會被替換,這些不會。先把這裡打牢,再往外走。',
@@ -35,7 +35,7 @@ const layers = [
   },
   {
     tag: '應用與架構 · Application',
-    color: '#4f6df5',
+    color: 'var(--hue-blue)',
     title: '轉換與架構:把觀念組織成系統',
     blurb:
       '介於觀念與工具之間的一層——怎麼把原始資料煉成可用模型、怎麼安排轉換與分層,以及幾個我認為最該懂的架構觀念。',
@@ -45,7 +45,7 @@ const layers = [
   },
   {
     tag: '基礎設施 · Infrastructure',
-    color: '#d6a45c',
+    color: 'var(--hue-amber)',
     title: '基礎設施:落地觀念的具體工具',
     blurb:
       '最外層、最具體、也最會被替換的一層。這些工具各自把上面的觀念變成能跑的東西——但它們是「手段」,核心觀念才是「目的」。看工具時,常回頭想它在實作哪個觀念。',
@@ -63,7 +63,7 @@ const layers = [
   },
   {
     tag: '橫切 · Cross-cutting',
-    color: '#e05a7d',
+    color: 'var(--hue-pink)',
     title: '可靠度與可觀測性:貫穿每一層',
     blurb:
       '這一層橫切全部——資料要正確、服務要不掛、變更要安全,而這一切的前提是「看得見」。SRE 講的是可靠度的觀念與文化(為什麼);Grafana LGTM 這套可觀測性工具講的是怎麼把它變成真的儀表板、告警與 SLO(怎麼做)。這也是我現在身兼 DE team EM 與 SRE、最花心力的一塊。',
@@ -74,7 +74,7 @@ const layers = [
   },
   {
     tag: '實戰 · War Stories',
-    color: '#9ccc65',
+    color: 'var(--hue-lime)',
     title: '戰爭故事:拿真實系統,重打一次',
     blurb:
       '上面每一層的觀念,在這裡用真實做過(也真實做錯過)的系統驗收。第一個戰場:直播代購電商平台——使用者留言下單、庫存不能超賣、金流物流一條鏈;每章先講當年怎麼做,再講如果重來會怎麼設計。',
@@ -82,7 +82,7 @@ const layers = [
   },
   {
     tag: '技術之外 · Beyond',
-    color: '#9aa4b2',
+    color: 'var(--hue-grey)',
     title: '人與成長:技術領導',
     blurb: '技術之外的另一條線——帶人的功課,和 2026 年開始同樣重要的:帶 AI 的功課。',
     groups: [sGroup('btl'), sGroup('ai-craft')],

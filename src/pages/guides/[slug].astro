@@ -14,7 +14,7 @@ const { guide } = Astro.props;
 const { Content } = await render(guide);
 ---
 <BaseLayout title={guide.data.title}>
-  <article class="prose prose-invert max-w-none">
+  <article class="prose max-w-none">
     <h1>{guide.data.title}</h1>
     <Content />
   </article>

@@ -2,29 +2,64 @@ import { useEffect, useRef, useState } from 'react';
 
 // Colour nodes by series; standalone posts fall back to grey. Keep this the
 // single source of truth — the legend below reads the same map.
+//
+// Colours are named hues, not literals: the DOM legend can use `var(--hue-*)`
+// directly, while <canvas> (which understands no custom properties) resolves
+// them once per theme through readPalette() below.
 const SERIES = [
-  ['Fundamentals of Data Engineering 讀書筆記', '#4f6df5', 'FoDE'],
-  ['SQL 我以為我懂', '#2fb6c0', 'SQL'],
-  ['Designing Data-Intensive Applications 讀書筆記', '#6a6fd0', 'DDIA'],
-  ['Spark 學習筆記', '#e0733a', 'Spark'],
-  ['Kafka 學習筆記', '#9b6ff0', 'Kafka'],
-  ['Airflow 學習筆記', '#54b890', 'Airflow'],
-  ['Kubernetes 學習筆記', '#d6a45c', 'K8s'],
-  ['Redis 學習筆記', '#dc4c3f', 'Redis'],
-  ['從 Infra 角度看資料工具', '#26a69a', 'Infra'],
-  ['Google SRE 讀書筆記', '#d95757', 'SRE'],
-  ['Grafana LGTM 可觀測性', '#c264c2', 'LGTM'],
-  ['Re:從零開始做直播代購電商平台', '#9ccc65', 'Re:0'],
-  ['成為 Tech Leader 讀書筆記', '#e05a7d', 'Tech Leader'],
+  ['Fundamentals of Data Engineering 讀書筆記', 'blue', 'FoDE'],
+  ['SQL 我以為我懂', 'cyan', 'SQL'],
+  ['Designing Data-Intensive Applications 讀書筆記', 'indigo', 'DDIA'],
+  ['Spark 學習筆記', 'orange', 'Spark'],
+  ['Kafka 學習筆記', 'purple', 'Kafka'],
+  ['Airflow 學習筆記', 'green', 'Airflow'],
+  ['Kubernetes 學習筆記', 'amber', 'K8s'],
+  ['Redis 學習筆記', 'red', 'Redis'],
+  ['從 Infra 角度看資料工具', 'teal', 'Infra'],
+  ['Google SRE 讀書筆記', 'rose', 'SRE'],
+  ['Grafana LGTM 可觀測性', 'magenta', 'LGTM'],
+  ['Re:從零開始做直播代購電商平台', 'lime', 'Re:0'],
+  ['成為 Tech Leader 讀書筆記', 'pink', 'Tech Leader'],
 ];
-const COLOR = Object.fromEntries(SERIES.map(([s, c]) => [s, c]));
-const OTHER = '#9aa4b2';
-const colorFor = (n) => (n.series && COLOR[n.series]) || OTHER;
+const HUE = Object.fromEntries(SERIES.map(([s, h]) => [s, h]));
+const OTHER = 'grey';
+const hueFor = (n) => (n.series && HUE[n.series]) || OTHER;
+
+// Tokens come back as hex — and the CSS minifier is free to write #ffffff as
+// #fff, so the translucent variants have to be parsed, not string-concatenated.
+function rgba(hex, a) {
+  let h = hex.replace('#', '');
+  if (h.length === 3 || h.length === 4) h = [...h].map((c) => c + c).join('');
+  const n = parseInt(h.slice(0, 6), 16);
+  return `rgba(${(n >> 16) & 255}, ${(n >> 8) & 255}, ${n & 255}, ${a})`;
+}
+
+// Snapshot of the current skin for the canvas, which understands no custom
+// properties: resolve every colour once here and again on each theme switch.
+function readPalette() {
+  const cs = getComputedStyle(document.documentElement);
+  const v = (name) => cs.getPropertyValue(name).trim();
+  const ink = v('--color-ink');
+  const muted = v('--color-muted');
+  const base = v('--color-base');
+  const node = {};
+  for (const [, hue] of SERIES) node[hue] = v(`--hue-${hue}`);
+  node[OTHER] = v(`--hue-${OTHER}`);
+  return {
+    node,
+    ink,
+    muted,
+    edgeOn: rgba(ink, 0.5),
+    edgeIdle: rgba(muted, 0.16),
+    edgeDim: rgba(muted, 0.07),
+    labelBg: rgba(base, 0.82),
+  };
+}
 
 export default function Graph() {
   const wrapRef = useRef(null);
   const canvasRef = useRef(null);
-  const S = useRef({ nodes: [], edges: [], adj: new Map(), view: { x: 0, y: 0, scale: 1 }, hoverId: null, activeTag: null });
+  const S = useRef({ nodes: [], edges: [], adj: new Map(), view: { x: 0, y: 0, scale: 1 }, hoverId: null, activeTag: null, paint: null });
   const [ready, setReady] = useState(false);
   const [tags, setTags] = useState([]);
   const [activeTag, setActiveTag] = useState(null);
@@ -62,6 +97,7 @@ export default function Graph() {
       const canvas = canvasRef.current;
       const ctx = canvas.getContext('2d');
       const st = S.current;
+      st.paint = readPalette();
 
       // Seed positions on a ring so the layout unfolds instead of exploding.
       const n = data.nodes.length;
@@ -189,7 +225,7 @@ export default function Graph() {
         for (const e of st.edges) {
           const a = st.nodes[e.s], b = st.nodes[e.t];
           const on = hoverId ? a.id === hoverId || b.id === hoverId : matches ? matches.has(a.id) && matches.has(b.id) : false;
-          ctx.strokeStyle = on ? 'rgba(230,230,230,0.5)' : anyFocus ? 'rgba(120,130,150,0.07)' : 'rgba(120,130,150,0.16)';
+          ctx.strokeStyle = on ? st.paint.edgeOn : anyFocus ? st.paint.edgeDim : st.paint.edgeIdle;
           ctx.beginPath();
           ctx.moveTo(a.x, a.y);
           ctx.lineTo(b.x, b.y);
@@ -198,12 +234,12 @@ export default function Graph() {
         for (const nd of st.nodes) {
           const dim = anyFocus && !inFocus(nd);
           ctx.globalAlpha = dim ? 0.2 : 1;
-          ctx.fillStyle = colorFor(nd);
+          ctx.fillStyle = st.paint.node[hueFor(nd)];
           ctx.beginPath();
           ctx.arc(nd.x, nd.y, radius(nd), 0, Math.PI * 2);
           ctx.fill();
           if (matches && matches.has(nd.id)) {
-            ctx.strokeStyle = '#e6e6e6';
+            ctx.strokeStyle = st.paint.ink;
             ctx.lineWidth = 2 / st.view.scale;
             ctx.beginPath();
             ctx.arc(nd.x, nd.y, radius(nd) + 3 / st.view.scale, 0, Math.PI * 2);
@@ -222,9 +258,9 @@ export default function Graph() {
           const label = nd.title.length > 16 ? nd.title.slice(0, 16) + '…' : nd.title;
           const tx = p.x + radius(nd) * st.view.scale + 4;
           const w = ctx.measureText(label).width;
-          ctx.fillStyle = 'rgba(31,35,48,0.82)';
+          ctx.fillStyle = st.paint.labelBg;
           ctx.fillRect(tx - 2, p.y - 8, w + 4, 16);
-          ctx.fillStyle = nd.id === hoverId ? '#e6e6e6' : '#9aa4b2';
+          ctx.fillStyle = nd.id === hoverId ? st.paint.ink : st.paint.muted;
           ctx.fillText(label, tx, p.y);
         }
       };
@@ -298,6 +334,11 @@ export default function Graph() {
         st.view.y = w.sy - w.y * ns;
         st.view.scale = ns;
       };
+      // The canvas caches resolved colours, so it has to be told when the
+      // reader flips the theme (ThemeToggle fires this).
+      const repaint = () => { st.paint = readPalette(); };
+      window.addEventListener('themechange', repaint);
+
       canvas.addEventListener('pointerdown', onDown);
       canvas.addEventListener('pointermove', onMove);
       canvas.addEventListener('pointerup', onUp);
@@ -307,6 +348,7 @@ export default function Graph() {
       S.cleanup = () => {
         cancelAnimationFrame(raf);
         window.removeEventListener('resize', resize);
+        window.removeEventListener('themechange', repaint);
         canvas.removeEventListener('pointerdown', onDown);
         canvas.removeEventListener('pointermove', onMove);
         canvas.removeEventListener('pointerup', onUp);
@@ -349,14 +391,14 @@ export default function Graph() {
       <div ref={wrapRef} className="relative w-full h-[72vh] min-h-[420px] bg-base border border-line rounded-lg overflow-hidden touch-none">
         <canvas ref={canvasRef} className="block" style={{ cursor: 'grab' }} />
         <div className="absolute top-3 left-3 flex flex-col gap-1 text-xs bg-surface/80 border border-line rounded p-2 backdrop-blur">
-          {SERIES.map(([s, c, label]) => (
+          {SERIES.map(([s, hue, label]) => (
             <span key={s} className="flex items-center gap-2 text-muted">
-              <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: c }} />
+              <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: `var(--hue-${hue})` }} />
               {label}
             </span>
           ))}
           <span className="flex items-center gap-2 text-muted">
-            <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: OTHER }} />
+            <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: `var(--hue-${OTHER})` }} />
             單篇
           </span>
         </div>

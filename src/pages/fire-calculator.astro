@@ -80,7 +80,7 @@ import '../styles/tools.css';
   </div>
 
   <style is:global>
-    .tool-page .intro, .tool-page .hint { color: #b8c0d0; }
+    .tool-page .intro, .tool-page .hint { color: var(--color-muted); }
     .tool-page .intro { margin: 0.5rem 0 1.2rem; }
     .tool-page .hint { font-size: 0.82rem; margin: 0.2rem 0 0.6rem; }
     .tool-page h3 { margin-top: 1.6rem; }
@@ -91,20 +91,20 @@ import '../styles/tools.css';
       max-width: 860px;
     }
     .tool-page .fire-grid.panel {
-      background: #1b1f2b; border: 1px solid #2c3242; border-radius: 10px; padding: 0.9rem; max-width: 860px;
+      background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 10px; padding: 0.9rem; max-width: 860px;
     }
     .tool-page .fire-grid label {
       display: flex; flex-direction: column; gap: 0.3rem;
-      font-size: 0.88rem; color: #cfd6e4;
+      font-size: 0.88rem; color: var(--color-ink);
     }
-    .tool-page .fire-grid label small { color: #8a92a6; font-weight: normal; }
+    .tool-page .fire-grid label small { color: var(--color-muted); font-weight: normal; }
     .tool-page .fire-grid input, .tool-page .fire-grid select { width: 100%; box-sizing: border-box; }
     .tool-page .fire-table {
       width: 100%; max-width: 860px; border-collapse: collapse; margin-bottom: 0.5rem;
     }
     .tool-page .fire-table th {
-      text-align: left; font-size: 0.8rem; color: #8a92a6; font-weight: 500;
-      padding: 0.3rem 0.4rem; border-bottom: 1px solid #2c3242;
+      text-align: left; font-size: 0.8rem; color: var(--color-muted); font-weight: 500;
+      padding: 0.3rem 0.4rem; border-bottom: 1px solid var(--color-line);
     }
     .tool-page .fire-table td { padding: 0.25rem 0.4rem; }
     .tool-page .fire-table input { width: 100%; box-sizing: border-box; }
@@ -113,37 +113,37 @@ import '../styles/tools.css';
     .tool-page .fire-table .age-cell { width: 90px; }
     .tool-page .fire-table .del-cell { width: 36px; text-align: center; }
     .tool-page .del-btn {
-      background: transparent; color: #8a92a6; border: none; cursor: pointer;
+      background: transparent; color: var(--color-muted); border: none; cursor: pointer;
       font-size: 1.1rem; padding: 0 0.3rem; margin: 0;
     }
-    .tool-page .del-btn:hover { color: #fca5a5; background: transparent; }
-    .tool-page .add-btn { background: #2c3242; }
-    .tool-page .add-btn:hover { background: #3a4154; }
+    .tool-page .del-btn:hover { color: var(--t-danger); background: transparent; }
+    .tool-page .add-btn { background: var(--t-neutral-btn); }
+    .tool-page .add-btn:hover { background: var(--t-neutral-btn-hover); }
     .tool-page .calc-row { margin-top: 1.4rem; }
-    .tool-page button.ghost { background: transparent; border: 1px solid #3a4154; }
-    .tool-page button.ghost:hover { background: #2c3242; }
+    .tool-page button.ghost { background: transparent; color: var(--color-ink); border: 1px solid var(--color-line); }
+    .tool-page button.ghost:hover { background: var(--color-surface); }
     .tool-page .result { max-width: 860px; }
     .tool-page .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1rem; }
     .tool-page .fire-card {
-      background: #1f2330; border: 1px solid #3a4154; border-radius: 10px; padding: 1rem 1.2rem;
+      background: var(--color-base); border: 1px solid var(--color-line); border-radius: 10px; padding: 1rem 1.2rem;
     }
     .tool-page .fire-card h3 { margin: 0 0 0.7rem; }
-    .tool-page .fire-card.lean h3 { color: #6ee7b7; }
-    .tool-page .fire-card.full h3 { color: #fca5a5; }
+    .tool-page .fire-card.lean h3 { color: var(--t-ok); }
+    .tool-page .fire-card.full h3 { color: var(--t-danger); }
     .tool-page .fire-row {
       display: flex; justify-content: space-between; gap: 1rem;
-      padding: 0.3rem 0; border-bottom: 1px dashed #2c3242; font-size: 0.92rem;
+      padding: 0.3rem 0; border-bottom: 1px dashed var(--color-line); font-size: 0.92rem;
     }
     .tool-page .fire-row:last-child { border-bottom: none; }
-    .tool-page .fire-row .val { font-weight: 600; color: #fff; text-align: right; }
-    .tool-page .fire-row .val.good { color: #6ee7b7; }
-    .tool-page .fire-row .val.bad { color: #fca5a5; }
+    .tool-page .fire-row .val { font-weight: 600; color: var(--color-ink); text-align: right; }
+    .tool-page .fire-row .val.good { color: var(--t-ok); }
+    .tool-page .fire-row .val.bad { color: var(--t-danger); }
     .tool-page .proj { margin-top: 1.2rem; }
     .tool-page .proj h3 { margin: 0 0 0.5rem; font-size: 1rem; }
     .tool-page .proj table { width: 100%; max-width: 520px; border-collapse: collapse; font-size: 0.85rem; }
-    .tool-page .proj th, .tool-page .proj td { padding: 0.3rem 0.5rem; border-bottom: 1px solid #2c3242; text-align: right; }
+    .tool-page .proj th, .tool-page .proj td { padding: 0.3rem 0.5rem; border-bottom: 1px solid var(--color-line); text-align: right; }
     .tool-page .proj th:first-child, .tool-page .proj td:first-child { text-align: left; }
-    .tool-page .note { color: #8a92a6; font-size: 0.78rem; margin-top: 1.2rem; line-height: 1.6; }
+    .tool-page .note { color: var(--color-muted); font-size: 0.78rem; margin-top: 1.2rem; line-height: 1.6; }
   </style>
 
   <script is:inline>
@@ -349,7 +349,7 @@ import '../styles/tools.css';
 
       const resultDiv = document.getElementById('result');
       if (p.retireAge <= p.currentAge || p.planEnd <= p.retireAge) {
-        resultDiv.innerHTML = `<p class="note" style="color:#fca5a5">請確認年齡設定：需滿足「目前年齡 &lt; 退休年齡 &lt; 終老年齡」。</p>`;
+        resultDiv.innerHTML = `<p class="note" style="color:var(--t-danger)">請確認年齡設定：需滿足「目前年齡 &lt; 退休年齡 &lt; 終老年齡」。</p>`;
         return;
       }
 

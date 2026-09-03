@@ -3,11 +3,34 @@ interface Props { issueNumber?: number; }
 const { issueNumber } = Astro.props;
 ---
 <section class="mt-12 pt-6 border-t border-line">
-  <script src="https://utteranc.es/client.js"
-    repo="Aidan79225/aidan79225.github.io"
-    issue-number={issueNumber}
-    issue-term={issueNumber ? undefined : "pathname"}
-    theme="github-dark"
-    crossorigin="anonymous"
-    async></script>
+  <script is:inline define:vars={{ issueNumber }}>
+    // utterances reads its theme from the script tag once, at load — so inject
+    // the tag ourselves with the current skin, and postMessage the iframe on
+    // every later switch (its documented theme API).
+    (function () {
+      var mount = document.currentScript.parentElement;
+      var theme = function () {
+        return document.documentElement.dataset.theme === 'light' ? 'github-light' : 'github-dark';
+      };
+      var s = document.createElement('script');
+      s.src = 'https://utteranc.es/client.js';
+      s.setAttribute('repo', 'Aidan79225/aidan79225.github.io');
+      if (issueNumber) s.setAttribute('issue-number', String(issueNumber));
+      else s.setAttribute('issue-term', 'pathname');
+      s.setAttribute('theme', theme());
+      s.setAttribute('crossorigin', 'anonymous');
+      s.async = true;
+      mount.appendChild(s);
+
+      addEventListener('themechange', function () {
+        var frame = mount.querySelector('.utterances-frame');
+        if (frame) {
+          frame.contentWindow.postMessage(
+            { type: 'set-theme', theme: theme() },
+            'https://utteranc.es',
+          );
+        }
+      });
+    })();
+  </script>
 </section>

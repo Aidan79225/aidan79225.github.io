@@ -29,7 +29,7 @@ import '../styles/tools.css';
         <label class="ts-field"><span>行程代碼(共享用)</span><input type="text" id="tripCode" class="ts-w9" placeholder="okinawa26" /></label>
       </div>
       <div class="ts-row" style="margin-top:.6rem">
-        <button id="lockBtn" style="background:#374151">🔒 鎖定此行程(禁止再修改)</button>
+        <button id="lockBtn" style="background:var(--t-neutral-btn)">🔒 鎖定此行程(禁止再修改)</button>
       </div>
     </div>
 
@@ -84,7 +84,7 @@ import '../styles/tools.css';
       <div class="ts-split-list" id="splitList"></div>
       <div class="ts-row" style="margin-top:.6rem">
         <button id="saveExpense">＋ 新增支出</button>
-        <button class="ghost" id="cancelEdit" style="display:none;background:#374151">取消編輯</button>
+        <button class="ghost" id="cancelEdit" style="display:none;background:var(--t-neutral-btn)">取消編輯</button>
       </div>
     </div>
 
@@ -130,8 +130,8 @@ import '../styles/tools.css';
       <div class="ts-row" style="margin-top:.6rem">
         <button id="syncBtn">⟲ 同步</button>
         <button id="shareBtn">🔗 複製分享連結</button>
-        <button class="ghost" id="exportBtn" style="background:#374151">匯出 JSON</button>
-        <button class="ghost" id="importBtn" style="background:#374151">匯入 JSON</button>
+        <button class="ghost" id="exportBtn" style="background:var(--t-neutral-btn)">匯出 JSON</button>
+        <button class="ghost" id="importBtn" style="background:var(--t-neutral-btn)">匯入 JSON</button>
         <input type="file" id="importFile" accept="application/json,.json" style="display:none" />
       </div>
       <label class="ts-muted" style="display:inline-flex;align-items:center;gap:.4rem;margin-top:.5rem;cursor:pointer">
