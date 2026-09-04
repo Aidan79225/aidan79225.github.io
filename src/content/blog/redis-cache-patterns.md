@@ -2,7 +2,7 @@
 title: "快取三大災難:穿透、擊穿、雪崩,與正確解法"
 date: 2026-07-17
 category: tech
-description: "把 Redis 當快取,最經典的模式是 cache-aside,但它有三個著名破口:穿透(查根本不存在的 key,cache 永遠擋不住)、擊穿(單一熱 key 剛好過期,並發全湧向 DB)、雪崩(大量 key 同時過期,DB 大範圍被打爆)。三個名字很像、常被搞混,但其實是三種不同的失敗——穿透是查不存在、擊穿是一個熱點、雪崩是一大片。這篇把三者的差別講清楚,並對症下藥:空值快取加布隆過濾器、互斥鎖重建、隨機 TTL 打散。"
+description: "把 Redis 當快取,最經典的模式是 cache-aside,但它有三個著名破口:穿透(查根本不存在的 key,cache 永遠擋不住)、擊穿(單一熱 key 剛好過期,並行全湧向 DB)、雪崩(大量 key 同時過期,DB 大範圍被打爆)。三個名字很像、常被搞混,但其實是三種不同的失敗——穿透是查不存在、擊穿是一個熱點、雪崩是一大片。這篇把三者的差別講清楚,並對症下藥:空值快取加布隆過濾器、互斥鎖重建、隨機 TTL 打散。"
 tags:
   - redis
   - cache
@@ -18,7 +18,7 @@ draft: false
 先把三者的**差別**講清楚——搞懂它們「破在哪」,解法就不會亂套:
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 580 210" role="img" aria-label="快取三大災難的對比。穿透是查根本不存在的 key,cache 和資料庫都沒有,cache 擋不住所以每次都直達資料庫。擊穿是單一熱門 key 剛好過期,瞬間大量並發同時 miss 全湧向資料庫重建。雪崩是大量 key 在同一時間一起過期,大範圍 miss 把資料庫打崩引發連鎖。三者共通點都是請求繞過 cache 打爆資料庫,差別在破口:不存在的 key、一個熱點、一大片。" style="width:100%;max-width:600px;height:auto;margin:0 auto;">
+  <svg viewBox="0 0 580 210" role="img" aria-label="快取三大災難的對比。穿透是查根本不存在的 key,cache 和資料庫都沒有,cache 擋不住所以每次都直達資料庫。擊穿是單一熱門 key 剛好過期,瞬間大量並行同時 miss 全湧向資料庫重建。雪崩是大量 key 在同一時間一起過期,大範圍 miss 把資料庫打崩引發連鎖。三者共通點都是請求繞過 cache 打爆資料庫,差別在破口:不存在的 key、一個熱點、一大片。" style="width:100%;max-width:600px;height:auto;margin:0 auto;">
     <text x="290" y="20" fill="#e6e6e6" font-size="10.5" text-anchor="middle" font-weight="bold">三種破口,長得不一樣</text>
     <rect x="10" y="32" width="182" height="130" rx="8" fill="#3a2d1f" stroke="#e0733a" stroke-width="1.4"/>
     <text x="101" y="52" fill="#e0733a" font-size="10" text-anchor="middle" font-weight="bold">穿透 Penetration</text>
@@ -29,7 +29,7 @@ draft: false
     <rect x="199" y="32" width="182" height="130" rx="8" fill="#3a3320" stroke="#d6a45c" stroke-width="1.4"/>
     <text x="290" y="52" fill="#d6a45c" font-size="10" text-anchor="middle" font-weight="bold">擊穿 Breakdown</text>
     <rect x="219" y="62" width="142" height="24" rx="4" fill="#1f2330" stroke="#d6a45c" stroke-width="1"/><text x="290" y="78" fill="#e6e6e6" font-size="8" text-anchor="middle">單一熱 key ⏰ 剛過期</text>
-    <text x="290" y="104" fill="#9aa4b2" font-size="8" text-anchor="middle">瞬間大量並發同時 miss</text>
+    <text x="290" y="104" fill="#9aa4b2" font-size="8" text-anchor="middle">瞬間大量並行同時 miss</text>
     <text x="290" y="122" fill="#9aa4b2" font-size="8" text-anchor="middle">→ 全湧向 DB 重建</text>
     <text x="290" y="146" fill="#d6a45c" font-size="8.6" text-anchor="middle" font-weight="bold">集中打一個點</text>
     <rect x="388" y="32" width="182" height="130" rx="8" fill="#3a2632" stroke="#e05a7d" stroke-width="1.4"/>
@@ -41,7 +41,7 @@ draft: false
     <text x="290" y="184" fill="#9aa4b2" font-size="8.4" text-anchor="middle">共通:請求繞過 cache 打爆 DB;差別在破口——</text>
     <text x="290" y="200" fill="#d6a45c" font-size="8.4" text-anchor="middle" font-weight="bold">不存在的 key(穿透)· 一個熱點(擊穿)· 一大片(雪崩)</text>
   </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">一句話記住差別:<b style="color:#e0733a">穿透</b>是查「<b>不存在</b>」的資料,cache 和 DB 都沒有,所以每一次都會打到 DB;<b style="color:#d6a45c">擊穿</b>是「<b>一個</b>熱門 key」剛好過期的瞬間,大量並發同時撲空、集中打向那一個點;<b style="color:#e05a7d">雪崩</b>是「<b>一大片</b> key」同時失效(常因為都設一樣的 TTL,或 Redis 整台掛掉),造成大範圍崩塌。搞清楚是「不存在 / 一個熱點 / 一大片」,才知道該用哪種解法</figcaption>
+  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">一句話記住差別:<b style="color:#e0733a">穿透</b>是查「<b>不存在</b>」的資料,cache 和 DB 都沒有,所以每一次都會打到 DB;<b style="color:#d6a45c">擊穿</b>是「<b>一個</b>熱門 key」剛好過期的瞬間,大量並行同時撲空、集中打向那一個點;<b style="color:#e05a7d">雪崩</b>是「<b>一大片</b> key」同時失效(常因為都設一樣的 TTL,或 Redis 整台掛掉),造成大範圍崩塌。搞清楚是「不存在 / 一個熱點 / 一大片」,才知道該用哪種解法</figcaption>
 </figure>
 
 ## 對症下藥:三種破口,三種補法
@@ -66,7 +66,7 @@ draft: false
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;"><b style="color:#e0733a">穿透</b>用「<b>空值也快取</b>」把不存在的查詢也擋在 cache(配短 TTL 避免髒資料),更嚴謹再加<b>布隆過濾器</b>在最前面攔掉一定不存在的 key;<b style="color:#d6a45c">擊穿</b>用<b>互斥鎖</b>,讓熱 key 過期時只有一個請求去重建、其餘乖乖等,避免萬箭齊發;<b style="color:#e05a7d">雪崩</b>用<b>隨機 TTL</b> 把過期時間錯開,別讓大家在同一秒到期——這招跟 <a href="/blog/sre-cron/">可靠 cron</a> 對付午夜驚群的 jitter,是同一個道理</figcaption>
 </figure>
 
-三種解法的手法不同,但骨子裡是同一句話:**別讓失敗集中在同一個時間、同一個點。** 空值快取是「把打不到的擋在門外」、互斥鎖是「把並發收斂成一個」、隨機 TTL 是「把同時發生的打散開」——擋住、收斂、打散,對應三種集中的破口。至於擊穿要用的互斥鎖,牽涉到「怎麼在分散式下正確地搶一把鎖」,那本身是個大題目,留到下一篇的分散式鎖細講。
+三種解法的手法不同,但骨子裡是同一句話:**別讓失敗集中在同一個時間、同一個點。** 空值快取是「把打不到的擋在門外」、互斥鎖是「把並行收斂成一個」、隨機 TTL 是「把同時發生的打散開」——擋住、收斂、打散,對應三種集中的破口。至於擊穿要用的互斥鎖,牽涉到「怎麼在分散式下正確地搶一把鎖」,那本身是個大題目,留到下一篇的分散式鎖細講。
 
 ## 落成命令:三種補法怎麼下
 
@@ -88,7 +88,7 @@ SET article:404 "" EX 30
 
 ### 三個名字很像,但本質是三種不同的集中
 
-穿透、擊穿、雪崩,我剛學時被這三個中文名搞得暈頭轉向——它們聽起來就像同一件事的三種說法。真正把它們釐清,是我意識到差別只在一個維度:**「打到 DB 的請求,為什麼集中?」** 穿透是因為查的東西根本不存在、cache 這道牆天生擋不住(空間上的漏);擊穿是因為一個熱點在過期瞬間、並發全撞上來(時間上的一個點);雪崩是因為一大片 key 剛好同時到期(時間上的一大片)。把它拆成「不存在 / 一個點 / 一大片」,名字就不再需要死背,而是能從情境自己推出來。**遇到一組容易混淆的術語,找到那個能區分它們的維度,比背定義有用一百倍。**
+穿透、擊穿、雪崩,我剛學時被這三個中文名搞得暈頭轉向——它們聽起來就像同一件事的三種說法。真正把它們釐清,是我意識到差別只在一個維度:**「打到 DB 的請求,為什麼集中?」** 穿透是因為查的東西根本不存在、cache 這道牆天生擋不住(空間上的漏);擊穿是因為一個熱點在過期瞬間、並行全撞上來(時間上的一個點);雪崩是因為一大片 key 剛好同時到期(時間上的一大片)。把它拆成「不存在 / 一個點 / 一大片」,名字就不再需要死背,而是能從情境自己推出來。**遇到一組容易混淆的術語,找到那個能區分它們的維度,比背定義有用一百倍。**
 
 ### 這些解法的共通精神:消除「同步性」
 

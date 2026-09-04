@@ -19,7 +19,7 @@ draft: false
 真實系統裡,同一份資料常要同時存在好幾個地方:DB 是主存放、Redis 是快取、Elasticsearch 是搜尋索引。最直覺的做法是**應用程式自己分頭寫三份(dual write)**——而這正是最常見的沉默資料事故的源頭:
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 580 250" role="img" aria-label="雙寫陷阱與 log 先行的對比。左邊雙寫:應用程式分頭把同一筆更新寫進資料庫、快取、搜尋索引三個系統。兩個病:一,部分失敗——寫完 DB 之後應用當掉,快取與索引沒寫到,而且沒有交易能跨系統回滾;二,亂序——兩個並發請求寫入三個系統的到達順序不同,DB 收到先 A 後 B、快取收到先 B 後 A,兩邊收斂到不同的最終值。結果:三個系統永久分歧,而且無聲無息。右邊 log 先行:只寫一個地方(log 或資料庫),所有下游按同一順序消費同一條 log,快取、索引都是 follower,順序一致、掉了可以重放,最終一致。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
+  <svg viewBox="0 0 580 250" role="img" aria-label="雙寫陷阱與 log 先行的對比。左邊雙寫:應用程式分頭把同一筆更新寫進資料庫、快取、搜尋索引三個系統。兩個病:一,部分失敗——寫完 DB 之後應用當掉,快取與索引沒寫到,而且沒有交易能跨系統回滾;二,亂序——兩個並行請求寫入三個系統的到達順序不同,DB 收到先 A 後 B、快取收到先 B 後 A,兩邊收斂到不同的最終值。結果:三個系統永久分歧,而且無聲無息。右邊 log 先行:只寫一個地方(log 或資料庫),所有下游按同一順序消費同一條 log,快取、索引都是 follower,順序一致、掉了可以重放,最終一致。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
     <defs><marker id="dw" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#e05a7d"/></marker><marker id="dwg" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#54b890"/></marker></defs>
     <line x1="290" y1="14" x2="290" y2="200" stroke="#3a4154" stroke-width="1" stroke-dasharray="4 4"/>
     <text x="146" y="26" fill="#e05a7d" font-size="9.4" text-anchor="middle" font-weight="bold">✗ 雙寫:應用自己寫三份</text>
@@ -32,7 +32,7 @@ draft: false
     <text x="146" y="140" fill="#e05a7d" font-size="7" text-anchor="middle" font-weight="bold">病一:寫到一半當掉 → 有的寫了有的沒寫</text>
     <text x="146" y="151" fill="#9aa4b2" font-size="6.6" text-anchor="middle">沒有交易能跨三個系統回滾</text>
     <rect x="26" y="162" width="240" height="28" rx="5" fill="#3a2626" stroke="#e05a7d" stroke-width="1.3"/>
-    <text x="146" y="174" fill="#e05a7d" font-size="7" text-anchor="middle" font-weight="bold">病二:並發寫抵達順序不同</text>
+    <text x="146" y="174" fill="#e05a7d" font-size="7" text-anchor="middle" font-weight="bold">病二:並行寫抵達順序不同</text>
     <text x="146" y="185" fill="#9aa4b2" font-size="6.6" text-anchor="middle">DB 收到先A後B、快取先B後A → 收斂到不同值</text>
     <text x="146" y="200" fill="#e05a7d" font-size="7.4" text-anchor="middle" font-weight="bold">→ 三個系統永久分歧,無聲無息</text>
     <text x="434" y="26" fill="#54b890" font-size="9.4" text-anchor="middle" font-weight="bold">✓ log 先行:只寫一個地方</text>
@@ -48,7 +48,7 @@ draft: false
     <rect x="30" y="212" width="520" height="26" rx="6" fill="#1f2330" stroke="#3a4154" stroke-width="1.2"/>
     <text x="290" y="229" fill="#d6a45c" font-size="8" text-anchor="middle" font-weight="bold">一份資料要進 N 個系統?選一個當 source of truth,其他全部當 follower</text>
   </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;"><b style="color:#e05a7d">雙寫</b>的兩個病無藥可醫:<b>部分失敗</b>(寫完 DB 應用當掉,快取沒跟上——跨系統沒有交易能回滾)與<b>亂序</b>(兩個並發寫抵達三個系統的順序不同,各自收斂到不同值)——三個系統<b>永久分歧,而且無聲無息</b>。<b style="color:#54b890">Log 先行</b>把問題結構性地消滅:只寫一個地方(一條有順序的 log),所有下游照<b>同一順序</b>消費——順序一致、掉了從 offset 重放。這其實就是 <a href="/blog/ddia-replication/">複製</a>那章的 leader–follower,推廣到「異質系統之間」:<b>選一個 source of truth,其他全部當 follower</b></figcaption>
+  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;"><b style="color:#e05a7d">雙寫</b>的兩個病無藥可醫:<b>部分失敗</b>(寫完 DB 應用當掉,快取沒跟上——跨系統沒有交易能回滾)與<b>亂序</b>(兩個並行寫抵達三個系統的順序不同,各自收斂到不同值)——三個系統<b>永久分歧,而且無聲無息</b>。<b style="color:#54b890">Log 先行</b>把問題結構性地消滅:只寫一個地方(一條有順序的 log),所有下游照<b>同一順序</b>消費——順序一致、掉了從 offset 重放。這其實就是 <a href="/blog/ddia-replication/">複製</a>那章的 leader–follower,推廣到「異質系統之間」:<b>選一個 source of truth,其他全部當 follower</b></figcaption>
 </figure>
 
 ## CDC:讓資料庫自己變成事件源頭

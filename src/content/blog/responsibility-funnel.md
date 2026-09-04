@@ -56,7 +56,7 @@ seriesOrder: 1
 把責任守恆放進日常工作流,就得到漏斗的形狀:
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 640 330" role="img" aria-label="責任漏斗:最上層寬帶是 AI 的大量產出(code、測試、文件、初稿);往下是護欄層(測試、規範、自動檢查);再往下是人的 review 與抽查;最窄的頸是決策與簽名——一個人的名字。右側標注:量往下遞減,責任密度往下遞增。頸寬等於驗收頻寬,是整條產線的吞吐上限。" style="width:100%;max-width:640px;height:auto;margin:0 auto;">
+  <svg viewBox="0 0 640 330" role="img" aria-label="責任漏斗:最上層寬帶是 AI 的大量產出(code、測試、文件、初稿);往下是護欄層(測試、規範、自動檢查);再往下是人的 review 與抽查;最窄的頸是決策與簽名——一個人的名字。右側標注:量往下遞減,責任密度往下遞增。頸寬等於驗收頻寬,是整條產線的 throughput 上限。" style="width:100%;max-width:640px;height:auto;margin:0 auto;">
     <polygon points="60,20 560,20 515,80 105,80" fill="#262b3a" stroke="#4f6df5" stroke-width="1.5"/>
     <text x="310" y="45" fill="#4f6df5" font-size="12" text-anchor="middle" font-weight="bold">AI 產出</text>
     <text x="310" y="65" fill="#9aa4b2" font-size="10" text-anchor="middle">code · 測試 · 文件 · 初稿 · 研究——量大而便宜</text>
@@ -75,13 +75,13 @@ seriesOrder: 1
     <line x1="40" y1="250" x2="40" y2="30" stroke="#e05a7d" stroke-width="1.2"/>
     <polygon points="40,22 35,34 45,34" fill="#e05a7d"/>
     <text x="26" y="240" fill="#e05a7d" font-size="10" text-anchor="start" transform="rotate(-90 26 240)">責任密度遞增</text>
-    <text x="310" y="295" fill="#d6a45c" font-size="11" text-anchor="middle" font-weight="bold">頸寬 = 你能「負責任地驗收」的頻寬 = 整條產線的吞吐上限</text>
+    <text x="310" y="295" fill="#d6a45c" font-size="11" text-anchor="middle" font-weight="bold">頸寬 = 你能「負責任地驗收」的頻寬 = 整條產線的 throughput 上限</text>
     <text x="310" y="315" fill="#9aa4b2" font-size="10" text-anchor="middle">AI 再快,東西都得擠過這裡才能出貨——這是 AI 生產力的 Amdahl 定律</text>
   </svg>
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">往下每一層:東西變少,但每一件的責任變重。頸不是流程的一站,是責任的匯流點。</figcaption>
 </figure>
 
-這張圖有一個工程上的推論,值得單獨講:**整條產線的吞吐量,上限不在 AI 的產出速度,在頸的寬度**。AI 一天能生二十個 PR,你一天能負責任地驗收幾個,產線就只能跑幾個——多出來的要嘛排隊,要嘛沒被真的驗過就流出去(後面會講這有多危險)。平行化再強,守恆的那段就是壓不掉——這是 Amdahl 定律,只是這次不可平行化的部分叫「責任」。
+這張圖有一個工程上的推論,值得單獨講:**整條產線的 throughput,上限不在 AI 的產出速度,在頸的寬度**。AI 一天能生二十個 PR,你一天能負責任地驗收幾個,產線就只能跑幾個——多出來的要嘛排隊,要嘛沒被真的驗過就流出去(後面會講這有多危險)。平行化再強,守恆的那段就是壓不掉——這是 Amdahl 定律,只是這次不可平行化的部分叫「責任」。
 
 所以「用了 AI 之後你的價值是什麼」有了一個具體的答案:**你的價值等於你的頸寬**——你能負責任地驗收多少東西,你就值多少。
 

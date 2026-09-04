@@ -42,7 +42,7 @@ Redis 跟 memcached 這類純 key-value 快取最根本的差別,在於 **value 
 Redis 動輒單機十萬級 QPS、微秒級延遲。快的原因不是單一魔法,而是三件事疊在一起:
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 580 200" role="img" aria-label="Redis 為什麼這麼快的三個原因。第一,資料全在記憶體 RAM,免磁碟隨機 I/O。第二,單執行緒加免鎖,沒有鎖競爭與 context switch,簡單且可預測,下一篇深入。第三,I/O 多工 epoll,一個執行緒就能服務上萬並發連線。再加上省記憶體的內部編碼,結果是微秒級延遲、單機十萬級 QPS。" style="width:100%;max-width:600px;height:auto;margin:0 auto;">
+  <svg viewBox="0 0 580 200" role="img" aria-label="Redis 為什麼這麼快的三個原因。第一,資料全在記憶體 RAM,免磁碟隨機 I/O。第二,單執行緒加免鎖,沒有鎖競爭與 context switch,簡單且可預測,下一篇深入。第三,I/O 多工 epoll,一個執行緒就能服務上萬並行連線。再加上省記憶體的內部編碼,結果是微秒級延遲、單機十萬級 QPS。" style="width:100%;max-width:600px;height:auto;margin:0 auto;">
     <text x="290" y="20" fill="#e6e6e6" font-size="10.5" text-anchor="middle" font-weight="bold">為什麼 Redis 這麼快:三件事疊起來</text>
     <rect x="12" y="34" width="180" height="116" rx="8" fill="#26324a" stroke="#4f6df5" stroke-width="1.5"/>
     <text x="102" y="58" fill="#4f6df5" font-size="10" text-anchor="middle" font-weight="bold">① 記憶體</text>
@@ -59,7 +59,7 @@ Redis 動輒單機十萬級 QPS、微秒級延遲。快的原因不是單一魔�
     <rect x="388" y="34" width="180" height="116" rx="8" fill="#2b2540" stroke="#9b6ff0" stroke-width="1.5"/>
     <text x="478" y="58" fill="#9b6ff0" font-size="10" text-anchor="middle" font-weight="bold">③ I/O 多工(epoll)</text>
     <text x="478" y="84" fill="#e6e6e6" font-size="8.4" text-anchor="middle">一個執行緒</text>
-    <text x="478" y="104" fill="#9aa4b2" font-size="8" text-anchor="middle">服務上萬並發連線</text>
+    <text x="478" y="104" fill="#9aa4b2" font-size="8" text-anchor="middle">服務上萬並行連線</text>
     <text x="478" y="130" fill="#9aa4b2" font-size="8" text-anchor="middle">不用一連線一 thread</text>
     <text x="290" y="176" fill="#d6a45c" font-size="8.6" text-anchor="middle" font-weight="bold">+ 省記憶體的內部編碼(ziplist / intset…)</text>
     <text x="290" y="192" fill="#9aa4b2" font-size="8.2" text-anchor="middle">結果:微秒級延遲、單機十萬級 QPS</text>

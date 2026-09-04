@@ -16,14 +16,14 @@ draft: false
 
 ## Lost update:兩個「讀-改-寫」互相蓋掉
 
-第一個傢伙還算好認:**兩筆交易都做「讀出來 → 算一算 → 寫回去」**,並發時彼此看不見對方——各自從 42 讀起、各自 +1、各自寫回 43,**其中一次更新就這樣蒸發了**。解法你其實都見過:**用原子操作**(`UPDATE SET counter = counter + 1`,把讀改寫壓成一步——[[redis-single-thread|Redis 的 INCR]] 同款)、**顯式上鎖**(`SELECT ... FOR UPDATE`)、或**CAS 樂觀鎖**(寫回時驗證值沒被動過——[[redis-pipeline-transaction|Redis 的 WATCH]] 同款)。lost update 有成熟的藥,真正難纏的是下一個。
+第一個傢伙還算好認:**兩筆交易都做「讀出來 → 算一算 → 寫回去」**,並行時彼此看不見對方——各自從 42 讀起、各自 +1、各自寫回 43,**其中一次更新就這樣蒸發了**。解法你其實都見過:**用原子操作**(`UPDATE SET counter = counter + 1`,把讀改寫壓成一步——[[redis-single-thread|Redis 的 INCR]] 同款)、**顯式上鎖**(`SELECT ... FOR UPDATE`)、或**CAS 樂觀鎖**(寫回時驗證值沒被動過——[[redis-pipeline-transaction|Redis 的 WATCH]] 同款)。lost update 有成熟的藥,真正難纏的是下一個。
 
 ## Write skew:各自都對,合起來錯
 
 **Write skew** 是這章的招牌,也是最違反直覺的一個。經典場景:醫院規定**至少要有兩位醫生值班**,現在 Alice 和 Bob 都想請假:
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 580 242" role="img" aria-label="write skew 的時序。系統不變量:至少兩位醫生值班,目前 Alice 與 Bob 都在值班。兩筆交易並發:Alice 的交易先檢查目前值班人數,讀到 2、大於等於 2,檢查通過,於是把自己改成請假;同一時間 Bob 的交易也檢查,因為快照隔離讓它看到的還是舊快照,也讀到 2,檢查也通過,也把自己改成請假。兩筆交易改的是不同的列,沒有寫入衝突,快照隔離兩筆都放行。結果值班人數變成 0,不變量被打破。關鍵:每筆交易單獨看都正確,合起來卻錯,因為檢查所依據的條件,被對方的寫入悄悄改變了。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
+  <svg viewBox="0 0 580 242" role="img" aria-label="write skew 的時序。系統不變量:至少兩位醫生值班,目前 Alice 與 Bob 都在值班。兩筆交易並行:Alice 的交易先檢查目前值班人數,讀到 2、大於等於 2,檢查通過,於是把自己改成請假;同一時間 Bob 的交易也檢查,因為快照隔離讓它看到的還是舊快照,也讀到 2,檢查也通過,也把自己改成請假。兩筆交易改的是不同的列,沒有寫入衝突,快照隔離兩筆都放行。結果值班人數變成 0,不變量被打破。關鍵:每筆交易單獨看都正確,合起來卻錯,因為檢查所依據的條件,被對方的寫入悄悄改變了。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
     <defs><marker id="ws" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#9aa4b2"/></marker></defs>
     <text x="290" y="18" fill="#e6e6e6" font-size="10.5" text-anchor="middle" font-weight="bold">不變量:值班醫生 ≥ 2(目前:Alice、Bob 都在)</text>
     <text x="60" y="46" fill="#4f6df5" font-size="9" text-anchor="middle" font-weight="bold">Alice 的交易</text>
@@ -52,13 +52,13 @@ draft: false
 Serializable 的定義很純:**執行結果等同於「所有交易一筆接一筆跑」**。有趣的是,實作它的三條路,性格天差地遠:
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 580 226" role="img" aria-label="通往可串行化的三條路。第一條:真的一筆一筆跑,單執行緒序列執行,沒有並發就沒有並發問題,Redis 與 VoltDB 走這條,前提是每筆交易要快、資料在記憶體、不能有互動等待。第二條:兩階段鎖 2PL,悲觀派,讀寫都上鎖、讀寫互擋,先擋再說,安全但延遲高、throughput 差、會死鎖。第三條:SSI 可串行化快照隔離,樂觀派,大家先跑,提交時驗證有沒有被別人影響,有就 abort 重試,衝突少時效能好,衝突多時一直重試。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
+  <svg viewBox="0 0 580 226" role="img" aria-label="通往可串行化的三條路。第一條:真的一筆一筆跑,單執行緒序列執行,沒有並行就沒有並行問題,Redis 與 VoltDB 走這條,前提是每筆交易要快、資料在記憶體、不能有互動等待。第二條:兩階段鎖 2PL,悲觀派,讀寫都上鎖、讀寫互擋,先擋再說,安全但延遲高、throughput 差、會死鎖。第三條:SSI 可串行化快照隔離,樂觀派,大家先跑,提交時驗證有沒有被別人影響,有就 abort 重試,衝突少時效能好,衝突多時一直重試。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
     <line x1="193" y1="14" x2="193" y2="186" stroke="#3a4154" stroke-width="1" stroke-dasharray="4 4"/>
     <line x1="387" y1="14" x2="387" y2="186" stroke="#3a4154" stroke-width="1" stroke-dasharray="4 4"/>
     <text x="97" y="28" fill="#54b890" font-size="9.4" text-anchor="middle" font-weight="bold">① 真的一筆一筆跑</text>
     <rect x="36" y="42" width="122" height="52" rx="6" fill="#223528" stroke="#54b890" stroke-width="1.4"/>
     <text x="97" y="62" fill="#e6e6e6" font-size="7.6" text-anchor="middle">單執行緒序列執行</text>
-    <text x="97" y="78" fill="#9aa4b2" font-size="7" text-anchor="middle">沒有並發 = 沒有並發問題</text>
+    <text x="97" y="78" fill="#9aa4b2" font-size="7" text-anchor="middle">沒有並行 = 沒有並行問題</text>
     <text x="97" y="114" fill="#54b890" font-size="7.4" text-anchor="middle" font-weight="bold">最強隔離,來自最笨的方法</text>
     <text x="97" y="132" fill="#e0733a" font-size="7" text-anchor="middle">前提:每筆都快(記憶體、無互動)</text>
     <text x="97" y="152" fill="#9aa4b2" font-size="6.8" text-anchor="middle">Redis(Lua/MULTI)/ VoltDB</text>
@@ -79,18 +79,18 @@ Serializable 的定義很純:**執行結果等同於「所有交易一筆接一�
     <rect x="30" y="196" width="520" height="26" rx="6" fill="#1f2330" stroke="#3a4154" stroke-width="1.2"/>
     <text x="290" y="213" fill="#d6a45c" font-size="8" text-anchor="middle" font-weight="bold">交易夠短夠快 → ①;衝突機率高 → ②(先鎖);衝突少 → ③(先跑,偶爾重試)</text>
   </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;"><b style="color:#54b890">① 序列執行</b>:乾脆不並發——單執行緒一筆接一筆,並發問題從根本上不存在。<a href="/blog/redis-single-thread/">Redis</a>(MULTI/Lua)與 VoltDB 走這條;前提是每筆交易都快(資料在記憶體、交易內不等外部)。<b style="color:#4f6df5">② 2PL</b>(悲觀):讀寫都上鎖、讀寫互擋——「反正會出事,先擋再說」;安全但延遲與 throughput 都難看,還會<a href="/blog/sql-transactions/">死鎖</a>。<b style="color:#9b6ff0">③ SSI</b>(樂觀):讓大家先跑,提交時驗證「你讀過的東西有沒有被別人改」,有就 abort 重試——衝突少時幾乎免費,衝突多時一直重試白工。<b>選哪條,取決於你的交易多快、衝突多常發生</b></figcaption>
+  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;"><b style="color:#54b890">① 序列執行</b>:乾脆不並行——單執行緒一筆接一筆,並行問題從根本上不存在。<a href="/blog/redis-single-thread/">Redis</a>(MULTI/Lua)與 VoltDB 走這條;前提是每筆交易都快(資料在記憶體、交易內不等外部)。<b style="color:#4f6df5">② 2PL</b>(悲觀):讀寫都上鎖、讀寫互擋——「反正會出事,先擋再說」;安全但延遲與 throughput 都難看,還會<a href="/blog/sql-transactions/">死鎖</a>。<b style="color:#9b6ff0">③ SSI</b>(樂觀):讓大家先跑,提交時驗證「你讀過的東西有沒有被別人改」,有就 abort 重試——衝突少時幾乎免費,衝突多時一直重試白工。<b>選哪條,取決於你的交易多快、衝突多常發生</b></figcaption>
 </figure>
 
 ## 反思
 
-### 「先檢查、再動作」是並發世界的頭號紅旗
+### 「先檢查、再動作」是並行世界的頭號紅旗
 
-write skew 給我的最大禮物,是一個**可掃描的程式碼氣味**:任何「先 SELECT 檢查條件、通過後再寫入」的段落,在並發下都是嫌疑犯——因為**檢查與動作之間,世界可能已經變了**。查餘額再扣款、查庫存再下單、查 username 沒人用再註冊、[[redis-distributed-lock|查鎖是自己的再釋放]]——全是同一個 check-then-act 的形狀。現在我 review 到這種段落,反射動作就是三連問:**這兩步是原子的嗎?不是的話,靠什麼保證中間沒人插進來?插進來會打破什麼不變量?** 十次有八次,作者沒想過第三題。這個氣味偵測器,比背任何隔離層級的定義都值錢。
+write skew 給我的最大禮物,是一個**可掃描的程式碼氣味**:任何「先 SELECT 檢查條件、通過後再寫入」的段落,在並行下都是嫌疑犯——因為**檢查與動作之間,世界可能已經變了**。查餘額再扣款、查庫存再下單、查 username 沒人用再註冊、[[redis-distributed-lock|查鎖是自己的再釋放]]——全是同一個 check-then-act 的形狀。現在我 review 到這種段落,反射動作就是三連問:**這兩步是原子的嗎?不是的話,靠什麼保證中間沒人插進來?插進來會打破什麼不變量?** 十次有八次,作者沒想過第三題。這個氣味偵測器,比背任何隔離層級的定義都值錢。
 
 ### 最強的隔離,來自最笨的方法——這件事很美
 
-可串行化的三條路裡,我最愛的是第一條:**乾脆不要並發。** 幾十年來大家拚命發明更聰明的鎖、更精巧的驗證,結果 Redis 和 VoltDB 說:記憶體夠快了,我單執行緒一筆一筆跑,並發問題**從定義上就不存在**。這正是我在 [[redis-single-thread|Redis 單執行緒]]那篇讚嘆過的「用簡單換可預測」——而 DDIA 把它放進交易理論的脈絡後更清楚了:**那不是取巧,是一條正統的 serializable 實作路線**,前提條件(交易短、資料在記憶體、不等外部)寫得明明白白。它提醒我:當硬體或場景變了,「最笨的方法」要重新評估一次——很多聰明設計,只是在為已經消失的瓶頸付複雜度。
+可串行化的三條路裡,我最愛的是第一條:**乾脆不要並行。** 幾十年來大家拚命發明更聰明的鎖、更精巧的驗證,結果 Redis 和 VoltDB 說:記憶體夠快了,我單執行緒一筆一筆跑,並行問題**從定義上就不存在**。這正是我在 [[redis-single-thread|Redis 單執行緒]]那篇讚嘆過的「用簡單換可預測」——而 DDIA 把它放進交易理論的脈絡後更清楚了:**那不是取巧,是一條正統的 serializable 實作路線**,前提條件(交易短、資料在記憶體、不等外部)寫得明明白白。它提醒我:當硬體或場景變了,「最笨的方法」要重新評估一次——很多聰明設計,只是在為已經消失的瓶頸付複雜度。
 
 ### 悲觀還是樂觀,問衝突率就對了
 
