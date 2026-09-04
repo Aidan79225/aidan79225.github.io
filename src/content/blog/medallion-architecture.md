@@ -28,7 +28,7 @@ draft: false
 ### 資料怎麼一層一層往上洗
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 600 180" role="img" aria-label="Medallion 架構:來源資料經 Bronze、Silver、Gold 三層精煉後供 BI 與 ML 使用" style="width:100%;max-width:640px;height:auto;margin:0 auto;">
+  <svg viewBox="0 0 680 180" role="img" aria-label="Medallion 架構:來源資料經 Bronze、Silver、Gold 三層精煉後供 BI 與 ML 使用" style="width:100%;max-width:640px;height:auto;margin:0 auto;">
     <defs><marker id="md" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
     <line x1="100" y1="90" x2="140" y2="90" stroke="#9aa4b2" stroke-width="1.5" marker-end="url(#md)"/>
     <line x1="246" y1="90" x2="286" y2="90" stroke="#9aa4b2" stroke-width="1.5" marker-end="url(#md)"/>

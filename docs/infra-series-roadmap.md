@@ -39,6 +39,29 @@
 
 ★ = 框架與最高價值(1、2、3)。第一批兩篇是骨架(框架 + 底座),優先寫;第二/三批把框架套在每個工具上;第四批收成平台視角。
 
+## 術語表(Ubiquitous Language)
+
+**自創系列**:這些術語是作者自己造的,沒有原書可以對 —— 所以中英文都要在這裡定死,之後每篇照抄。
+
+全系列同一個概念只准一個中文寫法;英文欄是翻譯時直接照抄的來源。
+寫到表上沒有的術語就補一列。跨系列共用的通用詞(快取、佇列、可觀測性)在
+`docs/ubiquitous-language.md`(全站術語表),這裡只放本系列特有的。
+
+| 中文用詞 | 英文 | 備註 |
+|---|---|---|
+| Infra 體檢表 | the infra checklist | 系列招牌:看任何工具都問這 8 題;措辭固定 |
+| 有狀態 / 無狀態 | stateful / stateless | 系列貫穿主軸,兩個詞不可換 |
+| 怎麼用 → 怎麼養 | how to use it → how to keep it alive | 系列定位那句,措辭固定 |
+| 借外部狀態 | borrowing external state | Connect 那篇的說法 |
+| 高可用 | HA | 內文用縮寫 |
+| 容量規劃 | capacity planning | |
+| 自架 vs 代管 | self-host vs managed | 兩個維度一塊一塊決定;不寫「自建 vs 託管」 |
+| 再平衡 | rebalance | 「工作單位可自由搬動」的帳單 |
+| 平行度 | parallelism | source 與 sink 各有天花板;與 DDIA 的並行(concurrency)分清楚 |
+| backlog / backpressure | backlog / backpressure | **zh style guide D 區明訂用英文**,不寫「堆積 / 背壓」 |
+| 死了能不能重來 | can it be restarted from scratch | 判斷彈性的那把尺,措辭固定 |
+| 一塊玻璃 | single pane of glass | 與 grafana 系列對齊,同一個中文詞 |
+
 ## 寫每篇時的慣例
 - front matter:`series: "從 Infra 角度看資料工具"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
 - tags 用 ASCII:`infrastructure` + 該工具(如 `kafka`、`redis`、`kubernetes`、`spark`、`airflow`、`rabbitmq`)。

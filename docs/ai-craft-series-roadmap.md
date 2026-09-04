@@ -106,6 +106,31 @@
 - junior 培養實戰(等有帶團隊導入的第一手觀察再寫;現職素材使用前先確認邊界)
 - 2026 年終回顧:年初寫的哪些已經過時——franchise 的第一個對照點
 
+## 術語表(Ubiquitous Language)
+
+**自創系列**:這些術語是作者自己造的,沒有原書可以對 —— 所以中英文都要在這裡定死,之後每篇照抄。
+
+**注**:`ai-responsibility-*` 兩篇目前沒有 `series:`,但用的是同一套保險比喻術語 —— 兩邊要對齊。
+
+全系列同一個概念只准一個中文寫法;英文欄是翻譯時直接照抄的來源。
+寫到表上沒有的術語就補一列。跨系列共用的通用詞(快取、佇列、可觀測性)在
+`docs/ubiquitous-language.md`(全站術語表),這裡只放本系列特有的。
+
+| 中文用詞 | 英文 | 備註 |
+|---|---|---|
+| 帶 AI 的手藝 | the craft of working with AI | 系列名;不寫「AI 協作技巧」 |
+| 責任 | responsibility | 系列定位的第一個詞:以責任為前提怎麼用 AI |
+| 護欄 | guardrail | 不寫「防護欄 / 圍欄」 |
+| 驗收 | acceptance | 不寫「驗收測試」除非確指 |
+| 規範 | spec | 內文多直接用 spec / specs 目錄 |
+| 品味 | taste | |
+| 頸 | bottleneck | 「漏斗的頸畫在哪」;上游 / 下游 = upstream / downstream |
+| 上鎖 | gated | 頸搬到上游「而且上了鎖」 |
+| 一人隊 | a team of one | 給獨立開發者的那條線 |
+| 自留額 | retained risk | 保險比喻;與 rezero 共用時對齊 |
+| 再保險網 | reinsurance net | 組織是一張再保險網,措辭固定 |
+| 職業蓋章人 | rubber-stamper | 黑暗版那節;不寫「橡皮圖章」(那是 Jenkins PRR 的用法) |
+
 ## 寫每篇時的慣例
 
 - front matter:`series: "帶 AI 的手藝(2026)"`、`seriesOrder: <#>`、`category: tech`、tags 含 `ai`(+ 該篇主題如 `leadership`、`code-review`)。

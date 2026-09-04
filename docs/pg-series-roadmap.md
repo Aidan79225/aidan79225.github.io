@@ -96,6 +96,31 @@
 4. roadmap 該篇狀態改 `✅ 已發布`。
 5. `npm run build` 驗證。
 
+## 術語表(Ubiquitous Language)
+
+**自創系列**:這些術語是作者自己造的,沒有原書可以對 —— 所以中英文都要在這裡定死,之後每篇照抄。
+
+**這個系列還沒發第一篇**。定位是「顧資料庫的人」,與 `SQL 我以為我懂`(寫查詢的人)分工 —— 兩邊共用的詞(MVCC、隔離等級)必須一致。
+
+全系列同一個概念只准一個中文寫法;英文欄是翻譯時直接照抄的來源。
+寫到表上沒有的術語就補一列。跨系列共用的通用詞(快取、佇列、可觀測性)在
+`docs/ubiquitous-language.md`(全站術語表),這裡只放本系列特有的。
+
+| 中文用詞 | 英文 | 備註 |
+|---|---|---|
+| 多版本並行控制 | MVCC | 內文用縮寫;與 sql 系列對齊 |
+| 舊版本 | dead tuple | 不寫「死元組」;PostgreSQL 官方用 dead tuple |
+| 清理 | VACUUM | 關鍵字照原文大寫 |
+| 表膨脹 | table bloat | |
+| 交易 ID 迴繞 | transaction ID wraparound | 官方用語,不譯成「回捲」 |
+| 預寫日誌 | WAL | 內文用縮寫;撐起崩潰復原 / 複寫 / PITR 三件事 |
+| 崩潰復原 | crash recovery | |
+| 時間點還原 | PITR | point-in-time recovery,內文用縮寫 |
+| 複寫 | replication | 與 DDIA / Redis 對齊 |
+| 檢查點 | checkpoint | 與 Spark 對齊但語意不同,備註要點明 |
+| 連線池 | connection pooling | PgBouncer 照原文 |
+| 顧資料庫的人 | the person who keeps the database alive | 系列定位那句,對照 sql 系列的「寫查詢的人」 |
+
 ## 寫每篇時的慣例
 - front matter:`series: "PostgreSQL 學習筆記"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
 - tags 用 ASCII:`postgresql` + 該篇主題(如 `database`、`mvcc`、`replication`、`backup`、`performance`、`operations`、`jsonb`)。**不要用 `sql` 當主 tag**,那是 SQL 系列的;兩系列各自的 tag 頁才不會糊在一起。

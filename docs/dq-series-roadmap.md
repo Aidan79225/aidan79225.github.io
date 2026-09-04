@@ -39,6 +39,26 @@
 
 ★ = 投報率最高(1、2、3、4、7)。第一批四篇是地基,優先寫;第二、三批依興趣調順序。
 
+## 術語表(Ubiquitous Language)
+
+書:*Data Quality Fundamentals*(Barr Moses, Lior Gavish, Molly Vorwerck;O'Reilly 2022)。**英文欄填原書用字**。**這個系列還沒發第一篇**,動筆時邊讀邊補。
+
+全系列同一個概念只准一個中文寫法;英文欄是翻譯時直接照抄的來源。
+寫到表上沒有的術語就補一列。跨系列共用的通用詞(快取、佇列、可觀測性)在
+`docs/ubiquitous-language.md`(全站術語表),這裡只放本系列特有的。
+
+| 中文用詞 | 英文 | 備註 |
+|---|---|---|
+| 資料可觀測性 | data observability | 全書核心概念;與 grafana 系列的 observability 對齊但不可混用 |
+| 資料停機 | data downtime | 書上自造詞,對照 SRE 的服務不可用 |
+| 血緣 | lineage | 端到端 lineage;不寫「譜系 / 沿襲」 |
+| 影響分析 | impact analysis | 上游一改、下游哪些會爆 |
+| 異常偵測 | anomaly detection | |
+| 根因分析 | root cause analysis | 與 SRE 的 postmortem 對齊 |
+| 資料契約 | data contract | |
+| 新鮮度 | freshness | 資料品質六面向之一 |
+| 資料品質 | data quality | 系列名詞,不寫「資料質量」 |
+
 ## 寫每篇時的慣例
 - front matter:`series: "Data Quality Fundamentals 讀書筆記"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
 - tags 用 ASCII:`data-quality` + `data-engineering` + 該篇主題(如 `observability`、`testing`、`monitoring`、`incident`、`lineage`)。

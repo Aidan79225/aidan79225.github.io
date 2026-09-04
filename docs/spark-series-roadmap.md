@@ -79,6 +79,33 @@
 3. **跑起來**(4):知道 job 在哪跑、`deploy-mode` 的坑,才有辦法自己驗證前面學的東西。
 4. **串流**(5):把同一套宣告式抽象推到無界資料,順勢接回 Kafka 那條線。
 
+## 術語表(Ubiquitous Language)
+
+工具系列:API 名稱、設定鍵、CLI 參數**一律不譯**(照原文寫)。這張表管的是「用中文寫的那些概念」怎麼統一。
+
+全系列同一個概念只准一個中文寫法;英文欄是翻譯時直接照抄的來源。
+寫到表上沒有的術語就補一列。跨系列共用的通用詞(快取、佇列、可觀測性)在
+`docs/ubiquitous-language.md`(全站術語表),這裡只放本系列特有的。
+
+| 中文用詞 | 英文 | 備註 |
+|---|---|---|
+| 轉換 / 動作 | transformation / action | RDD 章的分界;惰性求值 = lazy evaluation |
+| 分區 | partition | 與 Kafka / DDIA 對齊 |
+| shuffle | shuffle | 不譯;「分散式運算的房租」 |
+| 寬相依 / 窄相依 | wide / narrow dependency | |
+| 資料傾斜 | data skew | 不寫「資料歪斜」 |
+| broadcast join | broadcast join | 不譯成「廣播連接」 |
+| 執行計畫 | execution plan | `.explain()` 印出來的東西 |
+| 最佳化器 | Catalyst optimizer | 「相信最佳化器」不等於「不看它做了什麼」 |
+| 自適應查詢執行 | adaptive query execution (AQE) | 會在執行期改計畫 |
+| 驅動程式 / 執行器 | driver / executor | 內文多直接用 driver / executor |
+| 部署模式 | deploy mode | `client` vs `cluster`,值照原文 |
+| 無界表 | unbounded table | 「串流即無界表」是系列招牌抽象,措辭固定 |
+| 微批次 | micro-batch | 與 FoDE 的批次 / 微批次 / 串流光譜對齊 |
+| 水位線 | watermark | 遲到資料怎麼算 |
+| 檢查點 | checkpoint | 崩潰了怎麼接回來 |
+| 輸出模式 | output mode | append / update / complete 值照原文 |
+
 ## 寫每篇時的慣例
 - front matter:`series: "Spark 學習筆記"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
 - tags 用 ASCII:`spark` + `data-engineering` + 該篇主題(如 `pyspark`、`performance`、`deployment`、`stream-processing`)。

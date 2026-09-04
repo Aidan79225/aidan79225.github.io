@@ -48,6 +48,36 @@
 | 14 | `btl-14` | Ch20–21 領導力的考驗 | 別人怎麼評價你這個 Leader;通過自己給自己的考驗 | 📝 未寫 |
 | 15 | `btl-15` | Ch22–25 個人改變計畫 | 把改變排進行程:計畫、時間、支持系統(系列完結) | 📝 未寫 |
 
+## 術語表(Ubiquitous Language)
+
+書:*Becoming a Technical Leader: An Organic Problem-Solving Approach*(Gerald M. Weinberg,Dorset House 1986)。**英文欄填原書用字**;標 ⚠ 的是我從中文回推、尚未對過原文的,動筆或翻譯時翻書確認後改掉。
+
+全系列同一個概念只准一個中文寫法;英文欄是翻譯時直接照抄的來源。
+寫到表上沒有的術語就補一列。跨系列共用的通用詞(快取、佇列、可觀測性)在
+`docs/ubiquitous-language.md`(全站術語表),這裡只放本系列特有的。
+
+| 中文用詞 | 英文 | 備註 |
+|---|---|---|
+| 領導力 | leadership | 定義是「影響力,不是職位」;不寫「領導能力」 |
+| 線性 / 有機 | linear / organic | Ch1–2;棋手 vs 園丁兩種模型思維,系列反覆扣的對照 |
+| MOI 模型 | the MOI model | Ch3;本系列取 Motivation / Organization / Innovation(書上 I 有時寫 Ideas,系列固定用 Innovation) |
+| 激勵 / 組織 / 創新 | motivation / organization / innovation | MOI 三個字的中文,固定這三個詞 |
+| 成長模型 | how leaders develop | Ch4;宏觀線性 → 階梯 → 每階前先往下蹲 |
+| 創新的三大障礙 | the three great obstacles to innovation | Ch6 |
+| 看不到自己 | self-blindness | Ch6 障礙一 |
+| 沒問題綜合症 | the "no problem" syndrome | Ch6 障礙二 |
+| 相信只有一個正解 | ⚠ 待確認(believing is seeing?) | Ch6 障礙三;**動筆時翻書對原文用字** |
+| 自我覺察 | self-awareness | Ch7 |
+| 日記 | personal journal | Ch7 工具;事實 → 感受 → 教訓 |
+| 發想力 | idea power | Ch8 |
+| 點子殺手 | ⚠ 待確認(idea killer?) | Ch8;「擋殺手」那一種貢獻 |
+| 願景 | vision | Ch9;個人願景 = personal vision |
+| 激勵的兩大障礙 | the first / second great obstacle to motivating others | Ch10–11 |
+| 力量 | power | Ch14 Where Power Comes From;不寫「權力」除非確指職權 |
+| 言行一致 | congruence | Ch15;Weinberg/Satir 用語,不譯成「一致性」(那是技術詞) |
+| 蛻變 | transformation | Part Five |
+| 高峰時刻 | peak experience | btl-8 挖個人願景的方法 |
+
 ## 寫每篇時的慣例
 - front matter:`series: "成為 Tech Leader 讀書筆記"`、`seriesOrder: <#>`、`category: tech`、`comments: true`、`draft: true`(寫好再發)。
 - 標題慣例:「領導力 - X」(btl-1 例外,就叫「領導力」)。

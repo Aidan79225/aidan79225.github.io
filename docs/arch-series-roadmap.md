@@ -47,6 +47,26 @@ DDD 與 Clean Architecture **合成一個系列**(兩者重疊大:分層、依�
 
 ★ = 投報率最高(2、6、7、8、10)。第一幕三篇是地基,優先寫。可先寫 1 篇(建議 ② 依賴反轉)試水溫再展開。
 
+## 術語表(Ubiquitous Language)
+
+**自創系列**:這些術語是作者自己造的,沒有原書可以對 —— 所以中英文都要在這裡定死,之後每篇照抄。
+
+**這個系列還沒發第一篇** —— 這張表先從定位與章節表定,動筆時邊寫邊補。
+
+全系列同一個概念只准一個中文寫法;英文欄是翻譯時直接照抄的來源。
+寫到表上沒有的術語就補一列。跨系列共用的通用詞(快取、佇列、可觀測性)在
+`docs/ubiquitous-language.md`(全站術語表),這裡只放本系列特有的。
+
+| 中文用詞 | 英文 | 備註 |
+|---|---|---|
+| 依賴方向 | dependency direction | 系列定位第一句;不寫「相依方向」(但內文的「相依」照 zh guide 保留) |
+| 邊界 | boundary | 邊界的畫法 |
+| 改動成本 | cost of change | 「好讓改動變便宜」 |
+| 耦合 / 內聚 | coupling / cohesion | 與 FoDE 的鬆耦合對齊 |
+| 抽象洩漏 | leaky abstraction | |
+| 分層 | layering | 與 medallion / k8s 的分層對齊 |
+| 什麼時候別用 | when not to use it | 系列招牌段落,措辭固定 |
+
 ## 寫每篇時的慣例
 - front matter:`series: "架構,我以為我懂"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
 - tags 用 ASCII:`architecture` + 該篇主題(如 `clean-architecture`、`ddd`、`backend`、`android`)。

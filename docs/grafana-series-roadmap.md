@@ -54,6 +54,33 @@
 4. **變行動**(8 告警→9 儀表板→10 SLO):把「看到」變「行動」,這批最貼 SRE 日常。
 5. **焊點**(11):把整套用回資料平台,收束到 DE×SRE 定位。
 
+## 術語表(Ubiquitous Language)
+
+工具系列:API 名稱、資源型別、設定鍵、CLI 參數**一律不譯**(照原文寫)。這張表管的是「用中文寫的那些概念」怎麼統一。
+
+全系列同一個概念只准一個中文寫法;英文欄是翻譯時直接照抄的來源。
+寫到表上沒有的術語就補一列。跨系列共用的通用詞(快取、佇列、可觀測性)在
+`docs/ubiquitous-language.md`(全站術語表),這裡只放本系列特有的。
+
+| 中文用詞 | 英文 | 備註 |
+|---|---|---|
+| 監控 vs 可觀測性 | monitoring vs observability | 「已知的未知」→「未知的未知」;兩個詞不可互換 |
+| 三種訊號 | the three signals | metrics / logs / traces,一律用英文原詞 |
+| 一塊玻璃 | single pane of glass | 系列招牌說法;為了壓力下還能思考,不是為了美觀 |
+| 基數 | cardinality | metric 第一戒律;不寫「維度爆炸」 |
+| 粒度 | granularity | |
+| 拉取 / 推送 | pull / push | Prometheus 主動去抓;「不回應」本身是信號 |
+| 抓取 | scrape | Prometheus 用語,不寫「採集」 |
+| 標籤 | label | 「label 進索引、內容進 line」是 Loki 的核心取捨 |
+| 儀表板 / 面板 | dashboard / panel | 一個 panel 回答一個問題 |
+| 儀表板即程式碼 | dashboard as code | 與 IaC 的 everything as code 對齊 |
+| 模板變數 | template variable | 一張儀表板服務一百個目標 |
+| 追蹤 | trace | trace-id 不譯 |
+| 上下文傳遞 | context propagation | OTel 的殺手級價值 |
+| 取樣 | sampling | |
+| 告警 | alert / alerting | 與 SRE 系列對齊;不寫「警報 / 報警」 |
+| LGTM | Loki / Grafana / Tempo / Mimir | 四個字母展開時照原文 |
+
 ## 寫每篇時的慣例
 - front matter:`series: "Grafana LGTM 可觀測性"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
 - tags 用 ASCII:`observability` + 該篇主題(如 `prometheus`、`grafana`、`logging`、`tracing`、`alerting`、`slo`)。

@@ -68,6 +68,34 @@
 5. **Cluster Admin**(11 RBAC→12 kubeadm/etcd/upgrade):25% 且最「管理員」。
 6. **Troubleshooting**(13):30%,但它其實是把前面全部串起來的能力——放最後,當總複習。
 
+## 術語表(Ubiquitous Language)
+
+工具系列:API 名稱、資源型別、設定鍵、CLI 參數**一律不譯**(照原文寫)。這張表管的是「用中文寫的那些概念」怎麼統一。
+
+全系列同一個概念只准一個中文寫法;英文欄是翻譯時直接照抄的來源。
+寫到表上沒有的術語就補一列。跨系列共用的通用詞(快取、佇列、可觀測性)在
+`docs/ubiquitous-language.md`(全站術語表),這裡只放本系列特有的。
+
+| 中文用詞 | 英文 | 備註 |
+|---|---|---|
+| Pod / Node / Service | Pod / Node / Service | K8s 資源型別一律照原文大寫,不譯 |
+| 排程 | scheduling | Scheduler 決定 Pod 落哪台;不寫「調度」 |
+| 節點選擇器 / 親和性 | node selector / affinity | 值照原文 |
+| 汙點與容忍 | taint and toleration | |
+| 控制器 | controller | |
+| 宣告式 | declarative | 與 IaC 系列對齊,寫終點不寫步驟 |
+| 期望狀態 | desired state | 不寫「目標狀態」 |
+| 供需分離 | supply / demand separation | PV / PVC 那個抽象,系列自造說法 |
+| 持久卷 | PV / PVC | 內文一律用縮寫,不展開翻譯 |
+| 有狀態 / 無狀態 | stateful / stateless | 與 infra 系列的主軸對齊 |
+| 入口 | Ingress | 照原文;L4 / L7 分清楚 |
+| 網路政策 | NetworkPolicy | 把「全通」改成白名單 |
+| 扁平網路 | flat network | K8s 預設網路模型 |
+| 身分 | identity | ServiceAccount 是給 workload 的身分 |
+| 角色 / 綁定 | Role / Binding | RBAC 積木:Role 是權限、Binding 是膠水 |
+| 機密 | Secret | 照原文;只是 base64,不是加密 |
+| 套件 | Helm chart | 不寫「圖表」 |
+
 ## 寫每篇時的慣例
 - front matter:`series: "Kubernetes 學習筆記"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
 - tags 用 ASCII:`kubernetes` + 該篇主題(如 `storage`、`networking`、`security`、`scheduling`、`troubleshooting`)。

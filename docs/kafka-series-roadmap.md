@@ -82,6 +82,30 @@
 4. **生態系**(4):真實專案的九成工作量在這裡;順手接到 Spark 那條消費線。
 5. **維運**(5):retention 與 lag 把前四篇的承諾換算成磁碟與監控;要更深的部署面轉 `[[infra-kafka]]`。
 
+## 術語表(Ubiquitous Language)
+
+工具系列:API 名稱、設定鍵、CLI 參數**一律不譯**(照原文寫)。這張表管的是「用中文寫的那些概念」怎麼統一。
+
+全系列同一個概念只准一個中文寫法;英文欄是翻譯時直接照抄的來源。
+寫到表上沒有的術語就補一列。跨系列共用的通用詞(快取、佇列、可觀測性)在
+`docs/ubiquitous-language.md`(全站術語表),這裡只放本系列特有的。
+
+| 中文用詞 | 英文 | 備註 |
+|---|---|---|
+| 生產者 / 消費者 | producer / consumer | **zh style guide D 區明訂**:Kafka 的「生產者 / 生產與消費 / 生產端」是 producer,不要替換成 Production |
+| 主題 | topic | 內文多直接用 topic |
+| 分區 | partition | 與 DDIA / Spark 系列對齊,同一個中文詞;不寫「分片」 |
+| 位移 | offset | 事件在 partition 內的位置 |
+| 消費者群組 | consumer group | 不寫「消費組」 |
+| 消費延遲 | consumer lag | 第一個該盯的指標;不寫「消費滯後」 |
+| 副本 | replica | ISR = in-sync replicas,縮寫照原文 |
+| 保留 | retention | 「重播能力 vs 磁碟成本」的對帳 |
+| 壓實 | log compaction | 每個 key 只留最新值;不寫「壓縮」(那是 compression) |
+| 重播 | replay | |
+| 投遞語意 | delivery semantics | at-most-once / at-least-once / exactly-once 三個縮寫照原文 |
+| 冪等生產者 | idempotent producer | exactly-once 的其中一塊 |
+| 交易 | transaction | 與 DDIA 對齊(全站統一用「交易」);Kafka 的 transactional producer 語境也一樣 |
+
 ## 寫每篇時的慣例
 - front matter:`series: "Kafka 學習筆記"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
 - tags 用 ASCII:`kafka` + `data-engineering` + 該篇主題(如 `event-streaming`、`messaging`、`reliability`、`stream-processing`、`operations`)。

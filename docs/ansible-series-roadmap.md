@@ -41,6 +41,31 @@
 
 ★ = 投報率最高(1、3、4、5、7)。第一批六篇是地基,順序照寫;第三批依興趣調順序。16 章全數涵蓋(Ch 2+3、Ch 9+14、Ch 12+13 併篇;附錄 A 略、附錄 B 融入 #5)。
 
+## 術語表(Ubiquitous Language)
+
+書:*Ansible for DevOps*(Jeff Geerling)。**英文欄填原書用字**;Ansible 的 DSL 關鍵字一律照原文,不翻譯。
+
+全系列同一個概念只准一個中文寫法;英文欄是翻譯時直接照抄的來源。
+寫到表上沒有的術語就補一列。跨系列共用的通用詞(快取、佇列、可觀測性)在
+`docs/ubiquitous-language.md`(全站術語表),這裡只放本系列特有的。
+
+| 中文用詞 | 英文 | 備註 |
+|---|---|---|
+| 無代理 | agentless | Ansible 的關鍵賭注;不寫「免代理 / 無 agent」 |
+| 清單 | inventory | 內文多直接用 inventory |
+| playbook | playbook | 不譯成「劇本」 |
+| play / task / handler | play / task / handler | 骨架三件套,照原文 |
+| 角色 | role | 書上 role,重用單位 |
+| 模組 | module | 讓 ad-hoc 不只是群發 shell |
+| 隨手指令 | ad-hoc command | 不寫「臨時指令」 |
+| 事實 | facts | `gather_facts`;不寫「主機資訊」 |
+| 冪等 | idempotent | 描述終點而不是步驟 |
+| 變數優先序 | variable precedence | 書上有完整表 |
+| Ansible Vault | Ansible Vault | 祕密進版本控制;不譯 |
+| 重新定義成功 | changed_when / failed_when | exit code 0 不等於成功 |
+| 委派 | delegation | `delegate_to` |
+| 滾動更新 | rolling update | `serial:` |
+
 ## 寫每篇時的慣例
 - front matter:`series: "Ansible for DevOps 讀書筆記"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
 - tags 用 ASCII:`ansible` + 該篇主題(如 `devops`、`automation`、`deployment`、`security`、`ci`)。
