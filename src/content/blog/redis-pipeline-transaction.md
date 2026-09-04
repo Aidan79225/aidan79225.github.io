@@ -1,5 +1,5 @@
 ---
-title: "管線、事務與 Lua:省 RTT 與原子性"
+title: "管線、交易與 Lua:省 RTT 與原子性"
 date: 2026-07-21
 category: tech
 tags:
@@ -10,7 +10,7 @@ seriesOrder: 11
 comments: true
 draft: false
 ---
-有三個東西常被混在一起,其實各解**完全不同**的問題:**pipeline** 解「網路來回太多」、**MULTI/EXEC**(事務)解「一組命令要一起執行不被插隊」、**Lua** 解「要原子、又要帶邏輯」。搞混它們,你會拿 pipeline 當事務用、或以為 Redis 事務像資料庫一樣能 rollback——兩個都會踩坑。這篇把三者的分工一次講清。
+有三個東西常被混在一起,其實各解**完全不同**的問題:**pipeline** 解「網路來回太多」、**MULTI/EXEC**(交易)解「一組命令要一起執行不被插隊」、**Lua** 解「要原子、又要帶邏輯」。搞混它們,你會拿 pipeline 當交易用、或以為 Redis 交易像資料庫一樣能 rollback——兩個都會踩坑。這篇把三者的分工一次講清。
 
 ## Pipelining:把 N 次往返壓成 1 次
 
@@ -43,10 +43,10 @@ draft: false
 
 ## MULTI/EXEC:一起執行,但別叫它 ACID
 
-`MULTI` 開一個事務,之後的命令**先排隊不執行**,直到 `EXEC` 才**一次跑完、中間不被別的客戶端插隊**。聽起來像資料庫事務,但有個關鍵差異會嚇到人:**Redis 事務不能 rollback。**
+`MULTI` 開一個交易,之後的命令**先排隊不執行**,直到 `EXEC` 才**一次跑完、中間不被別的客戶端插隊**。聽起來像資料庫交易,但有個關鍵差異會嚇到人:**Redis 交易不能 rollback。**
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 580 212" role="img" aria-label="MULTI EXEC 事務與 WATCH 樂觀鎖。上排:MULTI 之後命令先排隊不執行,EXEC 時一次跑完、中間不被插隊,達成隔離。但沒有 rollback,如果某一條在執行時出錯,例如對一個 String 下 LPUSH,那一條失敗,後面的命令照樣執行。下排:WATCH 盯著一把 key,如果在 EXEC 之前這把 key 被別的客戶端改過,EXEC 就回 nil、整個事務作廢,由你自己重試,這是樂觀鎖 CAS。" style="width:100%;max-width:600px;height:auto;margin:0 auto;">
+  <svg viewBox="0 0 580 212" role="img" aria-label="MULTI EXEC 交易與 WATCH 樂觀鎖。上排:MULTI 之後命令先排隊不執行,EXEC 時一次跑完、中間不被插隊,達成隔離。但沒有 rollback,如果某一條在執行時出錯,例如對一個 String 下 LPUSH,那一條失敗,後面的命令照樣執行。下排:WATCH 盯著一把 key,如果在 EXEC 之前這把 key 被別的客戶端改過,EXEC 就回 nil、整個交易作廢,由你自己重試,這是樂觀鎖 CAS。" style="width:100%;max-width:600px;height:auto;margin:0 auto;">
     <defs><marker id="mt" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#9aa4b2"/></marker></defs>
     <text x="290" y="16" fill="#e6e6e6" font-size="10.5" text-anchor="middle" font-weight="bold">MULTI/EXEC:一起執行不被插隊,但不能 rollback</text>
     <rect x="16" y="30" width="66" height="30" rx="6" fill="#26324a" stroke="#4f6df5" stroke-width="1.4"/><text x="49" y="49" fill="#4f6df5" font-size="9" text-anchor="middle" font-weight="bold">MULTI</text>
@@ -65,7 +65,7 @@ draft: false
     <rect x="398" y="138" width="168" height="36" rx="6" fill="#3a2626" stroke="#e05a7d" stroke-width="1.3"/><text x="482" y="153" fill="#e05a7d" font-size="8" text-anchor="middle">被改 → EXEC 回 nil 作廢</text><text x="482" y="167" fill="#9aa4b2" font-size="7" text-anchor="middle">→ 你自己重試</text>
     <text x="290" y="198" fill="#9aa4b2" font-size="8" text-anchor="middle">MULTI 給你「一起跑、不被插隊」;WATCH 給你「有人搶先就作廢」——但都不是 rollback</text>
   </svg>
-  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">Redis 事務保證的是<b style="color:#54b890">「一起執行、不被插隊」</b>(隔離),而<b style="color:#e05a7d">不是「全成功或全失敗」</b>——某條命令在執行時出錯,前後的命令<b>照樣執行</b>,不會回滾。(唯一例外:命令有語法錯,`EXEC` 前就會整批拒絕。)要處理「讀了再改」的競態,配 <b style="color:#d6a45c">WATCH</b>:盯住一把 key,只要它在 <code>EXEC</code> 前被別人改過,整個事務就<b>作廢回 nil</b>,由你重試——這是樂觀鎖(CAS),不是鎖住別人,是「有人搶先我就重來」</figcaption>
+  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">Redis 交易保證的是<b style="color:#54b890">「一起執行、不被插隊」</b>(隔離),而<b style="color:#e05a7d">不是「全成功或全失敗」</b>——某條命令在執行時出錯,前後的命令<b>照樣執行</b>,不會回滾。(唯一例外:命令有語法錯,`EXEC` 前就會整批拒絕。)要處理「讀了再改」的競態,配 <b style="color:#d6a45c">WATCH</b>:盯住一把 key,只要它在 <code>EXEC</code> 前被別人改過,整個交易就<b>作廢回 nil</b>,由你重試——這是樂觀鎖(CAS),不是鎖住別人,是「有人搶先我就重來」</figcaption>
 </figure>
 
 落成命令,一個「安全扣款」的樂觀鎖長這樣:
@@ -98,11 +98,11 @@ end
 
 ### 「省 RTT」和「原子性」是兩個問題,先分清是哪個
 
-我看過最常見的誤用,是拿 pipeline 當事務——以為把命令打包送出,它們就會「一起、不被打斷」。不會。**pipeline 解的是網路(來回太多),事務/Lua 解的是並行(不想被插隊),這是兩個維度。** 想通這點後,我選工具的第一問永遠是:**我現在痛的是網路,還是並行?** 痛網路(要打幾百條命令)就 pipeline;痛並行(這幾步不能被別人插進來)就 MULTI 或 Lua。把問題歸對類,工具自己就選好了——這比背 API 有用得多。
+我看過最常見的誤用,是拿 pipeline 當交易——以為把命令打包送出,它們就會「一起、不被打斷」。不會。**pipeline 解的是網路(來回太多),交易/Lua 解的是並行(不想被插隊),這是兩個維度。** 想通這點後,我選工具的第一問永遠是:**我現在痛的是網路,還是並行?** 痛網路(要打幾百條命令)就 pipeline;痛並行(這幾步不能被別人插進來)就 MULTI 或 Lua。把問題歸對類,工具自己就選好了——這比背 API 有用得多。
 
-### Redis 「事務不能 rollback」不是缺陷,是誠實
+### Redis 「交易不能 rollback」不是缺陷,是誠實
 
-第一次知道 Redis 事務不會回滾,我有點傻眼——那還叫事務嗎?後來理解那是**刻意的取捨**:Redis 認為命令在執行期出錯,幾乎都是「你程式寫錯了」(對 String 用了 List 命令),那種錯就算 rollback 也救不回邏輯,不如保持引擎簡單快速、不背 rollback 這個重擔。它沒有假裝自己是關聯式資料庫。這件事教我一個看功能的習慣:**別被名字唬住,去看它「實際保證什麼」。** 「事務」「Secret」「鎖」這些詞都自帶光環,但光環底下的真實保證,常常比名字窄。真正要對照完整 ACID 的,還是回去看 [[sql-transactions|資料庫的事務]];Redis 的「事務」,就當它是「一批不被插隊的命令」來用,剛剛好。
+第一次知道 Redis 交易不會回滾,我有點傻眼——那還叫交易嗎?後來理解那是**刻意的取捨**:Redis 認為命令在執行期出錯,幾乎都是「你程式寫錯了」(對 String 用了 List 命令),那種錯就算 rollback 也救不回邏輯,不如保持引擎簡單快速、不背 rollback 這個重擔。它沒有假裝自己是關聯式資料庫。這件事教我一個看功能的習慣:**別被名字唬住,去看它「實際保證什麼」。** 「交易」「Secret」「鎖」這些詞都自帶光環,但光環底下的真實保證,常常比名字窄。真正要對照完整 ACID 的,還是回去看 [[sql-transactions|資料庫的交易]];Redis 的「交易」,就當它是「一批不被插隊的命令」來用,剛剛好。
 
 ### Lua 的哲學:把邏輯搬到資料旁邊
 

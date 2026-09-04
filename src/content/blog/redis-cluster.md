@@ -42,7 +42,7 @@ draft: false
 
 ## 一個限制:multi-key 操作與 hash tag
 
-分片帶來一個逃不掉的限制:**跨 slot 的 multi-key 操作不允許**。`MGET a b c`、`MULTI` 事務、Lua 腳本裡碰多把 key——只要這些 key 落在不同 slot(多半在不同 node),Redis 直接回錯,因為它不做跨節點的協調。
+分片帶來一個逃不掉的限制:**跨 slot 的 multi-key 操作不允許**。`MGET a b c`、`MULTI` 交易、Lua 腳本裡碰多把 key——只要這些 key 落在不同 slot(多半在不同 node),Redis 直接回錯,因為它不做跨節點的協調。
 
 解法是 **hash tag**:在 key 裡用大括號 `{}` 圈一段,Redis 就**只拿大括號裡的內容去算 slot**。把相關的 key 綁同一個 tag,它們就保證落在同一個 slot、同一台:
 
