@@ -1,5 +1,5 @@
 ---
-title: "What Is Kubernetes? From \"Running Containers\" to \"Declaring the State You Want\""
+title: "What Is Kubernetes? From 'Running Containers' to 'Declaring the State You Want'"
 date: 2026-07-06
 category: tech
 description: "K8s is hard to learn, usually because people memorise the API before the concept. This post starts from the beginning: what problem it actually solves, and the one core idea that ties everything together — a declared desired state plus a reconcile loop. This is the foundation of the whole series."
