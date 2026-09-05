@@ -24,7 +24,7 @@ draft: false
  <rect x="168" y="110" width="225" height="34" rx="4" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.3"/><text x="280" y="132" fill="#e6e6e6" font-size="10" text-anchor="middle">SSD</text><text x="548" y="132" fill="#9aa4b2" font-size="8.5" text-anchor="end">~0.1 ms</text>
  <rect x="138" y="150" width="285" height="34" rx="4" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.3"/><text x="280" y="172" fill="#e6e6e6" font-size="10" text-anchor="middle">HDD 磁碟(轉盤)</text><text x="548" y="172" fill="#9aa4b2" font-size="8.5" text-anchor="end">~10 ms</text>
  <rect x="100" y="190" width="360" height="34" rx="4" fill="#262b3a" stroke="#4f6df5" stroke-width="1.9"/><text x="280" y="212" fill="#e6e6e6" font-size="10.5" text-anchor="middle">物件儲存(S3 / GCS)</text><text x="548" y="212" fill="#9aa4b2" font-size="8.5" text-anchor="end">~100 ms · 超便宜</text>
- <rect x="65" y="230" width="430" height="34" rx="4" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.3" stroke-dasharray="4 3"/><text x="280" y="252" fill="#e6e6e6" font-size="10" text-anchor="middle">封存 / 冷儲存</text><text x="548" y="252" fill="#9aa4b2" font-size="8.5" text-anchor="end">分鐘~小時 · 最便宜</text>
+ <rect x="55" y="230" width="410" height="34" rx="4" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.3" stroke-dasharray="4 3"/><text x="280" y="252" fill="#e6e6e6" font-size="10" text-anchor="middle">封存 / 冷儲存</text><text x="548" y="252" fill="#9aa4b2" font-size="8.5" text-anchor="end">分鐘~小時 · 最便宜</text>
  <text x="280" y="286" fill="#9aa4b2" font-size="9.5" text-anchor="middle">↓ 越下面:越慢、越便宜、容量越大</text>
  </svg>
  <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">儲存是一條速度↔成本的階層,單價與延遲各差好幾個數量級;資料工程的重心落在最便宜、幾乎無限的物件儲存(藍)</figcaption>
