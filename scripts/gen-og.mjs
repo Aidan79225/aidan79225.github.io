@@ -37,7 +37,7 @@ const xml = (s) =>
 // even when preceded by CJK punctuation (《) rather than a space.
 function wrap(text, maxWidth, fontSize, maxLines) {
   const widthOf = (ch) => (/[\x00-\xff]/.test(ch) ? 0.55 : 1) * fontSize;
-  const isWord = (ch) => /[A-Za-z0-9]/.test(ch);
+  const isWord = (ch) => /[A-Za-z0-9'’-]/.test(ch);
   const measure = (s) => [...s].reduce((a, c) => a + widthOf(c), 0);
   const lines = [];
   let line = '';
