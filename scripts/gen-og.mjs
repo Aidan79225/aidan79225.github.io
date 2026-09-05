@@ -97,11 +97,19 @@ function parseFrontMatter(md) {
 }
 
 function template({ title, kicker, footer }) {
-  const fontSize = title.length > 34 ? 52 : 60;
+  let fontSize = title.length > 34 ? 52 : 60;
+  let lines = wrap(title, W - 200, fontSize, 4);
+  let centreY = 250;
+  if (lines.length > 3) {
+    // Long (typically English) titles: step the font down and centre lower so
+    // the block clears the "Aidan's Blog" header instead of colliding with it.
+    fontSize = 44;
+    lines = wrap(title, W - 200, fontSize, 4);
+    centreY = 285;
+  }
   const lineHeight = fontSize + 22;
-  const lines = wrap(title, W - 200, fontSize, 4);
   const blockH = lines.length * lineHeight;
-  const startY = 250 - blockH / 2 + fontSize; // vertically centre the title block
+  const startY = centreY - blockH / 2 + fontSize; // vertically centre the title block
   const titleTspans = lines
     .map(
       (ln, i) =>
