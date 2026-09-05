@@ -4,7 +4,15 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 // once, then substring-matches the query against title/tags/series/description.
 // CJK has no word boundaries, so a plain includes() is enough — no tokenizer.
 // Title matches rank above tag matches above body matches.
-export default function Search() {
+const STRINGS = {
+  'zh-hant': { placeholder: '搜尋文章… ( / )', label: '搜尋文章', noResult: (q) => `找不到「${q}」`, food: '美食', tech: '技術' },
+  en: { placeholder: 'Search posts… ( / )', label: 'Search posts', noResult: (q) => `No results for "${q}"`, food: 'Food', tech: 'Tech' },
+};
+
+// `locale` only changes the chrome (placeholder, empty state, category
+// label); the index itself is zh-only, so results are the same everywhere.
+export default function Search({ locale = 'zh-hant' }) {
+  const t = STRINGS[locale] ?? STRINGS['zh-hant'];
   const [index, setIndex] = useState([]);
   const [q, setQ] = useState('');
   const [open, setOpen] = useState(false);
@@ -101,8 +109,8 @@ export default function Search() {
         ref={inputRef}
         type="search"
         value={q}
-        placeholder="搜尋文章… ( / )"
-        aria-label="搜尋文章"
+        placeholder={t.placeholder}
+        aria-label={t.label}
         onChange={(e) => {
           setQ(e.target.value);
           setOpen(true);
@@ -114,7 +122,7 @@ export default function Search() {
       {open && q.trim() && (
         <ul className="absolute right-0 mt-1 w-full sm:w-72 max-h-80 overflow-auto bg-surface border border-line rounded shadow-lg z-50 list-none m-0 p-1">
           {results.length === 0 ? (
-            <li className="px-3 py-2 text-sm text-muted">找不到「{q.trim()}」</li>
+            <li className="px-3 py-2 text-sm text-muted">{t.noResult(q.trim())}</li>
           ) : (
             results.map((p, i) => (
               <li key={p.url}>
@@ -125,7 +133,7 @@ export default function Search() {
                 >
                   <span className="block text-sm text-ink">{p.title}</span>
                   <span className="block text-xs text-muted mt-0.5">
-                    {p.category === 'food' ? '美食' : '技術'}
+                    {p.category === 'food' ? t.food : t.tech}
                     {p.tags.length ? ` · ${p.tags.slice(0, 3).map((t) => `#${t}`).join(' ')}` : ''}
                   </span>
                 </a>

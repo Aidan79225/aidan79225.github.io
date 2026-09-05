@@ -17,8 +17,7 @@ const personLd = {
   url: new URL('/en/about/', Astro.site).href,
   image: new URL(author.avatar, Astro.site).href,
   jobTitle: 'Engineering Manager',
-  description:
-    'Engineering Manager — explaining complex systems with one diagram and concise text.',
+  description: author.bio.en,
   address: { '@type': 'PostalAddress', addressCountry: 'TW' },
   email: 'mailto:aidan79225@gmail.com',
   sameAs: author.links.map((l) => l.url),

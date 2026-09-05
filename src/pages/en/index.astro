@@ -2,35 +2,85 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PostCard from '../../components/PostCard.astro';
 import { getPublishedPosts, byDateDesc } from '../../lib/posts';
+import { seriesList, seriesBySlug } from '../../data/series';
 
-// English landing page: lists every translated post. Translations are opt-in
-// (a handful of posts, not a mirror of the site), so this page stays a simple
-// index instead of replicating the zh home.
-const posts = (await getPublishedPosts('en')).sort(byDateDesc);
+// English home. Mirrors the zh home's shape (intro → featured series → latest
+// posts) but is built from the translated posts only: every route under /en/
+// exists (untranslated pages fall back to Chinese), so the counts here tell the
+// reader how much of the site is actually in English.
+const en = await getPublishedPosts('en');
+const zh = await getPublishedPosts();
+const latest = [...en].sort(byDateDesc).slice(0, 5);
+
+const countBySeries = new Map<string, number>();
+for (const p of en) {
+  if (p.data.series) countBySeries.set(p.data.series, (countBySeries.get(p.data.series) ?? 0) + 1);
+}
+const translatedSeries = seriesList.filter((s) => s.enName && (countBySeries.get(s.enName) ?? 0) > 0);
+
+// Same three storylines as the zh home where translated; otherwise the
+// series with the most English posts fill in.
+const featured = ['ddia', 'rezero', 'fode']
+  .map((slug) => seriesBySlug.get(slug)!)
+  .filter((s) => s.enName && (countBySeries.get(s.enName) ?? 0) > 0)
+  .map((s) => ({ ...s, count: countBySeries.get(s.enName!) ?? 0 }));
+
+const alternates = [
+  { hreflang: 'zh-Hant', href: new URL('/', Astro.site).href },
+  { hreflang: 'en', href: new URL('/en/', Astro.site).href },
+  { hreflang: 'x-default', href: new URL('/', Astro.site).href },
+];
 ---
 <BaseLayout
-  title="Aidan's Blog — English"
-  description="Selected posts from Aidan's blog, translated into English. Complex systems explained with one diagram and concise text."
+  title="Aidan's Blog"
+  description="Aidan's blog — complex systems explained with one diagram and concise text. Data engineering, Kafka, Kubernetes, SRE, observability and tech leadership, translated into English."
   locale="en"
+  alternates={alternates}
 >
   <header class="mb-10">
-    <h1 class="text-3xl font-bold mb-2">Aidan's Blog — English</h1>
-    <p class="text-muted mb-3">
-      Selected posts translated into English. The blog is written in Traditional
-      Chinese — these are the posts I've translated so far; in-post links may
-      point to Chinese originals.
+    <h1 class="text-3xl font-bold mb-2">Aidan Wang</h1>
+    <p class="text-muted mb-3">Engineering Manager · writing about complex systems and tech leadership</p>
+    <p class="text-lg text-ink mb-2">
+      Complex systems explained with <strong>one diagram</strong> and concise text.
     </p>
-    <p class="text-sm flex flex-wrap gap-x-3 gap-y-1">
-      <a href="/en/about/" class="text-accent hover:underline">About me</a>
-      <a href="/" class="text-accent hover:underline">← 回到中文首頁 / Back to the Chinese home page</a>
+    <p class="text-muted text-sm mb-5">
+      The blog is written in Traditional Chinese and translated post by post: {en.length} of {zh.length} posts
+      are in English so far, across {translatedSeries.length} of {seriesList.length} series. Everything else
+      falls back to the Chinese original under the same URL, so links never dead-end.
+    </p>
+    <p class="flex flex-wrap gap-3 text-sm">
+      <a href="/en/start/" class="bg-accent text-ink font-bold rounded px-4 py-2 no-underline hover:opacity-90">Start here →</a>
+      <a href="/en/about/" class="bg-surface border border-line text-ink rounded px-4 py-2 no-underline hover:border-accent">About me</a>
+      <a href="/" class="bg-surface border border-line text-ink rounded px-4 py-2 no-underline hover:border-accent" lang="zh-Hant">中文首頁</a>
     </p>
   </header>
 
-  {posts.length > 0 ? (
-    <div class="grid gap-4">
-      {posts.map((post) => <PostCard post={post} />)}
-    </div>
-  ) : (
-    <p class="text-muted">No translations published yet — check back soon.</p>
-  )}
+  <h2 class="text-xl font-bold mb-3">Featured series</h2>
+  <div class="grid gap-4 sm:grid-cols-3 mb-10">
+    {featured.map((s) => (
+      <a
+        href={`/en/start/#${s.slug}`}
+        class="block bg-surface border border-line rounded-lg p-4 no-underline hover:border-accent transition-colors"
+        style={`border-top:3px solid ${s.color}`}
+      >
+        <p class="font-bold text-ink mb-1 leading-snug">{s.enName}</p>
+        <p class="text-muted text-xs mb-2">{s.count} {s.count === 1 ? 'post' : 'posts'} in English</p>
+        <p class="text-muted text-sm m-0">{s.enBlurb}</p>
+      </a>
+    ))}
+  </div>
+  <p class="text-sm text-muted -mt-6 mb-10">
+    The full map — all {seriesList.length} series, with the untranslated posts marked →
+    <a href="/en/start/" class="text-accent hover:underline">see everything</a>
+  </p>
+
+  <h2 class="text-xl font-bold mb-3">Latest in English</h2>
+  <div class="space-y-4 mb-8">
+    {latest.map((p) => <PostCard post={p} />)}
+  </div>
+  <p class="text-sm">
+    <a href="/en/tech/" class="text-accent hover:underline">All English posts</a> ·
+    <a href="/en/tools/" class="text-accent hover:underline">Tools</a> ·
+    <a href="/en/guides/" class="text-accent hover:underline">Guides</a>
+  </p>
 </BaseLayout>
