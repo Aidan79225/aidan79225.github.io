@@ -1,11 +1,16 @@
 ---
 import { author } from '../data/author';
+import type { Locale } from '../lib/i18n';
+// `locale` is the content language of the post above the card (PostLayout
+// passes `lang`), so an English post gets the English bio.
+interface Props { locale?: Locale }
+const { locale = 'zh-hant' } = Astro.props;
 ---
 <aside class="mt-12 pt-6 border-t border-line flex items-center gap-4">
   <img src={author.avatar} alt={author.name} class="w-16 h-16 rounded-full" />
   <div>
     <p class="font-bold">{author.name}</p>
-    <p class="text-muted text-sm">{author.bio} · {author.location}</p>
+    <p class="text-muted text-sm">{author.bio[locale]} · {author.location}</p>
     <p class="text-sm">
       {author.links.map((l, i) => (
         <span>{i > 0 ? ' · ' : ''}<a href={l.url} class="text-accent hover:underline">{l.label}</a></span>

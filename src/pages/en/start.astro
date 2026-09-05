@@ -1,0 +1,210 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import { getPublishedPosts } from '../../lib/posts';
+import { seriesList, seriesBySlug } from '../../data/series';
+import type { CollectionEntry } from 'astro:content';
+
+// English counterpart of /start/. Same Clean Architecture layering, same
+// series registry, but every post is listed in English where a translation
+// exists and marked (中文) where it doesn't — the map stays complete, and every
+// link works because /en/blog/<slug>/ exists for untranslated posts too.
+const zh = await getPublishedPosts();
+const en = await getPublishedPosts('en');
+const enByOriginal = new Map(en.map((p) => [p.data.translationOf!, p]));
+const byId = new Map(zh.map((p) => [p.id, p]));
+
+type Entry = { id: string; title: string; translated: boolean };
+const entry = (p: CollectionEntry<'blog'>): Entry => {
+  const t = enByOriginal.get(p.id);
+  return { id: p.id, title: (t ?? p).data.title, translated: !!t };
+};
+const bySeries = (name: string) =>
+  zh
+    .filter((p) => p.data.series === name)
+    .sort((a, b) => (a.data.seriesOrder ?? 0) - (b.data.seriesOrder ?? 0))
+    .map(entry);
+const pick = (ids: string[]) =>
+  ids.map((id) => byId.get(id)).filter((p): p is CollectionEntry<'blog'> => !!p).map(entry);
+
+const sGroup = (slug: string, prefix = '') => {
+  const s = seriesBySlug.get(slug)!;
+  return { slug, heading: prefix + (s.enName ?? s.name), posts: bySeries(s.name) };
+};
+
+const layers = [
+  {
+    tag: 'Core · Domain',
+    color: 'var(--hue-green)',
+    title: 'Core concepts: the most stable, most portable layer',
+    blurb:
+      "This is the layer you keep using through several jobs — the query language, the mental map of data engineering, the principles behind data-intensive systems. Tools get replaced; these don't. Get this solid first, then move outward.",
+    groups: [sGroup('fode'), sGroup('sql'), sGroup('ddia')],
+  },
+  {
+    tag: 'Application & architecture',
+    color: 'var(--hue-blue)',
+    title: 'Transformation and architecture: organising concepts into systems',
+    blurb:
+      'The layer between concepts and tools — how raw data is refined into usable models, how transformation and layering are arranged, and a few architectural ideas I think are most worth understanding.',
+    groups: [
+      { heading: null, posts: pick(['dbt-intro', 'medallion-architecture', 'pain-before-power']) },
+    ],
+  },
+  {
+    tag: 'Infrastructure',
+    color: 'var(--hue-amber)',
+    title: 'Infrastructure: the concrete tools that make the concepts real',
+    blurb:
+      'The outermost, most concrete, most replaceable layer. Each of these tools turns the concepts above into something that runs — but they are the means, and the core concepts are the end. When looking at a tool, keep asking which concept it implements.',
+    groups: [
+      sGroup('redis', 'In-memory data structures · '),
+      sGroup('kafka', 'Event streaming · '),
+      sGroup('spark', 'Distributed computing · '),
+      sGroup('airflow', 'Workflow orchestration · '),
+      sGroup('k8s', 'Container orchestration · '),
+      sGroup('iac', 'Infrastructure as code · '),
+      sGroup('ansible', 'Configuration management · '),
+      { heading: 'Distributed coordination · standalone', posts: pick(['zookeeper']) },
+      sGroup('infra', 'A horizontal view: running data tools as infra (operations / deployment / platform) · '),
+    ],
+  },
+  {
+    tag: 'Cross-cutting',
+    color: 'var(--hue-pink)',
+    title: 'Reliability and observability: across every layer',
+    blurb:
+      "This layer cuts across everything — data has to be correct, services have to stay up, changes have to be safe, and all of that presupposes being able to see. SRE covers the concepts and culture of reliability (the why); the Grafana LGTM stack covers turning it into real dashboards, alerts and SLOs (the how). It's also where I spend the most effort now, as the DE team's EM and its SRE at once.",
+    groups: [
+      sGroup('sre', 'Concepts and culture of reliability · '),
+      sGroup('obs', 'Observability tooling: the LGTM stack · '),
+    ],
+  },
+  {
+    tag: 'Practice · War Stories',
+    color: 'var(--hue-lime)',
+    title: 'War stories: rebuilding real systems',
+    blurb:
+      "Every concept above is tested here against systems I actually built (and actually got wrong). The first battlefield: a live-commerce platform — users ordering by comment, inventory that must never oversell, payments and fulfillment in one chain; each chapter first tells how it was done then, and how I'd design it if starting over.",
+    groups: [sGroup('rezero')],
+  },
+  {
+    tag: 'Beyond tech',
+    color: 'var(--hue-grey)',
+    title: 'People and growth: tech leadership',
+    blurb: 'The other line beyond technology — the lessons of leading people, and, just as important from 2026 on, the lessons of leading AI.',
+    groups: [sGroup('btl'), sGroup('ai-craft')],
+  },
+];
+
+const alternates = [
+  { hreflang: 'zh-Hant', href: new URL('/start/', Astro.site).href },
+  { hreflang: 'en', href: new URL('/en/start/', Astro.site).href },
+  { hreflang: 'x-default', href: new URL('/start/', Astro.site).href },
+];
+---
+<BaseLayout
+  title="Start Here"
+  description="Start here — this blog organised by Clean Architecture's layers: core concepts (SQL, data engineering, DDIA) inside and most stable; infrastructure tools (Redis, Kafka, Spark, Airflow, Kubernetes, and an infra view of them) outside and most concrete; SRE reliability and Grafana LGTM observability cutting across every layer; tech leadership beyond the technology."
+  locale="en"
+  alternates={alternates}
+>
+  <h1 class="text-3xl font-bold mb-2">Start here</h1>
+  <p class="text-muted mb-3">
+    Most posts here explain something complex with one diagram and concise text. I've organised them by borrowing the layers of
+    <strong class="text-ink">Clean Architecture</strong> — <strong class="text-ink">the closer to the core, the more stable and portable (concepts); the further out, the more concrete and replaceable (tools)</strong>.
+    Dependencies point inward, and so does learning: get the inner concepts solid first, then learn the tools that will eventually be swapped out.
+  </p>
+  <p class="text-muted text-sm mb-6">
+    This is the complete map. Posts translated into English are listed by their English title; the rest are marked
+    <span class="text-xs bg-base border border-line rounded px-1.5 py-0.5 font-mono" lang="zh-Hant">中文</span>
+    and open the Chinese original — {en.length} of {zh.length} posts are in English so far.
+  </p>
+
+  <nav class="flex flex-wrap gap-2 mb-6" aria-label="Jump to a series">
+    {seriesList.map((s) => (
+      <a
+        href={`#${s.slug}`}
+        class="text-xs bg-surface border border-line rounded px-2 py-1 text-ink hover:text-accent no-underline"
+        style={`border-left:3px solid ${s.color}`}
+      >{s.enName ?? s.name}</a>
+    ))}
+  </nav>
+
+  <figure class="my-6 flex justify-center">
+    <svg viewBox="0 0 600 350" role="img" aria-label="This blog organised as Clean Architecture's concentric circles. The innermost ring is core concepts, Domain, with SQL, data engineering and DDIA: the most stable and portable. The middle ring is application and architecture, such as dbt and Medallion. The outer ring is infrastructure, with Redis, Kafka, Spark, Airflow and Kubernetes: the most concrete and most often replaced. Dependencies point from outside in: outer layers depend on inner ones, never the reverse; outer tools get replaced, inner concepts must stay stable. Learn core concepts first, then concrete tools. SRE reliability cuts across every layer, the war-stories series ties every layer together against real systems, and Tech Leader sits beyond the technology." style="width:100%;max-width:600px;height:auto;">
+      <circle cx="180" cy="168" r="150" fill="#1f2330" stroke="#d6a45c" stroke-width="1.6"/>
+      <circle cx="180" cy="168" r="100" fill="#232838" stroke="#4f6df5" stroke-width="1.6"/>
+      <circle cx="180" cy="168" r="50" fill="#223528" stroke="#54b890" stroke-width="1.8"/>
+      <text x="180" y="44" fill="#d6a45c" font-size="12" text-anchor="middle" font-weight="bold">Infrastructure</text>
+      <text x="180" y="56" fill="#9aa4b2" font-size="7.6" text-anchor="middle">concrete · replaceable</text>
+      <text x="180" y="96" fill="#4f6df5" font-size="11" text-anchor="middle" font-weight="bold">Application</text>
+      <text x="180" y="107" fill="#9aa4b2" font-size="7.4" text-anchor="middle">transformation · architecture</text>
+      <text x="180" y="164" fill="#54b890" font-size="11" text-anchor="middle" font-weight="bold">Domain</text>
+      <text x="180" y="176" fill="#9aa4b2" font-size="7.2" text-anchor="middle">core concepts</text>
+      <text x="180" y="190" fill="#7fbfa0" font-size="7" text-anchor="middle">SQL · FoDE · DDIA</text>
+      <text x="180" y="250" fill="#8aa0e6" font-size="7.4" text-anchor="middle">dbt · Medallion</text>
+      <text x="180" y="300" fill="#d6b98a" font-size="7.6" text-anchor="middle">Redis · Kafka · Spark · Airflow · K8s</text>
+      <defs><marker id="dep" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto"><path d="M0,0 L0,6 L8,3 z" fill="#9aa4b2"/></marker></defs>
+      <line x1="575" y1="70" x2="392" y2="70" stroke="#9aa4b2" stroke-width="1.4" marker-end="url(#dep)"/>
+      <text x="483" y="62" fill="#e6e6e6" font-size="9" text-anchor="middle" font-weight="bold">Dependencies: outer → inner</text>
+      <text x="392" y="112" fill="#9aa4b2" font-size="8.6" text-anchor="start">Outer layers depend on inner ones,</text>
+      <text x="392" y="127" fill="#9aa4b2" font-size="8.6" text-anchor="start">never the reverse.</text>
+      <text x="392" y="152" fill="#9aa4b2" font-size="8.6" text-anchor="start">Outer (tools) get replaced;</text>
+      <text x="392" y="167" fill="#9aa4b2" font-size="8.6" text-anchor="start">inner (concepts) stay stable.</text>
+      <text x="392" y="196" fill="#54b890" font-size="8.8" text-anchor="start" font-weight="bold">Learning order:</text>
+      <text x="392" y="210" fill="#54b890" font-size="8.8" text-anchor="start" font-weight="bold">core concepts first, then tools</text>
+      <rect x="392" y="232" width="185" height="30" rx="6" fill="#3a2632" stroke="#e05a7d" stroke-width="1.3"/>
+      <text x="404" y="248" fill="#e05a7d" font-size="8.6" text-anchor="start" font-weight="bold">SRE + LGTM observability</text>
+      <text x="404" y="258" fill="#9aa4b2" font-size="7.4" text-anchor="start">reliability cuts across every layer</text>
+      <rect x="392" y="268" width="185" height="30" rx="6" fill="#28331f" stroke="#9ccc65" stroke-width="1.2"/>
+      <text x="404" y="284" fill="#9ccc65" font-size="8.6" text-anchor="start" font-weight="bold">War stories — tested in practice</text>
+      <text x="404" y="294" fill="#9aa4b2" font-size="7.4" text-anchor="start">real systems tie every layer together</text>
+      <rect x="392" y="304" width="185" height="30" rx="6" fill="#262b3a" stroke="#9aa4b2" stroke-width="1.2"/>
+      <text x="404" y="323" fill="#e6e6e6" font-size="8.6" text-anchor="start">Tech Leader — beyond the technology</text>
+    </svg>
+  </figure>
+
+  <div class="space-y-6">
+    {layers.map((layer) => (
+      <section class="bg-surface border border-line rounded-lg p-5" style={`border-left:3px solid ${layer.color}`}>
+        <span
+          class="inline-block text-[11px] font-mono font-bold mb-2 px-2 py-0.5 rounded"
+          style={`color:${layer.color};border:1px solid ${layer.color}`}
+        >{layer.tag}</span>
+        <h2 class="text-xl font-bold mb-1">{layer.title}</h2>
+        <p class="text-muted text-sm mb-4">{layer.blurb}</p>
+        <div class="space-y-4">
+          {layer.groups.map((g) => (
+            <div id={'slug' in g ? g.slug : undefined} class="scroll-mt-4">
+              {g.heading && (
+                <p class="text-xs text-muted mb-2">
+                  📚 {g.heading}{'slug' in g && ` · ${g.posts.length} ${g.posts.length === 1 ? 'post' : 'posts'}`}
+                  {'slug' in g && (() => { const n = g.posts.filter((p) => p.translated).length; return n < g.posts.length ? ` (${n} in English)` : ''; })()}
+                </p>
+              )}
+              <ol class="list-none m-0 p-0 space-y-1.5">
+                {g.posts.map((p, i) => (
+                  <li class="flex gap-3 items-baseline">
+                    <span class="text-accent text-sm font-mono shrink-0 w-5 text-right">{i + 1}</span>
+                    <a
+                      href={`/en/blog/${p.id}/`}
+                      class="text-ink hover:text-accent no-underline text-sm leading-relaxed"
+                      lang={p.translated ? undefined : 'zh-Hant'}
+                    >{p.title}</a>
+                    {!p.translated && (
+                      <span class="text-[10px] bg-base border border-line rounded px-1 py-0.5 font-mono text-muted shrink-0" lang="zh-Hant" title="Not translated yet — opens the Chinese original">中文</span>
+                    )}
+                  </li>
+                ))}
+              </ol>
+            </div>
+          ))}
+        </div>
+      </section>
+    ))}
+  </div>
+
+  <p class="text-muted text-sm mt-8">
+    Looking for a specific topic? Use the search at the top right, or browse by <a href="/en/tags/" class="text-accent hover:underline">tag</a>.
+  </p>
+</BaseLayout>

@@ -145,7 +145,7 @@ const showToc = tocHeadings.length >= 3;
       </aside>
     )}
 
-    <AuthorCard />
+    <AuthorCard locale={lang} />
     {post.data.comments !== false && <Comments issueNumber={post.data.commentsIssue} />}
   </article>
 </BaseLayout>

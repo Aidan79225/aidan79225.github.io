@@ -1,0 +1,32 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import { getPublishedPosts, byDateDesc } from '../../lib/posts';
+
+// English counterpart of /tech/: every translated tech post, newest first.
+// (Without this file /en/tech/ would be the zh list served as a fallback.)
+const posts = (await getPublishedPosts('en'))
+  .filter((p) => p.data.category === 'tech')
+  .sort(byDateDesc);
+
+const alternates = [
+  { hreflang: 'zh-Hant', href: new URL('/tech/', Astro.site).href },
+  { hreflang: 'en', href: new URL('/en/tech/', Astro.site).href },
+  { hreflang: 'x-default', href: new URL('/tech/', Astro.site).href },
+];
+---
+<BaseLayout
+  title="Tech"
+  description="Tech posts in English — data engineering and backend: Airflow, Spark, Kafka, dbt, data architecture and tech leadership, with complex ideas explained in diagrams."
+  locale="en"
+  alternates={alternates}
+>
+  <h1 class="text-2xl font-bold mb-1">Tech</h1>
+  <p class="text-muted text-sm mb-4">
+    {posts.length} posts translated into English so far. For the complete list, including posts still only in Chinese,
+    see <a href="/en/start/" class="text-accent hover:underline">Start here</a>.
+  </p>
+  <div class="space-y-4">
+    {posts.map((p) => <PostCard post={p} />)}
+  </div>
+</BaseLayout>
