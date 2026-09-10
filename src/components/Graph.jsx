@@ -20,6 +20,8 @@ const SERIES = [
   ['Grafana LGTM 可觀測性', 'magenta', 'LGTM'],
   ['Re:從零開始做直播代購電商平台', 'lime', 'Re:0'],
   ['成為 Tech Leader 讀書筆記', 'pink', 'Tech Leader'],
+  // 與 Tech Leader 共用 pink:同一層(技術領導)的兩個系列,靠標籤區分
+  ['An Elegant Puzzle 讀書筆記', 'pink', 'Puzzle'],
 ];
 const HUE = Object.fromEntries(SERIES.map(([s, h]) => [s, h]));
 const OTHER = 'grey';
