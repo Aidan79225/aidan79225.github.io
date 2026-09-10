@@ -28,6 +28,7 @@
 | `obs` | Grafana LGTM 可觀測性 | Observability with the Grafana LGTM Stack |
 | `rezero` | Re:從零開始做直播代購電商平台 | Re:Building a Live-Commerce Platform from Zero |
 | `btl` | 成為 Tech Leader 讀書筆記 | Becoming a Tech Leader — Reading Notes |
+| `aep` | An Elegant Puzzle 讀書筆記 | An Elegant Puzzle — Reading Notes |
 | `ai-craft` | 帶 AI 的手藝(2026) | The Craft of Working with AI (2026) |
 | *(未登記)* | Jenkins 學習筆記 | Jenkins — Learning Notes |
 

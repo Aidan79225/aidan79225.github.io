@@ -9,7 +9,7 @@ tags:
 series: "An Elegant Puzzle 讀書筆記"
 seriesOrder: 1
 comments: true
-draft: true
+draft: false
 ---
 站內已經有一個領導力系列了([[btl-1|成為 Tech Leader]]),為什麼還要再開一個?
 
@@ -35,7 +35,7 @@ draft: true
     <rect x="106" y="150" width="100" height="34" rx="7" fill="#262b3a" stroke="#4f6df5" stroke-width="1.6"/>
     <text x="156" y="171" fill="#e6e6e6" font-size="11" text-anchor="middle">你</text>
     <text x="156" y="204" fill="#9aa4b2" font-size="9" text-anchor="middle">一件一件處理完 ✓</text>
-    <path d="M 236 167 C 286 150 286 78 272 71" fill="none" stroke="#e05a7d" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#aep1)"/>
+    <path d="M 236 167 C 288 150 288 78 268 71" fill="none" stroke="#e05a7d" stroke-width="1.3" stroke-dasharray="4 3" marker-end="url(#aep1)"/>
     <text x="156" y="232" fill="#e05a7d" font-size="9.5" text-anchor="middle">下週一樣多——源頭一根寒毛都沒動</text>
     <line x1="310" y1="30" x2="310" y2="240" stroke="#3a4154" stroke-width="1" stroke-dasharray="4 4"/>
     <text x="464" y="24" fill="#e6e6e6" font-size="12.5" text-anchor="middle" font-weight="bold">改系統</text>

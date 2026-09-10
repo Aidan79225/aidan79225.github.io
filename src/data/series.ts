@@ -143,6 +143,14 @@ export const seriesList: SeriesInfo[] = [
     color: 'var(--hue-grey)',
   },
   {
+    slug: 'aep',
+    name: 'An Elegant Puzzle 讀書筆記',
+    enName: 'An Elegant Puzzle — Reading Notes',
+    blurb: '讀 Will Larson 的《An Elegant Puzzle》——把工程管理當系統設計:團隊編制、四種團隊狀態、遷移、政策與職級,以及四個工程師的最低可行版本。',
+    enBlurb: "Reading Will Larson's An Elegant Puzzle — engineering management as systems design: team sizing, the four states of a team, migrations, policy and career ladders, and the minimum viable version of all of it for a team of four.",
+    color: 'var(--hue-grey)',
+  },
+  {
     slug: 'ai-craft',
     name: '帶 AI 的手藝(2026)',
     enName: 'The Craft of Working with AI (2026)',
