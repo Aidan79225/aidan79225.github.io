@@ -9,7 +9,7 @@ tags:
 series: "An Elegant Puzzle 讀書筆記"
 seriesOrder: 2
 comments: true
-draft: true
+draft: false
 ---
 「團隊該幾個人」聽起來像 HR 的題目——其實它是這本書第一個、也是最有操作性的系統設計題。Larson 給的數字很直接:**一個 manager 帶 6 到 8 個工程師,一個帶 manager 的 manager 帶 4 到 6 個 manager。**
 

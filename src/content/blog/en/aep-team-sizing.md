@@ -10,7 +10,7 @@ series: "An Elegant Puzzle — Reading Notes"
 seriesOrder: 2
 comments: true
 translationOf: aep-team-sizing
-draft: true
+draft: false
 ---
 "How many people should a team have" sounds like an HR question. It's actually the book's first and most operational piece of systems design. Larson's numbers are direct: **a manager supports six to eight engineers; a manager of managers supports four to six managers.**
 
