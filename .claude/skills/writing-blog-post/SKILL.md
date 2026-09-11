@@ -27,6 +27,7 @@ This blog is **Aidan's personal brand / professional image** (a Backend Lead's t
 - Summary: surfaces points the source left unclear? A non-reader gets the gist in 5 min? Distilled into structure (not copied)? Does the prose stay lean around the diagram instead of repeating it?
 - Reflection: specific (real examples, numbers, situations)? Has your own judgment, not neutral restatement?
 - Overall: summary and reflection echo each other? Reflection not rushed (it's the selling point)?
+- **最後一步**:中文定稿後,接 `translating-to-english` 補英文版(見〈最後一步:接著補英文版〉)——系列文從 `seriesOrder: 1` 連續往下翻,別跳著翻。
 
 ## Front matter conventions (schema: `src/content.config.ts`)
 | Field | Note |
@@ -109,6 +110,17 @@ Inline diagram — for concept posts this is expected, not optional (whole block
 </figure>
 ```
 
+## 最後一步:接著補英文版
+
+中文定稿之後,**這篇還沒做完**——最後一步是叫 `translating-to-english` skill 把它翻成英文,放到 `src/content/blog/en/<同檔名>.md`。
+
+- **為什麼是現在**:剛寫完是成本最低的時刻——術語怎麼定、語氣怎麼收、圖裡哪句話是重點,都還在腦袋裡。拖成 backlog 之後等於重讀一次自己的文章,而且系列會累積翻譯債。
+- **怎麼接**:呼叫 `translating-to-english`(把這篇的 slug 給它),照那份 skill 的規矩走——`translationOf` 指回原文 slug、`series` 取英譯詞彙表 A 區的字串、`tags` 不翻、`draft` **照抄中文版的狀態**(中文還是草稿,英文就一起留草稿)。
+- **系列文要按順序翻**:從 `seriesOrder: 1` 連續往下。英文系列盒只列已翻譯的篇並自動編號,跳著翻會顯示成 1、2、3,prev/next 也會跳過中間那些。
+- **翻譯時發現術語表缺詞,補回 `docs/<key>-series-roadmap.md` 的〈術語表〉**,不要只寫進譯稿——下一篇還會用到同一個決定。
+- **圖要重新配寬**:英文大約是中文的 1.5–2 倍寬,同一個框塞不下。`translating-to-english` 有完整的處理順序(先砍字、再降字級、最後才動 viewBox)。
+- 例外:食物文、純個人紀錄可以不翻;**技術文預設要翻**。
+
 ## Common mistakes
 - Explaining a complex concept in text only → the blog's essence is visual; lead with a diagram that carries the model.
 - A diagram that just decorates (a logo, a vague box) instead of explaining → it must encode the actual mental model (flow, contrast, structure), or it's noise.
@@ -117,5 +129,6 @@ Inline diagram — for concept posts this is expected, not optional (whole block
 - 系列文用詞跟前幾篇不一致(同一個概念兩個名字)→ 動筆前查 roadmap 的術語表,寫完回填新詞。
 - CJK / spaced tag slugs → use ASCII slugs.
 - Blank lines inside an inline SVG → diagram breaks into a code block.
+- 中文寫完就收工,英文版無限期延後 → 翻譯成本隨時間上升,系列還會累積翻譯債。**最後一步就是接 `translating-to-english`**(見上一節)。
 
 **Existing examples:** `src/content/blog/btl-1.md` ~ `btl-4.md`.
