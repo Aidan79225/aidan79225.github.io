@@ -21,7 +21,7 @@ draft: false
 先講一個寫到系列中段才浮現的體悟。有一天我盯著這個系統的全貌,突然發現它很眼熟:**我們做的每一件事,都是一台資料庫內部構造的放大版。**
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 580 288" role="img" aria-label="一台拆開的資料庫:左欄是資料庫內部構造,右欄是我們系統的對應物,逐列對照。先寫日誌對應留言清洗後先落地;log consumer 建索引對應 FSM batch 建購物車;物化視圖對應賣出數量計數;讀時計算的 view 對應付款與訂單狀態讀時派生;redo log 對應可重放的配貨紀錄;內建排程對應 heartbeat 掃表;repair 對應每小時重算賣出數量。底部結論:拆開的代價,是資料庫免費送的交易保證得自己一項項補回來。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
+  <svg viewBox="0 0 580 288" role="img" aria-label="一台拆開的資料庫:左欄是資料庫內部構造,右欄是我們系統的對應物,逐列對照。先寫日誌對應留言清洗後先落地;log consumer 建索引對應 FSM batch 建購物車;物化視圖對應賣出數量計數;讀時計算的 view 對應付款與訂單的聚合狀態讀時派生;redo log 對應可重放的配貨紀錄;內建排程對應 heartbeat 掃表;repair 對應每小時重算賣出數量。底部結論:拆開的代價,是資料庫免費送的交易保證得自己一項項補回來。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
     <text x="145" y="24" fill="#4f6df5" font-size="8.4" text-anchor="middle" font-weight="bold">一台資料庫的裡面</text>
     <text x="435" y="24" fill="#9ccc65" font-size="8.4" text-anchor="middle" font-weight="bold">我們的系統</text>
     <rect x="30" y="36" width="230" height="22" rx="4" fill="#1f2330" stroke="#4f6df5" stroke-width="1"/>
@@ -42,7 +42,7 @@ draft: false
     <rect x="30" y="120" width="230" height="22" rx="4" fill="#1f2330" stroke="#4f6df5" stroke-width="1"/>
     <text x="145" y="135" fill="#e6e6e6" font-size="6.8" text-anchor="middle">view:讀的時候才計算</text>
     <rect x="320" y="120" width="230" height="22" rx="4" fill="#1f2330" stroke="#3a4154" stroke-width="1"/>
-    <text x="435" y="135" fill="#e6e6e6" font-size="6.8" text-anchor="middle">付款/訂單狀態讀時派生</text>
+    <text x="435" y="135" fill="#e6e6e6" font-size="6.8" text-anchor="middle">付款/訂單聚合狀態:讀時派生</text>
     <line x1="260" y1="131" x2="320" y2="131" stroke="#3a4154" stroke-width="1" stroke-dasharray="3 3"/>
     <rect x="30" y="148" width="230" height="22" rx="4" fill="#1f2330" stroke="#4f6df5" stroke-width="1"/>
     <text x="145" y="163" fill="#e6e6e6" font-size="6.8" text-anchor="middle">redo log:可重放的變更史</text>
@@ -73,13 +73,13 @@ draft: false
 
 先把三本帳和它們的 source of truth 攤開:
 
-- **庫存帳**:庫存上限+賣出數量,[[rezero-inventory|一張獨立表、兩個欄位]]。
+- **庫存帳**:庫存上限+兩個消耗計數(購物車/訂單),[[rezero-inventory|一張獨立表、三個數字]]。
 - **訂單帳**:order 與 order item,金額在成交當下[[rezero-cart-order|定格成會計事實]]。
 - **金流帳**:orders payment,配上 [[rezero-payment|per-provider 的付款事實表]]。
 
 帳會錯,必要條件是**同一個事實存在兩份、而且各自更新**——冗餘才會漂移。用這把尺量三本帳,結果很有趣:
 
-**訂單帳和金流帳,幾乎沒有冗餘。**訂單「狀態」不是一個欄位,是讀取時從事實派生的;付款進度不是一個布林,是把 per-provider 事實表加總出來的。[[rezero-promotion|優惠金額]]用 floor-and-subtract,總和恆等是算法保證,不是事後核對出來的。**沒有第二本會漂的帳,就沒有帳要對**——這不是我們對帳做得好,是這兩本帳從結構上取消了對帳的必要。
+**訂單帳和金流帳,幾乎沒有冗餘。**訂單「狀態」沒有一顆聚合的 status 欄位——各維度直接跟著事實走,聚合的判讀在讀取時發生;付款進度不是一個布林,是把 per-provider 事實表加總出來的。[[rezero-promotion|優惠金額]]用 floor-and-subtract,總和恆等是算法保證,不是事後核對出來的。**沒有第二本會漂的帳,就沒有帳要對**——這不是我們對帳做得好,是這兩本帳從結構上取消了對帳的必要。
 
 **庫存帳,有一個冗餘。**賣出數量是全系統唯一刻意物化的數字——為了直播當下的速度,不物化不行。它也真的漂過:[[rezero-inventory|migrate 那次超賣]],就是這個數字被需求變更打歪。而它配的防線,就是每小時重算:照著購物車和訂單的事實,把計數整個算回來。**一個冗餘,配一個修復迴圈,收支平衡。**
 
@@ -127,7 +127,7 @@ draft: false
 
 這個不對稱很值得看一眼。少收是公司的損失,對客人沒有影響,所以安靜地在內部處理;多收動了客人的錢,所以走最貴的渠道(客服電話)、給最有誠意的補償。**修帳的方向決定誰買單、用什麼貨幣付**——這又是一次[[rezero-fulfillment|機制歸系統、政策歸人]]:系統提供事實,人決定正義。
 
-而這一整套的實際戰績是:**上線後,幾乎沒印象處理過錯帳。**連[[rezero-cart-order|結束檔期]]那個一次動幾千筆資料的大結算,都只做黑名單、清購物車、清未付款訂單——不核帳,照樣跑得意外地順。當年我們把這歸功於乖乖遵守 3NF;現在我可以講得更準:**3NF 就是「同一個事實只存一份」的紀律,它在源頭掐死了漂移。**
+而這一整套的實際戰績是:**上線後,幾乎沒印象處理過錯帳。**連[[rezero-inventory|結束檔期]]那個一次動幾千筆資料的大結算,都只做黑名單、清購物車、清未付款訂單——不核帳,照樣跑得意外地順。當年我們把這歸功於乖乖遵守 3NF;現在我可以講得更準:**3NF 就是「同一個事實只存一份」的紀律,它在源頭掐死了漂移。**
 
 ## 重來:把「幾乎沒事」變成「可證明沒事」
 
