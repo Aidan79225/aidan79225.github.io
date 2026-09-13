@@ -30,7 +30,7 @@
 
 | # | slug | 章 | 主題 | 狀態 |
 |---|---|---|---|---|
-| 9 | `btl-9` | Ch10–11 The First / Second Great Obstacle to Motivating Others | 激勵的兩大障礙:別人是隱形的(明星工程師的 solo 敘事)/ 把人當電腦下指令(失真鏈 SVG、人=任務);反思=重讀「成員不理解」+ KPI 是鏈尾輸出 | 🚧 草稿(`draft: true`,待發布) |
+| 9 | `btl-9` | Ch10–11 The First / Second Great Obstacle to Motivating Others | 激勵的兩大障礙:別人是隱形的(明星工程師的 solo 敘事)/ 把人當電腦下指令(失真鏈 SVG、人=任務);反思=重讀「成員不理解」+ KPI 是鏈尾輸出 | ✅ 已發布 |
 | 10 | `btl-10` | Ch12–13 The Problem of Helping People / Learning to Be a Motivator | 幫助人為什麼這麼難;怎麼練成一個激勵者。反思素材:LoL 觀察——寧玩難操作但有趣的角色輸,不玩無聊角色贏;不玩石頭人/好運姊/凱莎(角色自帶保底),選 Irelia/達瑞文/煞蜜拉(表現天花板在玩家手上,達瑞文接斧、煞蜜拉 S 評價=遊戲幫操作打分)。深層:連贏都要「可歸因給自己的贏」=防偽標籤的遊戲版(內在動機/mastery 驅動;帶人時別預設成員動機跟自己同型) | 📝 未寫 |
 | 11 | `btl-11` | Ch14–15 Where Power Comes From / Power, Imperfection, and Congruence | 力量的來源;不完美與言行一致(congruence) | 📝 未寫 |
 
