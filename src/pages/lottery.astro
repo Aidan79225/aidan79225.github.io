@@ -168,9 +168,20 @@ import '../styles/tools.css';
     }
 
     function updateCounts() {
+      const lists = {};
+      for (const id of LISTS) lists[id] = uniqueLines($(id).value);
+      // 一般名單裡若混到優先戶／優先車位,抽籤時會被剔除(優先勝),
+      // 計數就照實際進池的算,才跟下面統計條的「參與戶數／車位總數」對得起來。
+      const dropped = {
+        households: lists.households.filter((h) => lists.priorityHouseholds.includes(h)).length,
+        parkings: lists.parkings.filter((p) => lists.priorityParkings.includes(p)).length,
+        priorityHouseholds: 0,
+        priorityParkings: 0,
+      };
       for (const id of LISTS) {
-        const n = uniqueLines($(id).value).length;
-        $(COUNTERS[id]).textContent = n + (id.toLowerCase().includes('parking') ? ' 位' : ' 戶');
+        const unit = id.toLowerCase().includes('parking') ? ' 位' : ' 戶';
+        const n = lists[id].length - dropped[id];
+        $(COUNTERS[id]).textContent = n + unit + (dropped[id] ? `(${dropped[id]} 筆已歸優先)` : '');
       }
     }
 
