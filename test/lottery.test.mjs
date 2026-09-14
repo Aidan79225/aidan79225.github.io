@@ -115,3 +115,38 @@ test('相鄰 seed 不會產生相關的洗牌結果', () => {
   const b = shuffleArray([1, 2, 3, 4, 5, 6, 7, 8], makeRng(SEED + 1, 'winners'));
   assert.notDeepEqual(a, b);
 });
+
+test('候補順位涵蓋所有未中籤戶,且不含中籤戶', () => {
+  const d = drawLots(base);
+  assert.deepEqual(d.waitlist.slice().sort(compareNames), d.losers);
+  for (const h of d.waitlist) assert.ok(!Object.values(d.result).includes(h));
+});
+
+test('候補順位是同一次抽籤洗牌的後段', () => {
+  const d = drawLots(base);
+  const order = shuffleArray([...d.households], makeRng(d.seed, 'winners'));
+  assert.deepEqual(d.waitlist, order.slice(d.parkings.length));
+});
+
+test('候補順位不是照門牌排的(不然小門牌永遠排第一)', () => {
+  // 單一 seed 可能碰巧洗出門牌順序，看多個 seed：只要有一個不同就證明沒被排序掉
+  const differs = Array.from({ length: 20 }, (_, i) => drawLots({ ...base, parkings: [], seed: SEED + i }))
+    .some((d) => d.waitlist.join() !== d.waitlist.slice().sort(compareNames).join());
+  assert.ok(differs, '每個 seed 的候補順位都剛好等於門牌排序，八成是被 sort 掉了');
+});
+
+test('同一個 seed 的候補順位可重現', () => {
+  assert.deepEqual(drawLots(base).waitlist, drawLots(base).waitlist);
+  assert.notDeepEqual(drawLots(base).waitlist, drawLots({ ...base, seed: base.seed + 1 }).waitlist);
+});
+
+test('車位夠給所有人時沒有候補', () => {
+  const d = drawLots({ seed: SEED, households: ['A'], priorityHouseholds: [], parkings: ['P1', 'P2'], priorityParkings: [] });
+  assert.deepEqual(d.waitlist, []);
+});
+
+test('候補順位每一戶只出現一次', () => {
+  const d = drawLots({ ...base, parkings: [] });
+  assert.equal(new Set(d.waitlist).size, d.waitlist.length);
+  assert.equal(d.waitlist.length + Object.keys(d.result).length, d.households.length);
+});

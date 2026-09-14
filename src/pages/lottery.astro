@@ -96,8 +96,15 @@ import '../styles/tools.css';
         <li>以 <code>winners</code> 流從全體住戶中抽出「車位數」這麼多的中籤戶。</li>
         <li>中籤戶中屬於優先戶者,依序先填優先車位。</li>
         <li>其餘中籤戶填入剩下的車位(順序由 <code>remainingParkings</code> 流決定)。</li>
-        <li>公布 seed 與名單 → 任何住戶把同樣的值填回這一頁,就會得到同一份結果。</li>
+        <li>沒中籤的戶<strong>不是丟掉</strong>,而是照同一次洗牌的名次排成<strong>候補順位</strong>
+          ——每一戶排到任一候補名次的機率相同,且一樣由 seed 決定,不是事後排的。</li>
+        <li>公布 seed 與名單 → 任何住戶把同樣的值填回這一頁,就會得到同一份結果(含候補順位)。</li>
       </ol>
+      <p class="lt-count" style="margin-top:.8rem">
+        <strong>遞補規則</strong>:有住戶退租時,空出來的車位由<strong>候補第 1 順位</strong>遞補,
+        不分優先車位或一般車位;該戶遞補後,其餘候補順位依序遞進。
+        優先只影響「中籤後停哪裡」,不影響中籤與遞補的先後。
+      </p>
       <p class="lt-count" style="margin-top:.8rem">
         一開啟載入的是範例名單(示意用的門牌與車位編號),按「清空輸入」後填入實際資料即可。
         所有運算都在瀏覽器內完成,名單不會送出。
@@ -233,15 +240,22 @@ import '../styles/tools.css';
       return wrap;
     }
 
-    function nameList(items) {
+    function nameList(items, numbered) {
       const box = document.createElement('div');
       box.className = 'lt-names';
-      for (const item of items) {
+      items.forEach((item, i) => {
         const chip = document.createElement('span');
         chip.className = 'lt-name';
-        chip.textContent = item;
+        if (numbered) {
+          const rank = document.createElement('b');
+          rank.className = 'lt-rank';
+          rank.textContent = String(i + 1);
+          chip.append(rank, document.createTextNode(item));
+        } else {
+          chip.textContent = item;
+        }
         box.append(chip);
-      }
+      });
       return box;
     }
 
@@ -277,14 +291,14 @@ import '../styles/tools.css';
         p.textContent = '目前沒有車位可抽,請先填入車位編號。';
         box.append(p);
       }
-      if (draw.losers.length) {
-        const g = group(`未中籤 ${draw.losers.length} 戶`);
-        g.append(nameList(draw.losers));
+      if (draw.waitlist.length) {
+        const g = group(`候補順位 ${draw.waitlist.length} 戶 —— 有人退租時由第 1 順位遞補`);
+        g.append(nameList(draw.waitlist, true));
         box.append(g);
       }
       if (draw.leftovers.length) {
         const g = group(`無人承租 ${draw.leftovers.length} 位`);
-        g.append(nameList(draw.leftovers));
+        g.append(nameList(draw.leftovers, false));
         box.append(g);
       }
 
@@ -319,7 +333,10 @@ import '../styles/tools.css';
       for (const row of toRows(draw)) {
         lines.push(`${row.parking}\t${row.household || '從缺'}${row.priority ? '\t(優先車位)' : ''}`);
       }
-      if (draw.losers.length) lines.push('', '未中籤的戶：', draw.losers.join('、'));
+      if (draw.waitlist.length) {
+        lines.push('', '候補順位（有人退租時由第 1 順位遞補）：');
+        draw.waitlist.forEach((h, i) => lines.push(`${i + 1}\t${h}`));
+      }
       if (draw.leftovers.length) lines.push('', '剩餘車位：', draw.leftovers.join('、'));
       return lines.join('\n');
     }
@@ -340,7 +357,11 @@ import '../styles/tools.css';
         if (data.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), name);
       };
       sheet('分配結果', allocation);
-      sheet('未中籤戶', current.losers.map((h) => ({ 未中籤戶: h })));
+      sheet('候補順位', current.waitlist.map((h, i) => ({
+        候補順位: i + 1,
+        戶名: h,
+        身分: current.priorityHouseholds.includes(h) ? '優先戶' : '一般戶',
+      })));
       sheet('剩餘車位', current.leftovers.map((p) => ({ 剩餘車位: p })));
       sheet('抽籤 seed', [{ seed: current.seed, 對應時間: getUTC8DateString(new Date(current.seed)) }]);
       sheet('原始資料一般戶名', uniqueLines($('households').value).map((h) => ({ 一般戶名: h })));

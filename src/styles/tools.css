@@ -348,6 +348,16 @@
     border-radius: 4px;
     color: var(--color-muted);
   }
+  .lt-name .lt-rank {
+    display: inline-block;
+    min-width: 1.4em;
+    margin-right: 0.4rem;
+    padding-right: 0.35rem;
+    border-right: 1px solid var(--color-line);
+    color: var(--color-accent);
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+  }
   .lt-empty { color: var(--color-muted); }
 
   /* 可驗證性 */

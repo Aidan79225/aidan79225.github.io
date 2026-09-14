@@ -68,7 +68,8 @@ export const compareNames = (a, b) => collator.compare(a, b);
  *   parkings: string[],               // 全部車位（優先車位在前）
  *   priorityParkings: string[],
  *   priorityHouseholds: string[],
- *   losers: string[],                 // 未中籤戶
+ *   waitlist: string[],               // 候補順位（未中籤戶，依抽籤順序；第一位先遞補）
+ *   losers: string[],                 // 未中籤戶（依門牌排序，供核對名單）
  *   leftovers: string[],              // 無人承租的車位
  * }}
  */
@@ -87,8 +88,12 @@ export function drawLots({ seed, households = [], priorityHouseholds = [], parki
   const totalHouseholds = [...priorityHouseholdList, ...generalHouseholds];
   const totalParkings = [...priorityParkingList, ...generalParkings];
 
-  // 先決定「誰中籤」：有幾個車位就抽幾戶。
-  const winners = shuffleArray([...totalHouseholds], makeRng(seed, 'winners')).slice(0, totalParkings.length);
+  // 先決定「誰中籤」：把全體住戶洗成一個完整排列，有幾個車位就取前幾名。
+  // 後段不是廢料 —— 那就是候補順位：同一次 Fisher–Yates 洗出來的均勻排列，
+  // 每一戶排到任一候補名次的機率相同，且同樣由 seed 決定，住戶可自行重跑驗證。
+  const drawOrder = shuffleArray([...totalHouseholds], makeRng(seed, 'winners'));
+  const winners = drawOrder.slice(0, totalParkings.length);
+  const waitlist = drawOrder.slice(totalParkings.length);
 
   // 中籤者中屬於優先戶的，先填優先車位。
   const result = {};
@@ -116,6 +121,7 @@ export function drawLots({ seed, households = [], priorityHouseholds = [], parki
     parkings: totalParkings,
     priorityParkings: priorityParkingList,
     priorityHouseholds: priorityHouseholdList,
+    waitlist,
     losers: totalHouseholds.filter((h) => !finalAssigned.has(h)).sort(compareNames),
     leftovers: totalParkings.filter((p) => !Object.prototype.hasOwnProperty.call(result, p)).sort(compareNames),
   };
