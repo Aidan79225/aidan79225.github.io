@@ -2,327 +2,398 @@
 import BaseLayout from '../layouts/BaseLayout.astro';
 import '../styles/tools.css';
 ---
-<BaseLayout title="車位抽籤">
-  <div class="tool-page">
-  <h2>車位抽籤系統</h2>
-  <div class="block seed-block">
-    <h3>抽籤 seed</h3>
-    <input type="text" id="seed" placeholder="可留空自動生成">
-    <h3>對應日期</h3>
-    <div id="date-display">尚未輸入 seed</div>
-  </div>
-  <div class="container">
-    <div class="block">
-      <h3>一般戶名</h3>
-      <textarea id="households"></textarea>
-    </div>
-    <div class="block">
-      <h3>優先戶名</h3>
-      <textarea id="priorityHouseholds"></textarea>
-    </div>
-    <div class="block">
-      <h3>一般車位</h3>
-      <textarea id="parkings"></textarea>
-    </div>
-    <div class="block">
-      <h3>優先車位</h3>
-      <textarea id="priorityParkings"></textarea>
-    </div>
-  </div>
-  <div>
-    <button onclick="drawLots()">抽籤</button>
-    <button onclick="downloadExcel()">下載 Excel</button>
-    <button onclick="fillExample()">範例填入</button>
-    <button onclick="clearInputs()">清空輸入</button>
-  </div>
-  <div class="result" id="result"></div>
-</div>
+<BaseLayout
+  title="車位抽籤"
+  description="社區車位抽籤工具 —— 以 seed 驅動的可重現抽籤(Mulberry32 + 具名亂數流),支援優先戶／優先車位,結果可複製、可下載 Excel,公布 seed 後任何住戶都能自行重跑驗證。"
+>
+  <div class="tool-page lottery">
+    <h2>🅿️ 車位抽籤</h2>
+    <p class="lt-intro">
+      抽籤結果由 <strong>seed</strong> 完全決定:公布 seed 與名單之後,任何住戶把同樣的值填回這一頁重跑,
+      就會得到<strong>一模一樣</strong>的分配。演算法與流程都在頁面上,沒有黑箱的空間
+      ——完整說明見<a href="/blog/lottery/" class="text-accent hover:underline">程式抽籤被質疑黑箱該如何處理</a>。
+    </p>
 
-  <style is:global>
-  .tool-page {
-    margin: 20px 0;
-  }
-  .tool-page textarea {
-    width: 300px;
-    min-height: 100px;
-    margin: 5px;
-    padding: 5px;
-    resize: none;
-  }
-  .tool-page button {
-    margin: 5px;
-    padding: 5px 10px;
-  }
-  .tool-page .container {
-    display: flex;
-    flex-wrap: wrap;
-  }
-  .tool-page .block {
-    margin-right: 20px;
-  }
-  .tool-page .result {
-    margin-top: 20px;
-    white-space: pre-line;
-  }
-  .tool-page .seed-block {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-  }
-  .tool-page .seed-block h3 {
-    margin: 0;
-    white-space: nowrap;
-  }
-  </style>
+    <h3>抽籤條件</h3>
+    <div class="lt-card">
+      <div class="lt-seed">
+        <label class="lt-field lt-grow">
+          <span class="lt-label">抽籤 seed(毫秒時間戳)</span>
+          <input type="text" id="seed" inputmode="numeric" placeholder="留空則以按下抽籤的當下時間為準" />
+        </label>
+        <div class="lt-time" id="seedTime">尚未輸入 seed</div>
+      </div>
+
+      <div class="lt-lists">
+        <div class="lt-field is-priority">
+          <div class="lt-head">
+            <label class="lt-label" for="priorityHouseholds">優先戶名</label>
+            <span class="lt-count" id="countPH">0 戶</span>
+          </div>
+          <textarea id="priorityHouseholds" spellcheck="false"></textarea>
+        </div>
+        <div class="lt-field is-priority">
+          <div class="lt-head">
+            <label class="lt-label" for="priorityParkings">優先車位</label>
+            <span class="lt-count" id="countPP">0 位</span>
+          </div>
+          <textarea id="priorityParkings" spellcheck="false"></textarea>
+        </div>
+        <div class="lt-field">
+          <div class="lt-head">
+            <label class="lt-label" for="households">一般戶名</label>
+            <span class="lt-count" id="countH">0 戶</span>
+          </div>
+          <textarea id="households" spellcheck="false"></textarea>
+        </div>
+        <div class="lt-field">
+          <div class="lt-head">
+            <label class="lt-label" for="parkings">一般車位</label>
+            <span class="lt-count" id="countP">0 位</span>
+          </div>
+          <textarea id="parkings" spellcheck="false"></textarea>
+        </div>
+      </div>
+      <p class="lt-count" style="margin-top:.6rem">每行一筆,重複的自動去除;同時出現在優先與一般名單的戶(或車位)只算優先。</p>
+
+      <div class="lt-actions">
+        <button type="button" id="drawBtn">抽籤</button>
+        <button type="button" id="nowBtn" class="lt-ghost">用現在時間當 seed</button>
+        <button type="button" id="exampleBtn" class="lt-ghost">範例填入</button>
+        <button type="button" id="clearBtn" class="lt-ghost">清空輸入</button>
+        <button type="button" id="copyBtn" class="lt-ghost">複製結果</button>
+        <button type="button" id="excelBtn" class="lt-ghost">下載 Excel</button>
+        <span class="lt-status" id="status" role="status" aria-live="polite"></span>
+      </div>
+    </div>
+
+    <div class="lt-stats" id="stats"></div>
+
+    <h3>分配結果</h3>
+    <p class="lt-count" id="resultMeta"></p>
+    <div id="result"></div>
+
+    <h3>怎麼驗證這場抽籤</h3>
+    <div class="lt-card lt-verify">
+      <dl>
+        <dt>抽籤 seed</dt><dd id="vSeed">—</dd>
+        <dt>對應時間</dt><dd id="vTime">—</dd>
+        <dt>亂數引擎</dt><dd>mulberry32( xmur3( "seed:label" ) ) + Fisher–Yates</dd>
+        <dt>亂數流</dt>
+        <dd>
+          <div class="lt-streams">
+            <span class="lt-stream">households</span>
+            <span class="lt-stream">priorityHouseholds</span>
+            <span class="lt-stream">parkings</span>
+            <span class="lt-stream">priorityParkings</span>
+            <span class="lt-stream">winners</span>
+            <span class="lt-stream">remainingParkings</span>
+          </div>
+        </dd>
+      </dl>
+      <ol class="lt-steps">
+        <li>四份名單各自用自己的標籤洗牌,彼此獨立,不靠 <code>seed + offset</code> 衍生。</li>
+        <li>以 <code>winners</code> 流從全體住戶中抽出「車位數」這麼多的中籤戶。</li>
+        <li>中籤戶中屬於優先戶者,依序先填優先車位。</li>
+        <li>其餘中籤戶填入剩下的車位(順序由 <code>remainingParkings</code> 流決定)。</li>
+        <li>公布 seed 與名單 → 任何住戶把同樣的值填回這一頁,就會得到同一份結果。</li>
+      </ol>
+      <p class="lt-count" style="margin-top:.8rem">
+        一開啟載入的是範例名單(示意用的門牌與車位編號),按「清空輸入」後填入實際資料即可。
+        所有運算都在瀏覽器內完成,名單不會送出。
+      </p>
+    </div>
+  </div>
+
   <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script is:inline>
+  <script>
+    import { drawLots, uniqueLines, compareNames, toRows } from '../lib/lottery.mjs';
 
-
-  function autoResizeAll() {
-    const allTextareas = document.querySelectorAll('textarea');
-    let maxHeight = 0;
-
-    // 先將每個 textarea 高度重置自動計算
-    allTextareas.forEach(t => {
-      if (t.id === 'seed') return;
-      t.style.height = 'auto';
-      maxHeight = Math.max(maxHeight, t.scrollHeight);
-    });
-
-    // 將最大高度套用到所有 textarea
-    allTextareas.forEach(t => {
-      if (t.id === 'seed') return;
-      t.style.height = maxHeight + 'px';
-    });
-  }
-
-  function getUniqueList(id) {
-    return [...new Set(document.getElementById(id).value.split(/\n+/).map(s => s.trim()).filter(Boolean))];
-  }
-
-  function xmur3(str) {
-    let h = 1779033703 ^ str.length;
-    for (let i = 0; i < str.length; i++) {
-      h = Math.imul(h ^ str.charCodeAt(i), 3432918353);
-      h = (h << 13) | (h >>> 19);
-    }
-    return (h ^= h >>> 16) >>> 0;
-  }
-
-  function mulberry32(a) {
-    return function () {
-      a |= 0; a = (a + 0x6D2B79F5) | 0;
-      let t = Math.imul(a ^ (a >>> 15), 1 | a);
-      t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t;
-      return ((t ^ (t >>> 14)) >>> 0) / 4294967296;
+    const $ = (id) => document.getElementById(id);
+    const LISTS = ['households', 'priorityHouseholds', 'parkings', 'priorityParkings'];
+    const COUNTERS = {
+      households: 'countH',
+      priorityHouseholds: 'countPH',
+      parkings: 'countP',
+      priorityParkings: 'countPP',
     };
-  }
 
-  function makeRng(seed, label) {
-    return mulberry32(xmur3(`${seed}:${label}`));
-  }
+    // 開站即呈現一場完整抽籤,而不是四個空白框:固定 seed 讓範例每次都一樣。
+    const EXAMPLE_SEED = 1789056000000;
+    const EXAMPLE = {
+      priorityHouseholds: ['53-1F', '53-15F', '55-1F', '55-15F'],
+      priorityParkings: ['B1-01', 'B1-02', 'B1-03', 'B1-04', 'B1-05', 'B1-06'],
+      households: [
+        '53-2F', '53-3F', '53-4F', '53-5F', '53-6F', '53-7F', '53-8F', '53-9F',
+        '53-10F', '53-11F', '53-12F', '53-13F',
+        '55-2F', '55-3F', '55-4F', '55-5F', '55-6F', '55-7F', '55-8F', '55-9F',
+        '55-10F', '55-11F', '55-12F', '55-13F',
+      ],
+      parkings: [
+        'B1-07', 'B1-08', 'B1-09', 'B1-10', 'B1-11', 'B1-12',
+        'B2-01', 'B2-02', 'B2-03', 'B2-04', 'B2-05', 'B2-06', 'B2-07', 'B2-08', 'B2-09', 'B2-10',
+      ],
+    };
 
-  function shuffleArray(array, rng) {
-    const result = array.slice();
-    for (let i = result.length - 1; i > 0; i--) {
-      const j = Math.floor(rng() * (i + 1));
-      [result[i], result[j]] = [result[j], result[i]];
-    }
-    return result;
-  }
+    let current = null;
+    let statusTimer;
 
-  function getSeed() {
-    const seedInputElement = document.getElementById('seed');
-    const seedInput = seedInputElement.value.trim();
-    if (seedInput && !/^\d+$/.test(seedInput)) {
-      alert("請輸入有效數字作為 seed");
-      return;
-    }
-    const seed = seedInput ? parseInt(seedInput, 10) : Date.now();
-    seedInputElement.value = seed;
-    const dateDisplay = document.getElementById("date-display");
-    dateDisplay.innerText = getUTC8DateString(new Date(seed));
-    return seed;
-  }
-
-
-  function drawLots() {
-    const seed = getSeed();
-
-    let households = getUniqueList('households');
-    let priorityHouseholds = getUniqueList('priorityHouseholds');
-    let parkings = getUniqueList('parkings');
-    let priorityParkings = getUniqueList('priorityParkings');
-
-    households = households.filter(h => !priorityHouseholds.includes(h));
-    parkings = parkings.filter(p => !priorityParkings.includes(p));
-    households = shuffleArray(households, makeRng(seed, 'households'));
-    priorityHouseholds = shuffleArray(priorityHouseholds, makeRng(seed, 'priorityHouseholds'));
-    parkings = shuffleArray(parkings, makeRng(seed, 'parkings'));
-    priorityParkings = shuffleArray(priorityParkings, makeRng(seed, 'priorityParkings'));
-
-    const totalHouseholds = [...priorityHouseholds, ...households];
-    const totalParkings = [...priorityParkings, ...parkings];
-
-    const winners = shuffleArray([...totalHouseholds], makeRng(seed, 'winners')).slice(0, totalParkings.length);
-
-    const result = {};
-    const remainingPriorityHouseholds = winners.filter(w => priorityHouseholds.includes(w));
-
-    priorityParkings.forEach(p => {
-      if (remainingPriorityHouseholds.length > 0) {
-        result[p] = remainingPriorityHouseholds.shift();
-      }
-    });
-
-    const remainingWinners = winners.filter(w => !Object.values(result).includes(w));
-    const remainingParkings = shuffleArray(totalParkings.filter(p => !Object.keys(result).includes(p)), makeRng(seed, 'remainingParkings'));
-    remainingParkings.forEach(p => {
-      if (remainingWinners.length > 0) {
-        result[p] = remainingWinners.shift();
-      }
-    });
-
-    displayResult(totalHouseholds, totalParkings, result, seed);
-  }
-
-  function displayResult(totalHouseholds, totalParkings, result, seed) {
-    const resultDiv = document.getElementById('result');
-    let output = "分配結果：\n";
-    for (const [p, h] of Object.entries(result)) {
-      output += `${h} → 車位 ${p}\n`;
+    function getUTC8DateString(d) {
+      return d.toLocaleString('zh-TW', {
+        timeZone: 'Asia/Taipei',
+        hour12: false,
+        year: 'numeric', month: '2-digit', day: '2-digit',
+        hour: '2-digit', minute: '2-digit', second: '2-digit',
+        fractionalSecondDigits: 3,
+      });
     }
 
-    const losers = totalHouseholds.filter(h => !Object.values(result).includes(h));
-    const leftoverParkings = totalParkings.filter(p => !Object.keys(result).includes(p));
-
-    if (losers.length > 0) {
-      output += "\n未中籤的戶：\n" + losers.join("\n");
+    function say(msg, kind) {
+      const el = $('status');
+      el.textContent = msg;
+      el.className = 'lt-status' + (kind ? ' ' + kind : '');
+      clearTimeout(statusTimer);
+      statusTimer = setTimeout(() => { el.textContent = ''; el.className = 'lt-status'; }, 4000);
     }
-    if (leftoverParkings.length > 0) {
-      output += "\n\n剩餘車位：\n" + leftoverParkings.join("\n");
+
+    function updateSeedTime() {
+      const el = $('seedTime');
+      const value = $('seed').value.trim();
+      el.classList.remove('err');
+      if (!value) { el.textContent = '留空 → 抽籤時自動採用當下時間'; return; }
+      if (!/^\d+$/.test(value)) { el.textContent = 'seed 必須是純數字'; el.classList.add('err'); return; }
+      const date = new Date(Number(value));
+      if (Number.isNaN(date.getTime())) { el.textContent = '無效的時間戳'; el.classList.add('err'); return; }
+      el.textContent = getUTC8DateString(date);
     }
-    output += "\n\n抽籤 seed: \n" + seed;
 
-    resultDiv.textContent = output;
-  }
-
-  function downloadExcel() {
-    const resultText = document.getElementById('result').textContent.split("\n");
-
-    const allocation = [];
-    const losers = [];
-    const leftovers = [];
-    const seed = [];
-
-    let section = 'allocation';
-    resultText.forEach(line => {
-      if (line.startsWith('分配結果')) section = 'allocation';
-      else if (line.startsWith('未中籤的戶')) section = 'losers';
-      else if (line.startsWith('剩餘車位')) section = 'leftovers';
-      else if (line.startsWith('抽籤 seed')) section = 'seed';
-      else if (line.trim() !== '') {
-        if (section === 'allocation' && line.includes('→')) {
-          const [h, p] = line.split('→').map(s => s.trim());
-          allocation.push({ 戶名: h, 車位: p.replace('車位 ', '') });
-        } else if (section === 'losers') {
-          losers.push({ 未中籤戶: line });
-        } else if (section === 'leftovers') {
-          leftovers.push({ 剩餘車位: line });
-        } else if (section === 'seed') {
-          seed.push({ seed: line });
-        }
+    function updateCounts() {
+      for (const id of LISTS) {
+        const n = uniqueLines($(id).value).length;
+        $(COUNTERS[id]).textContent = n + (id.toLowerCase().includes('parking') ? ' 位' : ' 戶');
       }
-    });
+    }
 
-    allocation.sort((a, b) => a.戶名.localeCompare(b.戶名, 'zh-Hant'));
-    losers.sort((a, b) => a.未中籤戶.localeCompare(b.未中籤戶, 'zh-Hant'));
-    leftovers.sort((a, b) => parseInt(a.剩餘車位) - parseInt(b.剩餘車位));
+    /** 讀 seed 欄位;留空就用現在時間,並把用掉的 seed 寫回欄位(才公布得出去)。 */
+    function readSeed() {
+      const input = $('seed');
+      const raw = input.value.trim();
+      if (raw && !/^\d+$/.test(raw)) { say('請輸入有效數字作為 seed', 'err'); return null; }
+      const seed = raw ? parseInt(raw, 10) : Date.now();
+      input.value = String(seed);
+      updateSeedTime();
+      return seed;
+    }
 
-    const wb = XLSX.utils.book_new();
-    if (allocation.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(allocation), "分配結果");
-    if (losers.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(losers), "未中籤戶");
-    if (leftovers.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(leftovers), "剩餘車位");
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(seed), "抽籤 seed");
+    function runDraw(seed, animate = true) {
+      const input = { seed };
+      for (const id of LISTS) input[id] = uniqueLines($(id).value);
+      current = drawLots(input);
+      render(current, animate);
+    }
 
-    let households = getUniqueList('households');
-    let priorityHouseholds = getUniqueList('priorityHouseholds');
-    let parkings = getUniqueList('parkings');
-    let priorityParkings = getUniqueList('priorityParkings');
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(households.map(h => ({ "一般戶名": h }))), "原始資料一般戶名");
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(priorityHouseholds.map(h => ({ "優先戶名": h }))), "原始資料優先戶名");
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(parkings.map(p => ({ "一般車位": p }))), "原始資料一般車位");
-    XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(priorityParkings.map(p => ({ "優先車位": p }))), "原始資料優先車位");
-    XLSX.writeFile(wb, "lottery_result.xlsx");
-  }
+    function slotHtml(row, index) {
+      const li = document.createElement('div');
+      li.className = 'lt-slot' + (row.priority ? ' is-priority' : '') + (row.household ? '' : ' is-empty');
+      if (index < 48) li.style.animationDelay = index * 18 + 'ms';
+      const no = document.createElement('span');
+      no.className = 'lt-no';
+      no.textContent = row.parking;
+      const who = document.createElement('span');
+      who.className = 'lt-who';
+      who.textContent = row.household || '從缺';
+      li.append(no, who);
+      return li;
+    }
 
-
-  function fillExample() {
-    document.getElementById("households").value = "53-1F\n53-2F\n53-3F\n53-4F\n53-5F";
-    document.getElementById("priorityHouseholds").value = "53-12F\n53-13F";
-    document.getElementById("priorityParkings").value = "1\n2\n3\n4\n5\n6\n7\n8\n9\n10";
-    document.getElementById("parkings").value =
-      "13\n14\n15\n16\n17\n18\n19\n20\n"
-      + "21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n"
-      + "31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n"
-      + "41\n42\n43\n44\n45\n46\n47\n48\n49\n"
-      + "51\n52\n53\n54\n55\n56\n57\n58\n59\n60\n"
-      + "61\n62\n63";
-    autoResizeAll();
-  }
-
-  function clearInputs() {
-    document.getElementById('households').value = '';
-    document.getElementById('priorityHouseholds').value = '';
-    document.getElementById('parkings').value = '';
-    document.getElementById('priorityParkings').value = '';
-    autoResizeAll();
-  }
-
-  function getUTC8DateString(d) {
-    return d.toLocaleString("zh-TW", {
-      timeZone: "Asia/Taipei",
-      hour12: false,
-      year: "numeric", month: "2-digit", day: "2-digit",
-      hour: "2-digit", minute: "2-digit", second: "2-digit",
-      fractionalSecondDigits: 3
-    });
-  }
-
-  function init() {
-
-    document.querySelectorAll('textarea').forEach(t => {
-      autoResizeAll();
-      t.addEventListener('input', () => autoResizeAll());
-    });
-    const seedInput = document.getElementById("seed");
-    const dateDisplay = document.getElementById("date-display");
-
-    seedInput.addEventListener("input", () => {
-      const value = seedInput.value.trim();
-      if (!value) {
-        dateDisplay.innerText = "尚未輸入 seed";
-        return;
+    function group(title, tag) {
+      const wrap = document.createElement('div');
+      wrap.className = 'lt-group';
+      const head = document.createElement('div');
+      head.className = 'lt-group-head';
+      if (tag) {
+        const badge = document.createElement('span');
+        badge.className = 'lt-tag';
+        badge.textContent = tag;
+        head.append(badge);
       }
+      head.append(document.createTextNode(title));
+      wrap.append(head);
+      return wrap;
+    }
 
-      const seedNum = Number(value);
-      if (isNaN(seedNum)) {
-        dateDisplay.innerText = "⚠️ seed 必須是數字";
-        return;
+    function nameList(items) {
+      const box = document.createElement('div');
+      box.className = 'lt-names';
+      for (const item of items) {
+        const chip = document.createElement('span');
+        chip.className = 'lt-name';
+        chip.textContent = item;
+        box.append(chip);
       }
+      return box;
+    }
 
-      const date = new Date(seedNum);
-      if (isNaN(date.getTime())) {
-        dateDisplay.innerText = "⚠️ 無效的日期";
-        return;
+    function render(draw, animate) {
+      const rows = toRows(draw);
+      const priorityRows = rows.filter((r) => r.priority);
+      const generalRows = rows.filter((r) => !r.priority);
+
+      const box = $('result');
+      box.className = animate ? 'lt-deal' : '';
+      box.replaceChildren();
+
+      let i = 0;
+      if (priorityRows.length) {
+        const g = group(`優先車位 ${priorityRows.length} 位`, '優先');
+        const slots = document.createElement('div');
+        slots.className = 'lt-slots';
+        for (const row of priorityRows) slots.append(slotHtml(row, i++));
+        g.append(slots);
+        box.append(g);
+      }
+      if (generalRows.length) {
+        const g = group(`一般車位 ${generalRows.length} 位`);
+        const slots = document.createElement('div');
+        slots.className = 'lt-slots';
+        for (const row of generalRows) slots.append(slotHtml(row, i++));
+        g.append(slots);
+        box.append(g);
+      }
+      if (!rows.length) {
+        const p = document.createElement('p');
+        p.className = 'lt-empty';
+        p.textContent = '目前沒有車位可抽,請先填入車位編號。';
+        box.append(p);
+      }
+      if (draw.losers.length) {
+        const g = group(`未中籤 ${draw.losers.length} 戶`);
+        g.append(nameList(draw.losers));
+        box.append(g);
+      }
+      if (draw.leftovers.length) {
+        const g = group(`無人承租 ${draw.leftovers.length} 位`);
+        g.append(nameList(draw.leftovers));
+        box.append(g);
       }
 
-      dateDisplay.innerText = getUTC8DateString(date);
+      const assigned = Object.keys(draw.result).length;
+      const stats = [
+        ['', draw.households.length, '參與戶數'],
+        ['', draw.parkings.length, '車位總數'],
+        ['hit', assigned, '中籤戶'],
+        ['miss', draw.losers.length, '未中籤戶'],
+      ];
+      const statsBox = $('stats');
+      statsBox.replaceChildren();
+      for (const [kind, value, label] of stats) {
+        const cell = document.createElement('div');
+        cell.className = 'lt-stat' + (kind ? ' ' + kind : '');
+        const b = document.createElement('b');
+        b.textContent = String(value);
+        const span = document.createElement('span');
+        span.textContent = label;
+        cell.append(b, span);
+        statsBox.append(cell);
+      }
+
+      const time = getUTC8DateString(new Date(draw.seed));
+      $('resultMeta').textContent = `seed ${draw.seed} ・ ${time}`;
+      $('vSeed').textContent = String(draw.seed);
+      $('vTime').textContent = `${time}(Asia/Taipei)`;
+    }
+
+    function resultText(draw) {
+      const lines = ['車位抽籤結果', `seed：${draw.seed}`, `時間：${getUTC8DateString(new Date(draw.seed))}`, ''];
+      for (const row of toRows(draw)) {
+        lines.push(`${row.parking}\t${row.household || '從缺'}${row.priority ? '\t(優先車位)' : ''}`);
+      }
+      if (draw.losers.length) lines.push('', '未中籤的戶：', draw.losers.join('、'));
+      if (draw.leftovers.length) lines.push('', '剩餘車位：', draw.leftovers.join('、'));
+      return lines.join('\n');
+    }
+
+    function downloadExcel() {
+      const XLSX = window.XLSX;
+      if (!XLSX) { say('Excel 元件還沒載入完成,請稍候再試', 'err'); return; }
+      if (!current) { say('還沒有結果可以下載', 'err'); return; }
+
+      const rows = toRows(current);
+      const allocation = rows
+        .filter((r) => r.household)
+        .map((r) => ({ 戶名: r.household, 車位: r.parking, 類別: r.priority ? '優先車位' : '一般車位' }))
+        .sort((a, b) => compareNames(a.戶名, b.戶名));
+
+      const wb = XLSX.utils.book_new();
+      const sheet = (name, data) => {
+        if (data.length > 0) XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet(data), name);
+      };
+      sheet('分配結果', allocation);
+      sheet('未中籤戶', current.losers.map((h) => ({ 未中籤戶: h })));
+      sheet('剩餘車位', current.leftovers.map((p) => ({ 剩餘車位: p })));
+      sheet('抽籤 seed', [{ seed: current.seed, 對應時間: getUTC8DateString(new Date(current.seed)) }]);
+      sheet('原始資料一般戶名', uniqueLines($('households').value).map((h) => ({ 一般戶名: h })));
+      sheet('原始資料優先戶名', uniqueLines($('priorityHouseholds').value).map((h) => ({ 優先戶名: h })));
+      sheet('原始資料一般車位', uniqueLines($('parkings').value).map((p) => ({ 一般車位: p })));
+      sheet('原始資料優先車位', uniqueLines($('priorityParkings').value).map((p) => ({ 優先車位: p })));
+      XLSX.writeFile(wb, 'lottery_result.xlsx');
+    }
+
+    async function copyResult() {
+      if (!current) { say('還沒有結果可以複製', 'err'); return; }
+      const text = resultText(current);
+      try {
+        await navigator.clipboard.writeText(text);
+        say('結果已複製,可直接貼進試算表', 'ok');
+      } catch {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.cssText = 'position:fixed;opacity:0';
+        document.body.append(ta);
+        ta.select();
+        const ok = document.execCommand && document.execCommand('copy');
+        ta.remove();
+        say(ok ? '結果已複製,可直接貼進試算表' : '瀏覽器不允許複製,請手動選取', ok ? 'ok' : 'err');
+      }
+    }
+
+    function fillExample() {
+      for (const id of LISTS) $(id).value = EXAMPLE[id].join('\n');
+      $('seed').value = String(EXAMPLE_SEED);
+      updateSeedTime();
+      updateCounts();
+    }
+
+    $('drawBtn').addEventListener('click', () => {
+      const seed = readSeed();
+      if (seed !== null) runDraw(seed);
     });
-  }
-  init();
+    $('nowBtn').addEventListener('click', () => {
+      $('seed').value = String(Date.now());
+      updateSeedTime();
+      runDraw(Number($('seed').value));
+      say('已用現在時間抽出新結果', 'ok');
+    });
+    $('exampleBtn').addEventListener('click', () => {
+      fillExample();
+      runDraw(EXAMPLE_SEED);
+      say('已載入範例名單', 'ok');
+    });
+    $('clearBtn').addEventListener('click', () => {
+      for (const id of LISTS) $(id).value = '';
+      $('seed').value = '';
+      updateSeedTime();
+      updateCounts();
+      runDraw(Date.now());
+      say('名單已清空', 'ok');
+    });
+    $('copyBtn').addEventListener('click', copyResult);
+    $('excelBtn').addEventListener('click', downloadExcel);
+    $('seed').addEventListener('input', updateSeedTime);
+    for (const id of LISTS) $(id).addEventListener('input', updateCounts);
 
-
-
+    // 一進頁面就看得到一場完整抽籤(不做入場動畫,首屏即定稿)。
+    fillExample();
+    runDraw(EXAMPLE_SEED, false);
   </script>
 </BaseLayout>

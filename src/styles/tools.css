@@ -199,3 +199,198 @@
   details.ts-guide ol { padding-left: 1.3rem; line-height: 1.7; }
   .ts-empty { color: var(--color-muted); padding: 0.6rem 0.2rem; }
 }
+
+/* ── 車位抽籤 ─────────────────────────────────────────────────────── */
+/* 顏色全部取自全站 token:優先一律用 --color-accent,一般用 --color-line,
+   成功/失敗用工具頁既有的 --t-ok / --t-danger,兩套主題自動跟著切換。 */
+.tool-page.lottery {
+  --lt-mono: ui-monospace, SFMono-Regular, Menlo, "Noto Sans Mono", monospace;
+
+  h3 { margin-top: 1.6rem; }
+
+  .lt-intro { color: var(--color-muted); font-size: 0.95rem; line-height: 1.7; }
+
+  .lt-card {
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 8px;
+    padding: 1rem;
+    margin-top: 0.75rem;
+  }
+
+  /* seed */
+  .lt-seed {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    align-items: flex-end;
+    padding-bottom: 1rem;
+    margin-bottom: 1rem;
+    border-bottom: 1px dashed var(--color-line);
+  }
+  .lt-field { display: flex; flex-direction: column; gap: 0.25rem; }
+  .lt-label { font-size: 0.8rem; color: var(--color-muted); }
+  .lt-grow { flex: 1 1 16rem; min-width: 0; }
+  .lt-seed input {
+    width: 100%;
+    font-family: var(--lt-mono);
+    font-variant-numeric: tabular-nums;
+  }
+  .lt-time {
+    flex: 1 1 14rem;
+    font-family: var(--lt-mono);
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    background: var(--color-base);
+    border-left: 3px solid var(--color-accent);
+    border-radius: 0 6px 6px 0;
+    padding: 0.4rem 0.7rem;
+  }
+  .lt-time.err { color: var(--t-danger); border-left-color: var(--t-danger); }
+
+  /* 名單 */
+  .lt-lists {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr));
+    gap: 0.9rem;
+  }
+  .lt-head { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+  .lt-count { font-size: 0.78rem; color: var(--color-muted); font-variant-numeric: tabular-nums; }
+  .lt-lists textarea {
+    width: 100%;
+    min-height: 9rem;
+    font-family: var(--lt-mono);
+    font-size: 0.85rem;
+    line-height: 1.7;
+  }
+  .lt-lists .is-priority textarea { border-left: 3px solid var(--color-accent); }
+  .lt-lists .is-priority .lt-label { color: var(--color-accent); }
+
+  /* 操作列 */
+  .lt-actions { display: flex; flex-wrap: wrap; align-items: center; margin-top: 1rem; }
+  button.lt-ghost { background: var(--t-neutral-btn); }
+  button.lt-ghost:hover { background: var(--t-neutral-btn-hover); }
+  .lt-status { margin-left: 0.5rem; font-size: 0.85rem; min-height: 1.2em; }
+  .lt-status.ok { color: var(--t-ok); }
+  .lt-status.err { color: var(--t-danger); }
+
+  /* 統計條 */
+  .lt-stats {
+    display: flex;
+    flex-wrap: wrap;
+    margin-top: 1.5rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+  .lt-stat { flex: 1 1 7rem; padding: 0.6rem 0.9rem; border-right: 1px solid var(--color-line); }
+  .lt-stat:last-child { border-right: 0; }
+  .lt-stat b {
+    display: block;
+    font-family: var(--lt-mono);
+    font-size: 1.6rem;
+    line-height: 1.3;
+    font-variant-numeric: tabular-nums;
+  }
+  .lt-stat span { font-size: 0.75rem; color: var(--color-muted); }
+  .lt-stat.hit b { color: var(--t-ok); }
+  .lt-stat.miss b { color: var(--t-danger); }
+
+  /* 分配結果 */
+  .lt-group + .lt-group { margin-top: 1.4rem; }
+  .lt-group-head {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.85rem;
+    color: var(--color-muted);
+    margin-bottom: 0.5rem;
+  }
+  .lt-group-head::after { content: ""; flex: 1; height: 1px; background: var(--color-line); }
+  .lt-tag {
+    font-size: 0.72rem;
+    font-weight: 700;
+    padding: 0.1rem 0.5rem;
+    border-radius: 999px;
+    background: var(--color-base);
+    border: 1px solid var(--color-line);
+    color: var(--color-accent);
+  }
+  .lt-slots { display: grid; grid-template-columns: repeat(auto-fill, minmax(8.5rem, 1fr)); gap: 0.5rem; }
+  .lt-slot {
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-top: 3px solid var(--color-line);
+    border-radius: 6px;
+    padding: 0.45rem 0.6rem;
+  }
+  .lt-slot.is-priority { border-top-color: var(--color-accent); }
+  .lt-slot .lt-no { display: block; font-family: var(--lt-mono); font-size: 0.75rem; color: var(--color-muted); }
+  .lt-slot .lt-who {
+    display: block;
+    font-family: var(--lt-mono);
+    font-size: 1rem;
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+  .lt-slot.is-empty { background: none; border: 1px dashed var(--color-line); }
+  .lt-slot.is-empty .lt-who { color: var(--color-muted); font-weight: 400; font-size: 0.9rem; }
+  .lt-deal .lt-slot { animation: lt-deal 0.34s cubic-bezier(0.2, 0.7, 0.3, 1) backwards; }
+
+  .lt-names { display: flex; flex-wrap: wrap; gap: 0.35rem; }
+  .lt-name {
+    font-family: var(--lt-mono);
+    font-size: 0.8rem;
+    padding: 0.15rem 0.5rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-radius: 4px;
+    color: var(--color-muted);
+  }
+  .lt-empty { color: var(--color-muted); }
+
+  /* 可驗證性 */
+  .lt-verify { border-left: 3px solid var(--color-accent); }
+  .lt-verify dl {
+    display: grid;
+    grid-template-columns: auto 1fr;
+    gap: 0.35rem 0.9rem;
+    margin: 0 0 0.8rem;
+    font-size: 0.9rem;
+  }
+  .lt-verify dt { color: var(--color-muted); white-space: nowrap; }
+  .lt-verify dd { margin: 0; font-family: var(--lt-mono); overflow-wrap: anywhere; }
+  .lt-streams { display: flex; flex-wrap: wrap; gap: 0.3rem; }
+  .lt-stream {
+    font-family: var(--lt-mono);
+    font-size: 0.72rem;
+    padding: 0.1rem 0.45rem;
+    border-radius: 4px;
+    background: var(--color-base);
+    color: var(--color-accent);
+  }
+  .lt-steps {
+    list-style: decimal;
+    padding-left: 1.3rem;
+    line-height: 1.8;
+    font-size: 0.9rem;
+    color: var(--color-muted);
+  }
+  .lt-steps code {
+    font-family: var(--lt-mono);
+    font-size: 0.85em;
+    background: var(--color-base);
+    border-radius: 4px;
+    padding: 0.05em 0.3em;
+  }
+}
+
+@keyframes lt-deal {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tool-page.lottery .lt-deal .lt-slot { animation: none; }
+}
