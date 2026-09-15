@@ -161,6 +161,42 @@ import '../styles/tools.css';
 
     let current = null;
     let statusTimer;
+    // 驗證模式(點驗證連結、或匯入 Excel)用的是別人的名單，不能蓋掉委員自己存的草稿。
+    let verifying = false;
+
+    const DRAFT_KEY = 'lottery-draft-v1';
+
+    /** 把抽籤條件存在這台裝置，重新整理、手機切走再回來都不會消失。 */
+    function saveDraft() {
+      if (verifying) return;
+      const draft = { seed: $('seed').value.trim() };
+      for (const id of LISTS) draft[id] = $(id).value;
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+      } catch {
+        // 無痕模式或儲存被關掉 —— 就當沒有草稿，不影響抽籤。
+      }
+    }
+
+    function loadDraft() {
+      try {
+        const raw = localStorage.getItem(DRAFT_KEY);
+        if (!raw) return null;
+        const draft = JSON.parse(raw);
+        if (!draft || LISTS.every((id) => !String(draft[id] ?? '').trim())) return null;
+        return draft;
+      } catch {
+        return null;
+      }
+    }
+
+    function clearDraft() {
+      try {
+        localStorage.removeItem(DRAFT_KEY);
+      } catch {
+        // 同上
+      }
+    }
 
     function getUTC8DateString(d) {
       return d.toLocaleString('zh-TW', {
@@ -426,31 +462,38 @@ import '../styles/tools.css';
 
     $('drawBtn').addEventListener('click', () => {
       const seed = readSeed();
-      if (seed !== null) runDraw(seed);
+      if (seed !== null) { runDraw(seed); saveDraft(); }
     });
     $('nowBtn').addEventListener('click', () => {
       $('seed').value = String(Date.now());
       updateSeedTime();
       runDraw(Number($('seed').value));
+      saveDraft();
       say('已用現在時間抽出新結果', 'ok');
     });
     $('exampleBtn').addEventListener('click', () => {
+      verifying = false;
       fillExample();
       runDraw(EXAMPLE_SEED);
+      clearDraft();                       // 範例不是真名單，不要留在這台裝置上
       say('已載入範例名單', 'ok');
     });
     $('clearBtn').addEventListener('click', () => {
+      verifying = false;
       for (const id of LISTS) $(id).value = '';
       $('seed').value = '';
       updateSeedTime();
       updateCounts();
       runDraw(Date.now());
+      clearDraft();                       // 清空是有意的動作，草稿也一起清掉
       say('名單已清空', 'ok');
     });
     $('copyBtn').addEventListener('click', copyResult);
     $('excelBtn').addEventListener('click', downloadExcel);
-    $('seed').addEventListener('input', updateSeedTime);
-    for (const id of LISTS) $(id).addEventListener('input', updateCounts);
+    // 使用者自己動手改過欄位，這份名單就是他的工作名單了 —— 離開驗證模式，開始存草稿。
+    const onEdit = (extra) => () => { verifying = false; extra(); saveDraft(); };
+    $('seed').addEventListener('input', onEdit(updateSeedTime));
+    for (const id of LISTS) $(id).addEventListener('input', onEdit(updateCounts));
 
     /** 目前輸入 + seed 的驗證連結。住戶點開就會跑出同一份結果。 */
     function shareUrl() {
@@ -480,6 +523,7 @@ import '../styles/tools.css';
 
     /** 把一組還原出來的輸入填回欄位並重跑。 */
     function applyInput(input) {
+      verifying = true;
       for (const id of LISTS) $(id).value = (input[id] ?? []).join('\n');
       $('seed').value = String(input.seed);
       updateSeedTime();
@@ -573,8 +617,20 @@ import '../styles/tools.css';
         showVerdict('err', '這個驗證連結壞了', (err && err.message) || '請向管委會索取正確的連結。');
       }
     } else {
-      fillExample();
-      runDraw(EXAMPLE_SEED, false);
+      const draft = loadDraft();
+      if (draft) {
+        // 上次沒抽完就關掉頁面(或不小心重新整理)——把名單原封不動接回來。
+        for (const id of LISTS) $(id).value = draft[id] ?? '';
+        $('seed').value = draft.seed ?? '';
+        updateSeedTime();
+        updateCounts();
+        const seed = /^\d+$/.test(String(draft.seed ?? '')) ? Number(draft.seed) : Date.now();
+        runDraw(seed, false);
+        say('已接回這台裝置上次輸入的名單', 'ok');
+      } else {
+        fillExample();
+        runDraw(EXAMPLE_SEED, false);
+      }
     }
   </script>
 </BaseLayout>

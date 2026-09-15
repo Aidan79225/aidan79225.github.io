@@ -415,6 +415,55 @@
   }
 }
 
+/* 列印:公告欄要貼的是結果,不是輸入框。只留標題、統計、分配結果、候補順位
+   與驗證資訊,並一律用白底黑字(深色主題直接印會是一片黑)。 */
+@media print {
+  body:has(.tool-page.lottery) {
+    background: #fff;
+    color: #000;
+  }
+  body:has(.tool-page.lottery) nav,
+  body:has(.tool-page.lottery) > footer {
+    display: none;
+  }
+  .tool-page.lottery {
+    --color-base: #fff;
+    --color-surface: #fff;
+    --color-ink: #000;
+    --color-muted: #333;
+    --color-line: #999;
+    --color-accent: #000;
+
+    .lt-intro,
+    .lt-seed,
+    .lt-lists,
+    .lt-actions,
+    .lt-share,
+    .lt-steps {
+      display: none;
+    }
+    /* 「抽籤條件」這個標題連同它的卡片一起收起來 */
+    h3:first-of-type { display: none; }
+    .lt-card:not(.lt-verify) { display: none; }
+
+    .lt-slot,
+    .lt-name,
+    .lt-stats,
+    .lt-verdict,
+    .lt-verify {
+      background: #fff;
+      border-color: #999;
+      box-shadow: none;
+    }
+    .lt-slot { break-inside: avoid; }
+    .lt-stat.hit b,
+    .lt-stat.miss b,
+    .lt-verdict strong,
+    .lt-name .lt-rank { color: #000; }
+    .lt-group { break-inside: avoid; }
+  }
+}
+
 @keyframes lt-deal {
   from { opacity: 0; transform: translateY(6px); }
   to { opacity: 1; transform: none; }
