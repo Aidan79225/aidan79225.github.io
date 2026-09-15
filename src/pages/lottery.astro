@@ -101,6 +101,12 @@ import '../styles/tools.css';
         <li>公布 seed 與名單 → 任何住戶把同樣的值填回這一頁,就會得到同一份結果(含候補順位)。</li>
       </ol>
       <p class="lt-count" style="margin-top:.8rem">
+        <strong>名單順序也是輸入的一部分</strong>:洗牌是照你貼上去的順序做的,
+        所以順序(通常就是紙本登記順序)要和 seed 一起公布。
+        驗證時請<strong>照原順序貼回,不要先排序</strong>——排過再貼會算出另一份結果,
+        那不是程式有問題。匯出的 Excel 裡每份原始名單都帶「登記序號」,照序號由小到大還原即可。
+      </p>
+      <p class="lt-count" style="margin-top:.8rem">
         <strong>遞補規則</strong>:有住戶退租時,空出來的車位由<strong>候補第 1 順位</strong>遞補,
         不分優先車位或一般車位;該戶遞補後,其餘候補順位依序遞進。
         優先只影響「中籤後停哪裡」,不影響中籤與遞補的先後。
@@ -338,6 +344,7 @@ import '../styles/tools.css';
         draw.waitlist.forEach((h, i) => lines.push(`${i + 1}\t${h}`));
       }
       if (draw.leftovers.length) lines.push('', '剩餘車位：', draw.leftovers.join('、'));
+      lines.push('', '（名單順序即紙本登記順序，也是抽籤輸入的一部分；驗證時請照原順序貼回，勿排序）');
       return lines.join('\n');
     }
 
@@ -363,11 +370,21 @@ import '../styles/tools.css';
         身分: current.priorityHouseholds.includes(h) ? '優先戶' : '一般戶',
       })));
       sheet('剩餘車位', current.leftovers.map((p) => ({ 剩餘車位: p })));
-      sheet('抽籤 seed', [{ seed: current.seed, 對應時間: getUTC8DateString(new Date(current.seed)) }]);
-      sheet('原始資料一般戶名', uniqueLines($('households').value).map((h) => ({ 一般戶名: h })));
-      sheet('原始資料優先戶名', uniqueLines($('priorityHouseholds').value).map((h) => ({ 優先戶名: h })));
-      sheet('原始資料一般車位', uniqueLines($('parkings').value).map((p) => ({ 一般車位: p })));
-      sheet('原始資料優先車位', uniqueLines($('priorityParkings').value).map((p) => ({ 優先車位: p })));
+      sheet('抽籤 seed', [{
+        seed: current.seed,
+        對應時間: getUTC8DateString(new Date(current.seed)),
+        名單順序: '即紙本登記順序，也是抽籤輸入的一部分',
+        驗證方式: '把 seed 與四份原始資料「依登記序號由小到大」貼回抽籤頁，即可重現本結果',
+        遞補規則: '空出的車位由候補第 1 順位遞補，不分優先或一般車位；其餘順位依序遞進',
+      }]);
+      // 名單順序就是紙本登記順序，也是抽籤的輸入之一。只靠「列的位置」保存太脆
+      // ——委員在 Excel 裡點一下排序就沒了，之後誰都重跑不出同一份結果。
+      // 多一欄登記序號，順序就成了資料本身，被排序過也還原得回來。
+      const rawSheet = (name, label, values) => sheet(name, values.map((v, i) => ({ 登記序號: i + 1, [label]: v })));
+      rawSheet('原始資料一般戶名', '一般戶名', uniqueLines($('households').value));
+      rawSheet('原始資料優先戶名', '優先戶名', uniqueLines($('priorityHouseholds').value));
+      rawSheet('原始資料一般車位', '一般車位', uniqueLines($('parkings').value));
+      rawSheet('原始資料優先車位', '優先車位', uniqueLines($('priorityParkings').value));
       XLSX.writeFile(wb, 'lottery_result.xlsx');
     }
 
