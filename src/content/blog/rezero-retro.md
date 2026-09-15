@@ -59,13 +59,13 @@ CTO 去問,得到一句回答:「**知道能用跟不能用,就有差別。**」
 都不是。核心的架構,上一節說了,重來也不換。**我最想改的,是監控。**
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 580 288" role="img" aria-label="兩張清單。左邊綠色,重來也不換的核心:FSM 與查詢即驗證、事實 append 加讀時派生、批次淤而不倒、3NF 與庫存雙欄位、per-provider 金流事實表、五個 boring 元件、排序不排期、轉檔即驗證。右邊琥珀色,重來要補的保護:四個黃金訊號加 batch lag、事故的語言 severity 與 runbook、dead-letter、第一天就上 Cloudflare、invariant query 排程、deleted_at 與 sweep 前反查、負載測試與另外半張 checklist。底部結論:核心是對的,欠的全是保護——這也解釋了我後來為什麼走向 SRE。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
+  <svg viewBox="0 0 580 288" role="img" aria-label="兩張清單。左邊綠色,重來也不換的核心:FSM 與查詢即驗證、事實 append 加讀時派生、批次淤而不倒、3NF 與庫存帳本三數字、per-provider 金流事實表、五個 boring 元件、排序不排期、轉檔即驗證。右邊琥珀色,重來要補的保護:四個黃金訊號加 batch lag、事故的語言 severity 與 runbook、dead-letter、第一天就上 Cloudflare、invariant query 排程、deleted_at 與 sweep 前反查、負載測試與另外半張 checklist。底部結論:核心是對的,欠的全是保護——這也解釋了我後來為什麼走向 SRE。" style="width:100%;max-width:620px;height:auto;margin:0 auto;">
     <text x="152" y="26" fill="#54b890" font-size="8" text-anchor="middle" font-weight="bold">重來也不換(核心)</text>
     <rect x="24" y="38" width="256" height="196" rx="8" fill="#233528" stroke="#54b890" stroke-width="1.3"/>
     <text x="152" y="60" fill="#e6e6e6" font-size="6.6" text-anchor="middle">FSM・查詢即驗證</text>
     <text x="152" y="82" fill="#e6e6e6" font-size="6.6" text-anchor="middle">事實 append+讀時派生</text>
     <text x="152" y="104" fill="#e6e6e6" font-size="6.6" text-anchor="middle">批次淤而不倒</text>
-    <text x="152" y="126" fill="#e6e6e6" font-size="6.6" text-anchor="middle">3NF・庫存雙欄位</text>
+    <text x="152" y="126" fill="#e6e6e6" font-size="6.6" text-anchor="middle">3NF・庫存帳本三數字</text>
     <text x="152" y="148" fill="#e6e6e6" font-size="6.6" text-anchor="middle">per-provider 金流事實表</text>
     <text x="152" y="170" fill="#e6e6e6" font-size="6.6" text-anchor="middle">五個 boring 元件・一台 VM</text>
     <text x="152" y="192" fill="#e6e6e6" font-size="6.6" text-anchor="middle">排序不排期・merge 即上線</text>
