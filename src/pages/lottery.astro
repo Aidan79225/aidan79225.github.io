@@ -63,9 +63,19 @@ import '../styles/tools.css';
         <button type="button" id="clearBtn" class="lt-ghost">清空輸入</button>
         <button type="button" id="copyBtn" class="lt-ghost">複製結果</button>
         <button type="button" id="excelBtn" class="lt-ghost">下載 Excel</button>
+        <button type="button" id="linkBtn" class="lt-ghost">產生驗證連結</button>
+        <button type="button" id="importBtn" class="lt-ghost">匯入 Excel 驗證</button>
+        <input type="file" id="importFile" accept=".xlsx,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" hidden />
         <span class="lt-status" id="status" role="status" aria-live="polite"></span>
       </div>
+
+      <div class="lt-share" id="shareBox" hidden>
+        <label class="lt-label" for="shareUrl">驗證連結(seed 與名單都在連結裡,不會送到伺服器)</label>
+        <input type="text" id="shareUrl" readonly />
+      </div>
     </div>
+
+    <div class="lt-verdict" id="verdict" hidden></div>
 
     <div class="lt-stats" id="stats"></div>
 
@@ -101,6 +111,12 @@ import '../styles/tools.css';
         <li>公布 seed 與名單 → 任何住戶把同樣的值填回這一頁,就會得到同一份結果(含候補順位)。</li>
       </ol>
       <p class="lt-count" style="margin-top:.8rem">
+        <strong>名單順序也是輸入的一部分</strong>:洗牌是照你貼上去的順序做的,
+        所以順序(通常就是紙本登記順序)要和 seed 一起公布。
+        驗證時請<strong>照原順序貼回,不要先排序</strong>——排過再貼會算出另一份結果,
+        那不是程式有問題。匯出的 Excel 裡每份原始名單都帶「登記序號」,照序號由小到大還原即可。
+      </p>
+      <p class="lt-count" style="margin-top:.8rem">
         <strong>遞補規則</strong>:有住戶退租時,空出來的車位由<strong>候補第 1 順位</strong>遞補,
         不分優先車位或一般車位;該戶遞補後,其餘候補順位依序遞進。
         優先只影響「中籤後停哪裡」,不影響中籤與遞補的先後。
@@ -115,6 +131,7 @@ import '../styles/tools.css';
   <script is:inline src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script>
     import { drawLots, uniqueLines, compareNames, toRows } from '../lib/lottery.mjs';
+    import { encodeShare, decodeShare, rowsToList, compareAllocation } from '../lib/lottery-share.mjs';
 
     const $ = (id) => document.getElementById(id);
     const LISTS = ['households', 'priorityHouseholds', 'parkings', 'priorityParkings'];
@@ -144,6 +161,42 @@ import '../styles/tools.css';
 
     let current = null;
     let statusTimer;
+    // 驗證模式(點驗證連結、或匯入 Excel)用的是別人的名單，不能蓋掉委員自己存的草稿。
+    let verifying = false;
+
+    const DRAFT_KEY = 'lottery-draft-v1';
+
+    /** 把抽籤條件存在這台裝置，重新整理、手機切走再回來都不會消失。 */
+    function saveDraft() {
+      if (verifying) return;
+      const draft = { seed: $('seed').value.trim() };
+      for (const id of LISTS) draft[id] = $(id).value;
+      try {
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+      } catch {
+        // 無痕模式或儲存被關掉 —— 就當沒有草稿，不影響抽籤。
+      }
+    }
+
+    function loadDraft() {
+      try {
+        const raw = localStorage.getItem(DRAFT_KEY);
+        if (!raw) return null;
+        const draft = JSON.parse(raw);
+        if (!draft || LISTS.every((id) => !String(draft[id] ?? '').trim())) return null;
+        return draft;
+      } catch {
+        return null;
+      }
+    }
+
+    function clearDraft() {
+      try {
+        localStorage.removeItem(DRAFT_KEY);
+      } catch {
+        // 同上
+      }
+    }
 
     function getUTC8DateString(d) {
       return d.toLocaleString('zh-TW', {
@@ -338,6 +391,7 @@ import '../styles/tools.css';
         draw.waitlist.forEach((h, i) => lines.push(`${i + 1}\t${h}`));
       }
       if (draw.leftovers.length) lines.push('', '剩餘車位：', draw.leftovers.join('、'));
+      lines.push('', '（名單順序即紙本登記順序，也是抽籤輸入的一部分；驗證時請照原順序貼回，勿排序）');
       return lines.join('\n');
     }
 
@@ -363,11 +417,21 @@ import '../styles/tools.css';
         身分: current.priorityHouseholds.includes(h) ? '優先戶' : '一般戶',
       })));
       sheet('剩餘車位', current.leftovers.map((p) => ({ 剩餘車位: p })));
-      sheet('抽籤 seed', [{ seed: current.seed, 對應時間: getUTC8DateString(new Date(current.seed)) }]);
-      sheet('原始資料一般戶名', uniqueLines($('households').value).map((h) => ({ 一般戶名: h })));
-      sheet('原始資料優先戶名', uniqueLines($('priorityHouseholds').value).map((h) => ({ 優先戶名: h })));
-      sheet('原始資料一般車位', uniqueLines($('parkings').value).map((p) => ({ 一般車位: p })));
-      sheet('原始資料優先車位', uniqueLines($('priorityParkings').value).map((p) => ({ 優先車位: p })));
+      sheet('抽籤 seed', [{
+        seed: current.seed,
+        對應時間: getUTC8DateString(new Date(current.seed)),
+        名單順序: '即紙本登記順序，也是抽籤輸入的一部分',
+        驗證方式: '把 seed 與四份原始資料「依登記序號由小到大」貼回抽籤頁，即可重現本結果',
+        遞補規則: '空出的車位由候補第 1 順位遞補，不分優先或一般車位；其餘順位依序遞進',
+      }]);
+      // 名單順序就是紙本登記順序，也是抽籤的輸入之一。只靠「列的位置」保存太脆
+      // ——委員在 Excel 裡點一下排序就沒了，之後誰都重跑不出同一份結果。
+      // 多一欄登記序號，順序就成了資料本身，被排序過也還原得回來。
+      const rawSheet = (name, label, values) => sheet(name, values.map((v, i) => ({ 登記序號: i + 1, [label]: v })));
+      rawSheet('原始資料一般戶名', '一般戶名', uniqueLines($('households').value));
+      rawSheet('原始資料優先戶名', '優先戶名', uniqueLines($('priorityHouseholds').value));
+      rawSheet('原始資料一般車位', '一般車位', uniqueLines($('parkings').value));
+      rawSheet('原始資料優先車位', '優先車位', uniqueLines($('priorityParkings').value));
       XLSX.writeFile(wb, 'lottery_result.xlsx');
     }
 
@@ -398,34 +462,175 @@ import '../styles/tools.css';
 
     $('drawBtn').addEventListener('click', () => {
       const seed = readSeed();
-      if (seed !== null) runDraw(seed);
+      if (seed !== null) { runDraw(seed); saveDraft(); }
     });
     $('nowBtn').addEventListener('click', () => {
       $('seed').value = String(Date.now());
       updateSeedTime();
       runDraw(Number($('seed').value));
+      saveDraft();
       say('已用現在時間抽出新結果', 'ok');
     });
     $('exampleBtn').addEventListener('click', () => {
+      verifying = false;
       fillExample();
       runDraw(EXAMPLE_SEED);
+      clearDraft();                       // 範例不是真名單，不要留在這台裝置上
       say('已載入範例名單', 'ok');
     });
     $('clearBtn').addEventListener('click', () => {
+      verifying = false;
       for (const id of LISTS) $(id).value = '';
       $('seed').value = '';
       updateSeedTime();
       updateCounts();
       runDraw(Date.now());
+      clearDraft();                       // 清空是有意的動作，草稿也一起清掉
       say('名單已清空', 'ok');
     });
     $('copyBtn').addEventListener('click', copyResult);
     $('excelBtn').addEventListener('click', downloadExcel);
-    $('seed').addEventListener('input', updateSeedTime);
-    for (const id of LISTS) $(id).addEventListener('input', updateCounts);
+    // 使用者自己動手改過欄位，這份名單就是他的工作名單了 —— 離開驗證模式，開始存草稿。
+    const onEdit = (extra) => () => { verifying = false; extra(); saveDraft(); };
+    $('seed').addEventListener('input', onEdit(updateSeedTime));
+    for (const id of LISTS) $(id).addEventListener('input', onEdit(updateCounts));
+
+    /** 目前輸入 + seed 的驗證連結。住戶點開就會跑出同一份結果。 */
+    function shareUrl() {
+      const lists = {};
+      for (const id of LISTS) lists[id] = uniqueLines($(id).value);
+      const seed = Number($('seed').value.trim());
+      if (!Number.isFinite(seed)) return null;
+      const url = new URL(window.location.href);
+      url.hash = 'verify=' + encodeShare({ seed, ...lists });
+      return url.toString();
+    }
+
+    function showVerdict(kind, title, detail) {
+      const box = $('verdict');
+      box.className = 'lt-verdict ' + kind;
+      box.hidden = false;
+      box.replaceChildren();
+      const h = document.createElement('strong');
+      h.textContent = title;
+      box.append(h);
+      if (detail) {
+        const p = document.createElement('p');
+        p.textContent = detail;
+        box.append(p);
+      }
+    }
+
+    /** 把一組還原出來的輸入填回欄位並重跑。 */
+    function applyInput(input) {
+      verifying = true;
+      for (const id of LISTS) $(id).value = (input[id] ?? []).join('\n');
+      $('seed').value = String(input.seed);
+      updateSeedTime();
+      updateCounts();
+      runDraw(input.seed, false);
+    }
+
+    /** 匯入先前匯出的 Excel：還原名單與 seed、重跑，並和檔案裡的分配結果對帳。 */
+    async function importWorkbook(file) {
+      const XLSX = window.XLSX;
+      if (!XLSX) { say('Excel 元件還沒載入完成,請稍候再試', 'err'); return; }
+      let wb;
+      try {
+        wb = XLSX.read(await file.arrayBuffer(), { type: 'array' });
+      } catch {
+        showVerdict('err', '讀不開這個檔案', '請選擇本頁「下載 Excel」產生的 .xlsx。');
+        return;
+      }
+      const rows = (name) => (wb.Sheets[name] ? XLSX.utils.sheet_to_json(wb.Sheets[name]) : []);
+      const meta = rows('抽籤 seed')[0];
+      const seed = Number(meta && meta.seed);
+      if (!Number.isFinite(seed)) {
+        showVerdict('err', '檔案裡找不到 seed', '需要「抽籤 seed」分頁,才知道要用哪個 seed 重跑。');
+        return;
+      }
+      const input = {
+        seed,
+        households: rowsToList(rows('原始資料一般戶名'), '一般戶名'),
+        priorityHouseholds: rowsToList(rows('原始資料優先戶名'), '優先戶名'),
+        parkings: rowsToList(rows('原始資料一般車位'), '一般車位'),
+        priorityParkings: rowsToList(rows('原始資料優先車位'), '優先車位'),
+      };
+      applyInput(input);
+
+      const verdict = compareAllocation(toRows(current), rows('分配結果'));
+      const when = getUTC8DateString(new Date(seed));
+      if (verdict.ok) {
+        showVerdict('ok', `✅ 與檔案一致(${verdict.checked} 筆)`,
+          `seed ${seed}（${when}）重跑的分配結果，與檔案裡的「分配結果」逐筆相同。下方候補順位同樣由這個 seed 決定。`);
+        say('驗證通過', 'ok');
+      } else if (verdict.checked === 0) {
+        showVerdict('ok', '已依檔案重跑',
+          `檔案裡沒有「分配結果」分頁可對帳，以下是用 seed ${seed}（${when}）與檔案裡的名單重跑的結果。`);
+      } else {
+        const parts = [];
+        if (verdict.mismatched.length) {
+          parts.push('車位不同：' + verdict.mismatched.slice(0, 5)
+            .map((m) => `${m.household}（檔案 ${m.expected} / 重跑 ${m.actual}）`).join('、'));
+        }
+        if (verdict.missing.length) parts.push('檔案有但重跑沒中籤：' + verdict.missing.slice(0, 5).join('、'));
+        if (verdict.extra.length) parts.push('重跑中籤但檔案沒有：' + verdict.extra.slice(0, 5).join('、'));
+        parts.push('常見原因是名單被改過或順序被排序過 —— 順序也是抽籤的輸入。');
+        showVerdict('err', `❌ 與檔案不一致（比對 ${verdict.checked} 筆）`, parts.join('；'));
+        say('驗證不通過', 'err');
+      }
+    }
+
+    $('linkBtn').addEventListener('click', async () => {
+      const url = shareUrl();
+      if (!url) { say('請先抽籤,才有 seed 可以放進連結', 'err'); return; }
+      $('shareBox').hidden = false;
+      $('shareUrl').value = url;
+      $('shareUrl').select();
+      try {
+        await navigator.clipboard.writeText(url);
+        say('驗證連結已複製', 'ok');
+      } catch {
+        say('連結已產生,請手動複製', 'ok');
+      }
+    });
+    $('importBtn').addEventListener('click', () => $('importFile').click());
+    $('importFile').addEventListener('change', async (e) => {
+      const file = e.target.files && e.target.files[0];
+      e.target.value = '';                       // 同一個檔案再選一次也要能觸發
+      if (file) await importWorkbook(file);
+    });
 
     // 一進頁面就看得到一場完整抽籤(不做入場動畫,首屏即定稿)。
-    fillExample();
-    runDraw(EXAMPLE_SEED, false);
+    // 帶著 #verify= 進來的是驗證連結：改用連結裡的名單與 seed 重跑。
+    const token = new URLSearchParams(location.hash.replace(/^#/, '')).get('verify');
+    if (token) {
+      try {
+        const input = decodeShare(token);
+        applyInput(input);
+        showVerdict('ok', '驗證模式',
+          `以下結果由連結裡的 seed ${input.seed}（${getUTC8DateString(new Date(input.seed))}）`
+          + '與名單重新計算，和公告的結果應該一字不差。連結內容沒有送到伺服器。');
+      } catch (err) {
+        fillExample();
+        runDraw(EXAMPLE_SEED, false);
+        showVerdict('err', '這個驗證連結壞了', (err && err.message) || '請向管委會索取正確的連結。');
+      }
+    } else {
+      const draft = loadDraft();
+      if (draft) {
+        // 上次沒抽完就關掉頁面(或不小心重新整理)——把名單原封不動接回來。
+        for (const id of LISTS) $(id).value = draft[id] ?? '';
+        $('seed').value = draft.seed ?? '';
+        updateSeedTime();
+        updateCounts();
+        const seed = /^\d+$/.test(String(draft.seed ?? '')) ? Number(draft.seed) : Date.now();
+        runDraw(seed, false);
+        say('已接回這台裝置上次輸入的名單', 'ok');
+      } else {
+        fillExample();
+        runDraw(EXAMPLE_SEED, false);
+      }
+    }
   </script>
 </BaseLayout>

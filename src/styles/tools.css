@@ -348,6 +348,25 @@
     border-radius: 4px;
     color: var(--color-muted);
   }
+  /* 驗證連結 / 匯入結果 */
+  .lt-share { margin-top: 0.9rem; }
+  .lt-share input { width: 100%; font-family: var(--lt-mono); font-size: 0.8rem; }
+
+  .lt-verdict {
+    margin-top: 1.25rem;
+    padding: 0.85rem 1rem;
+    background: var(--color-surface);
+    border: 1px solid var(--color-line);
+    border-left: 4px solid var(--color-accent);
+    border-radius: 8px;
+  }
+  .lt-verdict strong { display: block; font-size: 1rem; }
+  .lt-verdict p { margin: 0.3rem 0 0; font-size: 0.88rem; color: var(--color-muted); line-height: 1.7; }
+  .lt-verdict.ok { border-left-color: var(--t-ok); }
+  .lt-verdict.ok strong { color: var(--t-ok); }
+  .lt-verdict.err { border-left-color: var(--t-danger); }
+  .lt-verdict.err strong { color: var(--t-danger); }
+
   .lt-name .lt-rank {
     display: inline-block;
     min-width: 1.4em;
@@ -393,6 +412,55 @@
     background: var(--color-base);
     border-radius: 4px;
     padding: 0.05em 0.3em;
+  }
+}
+
+/* 列印:公告欄要貼的是結果,不是輸入框。只留標題、統計、分配結果、候補順位
+   與驗證資訊,並一律用白底黑字(深色主題直接印會是一片黑)。 */
+@media print {
+  body:has(.tool-page.lottery) {
+    background: #fff;
+    color: #000;
+  }
+  body:has(.tool-page.lottery) nav,
+  body:has(.tool-page.lottery) > footer {
+    display: none;
+  }
+  .tool-page.lottery {
+    --color-base: #fff;
+    --color-surface: #fff;
+    --color-ink: #000;
+    --color-muted: #333;
+    --color-line: #999;
+    --color-accent: #000;
+
+    .lt-intro,
+    .lt-seed,
+    .lt-lists,
+    .lt-actions,
+    .lt-share,
+    .lt-steps {
+      display: none;
+    }
+    /* 「抽籤條件」這個標題連同它的卡片一起收起來 */
+    h3:first-of-type { display: none; }
+    .lt-card:not(.lt-verify) { display: none; }
+
+    .lt-slot,
+    .lt-name,
+    .lt-stats,
+    .lt-verdict,
+    .lt-verify {
+      background: #fff;
+      border-color: #999;
+      box-shadow: none;
+    }
+    .lt-slot { break-inside: avoid; }
+    .lt-stat.hit b,
+    .lt-stat.miss b,
+    .lt-verdict strong,
+    .lt-name .lt-rank { color: #000; }
+    .lt-group { break-inside: avoid; }
   }
 }
 
