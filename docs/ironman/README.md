@@ -56,6 +56,8 @@
 
 ## 每日發文 SOP(五分鐘)
 
+> 在 Claude session 裡用 `/ironman-daily-pack`:自動算今天 Day 幾、跑 pre-flight 檢查(圖數、字數、footer、殘留語法)、遞出當日檔案並附插圖位置——以下手動步驟照做即可。
+
 1. 開 `dayNN.md`,全選複製,貼進 ithelp 編輯器(markdown 模式)
 2. 上傳 `img/` 裡對應的 PNG,插到 `![...]` 標記處
 3. 預覽確認圖與程式碼區塊正常
