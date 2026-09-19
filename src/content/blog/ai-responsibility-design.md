@@ -67,8 +67,8 @@ seriesOrder: 3
     <line x1="160" y1="94" x2="160" y2="122" stroke="#9aa4b2" stroke-width="1.3"/>
     <line x1="160" y1="170" x2="160" y2="198" stroke="#9aa4b2" stroke-width="1.3"/>
     <path d="M 280 80 C 330 130 290 200 222 216" fill="none" stroke="#e05a7d" stroke-width="1.6" stroke-dasharray="5 4"/>
-    <text x="318" y="140" fill="#e05a7d" font-size="9" text-anchor="middle">agent 可直拉 done</text>
-    <text x="318" y="153" fill="#e05a7d" font-size="9" text-anchor="middle">(通知也不會響)</text>
+    <text x="285" y="222" fill="#e05a7d" font-size="9" text-anchor="middle">agent 可直拉 done</text>
+    <text x="285" y="234" fill="#e05a7d" font-size="9" text-anchor="middle">(通知也不會響)</text>
     <text x="160" y="272" fill="#9aa4b2" font-size="10" text-anchor="middle">同一套認證能分辨人與機器——</text>
     <text x="160" y="288" fill="#9aa4b2" font-size="10" text-anchor="middle">但鎖只裝在計費 API 上</text>
     <line x1="345" y1="40" x2="345" y2="300" stroke="#3a4154" stroke-width="1"/>

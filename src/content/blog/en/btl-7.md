@@ -37,13 +37,13 @@ This chapter's answer: **idea power is a skill you can train, not a gift**. And 
     <line x1="450" y1="148" x2="466" y2="148" stroke="#9aa4b2" stroke-width="1.3" marker-end="url(#ip1)"/>
     <rect x="470" y="124" width="80" height="48" rx="9" fill="#262b3a" stroke="#d4af37" stroke-width="1.5"/><text x="510" y="145" fill="#e6e6e6" font-size="11.5" text-anchor="middle">Innovation</text><text x="510" y="161" fill="#9aa4b2" font-size="9" text-anchor="middle">shipped</text>
     <line x1="130" y1="204" x2="430" y2="204" stroke="#d4af37" stroke-width="2"/>
-    <text x="280" y="222" fill="#9aa4b2" font-size="10" text-anchor="middle">5 the umbrella — don't let ideas get killed early</text>
+    <text x="280" y="196" fill="#9aa4b2" font-size="10" text-anchor="middle">5 the umbrella — don't let ideas get killed early</text>
     <line x1="170" y1="258" x2="170" y2="210" stroke="#fca5a5" stroke-width="1.3" marker-end="url(#ip2)"/>
     <line x1="280" y1="258" x2="280" y2="210" stroke="#fca5a5" stroke-width="1.3" marker-end="url(#ip2)"/>
     <line x1="390" y1="258" x2="390" y2="210" stroke="#fca5a5" stroke-width="1.3" marker-end="url(#ip2)"/>
     <text x="170" y="276" fill="#fca5a5" font-size="10" text-anchor="middle">"we tried that"</text>
     <text x="280" y="276" fill="#fca5a5" font-size="10" text-anchor="middle">"that won't work"</text>
-    <text x="390" y="276" fill="#fca5a5" font-size="10" text-anchor="middle">"that's not how we do it"</text>
+    <text x="390" y="276" fill="#fca5a5" font-size="10" text-anchor="middle">"not how we do it"</text>
   </svg>
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">The five ways a leader feeds the idea flow — four add to it, the fifth blocks the arrows fired at it; "having the idea yourself" is one fifth of the job</figcaption>
 </figure>

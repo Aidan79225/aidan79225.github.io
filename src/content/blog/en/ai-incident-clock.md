@@ -106,8 +106,8 @@ Against what actually happened: per-message isolation was our post-incident fix;
     <polygon points="320,245 315,235 325,235" fill="#54b890"/>
     <text x="392" y="237" fill="#9aa4b2" font-size="9" text-anchor="middle">once it converges</text>
     <path d="M 560 120 C 600 190 480 265 410 268" fill="none" stroke="#e05a7d" stroke-width="1.5" stroke-dasharray="5 4"/>
-    <text x="565" y="205" fill="#e05a7d" font-size="9" text-anchor="middle">believing the narrative</text>
-    <text x="565" y="218" fill="#e05a7d" font-size="9" text-anchor="middle">= the authority shortcut</text>
+    <text x="520" y="266" fill="#e05a7d" font-size="9" text-anchor="middle">believing the narrative</text>
+    <text x="520" y="279" fill="#e05a7d" font-size="9" text-anchor="middle">= the authority shortcut</text>
   </svg>
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">How many rounds the loop runs is decided by evidence; the red shortcut is always there — even when this narrative happens to be right, you can't know that until the handle is walked, and the handle usually takes five minutes.</figcaption>
 </figure>
