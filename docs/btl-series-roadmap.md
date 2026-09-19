@@ -66,11 +66,11 @@
 | 創新的三大障礙 | the three great obstacles to innovation | Ch6 |
 | 看不到自己 | self-blindness | Ch6 障礙一 |
 | 沒問題綜合症 | the "no problem" syndrome | Ch6 障礙二 |
-| 相信只有一個正解 | ⚠ 待確認(believing is seeing?) | Ch6 障礙三;**動筆時翻書對原文用字** |
+| 相信只有一個正解 | ⚠ 待確認(believing is seeing?);英譯暫用 believing there's one right answer | Ch6 障礙三;**動筆時翻書對原文用字**。btl-5 英文版已用暫譯,對到原文後要一併改 |
 | 自我覺察 | self-awareness | Ch7 |
 | 日記 | personal journal | Ch7 工具;事實 → 感受 → 教訓 |
 | 發想力 | idea power | Ch8 |
-| 點子殺手 | ⚠ 待確認(idea killer?) | Ch8;「擋殺手」那一種貢獻 |
+| 點子殺手 | ⚠ 待確認(idea killer?);英譯暫用 idea killer | Ch8;「擋殺手」那一種貢獻。btl-7 英文版已用暫譯 |
 | 願景 | vision | Ch9;個人願景 = personal vision |
 | 激勵的兩大障礙 | the first / second great obstacle to motivating others | Ch10–11 |
 | 力量 | power | Ch14 Where Power Comes From;不寫「權力」除非確指職權 |
