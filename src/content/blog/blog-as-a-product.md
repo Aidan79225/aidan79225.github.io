@@ -2,6 +2,7 @@
 title: "這個部落格本身,就是一個作品:把寫作做成一條產線"
 date: 2026-08-07
 category: tech
+description: "寫了旅遊分帳和 GitCrisp,卻漏了最常被使用的那個作品 —— 你正在看的這個站。一百六十多篇文章、十幾個系列的背後是一條產線:一個 wiki-link 在 build 時自動長成內文連結、被引用那篇的反向連結,以及知識圖譜上的一條邊。這篇講靜態站怎麼做出動態感,還有寫作怎麼被工程化。"
 tags:
   - side-project
   - automation

@@ -4,8 +4,7 @@ date: 2026-07-17
 category: tech
 description: "RabbitMQ 跟 Kafka 都是訊息中介,但 infra 形狀差很多,關鍵在一個字:Kafka 是 log(訊息留著、consumer 用 offset 自己讀、可重播),RabbitMQ 是 queue(被取走 ack 就消失、broker 追蹤每筆)。這篇純從 infra 角度看 RabbitMQ:log vs queue 撐開的兩套不同 infra、它最招牌的坑——queue backlog 撞 memory/disk watermark 觸發 alarm、反過來 block publisher 的 backpressure 機制,以及 HA 用 quorum queue(Raft)、在 k8s 上怎麼跑。"
 tags:
- - infrastructure
- - rabbitmq
+  - infrastructure
 series: "從 Infra 角度看資料工具"
 seriesOrder: 5
 comments: true

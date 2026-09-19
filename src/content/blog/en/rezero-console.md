@@ -6,7 +6,6 @@ description: "First operations chapter: who does what during a live stream — t
 tags:
   - war-story
   - live-commerce
-  - internal-tools
 series: "Re:Building a Live-Commerce Platform from Zero"
 seriesOrder: 9
 comments: true

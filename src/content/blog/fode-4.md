@@ -2,6 +2,7 @@
 title: "技術到底該怎麼選:讀《Fundamentals of Data Engineering》Ch.4"
 date: 2026-06-30
 category: tech
+description: "先有架構,才選技術,不是反過來。很多團隊的決策長這樣:看到當紅工具 → 決定要用 → 再回頭把架構湊上去。這章給了一整排判準:不變的地基 vs 易變的表層、自建 vs 採購,以及成本要算 TCO 與 TOCO 兩本帳。"
 tags:
   - data-engineering
   - book-notes

@@ -2,6 +2,7 @@
 title: "Airflow 可靠性實戰:冪等、重試、SLA 與告警"
 date: 2026-07-21
 category: tech
+description: "Production 的 DAG 會在半夜出事。可靠性拆成三層防線:冪等是地基 —— task 注定會被跑不只一次,沒有冪等,retry 只會放大災難;retries 負責自癒;SLA 與告警負責在真的救不了的時候大聲叫。"
 tags:
   - airflow
   - data-engineering

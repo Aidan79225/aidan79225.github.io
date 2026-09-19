@@ -3,6 +3,7 @@ title: "旅遊分帳:把 Google Sheet 當後端,寫一個不會把帳弄丟的�
 date: 2026-08-05
 updated: 2026-08-06
 category: tech
+description: "跟朋友出國,分帳永遠是同一個劇本:有人墊機票、有人刷租車,回國對著一堆收據算到懷疑人生。市面上的 App 要嘛每個人都要註冊、要嘛大家得裝同一個 —— 而你永遠說服不了全部的同行者。所以需求收斂成三句話:開網頁就能用、不用註冊、帳不會弄丟,而後端是一份你自己的 Google 試算表。"
 tags:
   - side-project
   - system-design

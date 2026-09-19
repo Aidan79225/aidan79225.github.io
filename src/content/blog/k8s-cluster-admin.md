@@ -2,6 +2,7 @@
 title: "叢集管理:kubeadm、etcd 備份、升級"
 date: 2026-07-18
 category: tech
+description: "前面都站在「用」叢集的位置,這篇換到「建與養」:kubeadm 怎麼把一堆機器變成叢集、etcd 為什麼既是叢集的唯一真相也是唯一死穴(以及備份該怎麼做)、升級怎麼一個節點一個節點接力跑完。"
 tags:
   - kubernetes
   - operations

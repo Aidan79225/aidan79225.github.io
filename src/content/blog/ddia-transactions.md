@@ -6,7 +6,6 @@ description: "隔離層級與 MVCC 在 SQL 系列講過了;DDIA Ch7 真正的加
 tags:
   - distributed-systems
   - book-notes
-  - transactions
 series: "Designing Data-Intensive Applications 讀書筆記"
 seriesOrder: 7
 comments: true

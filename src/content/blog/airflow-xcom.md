@@ -2,10 +2,10 @@
 title: "Airflow 任務間怎麼傳資料:XCom、TaskFlow 進階與 params"
 date: 2026-06-21
 category: tech
+description: "一個 task 算出來的東西,怎麼交給下一個?XCom 是存在 metadata DB 的小型訊息板,TaskFlow 把它包到幾乎看不見。順帶把四種「傳東西」的機制分清楚,各有各的容量與時機。"
 tags:
   - airflow
   - data-engineering
-  - xcom
 series: "Airflow 學習筆記"
 seriesOrder: 4
 comments: true

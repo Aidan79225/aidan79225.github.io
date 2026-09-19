@@ -2,20 +2,20 @@
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import { getPublishedPosts } from '../../lib/posts';
 import { currentLocale, withLocale } from '../../lib/i18n';
+import { countTags, tagHasPage } from '../../lib/tags.mjs';
 const locale = currentLocale(Astro.currentLocale);
 const posts = await getPublishedPosts();
-const counts = new Map();
-for (const p of posts) {
-  for (const t of p.data.tags ?? []) counts.set(t, (counts.get(t) ?? 0) + 1);
-}
-const tags = [...counts.entries()].sort((a, b) => b[1] - a[1]);
+const counts = countTags(posts);
+const tags = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeCompare(b[0]));
 ---
 <BaseLayout title="Tags" description="依主題瀏覽 Aidan 的部落格文章標籤。">
   <h1 class="text-2xl font-bold mb-4">Tags</h1>
   <ul class="flex flex-wrap gap-2 list-none p-0">
     {tags.map(([tag, count]) => (
       <li>
-        <a href={withLocale(locale, `/tags/${encodeURIComponent(tag)}/`)} class="text-sm bg-surface border border-line rounded px-2 py-1 text-accent hover:underline">#{tag} ({count})</a>
+        {tagHasPage(counts, tag)
+          ? <a href={withLocale(locale, `/tags/${encodeURIComponent(tag)}/`)} class="text-sm bg-surface border border-line rounded px-2 py-1 text-accent hover:underline">#{tag} ({count})</a>
+          : <span class="text-sm bg-surface border border-line rounded px-2 py-1 text-muted" title="只有一篇,沒有獨立頁面">#{tag} ({count})</span>}
       </li>
     ))}
   </ul>

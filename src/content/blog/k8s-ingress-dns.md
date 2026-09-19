@@ -2,6 +2,7 @@
 title: "Ingress 與叢集 DNS:一個入口進來、一個名字相認"
 date: 2026-07-17
 category: tech
+description: "Service 給了短命 Pod 一個固定門牌,但留了兩個尾巴:外面怎麼用一個入口進來、再按網址分流?叢集內服務又怎麼靠名字互相找到?Ingress 與 Service 分工在不同網路層 —— 而 Ingress 本身只是規則,沒有 Controller 執行它,什麼也不會發生。"
 tags:
   - kubernetes
   - networking

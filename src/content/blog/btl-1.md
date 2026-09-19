@@ -2,6 +2,7 @@
 title: "領導力"
 date: 2025-10-12
 category: tech
+description: "Leadership 常被誤解成職位高、會下命令、有人聽話,但它的核心不是權力,是影響力 —— 而且有範圍:同一個人在不同團體裡的排名並不一樣。從通用模型談起,也談通用模型為什麼容易在真實團隊裡失準。"
 tags:
   - leadership
 comments: true

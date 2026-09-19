@@ -2,6 +2,7 @@
 title: "Kafka 的投遞保證:acks、ISR 與 at-least-once / exactly-once"
 date: 2026-06-25
 category: tech
+description: "崩潰重啟後,一筆事件會被重複處理還是漏掉?先看清一筆事件的旅程有三段會出事,再看 acks、ISR 與 commit 時機各自管住哪一段。三種投遞語意一張表看完 —— exactly-once 不是魔法,是兩塊拼起來的。"
 tags:
  - kafka
  - data-engineering

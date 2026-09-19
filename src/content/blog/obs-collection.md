@@ -2,9 +2,9 @@
 title: "採集層:資料怎麼進來——OpenTelemetry 與 Alloy"
 date: 2026-07-25
 category: tech
+description: "訊號要先進得來,才有得看。每個 app 直接連三個後端,連線是 M×N 條,換一個後端就要改全部的 app;一層 collector 把它壓成 M+N。OpenTelemetry 負責統一三種訊號的標準,Alloy 負責收集、處理、轉送,以及在 K8s 上 DaemonSet、sidecar 還是 gateway 怎麼選。"
 tags:
   - observability
-  - opentelemetry
 series: "Grafana LGTM 可觀測性"
 seriesOrder: 6
 comments: true

@@ -2,9 +2,9 @@
 title: "指標與 Prometheus:時序、pull、PromQL 與 cardinality 的坑"
 date: 2026-07-23
 category: tech
+description: "metrics 是「有沒有問題」的第一道防線,也是告警與 SLO 的底層數字。資料模型是名字加 labels 加一串時序 —— 而那個致命的坑就藏在這裡:每一個唯一的 label 組合都是獨立一條 series,cardinality 一爆,整台 Prometheus 陪葬。"
 tags:
   - observability
-  - prometheus
 series: "Grafana LGTM 可觀測性"
 seriesOrder: 3
 comments: true

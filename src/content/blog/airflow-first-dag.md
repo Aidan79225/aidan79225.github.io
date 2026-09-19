@@ -2,6 +2,7 @@
 title: "跑起第一個 Airflow:Docker 環境 + 你的第一個 DAG"
 date: 2026-06-16
 category: tech
+description: "從零到「親眼看到自己的 DAG 在介面上變綠」:用 Docker Compose 把 Scheduler、Worker、Metadata DB 變成看得到摸得到的容器,寫出第一個 DAG,在 Web UI 跑一輪。概念要落地,得先看到它動起來。"
 tags:
   - airflow
   - data-engineering

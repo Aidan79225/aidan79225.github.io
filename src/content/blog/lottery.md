@@ -3,6 +3,10 @@ title: "程式抽籤被質疑黑箱該如何處理"
 date: 2025-09-20
 updated: 2026-09-15
 category: tech
+tags:
+  - side-project
+  - concept
+description: "社區的車位抽籤程式被質疑黑箱,於是研究怎麼證明它不是。核心是可重現的隨機算法 —— 從 LCG 升級到 Mulberry32 加具名亂數流,名單順序也是輸入的一部分,沒中籤的人照同一次洗牌排成候補順位。但難點從來不在演算法,在怎麼讓一個不懂程式的住戶相信它。"
 commentsIssue: 1
 ---
 ## 前言

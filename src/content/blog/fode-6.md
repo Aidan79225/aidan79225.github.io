@@ -2,6 +2,7 @@
 title: "資料要存在哪:儲存的階層與抽象,讀《Fundamentals of Data Engineering》Ch.6"
 date: 2026-07-01
 category: tech
+description: "儲存不是一個東西,是一整條從奈秒到小時、從天價到白菜價的階層。看懂這條階層,後面「該放哪、放多久、花多少」才有依據。重心落在物件儲存與運算儲存分離 —— 以及資料是有溫度的,冷熱分層決定你的帳單。"
 tags:
  - data-engineering
  - book-notes

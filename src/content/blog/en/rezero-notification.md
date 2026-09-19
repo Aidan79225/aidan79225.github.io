@@ -6,7 +6,6 @@ description: "Fourth operations chapter: a channel ledger (private reply, email 
 tags:
   - war-story
   - live-commerce
-  - notification
 series: "Re:Building a Live-Commerce Platform from Zero"
 seriesOrder: 12
 comments: true

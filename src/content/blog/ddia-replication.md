@@ -6,7 +6,6 @@ description: "把同一份資料放在多台機器上(複製),只為三件事:�
 tags:
   - distributed-systems
   - book-notes
-  - replication
 series: "Designing Data-Intensive Applications 讀書筆記"
 seriesOrder: 5
 comments: true

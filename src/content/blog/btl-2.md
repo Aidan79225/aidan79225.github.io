@@ -2,6 +2,7 @@
 title: "領導力 - MOI"
 date: 2025-11-30
 category: tech
+description: "MOI 模型用三個構面描述一個領導者塑造出來的環境:Motivation(激勵)、Organization(組織)、Innovation(創新)。這篇把三個構面拆開,對照 Tech Leader 實際解決問題的方式。"
 tags:
   - leadership
 comments: true

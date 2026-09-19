@@ -2,10 +2,10 @@
 title: "Medallion 架構:用 Bronze / Silver / Gold 分層管資料品質"
 date: 2026-06-23
 category: tech
+description: "Medallion 把資料按品質與精煉程度分成三層:Bronze 保真、Silver 求乾淨可信、Gold 求好用,一層一層往上洗。它不是工具,是約定 —— Spark、dbt、純 SQL 都能實作。它真正在規範的是每一層該負什麼責任,壞掉時才定位得出來。"
 tags:
   - data-engineering
   - data-modeling
-  - lakehouse
 comments: true
 draft: false
 ---

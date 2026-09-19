@@ -6,7 +6,6 @@ description: "錢與貨的第二章:兩本庫存(銷售承諾與實體現實)天
 tags:
   - war-story
   - live-commerce
-  - fulfillment
 series: "Re:從零開始做直播代購電商平台"
 seriesOrder: 8
 comments: true

@@ -2,6 +2,7 @@
 title: "資料從哪來:源頭系統與資料生成,讀《Fundamentals of Data Engineering》Ch.5"
 date: 2026-06-30
 category: tech
+description: "資料工程師很少生資料,我們接資料 —— 而那些源頭系統不歸你管,你攔不住它們改 schema、改邏輯、改格式。這章講源頭有哪些種類、為什麼 OLTP 不該直接拿來分析、批次查詢與 CDC 兩條取數路線,以及那個永恆之痛:schema drift。"
 tags:
   - data-engineering
   - book-notes

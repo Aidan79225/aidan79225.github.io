@@ -6,7 +6,6 @@ description: "複製是同一份資料放多台;分區(partitioning / sharding)�
 tags:
   - distributed-systems
   - book-notes
-  - partitioning
 series: "Designing Data-Intensive Applications 讀書筆記"
 seriesOrder: 6
 comments: true

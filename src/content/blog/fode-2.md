@@ -2,10 +2,10 @@
 title: "資料工程生命週期:讀《Fundamentals of Data Engineering》Ch.2"
 date: 2026-06-28
 category: tech
+description: "全書的骨架:資料工程生命週期 —— 五個階段(生成、攝取、轉換、服務,加上橫跨中間的儲存)加六條暗流。階段看得見,暗流看不見,卻決定系統會不會垮。"
 tags:
   - data-engineering
   - book-notes
-  - lifecycle
 series: "Fundamentals of Data Engineering 讀書筆記"
 seriesOrder: 2
 comments: true

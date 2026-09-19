@@ -6,7 +6,6 @@ description: "The heart of live commerce: a ledger that stores a cap and two con
 tags:
   - war-story
   - live-commerce
-  - inventory
 series: "Re:Building a Live-Commerce Platform from Zero"
 seriesOrder: 5
 comments: true

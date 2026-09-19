@@ -2,6 +2,7 @@
 title: "把 Spark 跑起來:從本機到叢集與 managed 平台"
 date: 2026-06-23
 category: tech
+description: "同一段程式碼,在你筆電上跑、跟在幾十台機器的叢集上跑,差在哪?先把 Driver、Executor、Cluster Manager 三個角色搞懂,再看 spark-submit 的 client 與 cluster 模式把 Driver 放在哪 —— 以及為什麼你多半不會自己架叢集。"
 tags:
   - spark
   - data-engineering

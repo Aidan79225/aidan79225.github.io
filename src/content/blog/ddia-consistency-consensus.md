@@ -6,7 +6,6 @@ description: "Ch8 的結論是『真相由多數決定』;Ch9 講多數怎麼安
 tags:
   - distributed-systems
   - book-notes
-  - consistency
 series: "Designing Data-Intensive Applications 讀書筆記"
 seriesOrder: 9
 comments: true

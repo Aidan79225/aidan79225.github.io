@@ -2,9 +2,9 @@
 title: "追蹤與 Tempo:一個請求走過的路"
 date: 2026-07-23
 category: tech
+description: "trace 補的是 metric 與 log 之間那個洞:在哪一段?一個請求橫跨八個服務,metric 只會說 checkout 慢。這篇講 waterfall 怎麼看、context propagation 怎麼把 span 縫成一條 trace,以及取樣怎麼留下有趣的、丟掉無聊的。"
 tags:
   - observability
-  - tracing
 series: "Grafana LGTM 可觀測性"
 seriesOrder: 5
 comments: true

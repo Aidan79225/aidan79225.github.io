@@ -2,6 +2,7 @@
 title: "Airflow + Spark 跑在 K8s 上:不同的 node 怎麼跑不同的 pod"
 date: 2026-06-30
 category: tech
+description: "Airflow 管「什麼時候、什麼順序」,Spark 管「把大資料算完」,兩個都搬上 K8s 之後最常見的困惑是:到底有哪些東西在跑、各自是不是一顆 pod、又落在哪個 node?一句話收斂 —— Node 是房子、Pod 是住客、Scheduler 是仲介。"
 tags:
   - kubernetes
   - airflow

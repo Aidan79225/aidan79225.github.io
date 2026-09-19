@@ -2,6 +2,7 @@
 title: "領導力 - 願景"
 date: 2026-08-15
 category: tech
+description: "點子流有了,誰決定它流往哪裡?一個團隊可以點子很多、討論很熱,但每個點子指向不同方向,這時候點子多反而是內耗。願景不是牆上的標語,是點子的方向感 —— 也是「會生點子的人」和「帶動創新的 Leader」之間真正的分界線。"
 tags:
   - leadership
   - innovation

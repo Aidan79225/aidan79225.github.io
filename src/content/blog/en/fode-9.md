@@ -6,7 +6,6 @@ description: "All the hard work of ingesting, storing and modeling exists for th
 tags:
   - data-engineering
   - book-notes
-  - data-serving
 series: "Fundamentals of Data Engineering — Reading Notes"
 seriesOrder: 9
 comments: true

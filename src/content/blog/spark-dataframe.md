@@ -2,6 +2,7 @@
 title: "Spark DataFrame 實戰:讀取、轉換、寫出與 Spark SQL"
 date: 2026-06-21
 category: tech
+description: "日常工作九成用 DataFrame 而不是 RDD,因為它是宣告式、會被最佳化的,RDD 則是命令式、要自己顧效能。這篇動手轉一份資料:讀進來(給它 schema)、清洗、彙總、用 Spark SQL 換個寫法,以及用 partitionBy 讓重跑變冪等。"
 tags:
   - spark
   - data-engineering

@@ -6,7 +6,6 @@ description: "Replication keeps the same data on several machines; partitioning 
 tags:
   - distributed-systems
   - book-notes
-  - partitioning
 series: "Designing Data-Intensive Applications — Reading Notes"
 seriesOrder: 6
 comments: true

@@ -5,7 +5,6 @@ category: tech
 description: "新系列開場:讀 Will Larson 的《An Elegant Puzzle》。這本書的立場很硬——管理不是把事情一件一件解決掉,是設計那個一直在吐出事情的系統。先把這個轉念講清楚,再把全書五章拆成五個問題,最後誠實回答:一本寫給火箭船的書,四個工程師的團隊怎麼讀。"
 tags:
   - engineering-management
-  - systems-thinking
 series: "An Elegant Puzzle 讀書筆記"
 seriesOrder: 1
 comments: true

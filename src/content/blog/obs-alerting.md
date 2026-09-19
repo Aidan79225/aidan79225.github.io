@@ -2,10 +2,10 @@
 title: "Grafana 告警:從看見到行動"
 date: 2026-07-27
 category: tech
+description: "整個系列押的一句話:觀測的終點不是看到,是行動。告警不是什麼特殊機制,它就是一條會自己定時跑的查詢、一個門檻,再加一段 for 濾掉短暫尖峰。規則與通知解耦之後,好告警的唯一標準只剩一條:每一則都能行動。"
 tags:
   - observability
   - grafana
-  - alerting
 series: "Grafana LGTM 可觀測性"
 seriesOrder: 7
 comments: true

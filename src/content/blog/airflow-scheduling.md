@@ -2,6 +2,7 @@
 title: "Airflow 排程的真相:data interval、catchup 與 backfill"
 date: 2026-06-19
 category: tech
+description: "Airflow 最反直覺、也最多人卡住的一段:@daily 的 run 不是在當天跑、處理當下的資料 —— 一個 run 代表一段已經結束的區間,6/18 那一份是 6/19 00:00 才跑。搞懂 data interval,才分得清 catchup 噴出一堆 run 與刻意回補的 backfill。"
 tags:
   - airflow
   - data-engineering

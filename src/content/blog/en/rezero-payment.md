@@ -6,7 +6,6 @@ description: "First chapter on money and goods: two banks, smart transfers and c
 tags:
   - war-story
   - live-commerce
-  - payment
 series: "Re:Building a Live-Commerce Platform from Zero"
 seriesOrder: 7
 comments: true

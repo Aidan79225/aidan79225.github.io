@@ -6,7 +6,6 @@ description: "營運面第一章:直播現場的分工——主播看數據抓�
 tags:
   - war-story
   - live-commerce
-  - internal-tools
 series: "Re:從零開始做直播代購電商平台"
 seriesOrder: 9
 comments: true

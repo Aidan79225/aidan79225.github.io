@@ -2,6 +2,7 @@
 title: "領導力 - 創新的三大障礙"
 date: 2025-12-19
 category: tech
+description: "創新不是少數天才的靈光,是一種「環境允許你提出不同想法」的能力。但有三種心態會在源頭就把它擋下來 —— 看不到自己、沒問題綜合症、相信只有一個正解 —— 而且往往是無意識的。"
 tags:
   - leadership
   - innovation

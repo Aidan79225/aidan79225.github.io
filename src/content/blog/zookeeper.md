@@ -4,8 +4,7 @@ date: 2026-07-15
 category: tech
 description: "你很少直接用 ZooKeeper,卻天天間接依賴它——舊版 Kafka、HBase、Hadoop 的高可用都靠它撐著。它把『分散式協調』這件難事,收斂成一棵像檔案系統的小樹(znode)加上幾個簡單原語(ephemeral、sequential、watch),讓上層系統不必自己實作共識。這篇詳細講 ZooKeeper 的資料模型、ensemble 架構(寫走 leader、讀就地)、以及怎麼用『ephemeral-sequential + 只 watch 前一個』拼出分散式鎖與 leader 選舉又不引發驚群,最後談它的極限與為什麼有些系統開始離開它。"
 tags:
- - distributed-systems
- - zookeeper
+  - distributed-systems
 comments: true
 draft: false
 ---

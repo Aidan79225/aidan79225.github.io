@@ -2,6 +2,7 @@
 title: "Airflow 進階:Datasets、deferrable operators 與 executor 選型"
 date: 2026-07-22
 category: tech
+description: "三個進階功能,共同點是都在解 Airflow 的某種死板或浪費:排程只認時間(Datasets 讓下游改由資料觸發)、sensor 佔著 slot 空等(deferrable 把等待丟回事件迴圈)、worker 一刀切(executor 選型)。都是選配,但每個都讓平台更聰明、更省。"
 tags:
   - airflow
   - data-engineering

@@ -2,6 +2,7 @@
 title: "領導力 - 發想力"
 date: 2026-08-14
 category: tech
+description: "發想力是可以練的技能,不是天分。而且反直覺的是:Leader 對團隊點子的最大貢獻,往往不是自己想出點子,而是養一條活的點子流 —— 讓點子進得來、加工得動,也放得下自己的那一個。"
 tags:
   - leadership
   - innovation

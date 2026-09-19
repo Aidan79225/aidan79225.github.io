@@ -6,7 +6,6 @@ description: "直播代購的心臟章:不存「剩餘」、存上限與消耗�
 tags:
   - war-story
   - live-commerce
-  - inventory
 series: "Re:從零開始做直播代購電商平台"
 seriesOrder: 5
 comments: true

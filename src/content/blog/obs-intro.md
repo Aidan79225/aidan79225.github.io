@@ -2,6 +2,7 @@
 title: "可觀測性是什麼:三大支柱與 LGTM 全家桶"
 date: 2026-07-23
 category: tech
+description: "monitoring 看的是你預先知道要看的東西(已知的未知),observability 要回答的是你事先根本沒想到的問題(未知的未知)。三大支柱各答一個問題,合起來剛好是排障的黃金路徑:metric 看有沒有、trace 看在哪、log 看是什麼。"
 tags:
   - observability
   - grafana

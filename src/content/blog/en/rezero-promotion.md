@@ -6,7 +6,6 @@ description: "Third operations chapter: the three-axis coupon model (effect × t
 tags:
   - war-story
   - live-commerce
-  - pricing
 series: "Re:Building a Live-Commerce Platform from Zero"
 seriesOrder: 11
 comments: true

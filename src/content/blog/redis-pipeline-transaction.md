@@ -2,6 +2,7 @@
 title: "管線、交易與 Lua:省 RTT 與原子性"
 date: 2026-07-21
 category: tech
+description: "三個常被混在一起、其實各解完全不同問題的東西:pipeline 解網路來回太多(把 N 次 RTT 壓成 1 次)、MULTI/EXEC 解一組命令要一起執行不被插隊、Lua 解「要原子、又要帶邏輯」。搞混它們,你會拿 pipeline 當交易用。"
 tags:
   - redis
   - distributed-systems

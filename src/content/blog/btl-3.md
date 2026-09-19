@@ -2,6 +2,7 @@
 title: "領導力 - 成長模型"
 date: 2025-12-09
 category: tech
+description: "同一條成長曲線,在不同觀察尺度下會長成完全不同的形狀:拉遠看是穩定上升的直線,拉近看卻是停滯與跳躍交錯。從宏觀一路拉近到微觀 —— 「我好像卡住了」,很多時候只是尺度問題。"
 tags:
   - leadership
 comments: true

@@ -2,6 +2,7 @@
 title: "看板上的頸:工具怎麼設計人的責任——兩個開源專案的對照稽核"
 date: 2026-08-13
 category: tech
+description: "2026 年的工程師不是在白紙上跟 AI 協作,是在一堆新工具裡。挑兩個開源專案,不讀文案、讀 code,看「人的責任」被放在設計的哪個位置:Multica 把頸畫在下游、但沒裝鎖;Superpowers 把頸搬到上游,而且上了鎖。同一個漏斗,兩種頸。"
 tags:
   - ai
   - leadership
