@@ -98,13 +98,19 @@
 | 位移 | offset | 事件在 partition 內的位置 |
 | 消費者群組 | consumer group | 不寫「消費組」 |
 | 消費延遲 | consumer lag | 第一個該盯的指標;不寫「消費滯後」 |
-| 副本 | replica | ISR = in-sync replicas,縮寫照原文 |
+| 複本 | replica | ISR = in-sync replicas,縮寫照原文 |
 | 保留 | retention | 「重播能力 vs 磁碟成本」的對帳 |
 | 壓實 | log compaction | 每個 key 只留最新值;不寫「壓縮」(那是 compression) |
 | 重播 | replay | |
 | 投遞語意 | delivery semantics | at-most-once / at-least-once / exactly-once 三個縮寫照原文 |
 | 冪等生產者 | idempotent producer | exactly-once 的其中一塊 |
 | 交易 | transaction | 與 DDIA 對齊(全站統一用「交易」);Kafka 的 transactional producer 語境也一樣 |
+| 重新平衡 | rebalance | consumer group 成員變動時重新分配 partition;不寫「再平衡」 |
+| 複本數 | replication factor | 設定鍵是 `replication.factor`,中文敘述用「複本數」 |
+| 區段 | segment | partition 在磁碟上的檔案單位,retention 以整個 segment 為單位清理 |
+| 墓碑 | tombstone | compacted topic 裡代表「這個 key 被刪除」的 null 值,縮寫照原文 |
+| 容量規劃 | capacity planning | 幾台 broker、幾個 partition、多少磁碟 |
+| 批流同源 | one API across batch and stream | Spark Structured Streaming 的賣點,對比 Kafka Streams 時會用到 |
 
 ## 寫每篇時的慣例
 - front matter:`series: "Kafka 學習筆記"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。

@@ -74,7 +74,7 @@ producer 送出一筆事件後,要等到什麼程度才認定「成功」?這由
 - **先 commit、再處理**:萬一處理到一半 crash,offset 已經前進了 —— 重啟後從下一筆開始,**這筆就被跳過(漏掉)**。這是 **at-most-once**。
 - **先處理、再 commit**:處理完才推進 offset。若處理完、commit 前 crash,重啟後會**再讀一次同一筆(重複)**。這是 **at-least-once**。
 
-沒有「免費」的選項 —— 你只能選「寧可漏、還是寧可重複」。而絕大多數系統選 **at-least-once**:重複可以靠**幂等**消化,漏掉的資料卻通常救不回來。
+沒有「免費」的選項 —— 你只能選「寧可漏、還是寧可重複」。而絕大多數系統選 **at-least-once**:重複可以靠**冪等**消化,漏掉的資料卻通常救不回來。
 
 ## 三種投遞語意,一張表看完
 
@@ -82,22 +82,22 @@ producer 送出一筆事件後,要等到什麼程度才認定「成功」?這由
 |---|---|---|---|
 | **at-most-once** | 最多一次,可能漏 | 先 commit 後處理 | 會掉資料 |
 | **at-least-once** | 至少一次,可能重複 | 先處理後 commit | 下游要能去重 |
-| **exactly-once** | 不重不漏 | 幂等 producer + 交易 | 設定複雜、有效能成本 |
+| **exactly-once** | 不重不漏 | 冪等 producer + 交易 | 設定複雜、有效能成本 |
 
 ## exactly-once 不是魔法,是兩塊拼起來的
 
 很多人以為 exactly-once 是打開一個開關。實際上它是兩個機制疊起來,而且**範圍有限**:
 
-- **幂等 producer**(`enable.idempotence=true`):broker 給每個 producer 一個 PID,並對每筆訊息編序號,**自動去掉重送造成的重複**。解決的是「第一段重試導致的重複寫入」。
+- **冪等 producer**(`enable.idempotence=true`):broker 給每個 producer 一個 PID,並對每筆訊息編序號,**自動去掉重送造成的重複**。解決的是「第一段重試導致的重複寫入」。
 - **交易(transactions)**:把「讀一批、處理、寫結果、推進 offset」包成一個原子單位 —— 要嘛整批生效、要嘛整批不算。這讓 Kafka **內部**的 read-process-write(典型是 Kafka Streams)能做到 exactly-once。
 
-但要劃清界線:**Kafka 的 exactly-once 只在「Kafka 進、Kafka 出」的封閉迴路內成立。** 一旦你的消費者把結果寫到外部資料庫、呼叫外部 API,那一步 Kafka 的交易管不到 —— 跨出 Kafka 的 exactly-once,終究得靠**業務層自己幂等**(用 `order_id` 之類的唯一鍵去重、`upsert` 取代 `insert`)。
+但要劃清界線:**Kafka 的 exactly-once 只在「Kafka 進、Kafka 出」的封閉迴路內成立。** 一旦你的消費者把結果寫到外部資料庫、呼叫外部 API,那一步 Kafka 的交易管不到 —— 跨出 Kafka 的 exactly-once,終究得靠**業務層自己冪等**(用 `order_id` 之類的唯一鍵去重、`upsert` 取代 `insert`)。
 
 ## 反思
 
-### 務實的預設是「at-least-once + 下游幂等」,不是 exactly-once
+### 務實的預設是「at-least-once + 下游冪等」,不是 exactly-once
 
-我看過不少團隊一上來就追 exactly-once,結果設定複雜、效能掉、還是沒真的不重複 —— 因為他們的終點是外部資料庫,那段根本不在 Kafka 的交易範圍裡。我的預設一律是 **at-least-once(先處理後 commit),然後在消費端做幂等**:用業務唯一鍵去重、能 `upsert` 就不 `insert`。這套又簡單又穩,而且「處理本身可重入」這個性質,在重試、回補、重播歷史資料時全都用得上 —— **與其追求事件只來一次,不如讓你的處理「來幾次結果都一樣」。** 後者是你完全掌握的,前者不是。
+我看過不少團隊一上來就追 exactly-once,結果設定複雜、效能掉、還是沒真的不重複 —— 因為他們的終點是外部資料庫,那段根本不在 Kafka 的交易範圍裡。我的預設一律是 **at-least-once(先處理後 commit),然後在消費端做冪等**:用業務唯一鍵去重、能 `upsert` 就不 `insert`。這套又簡單又穩,而且「處理本身可重入」這個性質,在重試、回補、重播歷史資料時全都用得上 —— **與其追求事件只來一次,不如讓你的處理「來幾次結果都一樣」。** 後者是你完全掌握的,前者不是。
 
 ### `acks=all` 沒搭 `min.insync.replicas` 是最常見的假保證
 
