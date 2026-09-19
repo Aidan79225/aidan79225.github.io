@@ -2,10 +2,10 @@
 title: "Airflow 怎麼連外部系統:Provider、Operator、Hook、Sensor"
 date: 2026-06-25
 category: tech
+description: "真正的 pipeline 一定要碰外面:查資料庫、丟 S3、打 API、等檔案到齊。Provider、Operator、Hook、Sensor 是一層包一層 —— Operator 內部包 Hook,Hook 靠 Connection 拿帳密;連誰就 pip install 誰,核心保持精簡。以及什麼時候該跳過 Operator 直接用 Hook。"
 tags:
   - airflow
   - data-engineering
-  - integration
 series: "Airflow 學習筆記"
 seriesOrder: 5
 comments: true

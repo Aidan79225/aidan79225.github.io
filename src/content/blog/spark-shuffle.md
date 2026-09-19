@@ -2,6 +2,7 @@
 title: "Spark 效能的本體:shuffle 與調校"
 date: 2026-06-21
 category: tech
+description: "Spark 的效能本體就是 shuffle。這篇講透為什麼它貴、它怎麼把 job 依 stage 切開,以及四個實際能少 shuffle 的手段:先 filter 先 select 把資料變小、大表 join 小表改用 broadcast、分區數怎麼調、AQE 與 cache 什麼時候幫得上。"
 tags:
   - spark
   - data-engineering

@@ -2,6 +2,7 @@
 title: "打包與部署:Helm 與 Kustomize"
 date: 2026-07-19
 category: tech
+description: "同一個 app 要上三個環境,九成 YAML 一模一樣,只有副本數、映像 tag、資源大小、對外網址不同。兩種哲學處理這件事:Helm 是模板填空,把 app 變成可安裝、可版控、可回滾的套件;Kustomize 是純 YAML,用 base + overlay 疊出各環境。"
 tags:
   - kubernetes
   - operations

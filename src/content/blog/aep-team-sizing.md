@@ -5,7 +5,6 @@ category: tech
 description: "Larson 給的數字很硬:一個 manager 帶 6 到 8 個工程師,manager of managers 帶 4 到 6 個 manager,少於四個人的團隊「跟個人沒兩樣」。但數字不是重點——重點是每個區間會把你這個 manager 變成完全不同的角色:TLM、投資者,還是只剩安全網。以及一條更少人講的下限,和「管理幅度不等於人頭」。"
 tags:
   - engineering-management
-  - team-structure
 series: "An Elegant Puzzle 讀書筆記"
 seriesOrder: 2
 comments: true

@@ -2,6 +2,7 @@
 title: "領導力 - 成為 Leader 的迷思與痛苦"
 date: 2025-12-12
 category: tech
+description: "在真正成為 Leader 之前,有些想法會先把自己擋在門外:最常見的是「不在其位、不謀其政」,以及當上之後把自己當成團隊不可或缺的大腦。但團隊是一個系統,由各自能獨立運作的 module 組成 —— 少了 Leader 它仍該轉得動。順帶談成為 Tech Leader 之後真正的痛苦。"
 tags:
   - leadership
 series: "成為 Tech Leader 讀書筆記"

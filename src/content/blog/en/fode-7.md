@@ -6,7 +6,6 @@ description: "The second stop in the data engineering lifecycle: moving data fro
 tags:
   - data-engineering
   - book-notes
-  - ingestion
 series: "Fundamentals of Data Engineering — Reading Notes"
 seriesOrder: 7
 comments: true

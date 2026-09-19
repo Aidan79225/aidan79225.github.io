@@ -6,7 +6,6 @@ description: "Whether someone knows window functions is close to the dividing li
 tags:
   - sql
   - concept
-  - window-function
 series: "SQL: I Thought I Knew It"
 seriesOrder: 5
 comments: true

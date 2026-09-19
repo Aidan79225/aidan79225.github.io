@@ -2,6 +2,7 @@
 title: "Structured Streaming 入門:把串流當成一張無界的表"
 date: 2026-06-29
 category: tech
+description: "Structured Streaming 的核心抽象只有一句:串流是一張會一直長高的表。於是你對它的查詢,跟對靜態 DataFrame 做的一模一樣 —— 你寫批次查詢,Spark 幫你變成連續作業。真正要學的是三個串流才有的新問題,以及 micro-batch 其實只是「很快的批次」。"
 tags:
  - spark
  - data-engineering

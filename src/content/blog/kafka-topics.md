@@ -2,10 +2,10 @@
 title: "Kafka 的核心模型:Topic、Partition、Offset 與 Consumer Group"
 date: 2026-06-24
 category: tech
+description: "真正 append-only 的那條 log 是 partition,不是 topic —— topic 只是這些 partition 的集合。Partition 是 Kafka 一切平行與順序的單位:producer 怎麼決定事件落在哪、offset 怎麼記位置、consumer group 怎麼分工,以及為什麼順序保證只在 partition 內成立。"
 tags:
- - kafka
- - data-engineering
- - messaging
+  - kafka
+  - data-engineering
 series: "Kafka 學習筆記"
 seriesOrder: 2
 comments: true

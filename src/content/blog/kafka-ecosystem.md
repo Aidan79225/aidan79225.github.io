@@ -2,6 +2,7 @@
 title: "Kafka 生態系:Connect、Schema Registry 與 Streams"
 date: 2026-06-26
 category: tech
+description: "broker 只做一件事:可靠地存 log、送 log。但每條真實管線都會反覆出現三個需求 —— 資料要搬進搬出(Connect)、事件的長相要有人管(Schema Registry)、流上還要做運算(Streams)。這篇把界線劃清楚,各自解什麼、什麼時候才該用。"
 tags:
  - kafka
  - data-engineering

@@ -1,6 +1,7 @@
 ---
 import type { CollectionEntry } from 'astro:content';
-import { getPublishedPosts, getTranslation, postLang, postUrl } from '../lib/posts';
+import { getPublishedPosts, getTranslation, postLang, postUrl, getTagCounts } from '../lib/posts';
+import { tagHasPage } from '../lib/tags.mjs';
 import BaseLayout from './BaseLayout.astro';
 import AuthorCard from '../components/AuthorCard.astro';
 import Comments from '../components/Comments.astro';
@@ -16,6 +17,7 @@ interface Props { post: CollectionEntry<'blog'>; headings?: MarkdownHeading[]; }
 const { post, headings = [] } = Astro.props;
 const { title, date, updated, category, tags = [], series, description } = post.data;
 const metaDescription = description ?? excerpt(post.body ?? '', 140);
+const tagCounts = await getTagCounts();
 
 const lang = postLang(post);
 const t = ui[lang];
@@ -85,7 +87,9 @@ const showToc = tocHeadings.length >= 3;
     {tags.length > 0 && (
       <p class="flex flex-wrap gap-2 mb-6">
         {tags.map((tag) => (
-          <a href={l(`/tags/${encodeURIComponent(tag)}/`)} class="text-xs bg-surface border border-line rounded px-2 py-1 text-accent hover:underline">#{tag}</a>
+          tagHasPage(tagCounts, tag)
+            ? <a href={l(`/tags/${encodeURIComponent(tag)}/`)} class="text-xs bg-surface border border-line rounded px-2 py-1 text-accent hover:underline">#{tag}</a>
+            : <span class="text-xs bg-surface border border-line rounded px-2 py-1 text-muted">#{tag}</span>
         ))}
       </p>
     )}

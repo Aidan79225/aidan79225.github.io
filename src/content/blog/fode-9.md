@@ -6,7 +6,6 @@ description: "前面辛苦擷取、儲存、建模,全都是為了這一站:把�
 tags:
   - data-engineering
   - book-notes
-  - data-serving
 series: "Fundamentals of Data Engineering 讀書筆記"
 seriesOrder: 9
 comments: true

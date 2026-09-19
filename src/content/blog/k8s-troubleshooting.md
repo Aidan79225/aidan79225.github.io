@@ -2,6 +2,7 @@
 title: "故障排除:Pod、Node、Control Plane 怎麼查"
 date: 2026-07-19
 category: tech
+description: "CKA 佔比最高的一塊,但它不是新知識,是把整個系列串起來的能力。排障最忌諱用猜的,心法只有一句:沿著 Pod 的生命週期一關一關問「它卡在哪」—— 因為 K8s 已經把卡在哪一關,直接寫在狀態裡了。"
 tags:
   - kubernetes
   - troubleshooting

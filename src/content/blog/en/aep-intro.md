@@ -5,7 +5,6 @@ category: tech
 description: "A new series: reading Will Larson's An Elegant Puzzle. The book takes a hard line — management isn't solving things one at a time, it's designing the system that keeps emitting them. First the shift itself, then the five chapters read as five questions, and finally an honest answer: how does a team of four read a book written for rocket ships?"
 tags:
   - engineering-management
-  - systems-thinking
 series: "An Elegant Puzzle — Reading Notes"
 seriesOrder: 1
 comments: true

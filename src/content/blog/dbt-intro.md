@@ -4,9 +4,7 @@ date: 2026-07-03
 category: tech
 description: "dbt 是什麼?一篇搞懂它如何用一堆 SQL SELECT,把倉儲裡的原始資料轉成乾淨可信的模型,並把版控、測試、血緣、文件這套工程紀律帶進 ELT 的 T。"
 tags:
-  - dbt
   - data-engineering
-  - analytics-engineering
 comments: true
 draft: false
 ---

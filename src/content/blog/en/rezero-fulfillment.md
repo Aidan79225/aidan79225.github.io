@@ -6,7 +6,6 @@ description: "Second chapter on money and goods: two stock books (the sales prom
 tags:
   - war-story
   - live-commerce
-  - fulfillment
 series: "Re:Building a Live-Commerce Platform from Zero"
 seriesOrder: 8
 comments: true

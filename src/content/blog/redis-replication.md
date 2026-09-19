@@ -2,6 +2,7 @@
 title: "主從複製:讀寫分離與複製延遲的怪現象"
 date: 2026-07-20
 category: tech
+description: "走向高可用的第一塊地基:一個 master 負責寫、若干 replica 分擔讀。但非同步複製有代價 —— 剛寫完馬上讀卻讀不到的怪現象就是從這裡來的。順帶看 PSYNC 怎麼讓斷線重連不必從頭同步一次。"
 tags:
   - redis
   - distributed-systems

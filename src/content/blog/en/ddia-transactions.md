@@ -6,7 +6,6 @@ description: "Isolation levels and MVCC were covered in the SQL series; DDIA Ch7
 tags:
   - distributed-systems
   - book-notes
-  - transactions
 series: "Designing Data-Intensive Applications — Reading Notes"
 seriesOrder: 7
 comments: true

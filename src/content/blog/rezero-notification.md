@@ -6,7 +6,6 @@ description: "營運面第四章:渠道帳本(private reply、email、電話的�
 tags:
   - war-story
   - live-commerce
-  - notification
 series: "Re:從零開始做直播代購電商平台"
 seriesOrder: 12
 comments: true

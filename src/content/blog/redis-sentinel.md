@@ -2,6 +2,7 @@
 title: "高可用:Sentinel 怎麼自動故障轉移"
 date: 2026-07-20
 category: tech
+description: "主從複製給了你副本,卻留了一個大洞:master 掛了不會自動有人接手,得半夜爬起來手動升主、改指向、換位址。Sentinel 把那套手忙腳亂自動化 —— 主觀下線與客觀下線為什麼一定要過半、怎麼選 leader、又怎麼挑哪個 replica 升上去。"
 tags:
   - redis
   - high-availability

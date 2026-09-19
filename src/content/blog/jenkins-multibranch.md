@@ -6,7 +6,6 @@ description: "一個 repo 同時有 main、五個 feature branch、三個 PR—�
 tags:
   - jenkins
   - ci-cd
-  - branching
 series: "Jenkins 學習筆記"
 seriesOrder: 8
 comments: true

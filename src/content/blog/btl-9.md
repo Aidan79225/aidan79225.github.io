@@ -2,9 +2,9 @@
 title: "領導力 - 激勵的兩大障礙"
 date: 2026-08-15
 category: tech
+description: "為什麼你講的東西,別人不動?書給的答案很不客氣:問題通常不在別人,在你自己身上 —— 頂尖問題解決者的成功敘事裡,根本沒有別人。激勵篇的兩道障礙,都是你看不見的那種。"
 tags:
   - leadership
-  - motivation
 series: "成為 Tech Leader 讀書筆記"
 seriesOrder: 9
 comments: true

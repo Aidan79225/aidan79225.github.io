@@ -2,10 +2,10 @@
 title: "Apache Airflow 是什麼?從 cron 到工作流程編排"
 date: 2026-06-14
 category: tech
+description: "Airflow 是用 Python 把「有相依、要定時、失敗要能重試與監控」的工作編排起來 —— 流程不是設定檔,是程式碼。從 cron 一行開始講:工作一多、彼此有相依,cron 會在哪裡露出破綻,而 workflows as code 換回了什麼。"
 tags:
   - airflow
   - data-engineering
-  - orchestration
 series: "Airflow 學習筆記"
 seriesOrder: 1
 comments: true

@@ -5,7 +5,6 @@ category: tech
 tags:
   - data-engineering
   - book-notes
-  - lifecycle
 series: "Fundamentals of Data Engineering — Reading Notes"
 seriesOrder: 2
 comments: true

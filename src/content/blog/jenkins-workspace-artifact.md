@@ -6,7 +6,6 @@ description: "同一個 commit,在 CI 上綠燈、在同事機器上爆掉——
 tags:
   - jenkins
   - ci-cd
-  - build
 series: "Jenkins 學習筆記"
 seriesOrder: 4
 comments: true

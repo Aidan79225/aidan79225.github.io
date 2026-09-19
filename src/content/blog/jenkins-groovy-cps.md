@@ -6,7 +6,6 @@ description: "前面幾篇一直在說「別在 Jenkinsfile 裡寫程式」,理�
 tags:
   - jenkins
   - ci-cd
-  - groovy
 series: "Jenkins 學習筆記"
 seriesOrder: 9
 comments: true

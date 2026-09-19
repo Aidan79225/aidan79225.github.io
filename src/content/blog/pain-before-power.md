@@ -2,6 +2,7 @@
 title: "先確認痛點,再上重武器"
 date: 2026-06-28
 category: tech
+description: "在引入任何重型工具或架構之前,先確認你的痛點真的到了需要它的量級。沒到,就別上 —— 重武器的成本不在裝起來,在之後每天要餵養它。失敗模式永遠是同一個:把複雜度當成就。"
 tags:
   - concept
   - data-engineering

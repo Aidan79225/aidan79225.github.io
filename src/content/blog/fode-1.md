@@ -2,6 +2,7 @@
 title: "資料工程是什麼:讀《Fundamentals of Data Engineering》Ch.1"
 date: 2026-06-28
 category: tech
+description: "讀《Fundamentals of Data Engineering》第一章。這本書最大的價值,是把「資料工程」這個常被講得很模糊的職能收斂成一套語言:它的產出不是資料,是可信、可用的資料系統。順帶兩個好用的分類 —— A 型與 B 型工程師,以及同一個職稱在三種資料成熟度下根本是三種工作。"
 tags:
   - data-engineering
   - book-notes

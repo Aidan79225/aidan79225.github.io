@@ -6,7 +6,6 @@ description: "Keeping the same data on several machines (replication) buys three
 tags:
   - distributed-systems
   - book-notes
-  - replication
 series: "Designing Data-Intensive Applications — Reading Notes"
 seriesOrder: 5
 comments: true

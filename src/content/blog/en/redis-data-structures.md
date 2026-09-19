@@ -5,7 +5,6 @@ category: tech
 description: "The previous post said Redis is at heart a data structure server; this one opens the toolbox. The five core structures — String, List, Hash, Set, Sorted Set — each answer a class of problem: pick the right one and the problem is half solved; pick wrong and you'll grind out with a pile of GET/SET what was a one-line command. Then four advanced weapons, Bitmap, HyperLogLog, Geo and Stream, which share one idea: trade a little precision or flexibility for a huge gain in space or speed."
 tags:
   - redis
-  - data-structures
 series: "Redis — Learning Notes"
 seriesOrder: 2
 comments: true

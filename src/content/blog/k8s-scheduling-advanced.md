@@ -2,6 +2,7 @@
 title: "進階排程:讓 Pod 去對的 node"
 date: 2026-07-17
 category: tech
+description: "Scheduler 幫 Pending 的 Pod 挑 node 分兩步:先過濾、再評分。這篇把背後的旋鈕打開,先釐清最容易搞混的一件事 —— 到底是誰在挑誰:nodeSelector 與 affinity 是 Pod 去挑 node(拉),taint 則是 node 把 Pod 推開(推)。"
 tags:
   - kubernetes
   - scheduling

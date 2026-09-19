@@ -5,7 +5,6 @@ category: tech
 description: "Larson's numbers are blunt: a manager supports six to eight engineers, a manager of managers supports four to six managers, and a team under four people behaves no differently from an individual. But the numbers aren't the point — each band turns you into a completely different kind of manager: a TLM, an investor, or nothing but a safety net. Plus the lower bound nobody talks about, and why scope isn't headcount."
 tags:
   - engineering-management
-  - team-structure
 series: "An Elegant Puzzle — Reading Notes"
 seriesOrder: 2
 comments: true

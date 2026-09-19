@@ -2,10 +2,10 @@
 title: "Apache Kafka 是什麼?從訊息佇列到事件串流"
 date: 2026-06-24
 category: tech
+description: "別把 Kafka 想成把訊息送到就丟掉的佇列,要想成一條持續被追加、而且可以重頭再讀的事件 log —— 這個心智轉變是看懂它一切設計的鑰匙。從 N² 的系統整合講起:為什麼多一個消費者,不該回頭改生產者。"
 tags:
- - kafka
- - data-engineering
- - event-streaming
+  - kafka
+  - data-engineering
 series: "Kafka 學習筆記"
 seriesOrder: 1
 comments: true

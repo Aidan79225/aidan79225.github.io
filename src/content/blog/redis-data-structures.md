@@ -5,7 +5,6 @@ category: tech
 description: "上一篇說 Redis 的本質是資料結構伺服器,這篇就把工具箱打開。五個核心結構——String、List、Hash、Set、Sorted Set——各自對應一類問題:選對結構,問題就解一半;選錯,你會用一堆 GET/SET 硬幹本來一行命令的事。再加上四件進階武器 Bitmap、HyperLogLog、Geo、Stream,它們的共通點是『用一點精度或限制,換巨大的空間或速度』。"
 tags:
   - redis
-  - data-structures
 series: "Redis 學習筆記"
 seriesOrder: 2
 comments: true

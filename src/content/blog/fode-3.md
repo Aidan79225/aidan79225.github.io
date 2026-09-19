@@ -2,6 +2,7 @@
 title: "好的資料架構怎麼設計:讀《Fundamentals of Data Engineering》Ch.3"
 date: 2026-06-29
 category: tech
+description: "好的架構不是一張固定的藍圖,是一個用權衡換取彈性與可逆的決策過程 —— 沒有最好的架構,只有在這個脈絡下相對好的。九個原則裡最核心的兩個:可逆決策(雙向門 vs 單向門)與鬆耦合。"
 tags:
   - data-engineering
   - book-notes

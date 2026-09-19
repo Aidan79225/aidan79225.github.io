@@ -2,6 +2,7 @@
 title: "Kafka 維運與部署:KRaft、retention/compaction 與監控"
 date: 2026-06-26
 category: tech
+description: "Kafka 真的上線之後的事:KRaft 讓它終於擺脫 ZooKeeper,兩套系統變一套;retention 與 compaction 決定 log 留多久、每個 key 留幾版;該盯哪些指標,以及幾台 broker、幾個 partition 的容量規劃。"
 tags:
  - kafka
  - data-engineering

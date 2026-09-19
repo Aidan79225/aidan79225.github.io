@@ -5,7 +5,6 @@ category: tech
 tags:
   - data-engineering
   - data-modeling
-  - lakehouse
 comments: true
 draft: false
 translationOf: medallion-architecture

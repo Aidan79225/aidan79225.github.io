@@ -6,7 +6,6 @@ description: "營運面第三章:券的三軸模型(效果×門檻×範疇)、�
 tags:
   - war-story
   - live-commerce
-  - pricing
 series: "Re:從零開始做直播代購電商平台"
 seriesOrder: 11
 comments: true

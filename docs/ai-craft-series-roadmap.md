@@ -126,6 +126,13 @@
 | 品味 | taste | |
 | 頸 | bottleneck | 「漏斗的頸畫在哪」;上游 / 下游 = upstream / downstream |
 | 上鎖 | gated | 頸搬到上游「而且上了鎖」 |
+| 責任費 / 保費 | responsibility fee / premium | 薪水 = 勞動費 + 責任費;英文兩詞並用,別譯成 liability fee |
+| 再保險網 | reinsurance net | 組織圖的比喻;分層自留 = retained by layer |
+| 自留額 | retention | 保險術語;一人隊的風控上限 |
+| 職業蓋章人 | professional rubber stamp | 黑暗版的新職位;與「假頸 fake neck」同一組 |
+| 把手 | handle | 事故篇:AI 給的敘事要附一支可驗證的把手 |
+| 敘事 | narrative | 同上;「相信把手,不要相信敘事」 |
+| 權威幻覺 | the authority illusion | 直接採信敘事的短路 = the authority shortcut |
 | 一人隊 | a team of one | 給獨立開發者的那條線 |
 | 自留額 | retained risk | 保險比喻;與 rezero 共用時對齊 |
 | 再保險網 | reinsurance net | 組織是一張再保險網,措辭固定 |

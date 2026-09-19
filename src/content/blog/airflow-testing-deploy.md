@@ -2,6 +2,7 @@
 title: "Airflow 測試與部署:別讓一個 typo 弄垮整包 DAG"
 date: 2026-07-21
 category: tech
+description: "最要命的陷阱是 DAG 檔會被 scheduler 每隔幾秒重新解析一次 —— 在 top-level 連資料庫、打 API,會悄悄拖垮整個 scheduler。這篇講怎麼把壞 DAG 擋在 merge 前(三個層次的測試,由便宜到貴)、DAG 檔怎麼上環境,以及 self-host 與 managed 怎麼選。"
 tags:
   - airflow
   - data-engineering

@@ -2,6 +2,7 @@
 title: "NetworkPolicy 與 CNI:Pod 之間的防火牆"
 date: 2026-07-17
 category: tech
+description: "Pod 跟 Pod 之間預設能不能互通?答案會嚇到很多人 —— 預設全通,前端連得到資料庫,任何一顆被打下來就等於拿到整張網。K8s 把「每顆 Pod 有 IP 且互通」外包給 CNI;要把全通改成白名單得靠 NetworkPolicy,而它還需要 CNI 撐腰才有效。"
 tags:
   - kubernetes
   - networking

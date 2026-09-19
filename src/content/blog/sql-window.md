@@ -6,7 +6,6 @@ description: "會不會 window function,幾乎是判斷一個人 SQL 深不深�
 tags:
   - sql
   - concept
-  - window-function
 series: "SQL 我以為我懂"
 seriesOrder: 5
 comments: true

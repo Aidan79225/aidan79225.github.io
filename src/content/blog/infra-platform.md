@@ -4,8 +4,7 @@ date: 2026-07-22
 category: tech
 description: "系列收官:前面八篇一個一個工具看,這篇把它們兜成一個平台。而兜的方法,不是把七個工具背起來,是抓住那條從第一篇就在講的軸——stateful ↔ stateless。它一句話決定了每個工具在平台裡的位置:怎麼跑(StatefulSet vs Deployment)、能不能 autoscale、HA 要不要過半、要不要自己養。這篇畫出一個資料平台的分層、用 self-host vs managed 的兩個維度決定每塊自己養還是託管、以及怎麼用 LGTM 一塊玻璃看住這一整片異質工具。"
 tags:
- - infrastructure
- - platform
+  - infrastructure
 series: "從 Infra 角度看資料工具"
 seriesOrder: 9
 comments: true

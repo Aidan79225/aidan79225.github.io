@@ -6,7 +6,6 @@ description: "錢與貨的第一章:兩家銀行、智慧轉帳與信用卡、�
 tags:
   - war-story
   - live-commerce
-  - payment
 series: "Re:從零開始做直播代購電商平台"
 seriesOrder: 7
 comments: true

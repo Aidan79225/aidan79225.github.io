@@ -2,6 +2,7 @@
 title: "分散式鎖:從 SETNX 到 Redlock,與那場著名的爭議"
 date: 2026-07-20
 category: tech
+description: "看起來三行就能寫完,其實坑深到見底。從最天真的寫法一路補到 SET NX PX 加 Lua 釋放,再撞上 TTL 鎖的致命假設與 Redlock 那場著名爭議。最後那個分野才是重點:你要的是效率鎖,還是正確性鎖?"
 tags:
   - redis
   - distributed-systems

@@ -2,6 +2,7 @@
 title: "Pub/Sub vs Stream:Redis 版的訊息系統"
 date: 2026-07-21
 category: tech
+description: "Redis 有兩套截然不同的訊息機制,用錯就會莫名其妙掉訊息:Pub/Sub 是廣播,當下沒訂閱就收不到;Stream 是留著的 log 加 consumer group,像一台縮小版 Kafka。系列收尾也回答那個問題 —— 什麼時候該直接上 Kafka。"
 tags:
   - redis
   - distributed-systems

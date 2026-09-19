@@ -1,5 +1,6 @@
 import { getCollection, type CollectionEntry } from 'astro:content';
 import { DEFAULT_LOCALE, type Locale } from './i18n';
+import { countTags } from './tags.mjs';
 
 // English translations live under src/content/blog/en/, so their collection
 // ids carry an `en/` prefix; everything else is the zh-Hant original.
@@ -53,4 +54,15 @@ export function byDateDesc(
   const byDate = b.data.date.valueOf() - a.data.date.valueOf();
   if (byDate !== 0) return byDate;
   return (b.data.seriesOrder ?? 0) - (a.data.seriesOrder ?? 0);
+}
+
+// Tag → post count, computed once per build. Callers (post cards, post footers,
+// the tag cloud) use it to decide whether a tag has a page of its own: a tag
+// with a single post doesn't get one, so its chip renders as plain text.
+// Counts come from the zh originals — tags are one shared taxonomy across both
+// languages, and the /en/ tag routes are fallbacks of the zh pages.
+let tagCounts: Promise<Map<string, number>> | null = null;
+export function getTagCounts(): Promise<Map<string, number>> {
+  tagCounts ??= getPublishedPosts().then(countTags);
+  return tagCounts;
 }

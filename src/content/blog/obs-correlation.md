@@ -2,10 +2,10 @@
 title: "關聯:從一個尖峰,點到那一行 log"
 date: 2026-08-04
 category: tech
+description: "黃金路徑講了很多次,但三格之間到底怎麼「跳」過去?靠的是一條 trace_id 穿過三種訊號:metric 的尖峰上掛著 exemplar,點進去是整條 trace,span 再帶你到那幾行 log。重點在「點」不是「查」—— 事故當下沒有人有空手動對時間戳。"
 tags:
   - observability
   - grafana
-  - correlation
 series: "Grafana LGTM 可觀測性"
 seriesOrder: 8
 comments: true

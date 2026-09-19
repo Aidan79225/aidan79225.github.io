@@ -2,6 +2,7 @@
 title: "RBAC:誰能對叢集做什麼"
 date: 2026-07-18
 category: tech
+description: "一個 kubectl delete 打進 API Server,它憑什麼知道你是誰、又憑什麼准你刪?請求要過兩道門:認證問你是誰,授權問你能做什麼,而 RBAC 只管第二道。Role 是權限、Binding 是膠水,namespaced 與 cluster-wide 兩個維度別搞混。"
 tags:
   - kubernetes
   - security

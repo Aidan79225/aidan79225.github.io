@@ -2,6 +2,7 @@
 title: "頸上有時鐘:事故中的 AI——重播一場毒藥訊息事故"
 date: 2026-08-11
 category: tech
+description: "把責任漏斗丟進它最極端的測試場:事故。我把直播電商那場毒藥訊息事故重播一次,這次桌上有 AI —— 主播在罵、營運在催,而 AI 不能替你決定要不要停直播。三幕實驗,記錄它在哪裡真的加速了我,又在哪一步差點把我推向錯的方向。"
 tags:
   - ai
   - incident
@@ -104,8 +105,8 @@ seriesOrder: 2
     <polygon points="320,245 315,235 325,235" fill="#54b890"/>
     <text x="392" y="237" fill="#9aa4b2" font-size="9" text-anchor="middle">敘事收斂後</text>
     <path d="M 560 120 C 600 190 480 265 410 268" fill="none" stroke="#e05a7d" stroke-width="1.5" stroke-dasharray="5 4"/>
-    <text x="565" y="205" fill="#e05a7d" font-size="9" text-anchor="middle">直接採信敘事</text>
-    <text x="565" y="218" fill="#e05a7d" font-size="9" text-anchor="middle">= 權威幻覺的短路</text>
+    <text x="520" y="266" fill="#e05a7d" font-size="9" text-anchor="middle">直接採信敘事</text>
+    <text x="520" y="279" fill="#e05a7d" font-size="9" text-anchor="middle">= 權威幻覺的短路</text>
   </svg>
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">迴圈跑幾輪由證據決定;紅色捷徑永遠存在——就算這次的敘事是對的,你在把手走完之前無從知道,而把手往往只要五分鐘。</figcaption>
 </figure>

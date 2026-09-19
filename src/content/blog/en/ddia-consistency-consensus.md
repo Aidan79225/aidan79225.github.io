@@ -6,7 +6,6 @@ description: "Ch8 concluded that truth is decided by a majority; Ch9 is about ho
 tags:
   - distributed-systems
   - book-notes
-  - consistency
 series: "Designing Data-Intensive Applications — Reading Notes"
 seriesOrder: 9
 comments: true

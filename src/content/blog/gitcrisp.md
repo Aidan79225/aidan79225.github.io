@@ -2,6 +2,7 @@
 title: "GitCrisp:我和 AI 一起寫了一個 Git 桌面客戶端"
 date: 2026-08-07
 category: tech
+description: "三個半月、一百多個 PR、一萬六千行程式碼加一萬三千行測試,一個桌面版 Git 客戶端 —— 一個人加 Claude Code 做出來的。這篇不講 Git 客戶端怎麼寫,講這個組合工作起來像什麼:分層為什麼是給 AI 的護欄、pygit2 做不到的事,以及那一萬三千行測試到底在守什麼。"
 tags:
   - side-project
   - system-design

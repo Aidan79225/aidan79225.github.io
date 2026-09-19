@@ -2,6 +2,7 @@
 title: "Grafana:一塊玻璃,只查不存"
 date: 2026-07-23
 category: tech
+description: "理解 Grafana 只要抓住一句反直覺的話:它不存任何觀測資料,只是一塊拿來「問」的玻璃 —— 資料住在 data source,它手上只有 dashboard 與設定。想通這句,template variable 與 dashboard as code 就都通了:別用滑鼠拖出你的可靠性。"
 tags:
   - observability
   - grafana

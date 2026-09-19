@@ -2,6 +2,7 @@
 title: "Redis Cluster:16384 個 slot 怎麼分片與擴縮"
 date: 2026-07-20
 category: tech
+description: "一台裝不下就得分片,而 Redis Cluster 的分片很有個性:不用一致性雜湊,而是 CRC16 對 16384 個 slot 取餘數。客戶端靠 MOVED 與 ASK 不迷路,代價是 multi-key 操作得用 hash tag 綁在同一個 slot 裡。"
 tags:
   - redis
   - distributed-systems

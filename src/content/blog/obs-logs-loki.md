@@ -2,9 +2,9 @@
 title: "日誌與 Loki:只索引 label,不索引全文"
 date: 2026-07-23
 category: tech
+description: "Loki 最該懂的一件事:它不像 ELK 索引全文,而是像 Prometheus 一樣只索引 label,原始內容壓縮後丟物件儲存、靠 grep。這個選擇讓它便宜到能存海量 log —— 代價是同一個 cardinality 陷阱,換個地方又出現一次。"
 tags:
   - observability
-  - logging
 series: "Grafana LGTM 可觀測性"
 seriesOrder: 4
 comments: true

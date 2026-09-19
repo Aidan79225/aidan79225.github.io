@@ -2,10 +2,10 @@
 title: "Airflow 複雜流程控制:branching、trigger rules、TaskGroup、動態任務"
 date: 2026-06-28
 category: tech
+description: "真實流程不會照線乖乖跑完:要依條件分支、task 失敗了清理還是得跑、幾十個相似 task 要收整齊、甚至執行期才知道要跑幾個。branching、trigger rules、TaskGroup、Dynamic Task Mapping 四個工具,把固定的幾條線變成應付得了現場的 DAG。"
 tags:
   - airflow
   - data-engineering
-  - dag-design
 series: "Airflow 學習筆記"
 seriesOrder: 6
 comments: true

@@ -6,7 +6,6 @@ description: "資料工程生命週期的第二站:把資料從源頭搬進系�
 tags:
   - data-engineering
   - book-notes
-  - ingestion
 series: "Fundamentals of Data Engineering 讀書筆記"
 seriesOrder: 7
 comments: true

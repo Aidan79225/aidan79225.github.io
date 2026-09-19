@@ -2,6 +2,7 @@
 title: "Apache Spark 是什麼?一篇搞懂分散式資料處理"
 date: 2026-06-14
 category: tech
+description: "Spark 把大到單台機器裝不下、算不完的資料切成很多份,分散到整個叢集平行運算。但重點不是「Spark 比較強」,是規模 —— 資料塞得進一台機器時,pandas 或 DuckDB 又快又簡單;只有真的超過單機,分散式的代價才開始划算。"
 tags:
  - spark
  - data-engineering
