@@ -1,5 +1,5 @@
 ---
-import Search from './Search.jsx';
+import Search from './Search.astro';
 import ThemeToggle from './ThemeToggle.astro';
 import { currentLocale, withLocale } from '../lib/i18n';
 // Under /en/ every route exists (real page or zh fallback), so nav links keep
@@ -24,7 +24,7 @@ const items = [
       ))}
     </ul>
     <div class="w-full sm:w-auto sm:ml-auto flex items-center gap-2">
-      <Search client:load locale={locale} />
+      <Search />
       <ThemeToggle />
     </div>
   </div>

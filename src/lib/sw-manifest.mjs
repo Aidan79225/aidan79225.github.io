@@ -1,10 +1,15 @@
 // Pure helpers for the service-worker precache manifest (used by
 // scripts/gen-sw.mjs at build time; unit-tested in test/sw-manifest.test.mjs).
 //
-// Policy: precache everything a reader needs to browse the whole site offline
-// (pages, hashed assets, search/graph indexes, icons) and skip what they
-// don't (OG share images are the bulk of dist/ and only matter to crawlers;
-// sitemaps/RSS/robots are machine-facing).
+// Policy: precache what makes the site *readable* offline — every post, the
+// entry points that lead to them, and the assets/indexes those pages need.
+// Everything else is left to the runtime cache (handleNav is network-first and
+// stores each page it serves), so a reader who actually visits a tag page still
+// gets it offline afterwards — they just don't pay for all 100 of them up front.
+//
+// Skipped: OG share images (crawler-only, the bulk of dist/), machine-facing
+// files (sitemap/RSS/robots), the worker itself, the /en/ i18n-fallback tree,
+// tag pages (~3.2MB across 100 pages) and listing pages past page 1.
 
 /** Should this dist-relative file path be precached? */
 export function shouldPrecache(relPath) {
@@ -17,6 +22,12 @@ export function shouldPrecache(relPath) {
   if (p.endsWith('.xml')) return false; // sitemap / rss
   if (p === 'robots.txt' || p === 'CNAME') return false;
   if (p === 'sw.js') return false; // never cache the worker itself
+  // Tag pages: 100 pages / ~3.2MB of the same post cards re-sliced. The tag
+  // index (the cloud that links to them) is small and stays.
+  if (p.startsWith('tags/') && p !== 'tags/index.html') return false;
+  // Paginated listings: page 1 is the entry point, later pages are navigation
+  // a reader only reaches by clicking — and by then they're online.
+  if (/^[^/]+\/\d+\/index\.html$/.test(p)) return false;
   return true;
 }
 

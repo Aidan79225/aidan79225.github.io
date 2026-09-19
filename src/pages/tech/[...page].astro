@@ -1,0 +1,28 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PostCard from '../../components/PostCard.astro';
+import Pagination from '../../components/Pagination.astro';
+import { getPublishedPosts, byDateDesc } from '../../lib/posts';
+
+// 每頁 20 篇。以前這頁是一次印完全部(181 篇 / 891KB HTML),
+// service worker 還會把它預先快取起來 —— 手機讀者要付兩次。
+export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
+  const posts = (await getPublishedPosts())
+    .filter((p) => p.data.category === 'tech')
+    .sort(byDateDesc);
+  return paginate(posts, { pageSize: 20 });
+};
+
+const { page } = Astro.props;
+---
+<BaseLayout
+  title={page.currentPage === 1 ? 'Tech' : `Tech(第 ${page.currentPage} 頁)`}
+  description="技術文章 —— 資料工程與後端:Airflow、Spark、Kafka、dbt、資料架構與技術領導,用圖像把複雜概念講清楚。"
+>
+  <h1 class="text-2xl font-bold mb-4">Tech</h1>
+  <div class="space-y-4">
+    {page.data.map((p) => <PostCard post={p} />)}
+  </div>
+  <Pagination page={page} />
+</BaseLayout>

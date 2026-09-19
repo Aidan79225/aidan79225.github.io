@@ -50,3 +50,19 @@ test('windows-style separators are normalised', () => {
   assert.equal(toUrl('blog\\ddia-batch\\index.html'), '/blog/ddia-batch/');
   assert.equal(shouldPrecache('og\\x.png'), false);
 });
+
+test('tag 頁不預快取,但 tag 索引(導覽用的那頁)要', () => {
+  assert.equal(shouldPrecache('tags/data-engineering/index.html'), false);
+  assert.equal(shouldPrecache('tags/index.html'), true);
+});
+
+test('列表分頁第 2 頁以後不預快取,第 1 頁要', () => {
+  assert.equal(shouldPrecache('tech/2/index.html'), false);
+  assert.equal(shouldPrecache('tech/10/index.html'), false);
+  assert.equal(shouldPrecache('tech/index.html'), true);
+});
+
+test('文章頁一律預快取 —— 離線可讀是這個 worker 的重點', () => {
+  assert.equal(shouldPrecache('blog/lottery/index.html'), true);
+  assert.equal(shouldPrecache('blog/btl-1/index.html'), true);
+});

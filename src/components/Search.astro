@@ -1,0 +1,159 @@
+---
+// 站內搜尋。以前是 React island 掛 client:load —— 每一頁都下載並 hydrate
+// 182KB 的 react-dom,只為了一個多數讀者不會點的搜尋框。改成伺服器端就印好
+// 輸入框、互動時才載索引的原生版本:JS 只剩幾 KB,/search-index.json(100KB)
+// 也延後到第一次聚焦才抓。
+import { currentLocale } from '../lib/i18n';
+const locale = currentLocale(Astro.currentLocale);
+const STRINGS = {
+  // noResult 用 %s 當佔位,引號各語言不同(中文用「」,英文用 "")。
+  'zh-hant': { placeholder: '搜尋文章… ( / )', label: '搜尋文章', noResult: '找不到「%s」', food: '美食', tech: '技術' },
+  en: { placeholder: 'Search posts… ( / )', label: 'Search posts', noResult: 'No results for "%s"', food: 'Food', tech: 'Tech' },
+};
+const t = STRINGS[locale] ?? STRINGS['zh-hant'];
+---
+<div
+  class="relative w-full sm:w-auto"
+  data-search
+  data-no-result={t.noResult}
+  data-food={t.food}
+  data-tech={t.tech}
+>
+  <input
+    type="search"
+    data-search-input
+    placeholder={t.placeholder}
+    aria-label={t.label}
+    autocomplete="off"
+    class="w-full sm:w-52 bg-base border border-line rounded px-3 py-1 text-sm text-ink placeholder:text-muted focus:outline-none focus:border-accent"
+  />
+  <ul
+    data-search-results
+    hidden
+    class="absolute right-0 mt-1 w-full sm:w-72 max-h-80 overflow-auto bg-surface border border-line rounded shadow-lg z-50 list-none m-0 p-1"
+  ></ul>
+</div>
+
+<script>
+  const box = document.querySelector('[data-search]');
+  if (box) {
+    const input = box.querySelector('[data-search-input]');
+    const list = box.querySelector('[data-search-results]');
+    const S = box.dataset;
+
+    let index = null;      // 只抓一次
+    let loading = null;
+    let results = [];
+    let active = 0;
+
+    /** 第一次互動才抓索引 —— 沒搜尋的讀者完全不用付這 100KB。 */
+    function loadIndex() {
+      if (loading) return loading;
+      loading = fetch('/search-index.json')
+        .then((r) => r.json())
+        .then((data) => { index = data; render(); })
+        .catch(() => { index = []; });
+      return loading;
+    }
+
+    // 在 /en/ 底下瀏覽時,結果也留在 /en/(每篇在那邊都有對應路由)。
+    const localize = (url) => {
+      const path = window.location.pathname;
+      return path === '/en' || path.startsWith('/en/') ? `/en${url}` : url;
+    };
+
+    /** 標題命中 > 標籤命中 > 其他,取前 8 筆。 */
+    function search(q) {
+      if (!index || !q) return [];
+      const scored = [];
+      for (const p of index) {
+        const title = p.title.toLowerCase();
+        const tagHit = p.tags.some((tag) => tag.toLowerCase().includes(q));
+        const hay = `${p.title} ${p.tags.join(' ')} ${p.series} ${p.description}`.toLowerCase();
+        if (!hay.includes(q)) continue;
+        scored.push({ p, score: title.includes(q) ? 0 : tagHit ? 1 : 2 });
+      }
+      scored.sort((a, b) => a.score - b.score);
+      return scored.slice(0, 8).map((s) => s.p);
+    }
+
+    function render() {
+      const q = input.value.trim().toLowerCase();
+      if (!q) { list.hidden = true; list.replaceChildren(); results = []; return; }
+      if (!index) { loadIndex(); return; }        // 索引還沒到,抓完會再 render 一次
+      results = search(q);
+      list.replaceChildren();
+      if (!results.length) {
+        const li = document.createElement('li');
+        li.className = 'px-3 py-2 text-sm text-muted';
+        li.textContent = S.noResult.replace('%s', input.value.trim());
+        list.append(li);
+      } else {
+        results.forEach((p, i) => {
+          const li = document.createElement('li');
+          const a = document.createElement('a');
+          a.href = localize(p.url);
+          a.className = 'block px-3 py-2 rounded no-underline' + (i === active ? ' bg-base' : '');
+          a.dataset.idx = String(i);
+          const title = document.createElement('span');
+          title.className = 'block text-sm text-ink';
+          title.textContent = p.title;
+          const meta = document.createElement('span');
+          meta.className = 'block text-xs text-muted mt-0.5';
+          const tags = p.tags.length ? ` · ${p.tags.slice(0, 3).map((tag) => `#${tag}`).join(' ')}` : '';
+          meta.textContent = (p.category === 'food' ? S.food : S.tech) + tags;
+          a.append(title, meta);
+          a.addEventListener('mouseenter', () => { active = i; paint(); });
+          li.append(a);
+          list.append(li);
+        });
+      }
+      list.hidden = false;
+    }
+
+    /** 只更新選取樣式,不重建 DOM(方向鍵會連按)。 */
+    function paint() {
+      for (const a of list.querySelectorAll('a')) {
+        a.classList.toggle('bg-base', Number(a.dataset.idx) === active);
+      }
+    }
+
+    input.addEventListener('focus', loadIndex, { once: true });
+    input.addEventListener('input', () => { active = 0; render(); });
+    input.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') { list.hidden = true; input.blur(); return; }
+      if (!results.length) return;
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        active = Math.min(active + 1, results.length - 1);
+        list.hidden = false;
+        paint();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        active = Math.max(active - 1, 0);
+        paint();
+      } else if (e.key === 'Enter') {
+        e.preventDefault();
+        const p = results[active];
+        if (p) window.location.href = localize(p.url);
+      }
+    });
+
+    // 「/」或 ⌘K / Ctrl+K 從任何地方聚焦搜尋框。
+    window.addEventListener('keydown', (e) => {
+      const tag = document.activeElement && document.activeElement.tagName;
+      const typing = tag === 'INPUT' || tag === 'TEXTAREA';
+      if ((e.key === 'k' || e.key === 'K') && (e.metaKey || e.ctrlKey)) {
+        e.preventDefault();
+        input.focus();
+      } else if (e.key === '/' && !typing) {
+        e.preventDefault();
+        input.focus();
+      }
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!box.contains(e.target)) list.hidden = true;
+    });
+  }
+</script>

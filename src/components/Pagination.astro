@@ -1,0 +1,21 @@
+---
+// 列表頁分頁。/tech/ 原本一頁印完 181 篇(891KB HTML),手機進站就是這個量。
+import { ui, currentLocale } from '../lib/i18n';
+interface Props {
+  page: { url: { prev?: string; next?: string; current: string }; currentPage: number; lastPage: number };
+}
+const { page } = Astro.props;
+const t = ui[currentLocale(Astro.currentLocale)];
+const label = (t as any).paginationLabel ?? '';
+---
+{page.lastPage > 1 && (
+  <nav class="flex items-center justify-between gap-4 mt-8 pt-4 border-t border-line" aria-label={label || 'Pagination'}>
+    {page.url.prev
+      ? <a href={page.url.prev} class="text-accent hover:underline no-underline" rel="prev">← {page.currentPage - 1}</a>
+      : <span class="text-muted">←</span>}
+    <span class="text-muted text-sm tabular-nums">{page.currentPage} / {page.lastPage}</span>
+    {page.url.next
+      ? <a href={page.url.next} class="text-accent hover:underline no-underline" rel="next">{page.currentPage + 1} →</a>
+      : <span class="text-muted">→</span>}
+  </nav>
+)}

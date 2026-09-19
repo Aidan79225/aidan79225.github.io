@@ -12,7 +12,7 @@ const BLOG_DIR = join(dirname(fileURLToPath(import.meta.url)), '..', 'content', 
 // NOTE: headings are parsed from raw source, not the mdast tree, so a heading
 // containing inline markdown (links/images/HTML) would slug differently from
 // Astro's id. No current post does this; revisit if one ever does.
-function parseHeadings(raw) {
+export function parseHeadings(raw) {
   const slugger = new GithubSlugger();
   const anchors = [];
   const lines = raw.split(/\r?\n/);
