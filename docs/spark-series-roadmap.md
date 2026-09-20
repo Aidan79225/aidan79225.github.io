@@ -105,6 +105,13 @@
 | 水位線 | watermark | 遲到資料怎麼算 |
 | 檢查點 | checkpoint | 崩潰了怎麼接回來 |
 | 輸出模式 | output mode | append / update / complete 值照原文 |
+| 邏輯計畫 / 實體計畫 | logical plan / physical plan | `.explain()` 的上下兩層;「執行計畫」是統稱 |
+| filter 下推 | filter pushdown | 計畫裡顯示為 `PushedFilters`,名稱照原文 |
+| Exchange | Exchange | 不譯;實體計畫裡的 shuffle 就叫這個字,是讀計畫時第一個要數的 |
+| stage 邊界 | stage boundary | shuffle 切開 stage 的位置 |
+| 事件時間 / 處理時間 | event time / processing time | 串流章的核心分界,不寫「發生時間 / 接收時間」 |
+| 遲到資料 | late data | watermark 要回答的就是「多遲還算數」 |
+| managed 平台 | managed platform | Databricks / EMR / Glue / Dataproc;中文行文直接寫 managed |
 
 ## 寫每篇時的慣例
 - front matter:`series: "Spark 學習筆記"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
