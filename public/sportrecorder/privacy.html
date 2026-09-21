@@ -45,7 +45,7 @@
   <!-- ============================ ENGLISH ============================ -->
   <section id="en">
     <h1>Privacy Policy — SportRecorder</h1>
-    <p class="meta">Last updated: 19 June 2026</p>
+    <p class="meta">Last updated: 21 September 2026</p>
 
     <p>
       This Privacy Policy describes how the <strong>SportRecorder</strong> mobile application
@@ -58,25 +58,81 @@
       <li><strong>Eating records</strong> — the date and time of each eat event.</li>
       <li><strong>Photos</strong> — pictures you choose to take and attach to an eat record (stored as compressed images).</li>
       <li><strong>Location (GPS)</strong> — if you grant location permission, the approximate coordinates at the moment you create an eat record, attached to that record.</li>
-      <li><strong>Fasting &amp; reminder settings</strong> — your selected fasting/eating schedule, and your reminder preferences (lead time, quiet hours, and which reminders are enabled).</li>
+      <li><strong>Notes</strong> — any text you choose to write on an eat record.</li>
+      <li><strong>Fasting &amp; reminder settings</strong> — your selected fasting/eating schedule, your own
+        custom fasting windows, and your reminder preferences (lead time, quiet hours, and which
+        reminders are enabled).</li>
+      <li><strong>Google account e-mail</strong> — only if you turn on Backup &amp; restore (see section 4).
+        It is shown in the App so you can see which account your backups go to.</li>
     </ul>
 
     <h2>2. How the App uses this data</h2>
     <p>
       The data is used solely to provide the App's features to you — showing your fasting timer and
-      history, listing your eating records, and displaying the photos and location you attached.
+      history, listing your eating records, displaying the photos and location you attached, and —
+      only if you turn it on — backing your records up to your own Google Drive so you can restore
+      them on a new device.
     </p>
 
-    <h2>3. Where data is stored — local only</h2>
+    <h2>3. Where data is stored</h2>
     <p>
-      <strong>All data stays on your device.</strong> Eating records, settings and location coordinates
-      are stored in a local database on the device, and photos are stored in the App's private folder
-      on the device. The App does <strong>not</strong> send this data to us, and does
-      <strong>not</strong> share it with any third party. We do not operate any server that receives
-      your data, and the App contains no advertising or analytics tracking.
+      <strong>By default, all data stays on your device.</strong> Eating records, notes, settings and
+      location coordinates are stored in a local database on the device, and photos are stored in the
+      App's private folder on the device.
+    </p>
+    <p>
+      <strong>If you turn on Backup &amp; restore</strong>, a copy of that data is uploaded to
+      <strong>your own Google Drive</strong> — see section 4 for exactly what is uploaded and how to
+      delete it. Backup is off until you sign in yourself; the App never backs up on its own.
+    </p>
+    <p>
+      In both cases the App does <strong>not</strong> send your data to us, and does <strong>not</strong>
+      share it with any third party. We do not operate any server that receives your data — backups go
+      directly from your device to your Google account — and the App contains no advertising or
+      analytics tracking.
     </p>
 
-    <h2>4. Permissions</h2>
+    <h2>4. Google account data and Drive backup (optional)</h2>
+    <p>
+      Backup &amp; restore is <strong>optional and off by default</strong>. It only starts working after
+      you sign in with Google and grant access yourself.
+    </p>
+    <h3>What the App asks for</h3>
+    <p>
+      The App requests a single Google Drive scope,
+      <code>https://www.googleapis.com/auth/drive.appdata</code>. This scope can only read and write a
+      hidden folder that belongs to this App (Drive's "application data folder"). It
+      <strong>cannot see, read or change any other file in your Google Drive</strong>. The App requests
+      no other Google scope.
+    </p>
+    <h3>What is uploaded</h3>
+    <ul>
+      <li>Your eating records — date and time, notes, and location coordinates if you attached them.</li>
+      <li>The photos attached to those records.</li>
+      <li>Your custom fasting windows, fasting/eating settings and reminder preferences.</li>
+    </ul>
+    <p>
+      All of it goes into that hidden folder in <strong>your</strong> Google Drive. It is your data in
+      your account; we have no access to it.
+    </p>
+    <h3>Your Google account e-mail</h3>
+    <p>
+      After you grant access, the App reads the e-mail address of the signed-in account from Google
+      Drive so it can show you which account is in use. It is displayed in the App only. The access
+      token the App receives from Google is used for that session's upload or download and is
+      <strong>not stored</strong> by the App.
+    </p>
+    <h3>Limited Use</h3>
+    <p>
+      SportRecorder's use and transfer of information received from Google APIs to any other app will
+      adhere to the
+      <a href="https://developers.google.com/terms/api-services-user-data-policy" rel="noopener">Google
+      API Services User Data Policy</a>, including the Limited Use requirements. The data is used only
+      to provide the backup and restore feature you asked for. It is never sold, never transferred to
+      anyone else, never used for advertising, and never read by a human.
+    </p>
+
+    <h2>5. Permissions</h2>
     <ul>
       <li><strong>Location</strong> (<code>ACCESS_FINE_LOCATION</code> / <code>ACCESS_COARSE_LOCATION</code>) —
         used only to tag an eat record with where it was created. It is optional; if you deny it, the
@@ -89,40 +145,57 @@
         your reminders at the scheduled time.</li>
       <li><strong>Run after restart</strong> (<code>RECEIVE_BOOT_COMPLETED</code>) — used to restore your
         scheduled reminders after the device reboots.</li>
+      <li><strong>Network access</strong> (<code>INTERNET</code>) — used <em>only</em> by Backup &amp; restore,
+        to talk to Google Drive. If you never turn backup on, the App makes no network requests.</li>
     </ul>
     <p>
       Reminders are generated and scheduled entirely on your device from records and settings you have
       already entered. Enabling them sends no data off the device.
     </p>
 
-    <h2>5. Data retention</h2>
+    <h2>6. Data retention</h2>
     <p>
-      Because all data is stored only on your device, it is retained for as long as you keep it — that is,
+      Data on your device is retained for as long as you keep it — that is,
       <strong>until you delete it within the App, or until you uninstall the App</strong>. We do not retain
       copies of your data, because we never receive it.
     </p>
+    <p>
+      If you use Backup &amp; restore, the App keeps the <strong>three most recent backups</strong> in your
+      Google Drive and deletes older ones automatically. Those backups stay in your Google account until
+      you delete them (see section 7) — uninstalling the App does not remove them.
+    </p>
 
-    <h2>6. How to delete your data</h2>
+    <h2>7. How to delete your data</h2>
     <p>You are in full control of your data and can delete it at any time:</p>
     <ul>
       <li><strong>Delete a single record:</strong> on the <em>Record</em> screen, <strong>long-press</strong>
         an eating record and confirm. This permanently deletes that record together with its attached
         photos and location.</li>
-      <li><strong>Delete everything:</strong> <strong>uninstall the App</strong>, or clear the App's storage
-        from your device Settings (<em>Settings → Apps → SportRecorder → Storage → Clear data</em>). This
-        permanently removes all records, photos, location data and settings from your device.</li>
+      <li><strong>Delete everything on the device:</strong> <strong>uninstall the App</strong>, or clear the
+        App's storage from your device Settings (<em>Settings → Apps → SportRecorder → Storage → Clear
+        data</em>). This permanently removes all records, photos, location data and settings from your
+        device.</li>
+      <li><strong>Delete your backups from Google Drive:</strong> the backup folder is hidden, so it is not
+        listed among your normal Drive files. Delete it from
+        <a href="https://drive.google.com/drive/settings" rel="noopener">Google Drive → Settings → Manage
+        apps</a> → <em>SportRecorder</em> → <em>Delete hidden app data</em>.</li>
+      <li><strong>Revoke the App's access to your Google account:</strong> at
+        <a href="https://myaccount.google.com/permissions" rel="noopener">myaccount.google.com/permissions</a>.
+        You can also sign out inside the App, on the <em>Backup &amp; restore</em> screen. Revoking access
+        stops further backups; it does not delete backups already made, so do that separately if you want
+        them gone.</li>
     </ul>
 
-    <h2>7. Children's privacy</h2>
+    <h2>8. Children's privacy</h2>
     <p>The App is not directed to children under 13 and does not knowingly collect data from them.</p>
 
-    <h2>8. Changes to this policy</h2>
+    <h2>9. Changes to this policy</h2>
     <p>
       We may update this policy from time to time. The "Last updated" date above reflects the latest
       version. Material changes will be reflected on this page.
     </p>
 
-    <h2>9. Contact</h2>
+    <h2>10. Contact</h2>
     <p>If you have questions about this policy, contact us at
       <a href="mailto:aidan79225@gmail.com">aidan79225@gmail.com</a>.</p>
   </section>
@@ -132,7 +205,7 @@
   <!-- ============================ 繁體中文 ============================ -->
   <section id="zh" lang="zh-Hant">
     <h1>隱私權政策 — SportRecorder</h1>
-    <p class="meta">最後更新日期:2026 年 6 月 19 日</p>
+    <p class="meta">最後更新日期:2026 年 9 月 21 日</p>
 
     <p>
       本隱私權政策說明 <strong>SportRecorder</strong> 行動應用程式(以下稱「本應用程式」「我們」)
@@ -145,23 +218,69 @@
       <li><strong>進食紀錄</strong> — 每次進食的日期與時間。</li>
       <li><strong>照片</strong> — 您選擇拍攝並附加到進食紀錄的相片(以壓縮後的影像儲存)。</li>
       <li><strong>位置(GPS)</strong> — 若您授予定位權限,則在您建立進食紀錄當下的概略座標,並附加於該筆紀錄。</li>
-      <li><strong>斷食與提醒設定</strong> — 您選擇的斷食/進食時間方案,以及您的提醒偏好設定(提前時間、勿擾時段,以及各項提醒的開關)。</li>
+      <li><strong>備註</strong> — 您選擇為某筆進食紀錄寫下的文字。</li>
+      <li><strong>斷食與提醒設定</strong> — 您選擇的斷食/進食時間方案、您自訂的斷食時段,以及您的提醒偏好設定
+        (提前時間、勿擾時段,以及各項提醒的開關)。</li>
+      <li><strong>Google 帳號電子郵件</strong> — 僅在您開啟「備份與還原」時(見第 4 節)。它會顯示在應用程式中,
+        讓您知道備份存到哪一個帳號。</li>
     </ul>
 
     <h2>2. 資料的用途</h2>
     <p>
-      這些資料僅用於提供本應用程式的功能 — 顯示您的斷食計時與歷史、列出進食紀錄,以及顯示您附加的照片與位置。
+      這些資料僅用於提供本應用程式的功能 — 顯示您的斷食計時與歷史、列出進食紀錄、顯示您附加的照片與位置,
+      以及在<strong>您主動開啟</strong>的情況下,將您的紀錄備份到您自己的 Google 雲端硬碟,讓您能在新裝置上還原。
     </p>
 
-    <h2>3. 資料儲存位置 — 僅限本機</h2>
+    <h2>3. 資料儲存位置</h2>
     <p>
-      <strong>所有資料都只保存在您的裝置上。</strong>進食紀錄、設定與位置座標儲存在裝置的本機資料庫,
-      照片則儲存在裝置上本應用程式的專屬資料夾。本應用程式<strong>不會</strong>將這些資料傳送給我們,
-      也<strong>不會</strong>分享給任何第三方。我們沒有任何接收您資料的伺服器,本應用程式也不含任何
-      廣告或分析追蹤。
+      <strong>預設情況下,所有資料都只保存在您的裝置上。</strong>進食紀錄、備註、設定與位置座標儲存在裝置的
+      本機資料庫,照片則儲存在裝置上本應用程式的專屬資料夾。
+    </p>
+    <p>
+      <strong>若您開啟「備份與還原」</strong>,這些資料的副本會上傳到<strong>您自己的 Google 雲端硬碟</strong> —
+      上傳內容與刪除方式詳見第 4 節。在您親自登入之前,備份不會啟用;本應用程式不會自行備份。
+    </p>
+    <p>
+      無論哪一種情況,本應用程式都<strong>不會</strong>將您的資料傳送給我們,也<strong>不會</strong>分享給任何
+      第三方。我們沒有任何接收您資料的伺服器 — 備份是由您的裝置直接送往您的 Google 帳號 — 本應用程式也不含
+      任何廣告或分析追蹤。
     </p>
 
-    <h2>4. 權限</h2>
+    <h2>4. Google 帳號資料與雲端硬碟備份(選用)</h2>
+    <p>
+      「備份與還原」是<strong>選用功能,預設為關閉</strong>,必須由您親自以 Google 登入並授權後才會運作。
+    </p>
+    <h3>本應用程式請求的權限範圍</h3>
+    <p>
+      本應用程式只請求一個 Google 雲端硬碟權限範圍:
+      <code>https://www.googleapis.com/auth/drive.appdata</code>。
+      此範圍只能讀寫一個屬於本應用程式的隱藏資料夾(雲端硬碟的「應用程式資料夾」),
+      <strong>無法看見、讀取或變更您雲端硬碟中的任何其他檔案</strong>。本應用程式不會請求其他 Google 權限範圍。
+    </p>
+    <h3>上傳的內容</h3>
+    <ul>
+      <li>您的進食紀錄 — 日期與時間、備註,以及您有附加時的位置座標。</li>
+      <li>附加於這些紀錄的照片。</li>
+      <li>您自訂的斷食時段、斷食/進食設定與提醒偏好。</li>
+    </ul>
+    <p>
+      以上全部存放於<strong>您自己的</strong> Google 雲端硬碟中的那個隱藏資料夾。那是您帳號裡的您的資料,
+      我們無法存取。
+    </p>
+    <h3>您的 Google 帳號電子郵件</h3>
+    <p>
+      在您授權後,本應用程式會向 Google 雲端硬碟讀取已登入帳號的電子郵件地址,用以顯示目前使用的是哪個帳號,
+      且僅顯示於應用程式內。本應用程式自 Google 取得的存取權杖僅用於該次上傳或下載,<strong>不會被保存</strong>。
+    </p>
+    <h3>Limited Use(有限使用)聲明</h3>
+    <p>
+      SportRecorder 對於自 Google API 取得之資訊的使用與轉移,均遵循
+      <a href="https://developers.google.com/terms/api-services-user-data-policy" rel="noopener">Google
+      API Services User Data Policy</a>,包含其中的 Limited Use 要求。這些資料僅用於提供您所要求的備份與還原功能,
+      不會被販售、不會轉移給任何其他人、不會用於廣告,也不會有人閱讀。
+    </p>
+
+    <h2>5. 權限</h2>
     <ul>
       <li><strong>位置</strong>(<code>ACCESS_FINE_LOCATION</code> / <code>ACCESS_COARSE_LOCATION</code>)—
         僅用於為進食紀錄標記建立地點。此權限為選用;若您拒絕,紀錄仍會在沒有位置的情況下儲存。</li>
@@ -172,37 +291,51 @@
         用於在預定時間準時送出您的提醒。</li>
       <li><strong>開機後執行</strong>(<code>RECEIVE_BOOT_COMPLETED</code>)—
         用於在裝置重新開機後,重新排定您的提醒。</li>
+      <li><strong>網路存取</strong>(<code>INTERNET</code>)— <em>僅</em>供「備份與還原」與 Google 雲端硬碟通訊之用。
+        若您從未開啟備份,本應用程式不會發出任何網路請求。</li>
     </ul>
     <p>
       提醒完全由您裝置上既有的紀錄與設定在本機產生與排程,開啟提醒不會將任何資料傳送至裝置以外。
     </p>
 
-    <h2>5. 資料保留期間</h2>
+    <h2>6. 資料保留期間</h2>
     <p>
-      由於所有資料僅儲存在您的裝置上,資料會保留至您不再保留為止 — 也就是
+      您裝置上的資料會保留至您不再保留為止 — 也就是
       <strong>直到您在應用程式內刪除,或解除安裝本應用程式為止</strong>。我們不會保留您資料的任何副本,
       因為我們從未取得這些資料。
     </p>
+    <p>
+      若您使用「備份與還原」,本應用程式會在您的 Google 雲端硬碟中保留<strong>最近 3 份備份</strong>,
+      更舊的會自動刪除。這些備份會留在您的 Google 帳號中,直到您自行刪除為止(見第 7 節)—
+      <strong>解除安裝本應用程式並不會移除它們</strong>。
+    </p>
 
-    <h2>6. 如何刪除您的資料</h2>
+    <h2>7. 如何刪除您的資料</h2>
     <p>您可完全掌控自己的資料,並隨時刪除:</p>
     <ul>
       <li><strong>刪除單筆紀錄:</strong>在「<em>Record</em>(紀錄)」畫面<strong>長按</strong>某筆進食紀錄並確認,
         即會永久刪除該筆紀錄及其附加的照片與位置。</li>
-      <li><strong>刪除全部:</strong><strong>解除安裝本應用程式</strong>,或在裝置設定中清除本應用程式的儲存空間
-        (<em>設定 → 應用程式 → SportRecorder → 儲存空間 → 清除資料</em>),即會永久移除裝置上的所有紀錄、
+      <li><strong>刪除裝置上的全部資料:</strong><strong>解除安裝本應用程式</strong>,或在裝置設定中清除本應用程式的
+        儲存空間(<em>設定 → 應用程式 → SportRecorder → 儲存空間 → 清除資料</em>),即會永久移除裝置上的所有紀錄、
         照片、位置資料與設定。</li>
+      <li><strong>刪除 Google 雲端硬碟中的備份:</strong>備份資料夾是隱藏的,不會出現在您平常的雲端硬碟檔案清單中。
+        請至 <a href="https://drive.google.com/drive/settings" rel="noopener">Google 雲端硬碟 → 設定 → 管理應用程式</a>
+        → <em>SportRecorder</em> → <em>刪除隱藏的應用程式資料</em>。</li>
+      <li><strong>撤銷本應用程式對您 Google 帳號的存取權:</strong>請至
+        <a href="https://myaccount.google.com/permissions" rel="noopener">myaccount.google.com/permissions</a>。
+        您也可以在應用程式的「<em>備份與還原</em>」畫面登出。撤銷授權只會停止後續備份,
+        <strong>不會刪除已經建立的備份</strong>,若要一併清除請另外執行上一項。</li>
     </ul>
 
-    <h2>7. 兒童隱私</h2>
+    <h2>8. 兒童隱私</h2>
     <p>本應用程式並非以未滿 13 歲兒童為對象,也不會在知情的情況下蒐集其資料。</p>
 
-    <h2>8. 政策變更</h2>
+    <h2>9. 政策變更</h2>
     <p>
       我們可能不時更新本政策,上方「最後更新日期」即代表最新版本。重大變更會反映於本頁面。
     </p>
 
-    <h2>9. 聯絡方式</h2>
+    <h2>10. 聯絡方式</h2>
     <p>若您對本政策有任何疑問,請來信
       <a href="mailto:aidan79225@gmail.com">aidan79225@gmail.com</a>。</p>
   </section>
