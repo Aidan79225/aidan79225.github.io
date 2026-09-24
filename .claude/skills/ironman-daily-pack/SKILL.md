@@ -20,7 +20,7 @@ description: Use when the user asks for the 鐵人賽「當日發文包」, asks
 
 - 第一行 H1 取標題(`# Day N|…` 去掉 `# `)——對照 `README.md` 地圖的該列(標題、來源章、圖)是否一致。
 - `grep -n '!\['` 列出圖片標記與**行號**;`ls docs/ironman/img/dayNN-*.png` 比對張數——不一致要明確警告(README 標了無圖的天,如 day17、day21,零張是正常)。
-- 字數:`wc -m` ≥ 300(規則下限;存稿實際都遠超)。
+- 字數:數**中文字**,不用 `wc -m`(這個環境 locale 未設定時 `wc -m` 會退化成數 bytes,每個中文字算 3,數字虛胖近三倍):`python3 -c "import re;print(len(re.findall(r'[\u4e00-\u9fff]',open('docs/ironman/dayNN.md',encoding='utf-8').read().split('\n---\n')[0])))"` ≥ 300(規則下限;存稿最短的一天約 700 字)。
 - 文末 footer 有部落格原文連結(`blog.aidan.tw/blog/`)——自證自創的憑據,不可缺。
 - 無 wikilink 殘留(`grep '\[\['`)、無 KaTeX `$`(ithelp 不渲染)。
 - 上/下篇銜接詞抽查:拆章的兩篇有「明天」「昨天」字樣時,確認指涉的天數對。
