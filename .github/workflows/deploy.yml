@@ -29,6 +29,10 @@ jobs:
           # *variable* (Settings → Secrets and variables → Actions → Variables).
           # Not a secret — it ships in client JS — but kept out of source.
           PUBLIC_CF_BEACON_TOKEN: ${{ vars.PUBLIC_CF_BEACON_TOKEN }}
+          # Formspree form id for the /consulting/ inquiry form (the part
+          # after /f/ in the endpoint). Also a public Actions *variable*; unset
+          # = the form falls back to a prefilled mailto link.
+          PUBLIC_FORMSPREE_ID: ${{ vars.PUBLIC_FORMSPREE_ID }}
   deploy:
     needs: build
     runs-on: ubuntu-latest
