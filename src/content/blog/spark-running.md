@@ -35,7 +35,7 @@ draft: false
     <line x1="200" y1="128" x2="92" y2="170" stroke="#9aa4b2" stroke-width="1.4" marker-end="url(#rn1)"/>
     <line x1="260" y1="128" x2="260" y2="170" stroke="#9aa4b2" stroke-width="1.4" marker-end="url(#rn1)"/>
     <line x1="320" y1="128" x2="428" y2="170" stroke="#9aa4b2" stroke-width="1.4" marker-end="url(#rn1)"/>
-    <text x="150" y="150" fill="#9aa4b2" font-size="9.5" text-anchor="middle">② 啟動</text>
+    <text x="122" y="140" fill="#9aa4b2" font-size="9.5" text-anchor="middle">② 啟動</text>
     <rect x="24" y="172" width="130" height="46" rx="8" fill="#262b3a" stroke="#4f6df5" stroke-width="1.4"/>
     <text x="89" y="193" fill="#e6e6e6" font-size="11.5" text-anchor="middle">Executor</text>
     <text x="89" y="208" fill="#9aa4b2" font-size="9" text-anchor="middle">task + cache</text>
@@ -46,7 +46,7 @@ draft: false
     <text x="431" y="193" fill="#e6e6e6" font-size="11.5" text-anchor="middle">Executor</text>
     <text x="431" y="208" fill="#9aa4b2" font-size="9" text-anchor="middle">task + cache</text>
     <path d="M186 40 C 120 70, 70 120, 80 168" fill="none" stroke="#4f6df5" stroke-width="1.3" stroke-dasharray="3 3" marker-end="url(#rn1)"/>
-    <text x="92" y="110" fill="#4f6df5" font-size="9.5" text-anchor="middle">③ 派 task</text>
+    <text x="44" y="110" fill="#4f6df5" font-size="9.5" text-anchor="middle">③ 派 task</text>
   </svg>
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">Driver 向 Cluster Manager 要資源、Cluster Manager 啟動 Executor;之後 Driver 直接把 task 派給 Executor、收回結果</figcaption>
 </figure>
