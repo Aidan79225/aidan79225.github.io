@@ -1,6 +1,6 @@
 ---
 title: "Leadership — The Two Great Obstacles to Motivating Others"
-date: 2026-08-15
+date: 2026-09-26
 category: tech
 description: "Why doesn't anyone move when you say something? The book's answer isn't kind: the problem usually isn't them, it's you — and there are two obstacles you can't see. Both of them come down to the same thing: never actually understanding the person."
 tags:
@@ -9,7 +9,6 @@ comments: true
 series: "Becoming a Tech Leader — Reading Notes"
 seriesOrder: 9
 translationOf: btl-9
-draft: true
 ---
 ## The two great obstacles to motivating others
 
