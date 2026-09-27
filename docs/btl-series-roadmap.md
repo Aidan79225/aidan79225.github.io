@@ -31,7 +31,7 @@
 | # | slug | 章 | 主題 | 狀態 |
 |---|---|---|---|---|
 | 9 | `btl-9` | Ch10–11 The First / Second Great Obstacle to Motivating Others | 激勵的兩大障礙:別人是隱形的(明星工程師的 solo 敘事)/ 把人當電腦下指令(失真鏈 SVG、人=任務);反思=重讀「成員不理解」+ KPI 是鏈尾輸出 | ✅ 已發布 |
-| 10 | `btl-10` | Ch12–13 The Problem of Helping People / Learning to Be a Motivator | 幫助人為什麼這麼難;怎麼練成一個激勵者。反思素材:LoL 觀察——寧玩難操作但有趣的角色輸,不玩無聊角色贏;不玩石頭人/好運姊/凱莎(角色自帶保底),選 Irelia/達瑞文/煞蜜拉(表現天花板在玩家手上,達瑞文接斧、煞蜜拉 S 評價=遊戲幫操作打分)。深層:連贏都要「可歸因給自己的贏」=防偽標籤的遊戲版(內在動機/mastery 驅動;帶人時別預設成員動機跟自己同型) | 📝 未寫 |
+| 10 | `btl-10` | Ch12–13 The Problem of Helping People / Learning to Be a Motivator | 幫助的難題:四句判詞 → 三道閘門(他要嗎/問題一致嗎/幫他還是幫我;沒過=打擾/雞同鴨講/搶戲)+ 接鍵盤撞閘現場;激勵者先看懂自己。反思=LoL 動機樣本(達瑞文 vs 石頭人)→ 派任務=幫人選英雄 → 重讀 clean architecture(假幫助) | 🚧 草稿(中英皆備,`draft: true`) |
 | 11 | `btl-11` | Ch14–15 Where Power Comes From / Power, Imperfection, and Congruence | 力量的來源;不完美與言行一致(congruence) | 📝 未寫 |
 
 ## Part Four — 組織(Organization)
@@ -77,6 +77,10 @@
 | 言行一致 | congruence | Ch15;Weinberg/Satir 用語,不譯成「一致性」(那是技術詞) |
 | 蛻變 | transformation | Part Five |
 | 高峰時刻 | peak experience | btl-8 挖個人願景的方法 |
+| 幫助的難題 | the problem of helping others | Ch12;判詞:不想要的幫助永遠不會成功、每個幫忙都同時在幫自己 |
+| 三道閘門 | the three gates | btl-10 自創的整理模型(非原書用語):他要嗎/問題定義一致嗎/幫他還是幫我 |
+| 激勵者 | motivator | Ch13 Learning to Be a Motivator;先看懂自己被什麼驅動 |
+| 動機 | motivation(個人的 drive 寫 what drives you) | btl-10 反思;mastery 驅動、可歸因的贏 = a win you can attribute to yourself |
 
 ## 寫每篇時的慣例
 - front matter:`series: "成為 Tech Leader 讀書筆記"`、`seriesOrder: <#>`、`category: tech`、`comments: true`、`draft: true`(寫好再發)。
