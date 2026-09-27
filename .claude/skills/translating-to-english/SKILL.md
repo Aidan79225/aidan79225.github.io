@@ -136,6 +136,8 @@ npm run dev       # then open /en/blog/<slug>/ — READ IT, and look at the diag
 
 **Opening the rendered page is not optional.** Diagram overflow and blank-line-in-SVG breakage are invisible in the markdown and obvious on the page. Check the series box shows the English series name and links to `/start/`, and that the language banner points back at the Chinese original.
 
+**Screenshot every re-fitted diagram and send it to the author for confirmation** — same hard rule as `writing-blog-post`'s〈SVG 截圖確認〉section (the extraction + headless-Chromium commands live there). English overflow is exactly what the screenshot catches, and the translation isn't final until the author OKs the picture.
+
 ## Common mistakes
 
 - **Translating the diagram's text but not re-fitting the boxes** → English spills out of the rects. The most common defect, and it hits the site's signature element.
