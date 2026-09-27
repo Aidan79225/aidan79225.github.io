@@ -9,7 +9,6 @@ comments: true
 series: "Becoming a Tech Leader — Reading Notes"
 seriesOrder: 10
 translationOf: btl-10
-draft: true
 ---
 ## The problem of helping
 

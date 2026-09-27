@@ -31,7 +31,7 @@
 | # | slug | 章 | 主題 | 狀態 |
 |---|---|---|---|---|
 | 9 | `btl-9` | Ch10–11 The First / Second Great Obstacle to Motivating Others | 激勵的兩大障礙:別人是隱形的(明星工程師的 solo 敘事)/ 把人當電腦下指令(失真鏈 SVG、人=任務);反思=重讀「成員不理解」+ KPI 是鏈尾輸出 | ✅ 已發布 |
-| 10 | `btl-10` | Ch12–13 The Problem of Helping People / Learning to Be a Motivator | 幫助的難題:四句判詞 → 三道閘門(他要嗎/問題一致嗎/幫他還是幫我;沒過=打擾/雞同鴨講/搶戲)+ 接鍵盤撞閘現場;激勵者先看懂自己。反思=LoL 動機樣本(達瑞文 vs 石頭人)→ 派任務=幫人選英雄 → 重讀 clean architecture(假幫助) | 🚧 草稿(中英皆備,`draft: true`) |
+| 10 | `btl-10` | Ch12–13 The Problem of Helping People / Learning to Be a Motivator | 幫助的難題:四句判詞 → 三道閘門(他要嗎/問題一致嗎/幫他還是幫我;沒過=打擾/雞同鴨講/搶戲)+ 接鍵盤撞閘現場;激勵者先看懂自己。反思=LoL 動機樣本(達瑞文 vs 石頭人)→ 派任務=幫人選英雄 → 重讀 clean architecture(假幫助) | ✅ 已發布(中英) |
 | 11 | `btl-11` | Ch14–15 Where Power Comes From / Power, Imperfection, and Congruence | 力量的來源;不完美與言行一致(congruence) | 📝 未寫 |
 
 ## Part Four — 組織(Organization)

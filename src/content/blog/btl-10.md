@@ -8,7 +8,6 @@ tags:
 series: "成為 Tech Leader 讀書筆記"
 seriesOrder: 10
 comments: true
-draft: true
 ---
 ## 幫助的難題
 
