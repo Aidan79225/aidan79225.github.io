@@ -24,6 +24,7 @@ This blog is **Aidan's personal brand / professional image** (a Backend Lead's t
 
 ## Quality checklist (before publishing)
 - **Visual: does a concept post have a diagram carrying the core model? Could a reader who only looks at the picture get the gist? Is the diagram clearer than the equivalent paragraph would be? (the blog's essence — don't ship a complex concept text-only)**
+- **SVG 截圖確認(硬規矩)**:每張新增或修改過的 inline SVG,回報前先渲染成截圖**交給作者確認**(見〈SVG 截圖確認〉一節)——沒拿到 OK 之前不算定稿、不發布。
 - Summary: surfaces points the source left unclear? A non-reader gets the gist in 5 min? Distilled into structure (not copied)? Does the prose stay lean around the diagram instead of repeating it?
 - Reflection: specific (real examples, numbers, situations)? Has your own judgment, not neutral restatement?
 - Overall: summary and reflection echo each other? Reflection not rushed (it's the selling point)?
@@ -69,6 +70,29 @@ The series box, tag chips, and prev/next are generated automatically by `src/lay
   would stay dark on a white page. `npm test` fails on an unmapped colour — add it to that map and run `npm run theme:css`.
 - Remote images: plain markdown `![](url)` renders as-is.
 - Verify with `npm run build`; preview with `npm run dev`.
+
+## SVG 截圖確認(硬規矩)
+
+**每張新增或修改過的 inline SVG,回報前都要渲染成截圖交給作者確認**——文字爆框、字重疊、字太小,在 markdown 原始碼裡看不出來,截圖上一眼就見。作者 OK 之後才算定稿;發布前若圖又改過,重截一次。
+
+做法(不跑 dev server 的最小路徑):把 `<figure>…</figure>` 區塊抽出來,包進一頁深色底的 HTML,用 headless Chromium 截圖,再把 PNG **送給作者**(不是只存在磁碟上、也不是只自己看過就算):
+
+```bash
+# 1) 抽 figure、包 HTML(深色底 #14181f,寬 720 置中)
+node --input-type=module -e "
+import fs from 'fs';
+const src = fs.readFileSync('src/content/blog/<slug>.md','utf8');
+(src.match(/<figure[\s\S]*?<\/figure>/g) ?? []).forEach((f,i)=>
+  fs.writeFileSync(\`/tmp/fig\${i+1}.html\`,
+    \`<!doctype html><meta charset=utf-8><body style='margin:0;padding:24px;background:#14181f;font-family:system-ui,\"Noto Sans TC\",sans-serif'><div style='max-width:720px;margin:0 auto'>\${f}</div>\`));
+"
+# 2) 截圖(雲端環境的 Chromium 在 /opt/pw-browsers/chromium;本機用任何 headless Chrome)
+/opt/pw-browsers/chromium --headless=new --disable-gpu --no-sandbox --hide-scrollbars \
+  --window-size=768,520 --screenshot=/tmp/fig1.png /tmp/fig1.html
+# 3) 把 PNG 交給作者(Claude Code 用 SendUserFile / 對話附圖),等 OK
+```
+
+截圖時自己先檢查一輪:文字都在框內、沒撞到鄰近的形狀或線、標籤對得上它標的東西——有問題先修再送,別把明顯的爆框丟給作者抓。
 
 ## Copy-paste skeleton
 New post → `src/content/blog/<slug>.md`:
@@ -129,6 +153,7 @@ Inline diagram — for concept posts this is expected, not optional (whole block
 - 系列文用詞跟前幾篇不一致(同一個概念兩個名字)→ 動筆前查 roadmap 的術語表,寫完回填新詞。
 - CJK / spaced tag slugs → use ASCII slugs.
 - Blank lines inside an inline SVG → diagram breaks into a code block.
+- 沒截圖就回報「圖畫好了」→ 爆框、字重疊只有渲染後看得到;**每張新增/修改的 SVG 都要截圖給作者確認**(見〈SVG 截圖確認〉)。
 - 中文寫完就收工,英文版無限期延後 → 翻譯成本隨時間上升,系列還會累積翻譯債。**最後一步就是接 `translating-to-english`**(見上一節)。
 
 **Existing examples:** `src/content/blog/btl-1.md` ~ `btl-4.md`.
