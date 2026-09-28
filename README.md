@@ -52,14 +52,14 @@ public/assets/images/     # static assets (avatar, …)
 
 Two collections (`src/content.config.ts`):
 
-- **`blog`** — `title`, `date`, `category` (`tech` | `food`), `tags?`, `series?`, `seriesOrder?`, `comments` (default `true`), `commentsIssue?`, `translationOf?` (English posts only)
+- **`blog`** — `title`, `date`, `category` (`tech`), `tags?`, `series?`, `seriesOrder?`, `comments` (default `true`), `commentsIssue?`, `translationOf?` (English posts only)
 - **`guides`** — `title`, `description`
 
 Three-layer taxonomy:
 
 | Layer | Role |
 |---|---|
-| **category** (`tech`/`food`) | coarse bucket, drives the top nav |
+| **category** (`tech`) | coarse bucket, drives the top nav |
 | **tags** | cross-cutting topics, browsable at `/tags/` and `/tags/<tag>/` |
 | **series** | ordered series (e.g. the *成為 Tech Leader* reading notes) — renders a series box + prev/next in each post |
 
@@ -68,7 +68,7 @@ Three-layer taxonomy:
 - `/` — home (recent posts)
 - `/blog/<slug>/` — a post
 - `/start/` — start-here map; every series has an anchor (`/start/#<slug>`, metadata in `src/data/series.ts`)
-- `/tech/`, `/food/` — category listings
+- `/tech/` — category listing
 - `/tags/`, `/tags/<tag>/` — tag browse
 - `/guides/`, `/guides/<slug>/` — guides (e.g. `/guides/odoo-usage-guide/`)
 - `/about/`

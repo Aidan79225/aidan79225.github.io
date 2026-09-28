@@ -7,8 +7,8 @@ import { currentLocale } from '../lib/i18n';
 const locale = currentLocale(Astro.currentLocale);
 const STRINGS = {
   // noResult 用 %s 當佔位,引號各語言不同(中文用「」,英文用 "")。
-  'zh-hant': { placeholder: '搜尋文章… ( / )', label: '搜尋文章', noResult: '找不到「%s」', food: '美食', tech: '技術' },
-  en: { placeholder: 'Search posts… ( / )', label: 'Search posts', noResult: 'No results for "%s"', food: 'Food', tech: 'Tech' },
+  'zh-hant': { placeholder: '搜尋文章… ( / )', label: '搜尋文章', noResult: '找不到「%s」', tech: '技術' },
+  en: { placeholder: 'Search posts… ( / )', label: 'Search posts', noResult: 'No results for "%s"', tech: 'Tech' },
 };
 const t = STRINGS[locale] ?? STRINGS['zh-hant'];
 ---
@@ -16,7 +16,6 @@ const t = STRINGS[locale] ?? STRINGS['zh-hant'];
   class="relative w-full sm:w-auto"
   data-search
   data-no-result={t.noResult}
-  data-food={t.food}
   data-tech={t.tech}
 >
   <input
@@ -101,7 +100,7 @@ const t = STRINGS[locale] ?? STRINGS['zh-hant'];
           const meta = document.createElement('span');
           meta.className = 'block text-xs text-muted mt-0.5';
           const tags = p.tags.length ? ` · ${p.tags.slice(0, 3).map((tag) => `#${tag}`).join(' ')}` : '';
-          meta.textContent = (p.category === 'food' ? S.food : S.tech) + tags;
+          meta.textContent = S.tech + tags;
           a.append(title, meta);
           a.addEventListener('mouseenter', () => { active = i; paint(); });
           li.append(a);

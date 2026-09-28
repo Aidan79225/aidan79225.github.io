@@ -158,7 +158,7 @@ async function main() {
     if (!fm || fm.draft || !fm.title) continue;
     const slug = f.replace(/\.md$/, '');
     const isEn = slug.startsWith('en/');
-    const kicker = fm.category === 'food' ? (isEn ? 'Food' : '美食') : (isEn ? 'Tech' : '技術');
+    const kicker = isEn ? 'Tech' : '技術';
     const footer = fm.series
       ? `${isEn ? 'Series' : '系列'} · ${fm.series}`
       : (fm.tags || []).slice(0, 4).map((t) => `#${t}`).join('  ');

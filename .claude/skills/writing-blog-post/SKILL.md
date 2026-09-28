@@ -18,7 +18,7 @@ This blog is **Aidan's personal brand / professional image** (a Backend Lead's t
 寫作中第一次用到表上沒有的概念名詞,**寫完這篇就回填一列**(中文、英文、備註)。英文欄一律填 —— 讀書筆記的原書用字寫作當下就在眼前,事後回頭找那一段成本高得多。
 
 ## Structure
-1. **Diagram(s)** (inline `<svg>`): for any post explaining a non-trivial concept, a diagram is **expected, not optional** — it should carry the central model so a reader who only looks at the picture already gets the gist. Add more than one when there are distinct ideas (e.g. `kafka-topics` has partition + consumer-group; `kafka-delivery` has the journey + per-key compaction). The only posts that legitimately skip it are pure reflection/reading-notes with no spatial structure to show (some `btl-*`) and food photo posts. **If a concept is complex and you can't picture it, that's a signal you haven't distilled it enough yet — not a reason to ship text-only.**
+1. **Diagram(s)** (inline `<svg>`): for any post explaining a non-trivial concept, a diagram is **expected, not optional** — it should carry the central model so a reader who only looks at the picture already gets the gist. Add more than one when there are distinct ideas (e.g. `kafka-topics` has partition + consumer-group; `kafka-delivery` has the journey + per-key compaction). The only posts that legitimately skip it are pure reflection/reading-notes with no spatial structure to show (some `btl-*`). **If a concept is complex and you can't picture it, that's a signal you haven't distilled it enough yet — not a reason to ship text-only.**
 2. **Summary** (`##` / `###`): distill the source into clear **models, lists, contrasts** — aim for "clearer and more salient than the original," not paragraph-by-paragraph retelling. The prose orbits the diagram; keep it lean.
 3. **`## 反思`**: personal experience + opinion proving real use. Sub-divide with `###` when there are distinct angles (e.g. `btl-4`'s 心態 / 技術能力).
 
@@ -36,7 +36,7 @@ This blog is **Aidan's personal brand / professional image** (a Backend Lead's t
 | `title` | Series posts use "領導力 - XXX"; standalone posts free-form. |
 | `date` | `YYYY-MM-DD`. |
 | `updated` | Optional `YYYY-MM-DD` — set on substantive revisions only (not typo fixes). Shows「更新於」on the post and feeds `dateModified` / `article:modified_time`. |
-| `category` | Currently `tech` / `food` only (coarse, drives topbar). |
+| `category` | Currently `tech` only (coarse, drives topbar). |
 | `tags` | Cross-cutting topics, **ASCII slug** (e.g. `leadership`, `system-design`) for clean URLs. |
 | `series` | Series title — the **exact same string** is the grouping key (a typo splits the series). |
 | `seriesOrder` | Order within the series (1, 2, 3…). |

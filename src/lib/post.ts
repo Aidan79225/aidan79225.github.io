@@ -29,8 +29,7 @@ export type Cover =
   | null;
 
 // Pull the first visual out of a post body to use as a card cover: the first
-// inline <svg> figure (tech posts) or the first markdown image (food posts),
-// whichever appears earlier. Returns null when a post has neither, so cards
+// inline <svg> figure or the first markdown image, whichever appears earlier. Returns null when a post has neither, so cards
 // without a diagram just fall back to a text-only layout.
 export function coverFromBody(body: string): Cover {
   const text = body ?? '';
