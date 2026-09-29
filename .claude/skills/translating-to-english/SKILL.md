@@ -24,7 +24,7 @@ Four things carry a translation. In order of how often they get botched:
 **The unit of work is one post.** A series glossary is a prerequisite that scales with the situation, not a gate you must clear before touching anything. Pick the mode that matches:
 
 ### A. A standalone post (no `series:`)
-`pain-before-power`, `dbt-intro`, `medallion-architecture`, `blog-as-a-product`, `gitcrisp`, `zookeeper`, `lottery`, `travel-split`, and the food posts. **Just translate it** — `docs/ubiquitous-language.md` (the site-wide table) covers the shared terms, and there's no cross-post consistency to protect. These are also the best place to start: concept notes get linked from everywhere, so their titles become link labels across the whole English site.
+`pain-before-power`, `dbt-intro`, `medallion-architecture`, `blog-as-a-product`, `gitcrisp`, `zookeeper`, `lottery`, `travel-split`. **Just translate it** — `docs/ubiquitous-language.md` (the site-wide table) covers the shared terms, and there's no cross-post consistency to protect. These are also the best place to start: concept notes get linked from everywhere, so their titles become link labels across the whole English site.
 
 ### B. One post from a finished series
 Settle the glossary once, then translate:
