@@ -9,7 +9,6 @@ tags:
   - side-project
 series: "帶 AI 的手藝(2026)"
 seriesOrder: 5
-draft: true
 ---
 ## 前言
 

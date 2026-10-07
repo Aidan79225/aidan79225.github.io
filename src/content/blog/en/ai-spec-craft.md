@@ -9,7 +9,6 @@ tags:
   - side-project
 series: "The Craft of Working with AI (2026)"
 seriesOrder: 5
-draft: true
 translationOf: ai-spec-craft
 ---
 ## Preface
