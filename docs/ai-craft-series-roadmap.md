@@ -19,7 +19,7 @@
 1. **獨家料檢查(最重要)**:每篇發佈前必須回答「這篇有沒有只有我能給的東西?」——第一手數據(GitCrisp 100+ PR、部落格產線)、真實事故、EM 視角。答不出來就不發,寧缺勿濫。
 1.5 **實例優先(#2 驗證過的勝利公式)**:能做實驗就做實驗,能重演就重演,能挖數據就挖數據——論述是骨架,實例是肉。〈頸上有時鐘〉的讀者回饋證實:真實實驗紀錄(含 AI 的原話節錄、含它可能錯的地方)比論述可信十倍。連帶學到的操作紀律:**餵給實驗的資訊必須用真實口徑**——症狀轉述失真,重演的就是另一場事故(#2 重跑過一次才對)。
 2. **第一季只規劃 6 篇**:觀點文供給比讀書筆記難,斷更的系列比不開系列傷品牌。寫完 6 篇、還有素材,再開第二季表。
-3. **時機**:9/15 鐵人賽開賽,連載期間(9/15–10/14)不發本系列新文;此系列是**鐵人賽後的主線**。開賽前只做素材入檔。
+3. **時機**:~~9/15 鐵人賽開賽,連載期間(9/15–10/14)不發本系列新文~~——2026-10-07 鐵人賽斷更,限制取消;本系列即日起恢復正常發文。
 4. 素材隨手入檔本文件(學 rezero roadmap 的養法);跨系列用 `[[slug]]` 互連(gitcrisp、blog-as-a-product、travel-split 是本系列的案例庫)。
 
 ## 第一季(6 篇)
@@ -30,7 +30,7 @@
 | 2 | `ai-incident-clock` | 頸上有時鐘:事故中的 AI | 從候補升位(素材最熟、鐵人賽存稿已完成故產能無虞、開賽前讓系列有兩篇)。重播毒藥訊息事故的**真實重演實驗**(分階段餵 on-call 已知資訊給乾淨的 AI,記錄真實回應);詳細素材見下方候補區原始筆記 | ✅ 已發布 |
 | 3 | `ai-responsibility-design` | 看板上的頸:工具怎麼設計人的責任——兩個開源專案的對照稽核 | 從候補升位(2026-08-13 討論定案,下一篇)。Multica(agent team 看板)與 Superpowers(spec-first 工作流)的 code-level 責任稽核對照;詳細素材見下方候補區筆記 | ✅ 已發布 |
 | 4 | `ai-responsibility-premium` | 責任的保費:AI 不收,也不賠 | 從討論定案(2026-08-13):雇用的本質=勞動+責任分擔;薪水裡的責任費(簽證費/on-call 津貼/主管加給);組織=再保險網(分層自留),AI fleet=垂直瀑布全反射;合約稽核實例(民法承攬瑕疵擔保 vs GitHub 條款演化+賠償上限);AI 不能承保的三條件(skin in the game/持續身分/社會承認);黑暗版:職業蓋章人。第一手:前職承保地圖(選標同仁/前端同仁/PM/CTO 對外含毒藥事故) | ✅ 已發布 |
-| 5 | `ai-spec-craft` | 規範即程式:CLAUDE.md 是新時代的 onboarding 文件 | 「把要求寫清楚」這門被低估的手藝;規範文件=給 AI 的護欄=給人的 onboarding;GitCrisp/本站 CLAUDE.md 實例解剖;寫不清楚要求的人帶 AI 跟帶人都會失敗 | ⬜ |
+| 5 | `ai-spec-craft` | 規範即程式:CLAUDE.md 是新時代的 onboarding 文件 | 「把要求寫清楚」這門被低估的手藝;規範文件=給 AI 的護欄=給人的 onboarding;GitCrisp/本站 CLAUDE.md 實例解剖;寫不清楚要求的人帶 AI 跟帶人都會失敗 | ✅ 已發布(中英,2026-10-07) |
 | 6 | `ai-review-craft` | 驗收的手藝:怎麼 review AI 的 code | 風險分級(哪些全文讀、哪些抽查、哪些機器擋)、預測→驗證迴圈的實際操作、review 測試比 review feature 更重(護欄壞了是靜默的) | ⬜ |
 | 7 | `ai-guardrails` | 護欄工程:測試與規範在 AI 產線的新角色 | 護欄=把頸加寬;護欄的遞迴與止損點;GitCrisp 13.5k 行測試、本站 avoid-word/pre-commit 實例;護欄的投資報酬怎麼算 | ⬜ |
 | 8 | `ai-false-neck` | 假頸解剖:automation complacency 六十年的教訓 | 航空業自動化失能研究 → code review 的對應;「十次有九次是對的,第十次你已經不看了」;維持頸的材質要刻意練習 | ⬜ |
@@ -41,6 +41,8 @@
 - **#3 看板上的頸**:對照稽核——Multica 與 Superpowers 的 code-level 責任稽核(引用釘 commit,可查證);第一手補強:本站 `docs/superpowers/specs/` 的簽核紀錄與體感;可選的行動環節:回饋 issue 給 Multica。
 - **#4 責任的保費**:合約稽核(2026-08-13 已執行)——GitHub 條款演化實錄:2024 Copilot 版「You retain all responsibility for Your Code, including Suggestions」→ 2026-03 Generative AI Services 版「solely responsible for any application or agent you create」(產品越 agent 化,責任綁得越全面);General Terms 2025-03 賠償上限=12 個月費用。對照台灣民法承攬瑕疵擔保(法律預設綁在承攬人身上)。稽核限 GitHub 家族(egress 限制),文內如實聲明。
 - **#5 規範即程式**:A/B 實驗——同一個開發任務,給乾淨的 AI 各跑一次「有 CLAUDE.md」vs「沒有 CLAUDE.md」,對照輸出的架構邊界、命名、測試習慣;把兩份 diff 的差異當文章主體。
+  - **已執行(2026-10-07)**:兩個任務(部落格寫 Idempotency Key 文、GitCrisp 加 Create branch from stash),repo 副本刪掉 CLAUDE.md/skills/術語表當對照組,headless `claude -p` 各跑一次(n=1)。結果:正式程式碼幾乎相同(GitCrisp 兩組同樣六個檔)——codebase 是隱性規範;差異全在責任層(branch vs master、draft true vs false、拒絕代寫 vs 代寫「我的經驗是」、e2e 啟動驗收 vs 沒開 app、分層拆 commit)。
+  - 規範考古另加 letscook(私人 Godot 遊戲 repo,9/26 起;CLAUDE.md 在第 279 個 commit 才出現)。**私有 repo,文中只寫流程層事實、不寫遊戲內容;發佈前與作者確認揭露範圍。**
 - **#6 驗收的手藝**:抓蟲實驗——在一個 AI 產出的 PR 裡刻意埋 2–3 個不同層次的 bug(邏輯邊界/靜默回歸/風格),記錄自己用「預測→驗證」流程 review 的過程與漏抓率;或反向:讓另一個乾淨的 AI 當 reviewer,對照人機各自抓到什麼。
 - **#7 護欄工程**:數據挖掘——GitCrisp repo 實測:統計測試攔下的回歸次數(CI 紅燈紀錄)、pre-commit/avoid-word 的攔截率;算一次護欄的投資報酬。
 - **#8 假頸解剖**:自我實驗——連續 N 個 AI PR 刻意記錄自己的 review 深度(全文讀/抽查/掃過),畫出注意力衰減曲線;對照航空業的警覺衰減研究。
@@ -89,7 +91,7 @@
 
 **時程紀律**:
 - **2026 鐵人賽(9/15)不動**——rezero 存稿 100% 完成,不拿確定性換風險。
-- 本系列走 rezero 驗證過的 pipeline:**平時養大 → 賽前改編**。鐵人賽後(10 月中)恢復寫作,每 2–3 週一篇,至 2027 年中約累積 20+ 篇;暑假衝刺補滿、改編 30 天版、存稿(`docs/ironman/` 產線現成)。
+- 本系列走 rezero 驗證過的 pipeline:**平時養大 → 賽前改編**。2026 鐵人賽 10/7 斷更後即恢復寫作,每 2–3 週一篇,至 2027 年中約累積 20+ 篇;暑假衝刺補滿、改編 30 天版、存稿(`docs/ironman/` 產線現成)。
 - franchise 巧合:系列掛(2026),2027 鐵人賽版天然是升級改版——一年後回看哪些被驗證、哪些過時,對照本身就是連載素材。
 
 ## 候補(第二季素材池)
@@ -137,6 +139,10 @@
 | 自留額 | retained risk | 保險比喻;與 rezero 共用時對齊 |
 | 再保險網 | reinsurance net | 組織是一張再保險網,措辭固定 |
 | 職業蓋章人 | rubber-stamper | 黑暗版那節;不寫「橡皮圖章」(那是 Jenkins PRR 的用法) |
+| 規範即程式 | spec as code | #5 的標題論點:規範被 AI 照字面執行,所以會有 bug、會過期、會長出死碼 |
+| 隱性規範 | implicit spec | #5:既有 codebase 本身就是規範,AI 照著它長 |
+| 簽名條件 | sign-off conditions | #5:`CLAUDE.md` 是事先寫好的簽名條件——做到哪才准交、交給誰 |
+| 過度執行 / 過期 / 死碼 | over-execution / staleness / dead rules | #5 規範的四種失效(另一種:本身有 bug) |
 
 ## 寫每篇時的慣例
 
