@@ -25,7 +25,7 @@ seriesOrder: 5
 - **部落格**:「寫一篇新文章,解釋 API 的 Idempotency Key……寫完幫我 commit。」
 - **GitCrisp**:「在 sidebar 的 stash 右鍵選單加一個『Create branch from stash…』,做的事等同 `git stash branch`。做完 commit。」
 
-四次執行,每次兩到三分鐘、0.3 到 0.5 美元。先講清楚:**每組只跑一次**,這是一次觀察,不是統計。但它的結果跟我預期的方向不一樣,所以值得寫。
+四次執行,每次兩到三分鐘、0.3 到 0.5 美元。先講清楚:**每組只跑一次**,這是一次觀察,不是統計。但結果跟直覺預期的方向不一樣,所以值得寫。
 
 <figure style="margin:1.5rem 0;text-align:center;">
   <svg viewBox="0 0 640 400" role="img" aria-label="A/B 實驗結果對照。上方橫跨兩欄的一條:程式碼層幾乎一樣——GitCrisp 兩組改了同樣六個正式程式檔、同樣的分層,因為 codebase 本身就是隱性規範。下方五列是責任層的差異,左欄沒有規範、右欄有規範:出貨路徑,直接 commit 到 master 對比開 branch 等 PR;發布閘門,draft false 寫完即發對比 draft true 等作者確認;第一手經驗,代寫「我的經驗是」對比拒絕代寫並標出要作者補;驗收,只跑單元測試對比真的把 app 跑起來做 e2e;切分,一個 commit 對比照架構分層拆兩個。結論:規範改變的不是 code 長什麼樣,是責任落在哪裡。" style="width:100%;max-width:640px;height:auto;margin:0 auto;">
@@ -69,7 +69,7 @@ seriesOrder: 5
 
 ### 發現一:codebase 本身就是規範
 
-我原本預期沒規範的那組會亂長——架構越界、命名走鐘。結果完全沒有。GitCrisp 那題,兩組改的是**同樣六個正式程式檔**:port、command、infrastructure、bus、flow、sidebar,一層不多、一層不少。原因很簡單:一個已經照 Clean Architecture 分好層的 codebase,每個既有功能都是一份範例,AI 讀幾個檔案就學會了。
+直覺會預期沒規範的那組亂長——架構越界、命名走鐘。結果完全沒有。GitCrisp 那題,兩組改的是**同樣六個正式程式檔**:port、command、infrastructure、bus、flow、sidebar,一層不多、一層不少。原因很簡單:一個已經照 Clean Architecture 分好層的 codebase,每個既有功能都是一份範例,AI 讀幾個檔案就學會了。
 
 部落格那題更明顯。沒規範的那組自己說:「README 提到的寫作 skill 不存在,所以我照既有文章(`redis-cache-patterns`、`medallion-architecture`)的格式寫。」——它找不到規範,就把整個 `src/content/blog/` 當規範。而且寫得還不差:三張圖、比另一組長一倍,還說自己先用 SQLite 模擬了一遍重送流程。**單看文章品質,沒規範那組不輸。**
 
@@ -89,7 +89,7 @@ seriesOrder: 5
 
 ## 考古:每一條規則都是一道疤
 
-實驗回答了「規範改變什麼」。另一個問題是:**規範是怎麼長出來的?**我把三個 repo 的規範檔 `git log` 翻了一遍,把每條規則追回它出生的那個 commit:
+實驗回答了「規範改變什麼」。另一個問題是:**規範是怎麼長出來的?**我請 AI 把三個 repo 的規範檔 `git log` 翻了一遍,把每條規則追回它出生的那個 commit:
 
 | 規則 | 出生的那一次 |
 |---|---|
@@ -113,7 +113,7 @@ seriesOrder: 5
 | 第 90 百分位 | 1,884 行 | 505 行 |
 | 超過 400 行的比例 | 36% | 20% |
 
-前後兩段的功能本來就不一樣,這張表不是對照實驗。但規則後那 20% 超過 400 行的 PR,我逐一看過:大半有四到六成是測試,另一個是 README 改寫。規則守住的是「reviewer 一次要讀的正式程式碼量」,不是一個死數字。
+前後兩段的功能本來就不一樣,這張表不是對照實驗。但規則後那 20% 超過 400 行的 PR 逐一看過:大半有四到六成是測試,另一個是 README 改寫。規則守住的是「reviewer 一次要讀的正式程式碼量」,不是一個死數字。
 
 ## 規範即程式:它有 bug、會過期、會長出死碼
 

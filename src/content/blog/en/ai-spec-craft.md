@@ -26,7 +26,7 @@ The setup: copy a repo into two clean working copies, leave one untouched, strip
 - **Blog**: "Write a new post explaining API Idempotency Keys… commit it when you're done."
 - **GitCrisp**: "Add 'Create branch from stash…' to the sidebar's stash context menu, doing what `git stash branch` does. Commit when it's done."
 
-Four runs, two to three minutes and 30 to 50 cents each. To be clear up front: **each arm ran once**. This is an observation, not a statistic. But it came out pointing somewhere other than where I expected, which is why it's worth writing up.
+Four runs, two to three minutes and 30 to 50 cents each. To be clear up front: **each arm ran once**. This is an observation, not a statistic. But it came out pointing somewhere other than where you'd expect, which is why it's worth writing up.
 
 <figure style="margin:1.5rem 0;text-align:center;">
   <svg viewBox="0 0 640 400" role="img" aria-label="A/B experiment results. A band spanning both columns at the top: the code layer came out nearly the same — in GitCrisp both runs changed the same six source files along the same layers, because the codebase itself is an implicit spec. Below, five rows of responsibility-layer differences, without a spec on the left and with a spec on the right: shipping path, committing straight to master versus opening a branch for a PR; publish gate, draft false and shipped as written versus draft true and waiting for the author; first-hand experience, writing 'in my experience' on the author's behalf versus refusing and flagging it for the author; acceptance, unit tests only versus actually launching the app end to end; splitting, one commit versus two commits split by architecture layer. Conclusion: a spec changes where responsibility lands, not what the code looks like." style="width:100%;max-width:640px;height:auto;margin:0 auto;">
@@ -70,7 +70,7 @@ Four runs, two to three minutes and 30 to 50 cents each. To be clear up front: *
 
 ### Finding one: the codebase is itself a spec
 
-I expected the no-spec arm to sprawl — layer violations, naming drift. None of it happened. On the GitCrisp task, both arms changed **the same six source files**: port, command, infrastructure, bus, flow, sidebar — not one layer more, not one less. The reason is simple: in a codebase already split along Clean Architecture lines, every existing feature is a worked example, and the AI learns the pattern from reading a few files.
+You'd expect the no-spec arm to sprawl — layer violations, naming drift. None of it happened. On the GitCrisp task, both arms changed **the same six source files**: port, command, infrastructure, bus, flow, sidebar — not one layer more, not one less. The reason is simple: in a codebase already split along Clean Architecture lines, every existing feature is a worked example, and the AI learns the pattern from reading a few files.
 
 The blog task made it even clearer. The no-spec arm said so itself: "The writing skill the README mentions doesn't exist, so I followed the format of existing posts (`redis-cache-patterns`, `medallion-architecture`)." — with no spec to find, it treated all of `src/content/blog/` as the spec. And it wrote a decent post: three diagrams, twice the length of the other arm's, and it reported simulating the retry flow in SQLite first. **On article quality alone, the no-spec arm didn't lose.**
 
@@ -90,7 +90,7 @@ So a spec's value isn't in the code band — it's in the five rows outside it. I
 
 ## Archaeology: every rule is a scar
 
-The experiment answered "what does a spec change". The other question is: **how do specs grow?** I went through `git log` for the spec files in all three repos and traced each rule back to the commit it was born in:
+The experiment answered "what does a spec change". The other question is: **how do specs grow?** I had an AI go through `git log` for the spec files in all three repos and trace each rule back to the commit it was born in:
 
 | Rule | Where it was born |
 |---|---|
@@ -114,7 +114,7 @@ And the scars work. GitCrisp's PR-size rule went into `CLAUDE.md` on August 26. 
 | 90th percentile | 1,884 lines | 505 lines |
 | Share over 400 lines | 36% | 20% |
 
-The features in the two periods weren't the same, so this isn't a controlled comparison. But I went through the 20% of post-rule PRs over 400 lines one by one: most are 40–60% tests, and one is a README rewrite. What the rule protects is "how much production code a reviewer has to read at once", not a magic number.
+The features in the two periods weren't the same, so this isn't a controlled comparison. But going through the 20% of post-rule PRs over 400 lines one by one: most are 40–60% tests, and one is a README rewrite. What the rule protects is "how much production code a reviewer has to read at once", not a magic number.
 
 ## Spec as code: it has bugs, goes stale, and grows dead branches
 

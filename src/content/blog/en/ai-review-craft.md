@@ -2,7 +2,7 @@
 title: "The Craft of Acceptance: How to Review AI's Code"
 date: 2026-10-08
 category: tech
-description: "I planted three bugs in a PR an AI wrote, with all 1,294 tests still green. Then I blind-reviewed it myself for twenty minutes while nine AI reviewers each took a pass. The AI verified in a minute or two what I couldn't be bothered to check; what I caught was the thing it only sees reliably when a spec spells it out — and one real bug I missed, it found. The craft of acceptance isn't reading more carefully. It's handing evidence, judgment and guardrails to the right party."
+description: "I had an AI plant three bugs in a PR an AI wrote — without telling me what or where, not even a hint — and all 1,294 tests stayed green. Then I blind-reviewed it myself for twenty minutes while nine AI reviewers each took a pass. The AI verified in a minute or two what I couldn't be bothered to check; what I caught was the thing it only sees reliably when a spec spells it out — and one real bug I missed, it found. The craft of acceptance isn't reading more carefully. It's handing evidence, judgment and guardrails to the right party."
 tags:
   - ai
   - code-review
@@ -15,11 +15,11 @@ translationOf: ai-review-craft
 
 [[responsibility-funnel|The first post]] said the width of the neck is the bandwidth you have for accepting work responsibly; [[ai-spec-craft|the last one]] said a spec decides when something counts as done. This post takes the next step: **the work is done and in your hands — how do you check it?**
 
-"Reviewing AI's code" sounds like the same job as reviewing a person's code, only with more volume. That's what I thought too. So this post doesn't start with an argument. It starts with an experiment — with me as the subject.
+"Reviewing AI's code" sounds like the same job as reviewing a person's code, only with more volume. This post doesn't start with an argument. It starts with an experiment — with me as the subject.
 
 ## The experiment: a green PR with three bugs in it
 
-The material came from the last post's experiment: the "Create branch from stash…" feature an AI built for [[gitcrisp|GitCrisp]], a real AI-written PR of a little over 160 lines. I planted three bugs in it at three different levels, with one condition: **every existing test still had to pass** — 1,294 tests, all green, exactly like the PRs you get every day.
+The material came from the last post's experiment: the "Create branch from stash…" feature an AI built for [[gitcrisp|GitCrisp]], a real AI-written PR of a little over 160 lines. I had an AI plant three bugs in it at three different levels, with two conditions: **every existing test still had to pass** — 1,294 tests, all green, exactly like the PRs you get every day — and **it couldn't tell me anything about what it planted or where**, not even a hint. Here are the answers, revealed only after the review:
 
 - **B1, a logic boundary**: the stash index gets "translated" once, under a confident comment: "`get_stashes()` lists the oldest stash first, while git counts `stash@{0}` from the newest, so translate the sidebar index." That comment is wrong. With a single stash the translation changes nothing, so the tests pass; with two or more, the user clicks the newest one, and the one that gets branched and then dropped is the oldest.
 - **B2, a silent regression**: one existing line of wiring changes — "Apply" is now connected to "Pop", so pressing Apply also deletes the stash. The new feature is fine; what broke is the thing next to it that used to work, and the existing tests only check that the signal is emitted, not where it's connected.
@@ -85,7 +85,7 @@ Then both sides ran at once. **The human arm was me, blind** — not knowing how
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">One green PR, three planted bugs, one that wasn't planted. Most of what the human and the AI caught overlaps — the cells that don't are what this post is about.</figcaption>
 </figure>
 
-The honest part first: each condition ran three times, and there was exactly one human subject (me). This isn't a statistic; it's one controlled observation. Also, my first setup for the bare-review arm had a hole — `CLAUDE.md` had been deleted but was still in the git history, and two of the reviews read it. The numbers in the diagram are from a rerun with `CLAUDE.md` removed from the history too.
+The honest part first: each condition ran three times, and there was exactly one human subject (me). This isn't a statistic; it's one controlled observation. Also, the AI running the experiment set up the bare-review arm with a hole the first time — `CLAUDE.md` had been deleted but was still in the git history, and two of the reviews read it. The numbers in the diagram are from a rerun with `CLAUDE.md` removed from the history too.
 
 ### What I caught, and how
 
@@ -97,15 +97,17 @@ B3 I predicted. Before reading the diff, I wrote down: **"Finishing the implemen
 
 B1 is the interesting one, because I did **not** catch it being wrong. My second prediction was "I'm not sure how a library like pygit2 behaves, so I'll need some proof." When I reached the comment saying the oldest stash comes first, I couldn't find evidence that it was right, or that it was wrong — and honestly, as the reviewer, I didn't want to go digging for it. So my review comment was: **"The comment says the oldest comes first, but no test case pins that behaviour down."**
 
+There's also a standard I always raise in review and forgot to put in my report this time: **don't use comments to explain behaviour — express behaviour through function and variable names; keep comments for why a workaround exists, never for how something works.** By that rule, B1's comment wouldn't have survived whether or not it was true — it explains *how* to translate the index, when the translation should have been pulled out into a function whose name says what it does, with a test pinning its behaviour. The counterexample is in the same file: the original PR's comment — "libgit2 has no equivalent of `git stash branch`; shell out so the branch/checkout/apply/drop semantics match git exactly" — explains why the code takes a detour. That kind stays.
+
 ### What the AI caught, and how
 
 B1 and B2: nine reports, nine hits. And the AI caught B1 in a completely different way: **eight of the nine wrote a throwaway script on the spot** — create a scratch repo, stash twice, print the order pygit2 returns — and then pointed at the output: "this comment is wrong, I tested it." The step I didn't want to take, it took in a minute or two, for ten or twenty cents.
 
 B3 was a different story. The bare review mentioned it once in three runs, the one with `CLAUDE.md` twice, and only with the review skill — which says outright that "presentation must not reach past the ports into infrastructure" — did it land three times out of three, with two of those marking it blocking. **On a judgment call, the AI only sees it reliably when a spec spells it out.**
 
-Then there's the cell I lost. The original AI-written PR already had a bug I hadn't planted. When the stash includes untracked files and the working tree happens to contain a file with the same name, `git stash branch` has already created the new branch and switched to it before failing to restore the stash — and the UI shows a single ERROR line, with no hint that the user is now standing on a different branch. I reproduced it with a script afterwards; it's real. I didn't see it. All three runs with the review skill did.
+Then there's the cell I lost. The original AI-written PR already had a bug nobody had planted. When the stash includes untracked files and the working tree happens to contain a file with the same name, `git stash branch` has already created the new branch and switched to it before failing to restore the stash — and the UI shows a single ERROR line, with no hint that the user is now standing on a different branch. The AI reproduced it with a script afterwards; it's real. I didn't see it. All three runs with the review skill did.
 
-The other side needs saying too: **on top of all that, every AI report attached three to seven non-blocking comments** — some useful (a branch name starting with `-` gets read by git as an option), some speculative ("`index.read()` may not refresh HEAD"), and one that got the mechanism wrong (it said a dirty working tree would leave things half-done; when I tested it, it failed cleanly). Every one of those has to be weighed by someone.
+The other side needs saying too: **on top of all that, every AI report attached three to seven non-blocking comments** — some useful (a branch name starting with `-` gets read by git as an option), some speculative ("`index.read()` may not refresh HEAD"), and one that got the mechanism wrong (it said a dirty working tree would leave things half-done; when tested afterwards, it failed cleanly). Every one of those has to be weighed by someone.
 
 ## The division of acceptance: evidence, judgment, guardrails
 
@@ -159,11 +161,11 @@ This is the physical form of what [[responsibility-funnel|the first post]] meant
 
 The first post said **neck width = acceptance speed × calibration**: real neck width includes knowing where you don't understand, and for those parts slowing down, adding a guardrail, or saying plainly "I can't sign this part yet." When I wrote that, it was an argument. This time it was the real thing — that's exactly what I did with B1. I wasn't sure how pygit2 behaves, so I didn't pretend to be. I asked for a test.
 
-The scary version is the reverse: if I'd read "the oldest comes first", thought "yeah, sounds reasonable", and let it through, that would have been the authority illusion from [[ai-incident-clock|the incident post]] — the AI's comment looks the most like an answer. That comment was confident, professional in tone, came with a reason — and was wrong. **A comment an AI wrote isn't documentation; it's a claim waiting to be verified.**
+The scary version is the reverse: if I'd read "the oldest comes first", thought "yeah, sounds reasonable", and let it through, that would have been the authority illusion from [[ai-incident-clock|the incident post]] — the AI's comment looks the most like an answer. That comment was confident, professional in tone, came with a reason — and was wrong. **A comment an AI wrote isn't documentation; it's a claim waiting to be verified** — and often the best move is not to let a how-it-works comment exist at all: what a good name can say needs no comment, and what a name can't say, a comment only makes look trustworthy.
 
 ### An AI reviewer isn't a second pair of eyes; it's an evidence machine
 
-Before the experiment, I thought an AI reviewer's value was "one more pair of eyes". Afterwards I think that metaphor is wrong. Most of what it caught overlapped with what I caught, so it isn't a *different* pair of eyes. What's genuinely different is that it's **willing to pay the cost of verification for every small doubt** — spin up a scratch repo, run a script, reproduce a failure. That's also how the unplanted real bug got found.
+The usual line is that an AI reviewer's value is "one more pair of eyes". Going by this experiment, that metaphor doesn't fit. Most of what it caught overlapped with what I caught, so it isn't a *different* pair of eyes. What's genuinely different is that it's **willing to pay the cost of verification for every small doubt** — spin up a scratch repo, run a script, reproduce a failure. That's also how the unplanted real bug got found.
 
 But it's also a machine that produces noise: three to seven non-blocking comments per report, some speculative, one with the mechanism wrong. Taking its output straight as the verdict just swaps the neck for another kind of rubber stamp — I'd only have moved from stamping AI-written code to stamping AI-written reviews. So the way I'll use it is: **let it run first, treat its findings as leads to verify, and spend my own time on two things only — what it marks as blocking, and what it can't judge at all.**
 
