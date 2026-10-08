@@ -47,3 +47,4 @@
 | 2026-07-17 | 扇出 | **fan out**(英文詞前後留空格) | 不用中文「扇出」;DDIA 既有的專有名 fan-out on read/write 保留 |
 | 2026-07-17 | 吞吐 / 吞吐量 / 高吞吐 / 低吞吐 | **throughput** / **High-throughput** / **Low-throughput**(前後留空格) | 環境語意一律英文;高低用連字號複合詞 |
 | 2026-07-17 | 堆積 / 背壓 | **backlog** / **backpressure**(前後留空格) | queue 堆積=backlog;背壓=backpressure。標題可首字大寫(Backpressure) |
+| 2026-10-08 | 「我在裡面埋了三個 bug」「我事後寫腳本重現過」「我原本預期……」(實際是 AI 做的事、或作者沒說過的想法) | 「我請 AI 埋……」「AI 事後重現過」「直覺會預期……」 | **「我」= 作者本人**:AI 代做的事寫明是 AI;作者沒說過的預期/感受不代寫(規矩已寫進 writing-blog-post skill) |
