@@ -9,7 +9,6 @@ tags:
   - leadership
 series: "The Craft of Working with AI (2026)"
 seriesOrder: 6
-draft: true
 translationOf: ai-review-craft
 ---
 ## Preface

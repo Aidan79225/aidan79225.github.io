@@ -9,7 +9,6 @@ tags:
   - leadership
 series: "帶 AI 的手藝(2026)"
 seriesOrder: 6
-draft: true
 ---
 ## 前言
 
