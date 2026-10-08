@@ -31,7 +31,7 @@
 | 3 | `ai-responsibility-design` | 看板上的頸:工具怎麼設計人的責任——兩個開源專案的對照稽核 | 從候補升位(2026-08-13 討論定案,下一篇)。Multica(agent team 看板)與 Superpowers(spec-first 工作流)的 code-level 責任稽核對照;詳細素材見下方候補區筆記 | ✅ 已發布 |
 | 4 | `ai-responsibility-premium` | 責任的保費:AI 不收,也不賠 | 從討論定案(2026-08-13):雇用的本質=勞動+責任分擔;薪水裡的責任費(簽證費/on-call 津貼/主管加給);組織=再保險網(分層自留),AI fleet=垂直瀑布全反射;合約稽核實例(民法承攬瑕疵擔保 vs GitHub 條款演化+賠償上限);AI 不能承保的三條件(skin in the game/持續身分/社會承認);黑暗版:職業蓋章人。第一手:前職承保地圖(選標同仁/前端同仁/PM/CTO 對外含毒藥事故) | ✅ 已發布 |
 | 5 | `ai-spec-craft` | 規範即程式:CLAUDE.md 是新時代的 onboarding 文件 | 「把要求寫清楚」這門被低估的手藝;規範文件=給 AI 的護欄=給人的 onboarding;GitCrisp/本站 CLAUDE.md 實例解剖;寫不清楚要求的人帶 AI 跟帶人都會失敗 | ✅ 已發布(中英,2026-10-07) |
-| 6 | `ai-review-craft` | 驗收的手藝:怎麼 review AI 的 code | 風險分級(哪些全文讀、哪些抽查、哪些機器擋)、預測→驗證迴圈的實際操作、review 測試比 review feature 更重(護欄壞了是靜默的) | ⬜ |
+| 6 | `ai-review-craft` | 驗收的手藝:怎麼 review AI 的 code | 風險分級(哪些全文讀、哪些抽查、哪些機器擋)、預測→驗證迴圈的實際操作、review 測試比 review feature 更重(護欄壞了是靜默的) | ✅ 已發布(中英,2026-10-08) |
 | 7 | `ai-guardrails` | 護欄工程:測試與規範在 AI 產線的新角色 | 護欄=把頸加寬;護欄的遞迴與止損點;GitCrisp 13.5k 行測試、本站 avoid-word/pre-commit 實例;護欄的投資報酬怎麼算 | ⬜ |
 | 8 | `ai-false-neck` | 假頸解剖:automation complacency 六十年的教訓 | 航空業自動化失能研究 → code review 的對應;「十次有九次是對的,第十次你已經不看了」;維持頸的材質要刻意練習 | ⬜ |
 | 9 | `ai-taste` | 品味經濟學:當產出免費,稀缺的是什麼 | taste 的工程定義(知道什麼是好、且能說出為什麼);品味怎麼練、怎麼寫進文件變成可傳承的;產出通膨時代的個人定價 | ⬜ |
@@ -44,6 +44,7 @@
   - **已執行(2026-10-07)**:兩個任務(部落格寫 Idempotency Key 文、GitCrisp 加 Create branch from stash),repo 副本刪掉 CLAUDE.md/skills/術語表當對照組,headless `claude -p` 各跑一次(n=1)。結果:正式程式碼幾乎相同(GitCrisp 兩組同樣六個檔)——codebase 是隱性規範;差異全在責任層(branch vs master、draft true vs false、拒絕代寫 vs 代寫「我的經驗是」、e2e 啟動驗收 vs 沒開 app、分層拆 commit)。
   - 規範考古另加 letscook(私人 Godot 遊戲 repo,9/26 起;CLAUDE.md 在第 279 個 commit 才出現)。**私有 repo,文中只寫流程層事實、不寫遊戲內容;發佈前與作者確認揭露範圍。**
 - **#6 驗收的手藝**:抓蟲實驗——在一個 AI 產出的 PR 裡刻意埋 2–3 個不同層次的 bug(邏輯邊界/靜默回歸/風格),記錄自己用「預測→驗證」流程 review 的過程與漏抓率;或反向:讓另一個乾淨的 AI 當 reviewer,對照人機各自抓到什麼。
+  - **已執行(2026-10-08)**:素材是 #5 實驗的 GitCrisp「Create branch from stash」PR,埋三個 bug(B1 stash index 反轉+錯誤註解、B2 Apply 接到 Pop、B3 presentation import pygit2),1294 測試全綠。作者盲測 20 分鐘:B2、B3 抓到,B1 以「沒有 test 釘住」指出但未驗證;漏掉原 PR 就有的部分失敗 bug。AI reviewer 三條件 × 3 次:B1/B2 全中(8/9 寫腳本實測),B3 裸 1/3、+CLAUDE.md 2/3、+review skill 3/3;部分失敗 1/3、1/3、3/3。裸 review 第一輪因 CLAUDE.md 殘留在 git 歷史而重跑。
 - **#7 護欄工程**:數據挖掘——GitCrisp repo 實測:統計測試攔下的回歸次數(CI 紅燈紀錄)、pre-commit/avoid-word 的攔截率;算一次護欄的投資報酬。
 - **#8 假頸解剖**:自我實驗——連續 N 個 AI PR 刻意記錄自己的 review 深度(全文讀/抽查/掃過),畫出注意力衰減曲線;對照航空業的警覺衰減研究。
 - **#9 品味經濟學**:對照實驗——同一需求讓 AI 生成三種實作,寫下自己選哪個、為什麼;再把「為什麼」寫成規則餵回去,看第二輪生成有沒有變好——品味能不能被文件化的實測。
@@ -143,6 +144,9 @@
 | 隱性規範 | implicit spec | #5:既有 codebase 本身就是規範,AI 照著它長 |
 | 簽名條件 | sign-off conditions | #5:`CLAUDE.md` 是事先寫好的簽名條件——做到哪才准交、交給誰 |
 | 過度執行 / 過期 / 死碼 | over-execution / staleness / dead rules | #5 規範的四種失效(另一種:本身有 bug) |
+| 證據 / 判斷 / 護欄 | evidence / judgment / guardrail | #6 驗收的三條分工:證據便宜交給機器、判斷留給人、拿不到證據就要求護欄 |
+| 證明的責任 | burden of proof | #6:證明的責任在作者,不在 reviewer |
+| 證據機 | evidence machine | #6:AI reviewer 不是第二雙眼睛,是一台願意為小疑點付驗證成本的證據機 |
 
 ## 寫每篇時的慣例
 
