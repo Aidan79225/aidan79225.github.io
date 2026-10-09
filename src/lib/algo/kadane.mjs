@@ -14,6 +14,7 @@ const CODE = [
 const NOTES = {
   'zh-hant': {
     init: 'best 和 sum 都從 0 開始(允許空子陣列,所以答案至少是 0)。',
+    first: (x) => `看第一格 array[0] = ${x}:前面沒有東西可以接,sum = ${x}。`,
     extend: (k, x, s) => `看 array[${k}] = ${x}:接在前面的子陣列後面,sum 變成 ${s}。`,
     restart: (k, x, s) =>
       `看 array[${k}] = ${x}:前面累積的 sum 是負的,接上去只會更小,所以從這格重新開始,sum = ${s}。`,
@@ -26,6 +27,7 @@ const NOTES = {
   },
   en: {
     init: 'best and sum both start at 0 (the empty subarray is allowed, so the answer is at least 0).',
+    first: (x) => `First element array[0] = ${x}: nothing to extend yet, so sum = ${x}.`,
     extend: (k, x, s) => `array[${k}] = ${x}: extend the current subarray, so sum becomes ${s}.`,
     restart: (k, x, s) =>
       `array[${k}] = ${x}: the running sum is negative and would only drag it down, so start over here, sum = ${s}.`,
@@ -90,7 +92,10 @@ export function frames(array, lang = 'zh-hant') {
   snapshot(0, t.init, -1);
   for (let k = 0; k < array.length; k++) {
     const x = array[k];
-    if (x > sum + x) {
+    if (k === 0) {
+      sum = x;
+      snapshot(2, t.first(x), k, [range(start, k, 'current')]);
+    } else if (x > sum + x) {
       start = k;
       sum = x;
       snapshot(2, t.restart(k, x, sum), k, [range(start, k, 'current')]);

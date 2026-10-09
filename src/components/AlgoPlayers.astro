@@ -66,6 +66,7 @@
   }
   .prose .algo-code li {
     margin: 0;
+    line-height: 1.6;
     padding: 0.1rem 0.75rem;
     border-left: 3px solid transparent;
     white-space: pre;
@@ -237,7 +238,84 @@
     font-size: 0.75rem;
     color: var(--color-muted);
   }
+  /* 並排比較:每條 lane 自己一組程式碼、陣列、變數、計數條 */
+  .algo-lanes {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  @media (min-width: 640px) {
+    .algo-lanes {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+  .algo-lane {
+    min-width: 0;
+    padding: 0.75rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.375rem;
+    background: color-mix(in srgb, var(--color-base) 40%, transparent);
+  }
+  .prose .algo-lane-title {
+    margin: 0 0 0.5rem;
+    font-size: 0.95rem;
+  }
+  .algo-lane.is-done .algo-lane-title::after {
+    content: ' ✓';
+    color: var(--algo-best);
+  }
+  .algo-lane .algo-code li code {
+    font-size: 0.72rem;
+  }
+  .algo-lane .algo-cell {
+    flex-basis: 2rem;
+  }
+  .algo-lane .algo-vars {
+    grid-template-columns: repeat(4, max-content 1fr);
+    margin-top: 0.25rem;
+  }
+  .algo-meter {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .algo-meter[hidden] {
+    display: none;
+  }
+  .algo-meter-track {
+    flex: 1;
+    height: 0.6rem;
+    border-radius: 999px;
+    background: var(--color-base);
+    border: 1px solid var(--color-line);
+    overflow: hidden;
+  }
+  .algo-meter-fill {
+    display: block;
+    height: 100%;
+    background: var(--color-accent);
+    transition: width 0.2s;
+  }
+  .algo-lane.is-done .algo-meter-fill {
+    background: var(--algo-best);
+  }
+  .algo-meter-text {
+    flex: 0 0 auto;
+    color: var(--color-muted);
+  }
+  .prose .algo-lane-note {
+    min-height: 2.6em;
+    margin: 0.5rem 0 0;
+    font-size: 0.8rem;
+    color: var(--color-muted);
+  }
   @media (prefers-reduced-motion: reduce) {
+    .algo-meter-fill {
+      transition: none;
+    }
     .algo-value {
       transition: none;
     }

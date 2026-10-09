@@ -2,4 +2,5 @@
 // 只有用到它的文章才會下載。新增演算法:寫一個 frame 產生器,在這裡登記一行。
 export const ALGOS = {
   kadane: () => import('./kadane.mjs'),
+  'max-subarray-race': () => import('./max-subarray-race.mjs'),
 };

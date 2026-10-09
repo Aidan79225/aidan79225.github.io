@@ -3,7 +3,9 @@
 // 原生 DOM、不用 React:跟站內搜尋同一個理由,不為一個元件下載 react-dom。
 //
 // frame 的形狀(由各演算法模組產生):
-//   { line, note, array, cursor, ranges: [{ from, to, kind }], vars: [{ name, value }] }
+//   單一演算法:{ line, note, array, cursor, ranges: [{ from, to, kind }], vars: [{ name, value }] }
+//   並排比較:  { note, lanes: [<上面的形狀 + 選填 done、meter: { value, max }>, …] }
+//   並排時模組另外提供 lanes: [{ title, code }] 與 meterLabel,每條 lane 各自畫程式碼、陣列、變數。
 
 const UI = {
   'zh-hant': {
@@ -57,22 +59,82 @@ const h = (tag, attrs = {}, ...children) => {
   return el;
 };
 
+// 一條 lane = 一份程式碼 + 一個陣列 + 變數表(+ 並排時的標題、計數條、lane 說明)。
+// 單一演算法就是只有一條、沒有標題的 lane。
+function laneView({ title, code: lines }, meterLabel) {
+  const code = h('ol', { class: 'algo-code', 'aria-label': 'code' });
+  lines.forEach((line) => code.append(h('li', {}, h('code', {}, line))));
+  const cells = h('div', { class: 'algo-cells' });
+  const vars = h('dl', { class: 'algo-vars' });
+  const laneNote = h('p', { class: 'algo-lane-note' });
+  const meterFill = h('span', { class: 'algo-meter-fill' });
+  const meterText = h('span', { class: 'algo-meter-text' });
+  const meter = h(
+    'div',
+    { class: 'algo-meter' },
+    h('span', { class: 'algo-meter-track' }, meterFill),
+    meterText,
+  );
+  const el = title
+    ? h(
+        'section',
+        { class: 'algo-lane' },
+        h('h4', { class: 'algo-lane-title' }, title),
+        code,
+        cells,
+        vars,
+        meter,
+        laneNote,
+      )
+    : h('div', { class: 'algo-stage' }, code, h('div', { class: 'algo-view' }, cells, vars));
+
+  function render(f) {
+    [...code.children].forEach((li, n) => li.classList.toggle('is-active', n === f.line));
+    cells.replaceChildren(
+      ...f.array.map((value, i) => {
+        const kinds = f.ranges.filter((r) => i >= r.from && i <= r.to).map((r) => r.kind);
+        return h(
+          'div',
+          {
+            class: ['algo-cell', i === f.cursor ? 'is-cursor' : '', ...kinds.map((k) => `in-${k}`)]
+              .filter(Boolean)
+              .join(' '),
+          },
+          h('span', { class: 'algo-value' }, String(value)),
+          h('span', { class: 'algo-index' }, String(i)),
+        );
+      }),
+    );
+    vars.replaceChildren(
+      ...f.vars.flatMap(({ name, value }) => [h('dt', {}, name), h('dd', {}, String(value))]),
+    );
+    el.classList.toggle('is-done', Boolean(f.done));
+    meter.hidden = !f.meter;
+    if (f.meter) {
+      meterFill.style.width = `${(100 * f.meter.value) / f.meter.max}%`;
+      meterText.textContent = `${meterLabel ?? ''} ${f.meter.value}`;
+    }
+    laneNote.textContent = f.note ?? '';
+  }
+
+  return { el, render };
+}
+
 export function mountPlayer(root, algo, lang) {
   const t = UI[lang] ?? UI['zh-hant'];
-  const legend = algo.legend?.[lang] ?? algo.legend?.['zh-hant'] ?? {};
+  const pick = (v) => (v && typeof v === 'object' ? (v[lang] ?? v['zh-hant']) : v);
+  const legend = pick(algo.legend) ?? {};
   const initial = algo.parseInput(root.dataset.input ?? '') ?? algo.defaultInput;
 
   let frames = [];
   let index = 0;
   let timer = null;
-  let speed = 'normal';
+  let speed = algo.defaultSpeed ?? 'normal';
 
   // ── 版面 ──
-  const code = h('ol', { class: 'algo-code', 'aria-label': 'code' });
-  algo.code.forEach((line) => code.append(h('li', {}, h('code', {}, line))));
-
-  const cells = h('div', { class: 'algo-cells' });
-  const vars = h('dl', { class: 'algo-vars' });
+  const lanes = (algo.lanes ?? [{ code: algo.code }]).map((def) =>
+    laneView({ title: pick(def.title), code: def.code }, pick(algo.meterLabel)),
+  );
   const note = h('p', { class: 'algo-note', 'aria-live': 'polite' });
   const legendRow = h(
     'p',
@@ -156,12 +218,8 @@ export function mountPlayer(root, algo, lang) {
   );
 
   root.replaceChildren(
-    h(
-      'div',
-      { class: 'algo-stage' },
-      code,
-      h('div', { class: 'algo-view' }, cells, legendRow, vars),
-    ),
+    lanes.length > 1 ? h('div', { class: 'algo-lanes' }, ...lanes.map((l) => l.el)) : lanes[0].el,
+    legendRow,
     note,
     controls,
     inputRow,
@@ -216,27 +274,8 @@ export function mountPlayer(root, algo, lang) {
 
   // ── 繪製 ──
   function render(f) {
-    [...code.children].forEach((li, n) => li.classList.toggle('is-active', n === f.line));
-
-    cells.replaceChildren(
-      ...f.array.map((value, i) => {
-        const kinds = f.ranges.filter((r) => i >= r.from && i <= r.to).map((r) => r.kind);
-        return h(
-          'div',
-          {
-            class: ['algo-cell', i === f.cursor ? 'is-cursor' : '', ...kinds.map((k) => `in-${k}`)]
-              .filter(Boolean)
-              .join(' '),
-          },
-          h('span', { class: 'algo-value' }, String(value)),
-          h('span', { class: 'algo-index' }, String(i)),
-        );
-      }),
-    );
-
-    vars.replaceChildren(
-      ...f.vars.flatMap(({ name, value }) => [h('dt', {}, name), h('dd', {}, String(value))]),
-    );
+    const laneFrames = f.lanes ?? [f];
+    lanes.forEach((lane, i) => lane.render(laneFrames[i]));
     note.textContent = f.note;
     scrub.value = String(index);
     counter.textContent = `${t.step} ${index + 1} / ${frames.length}`;

@@ -100,7 +100,10 @@
   - `src/lib/algo/player.mjs` — 原生 DOM 播放器(不用 React,理由同站內搜尋:不為一個元件下載 react-dom)。
   - `src/components/AlgoPlayers.astro` — 只在內文有 `data-algo=` 的文章載入;捲到附近才下載播放器與演算法模組。
   - `test/algo-<name>.test.mjs` — **每個動畫都要有測試**:最後一個 frame 的答案要跟暴力解對拍(隨機輸入跑幾百次),frame 之間的不變量要成立(例如 Kadane 每一步 current 區間的和 = sum)。動畫畫錯比沒有動畫更糟。
-- 已完成:`kadane`(#1 最大子陣列和,CPHB Ch2 的範例輸入)。
+- **並排比較**:模組提供 `lanes: [{ title, code }]`,frame 改成 `{ note, lanes: [...] }`,每條 lane 各自畫程式碼、陣列、變數,加上 `meter`(操作次數計數條,各 lane 用同一個 max,長短可以直接比)。適合「暴力解 vs 快解法」這種對照。
+- 已完成:
+  - `kadane`(#1,CPHB Ch2 的範例輸入)
+  - `max-subarray-race`(#1,O(n²) 暴力解與 Kadane 並排,共用同一個時鐘、每步各做一次加法;Kadane 第 8 步做完,暴力解要到第 36 步)
 
 ### 視圖類型(依需要逐步加進播放器)
 | 視圖 | 用在 | 狀態 |
@@ -120,7 +123,7 @@
 
 | # | 動畫(`data-algo`) | 例子 / 讀者要看見的事 |
 |---|---|---|
-| 1 | `kadane` ✅;`max-subarray-brute` | 原書陣列 [-1,2,4,-3,5,2,-5,2]:O(n²) 一個一個區間試 vs Kadane 一次掃完,步數計數器並排 |
+| 1 | `kadane` ✅;`max-subarray-race` ✅ | 原書陣列 [-1,2,4,-3,5,2,-5,2]:O(n²) 一個一個區間試 vs Kadane 一次掃完,步數計數器並排 |
 | 2 | `binary-search`、`counting-sort` | 每一步砍掉一半(剩餘區間縮小);對答案二分的判定函數 |
 | 3 | `vector-growth` | 倍增時的搬家次數,攤銷後每次 push 是 O(1) |
 | 4 | `subsets-backtrack`、`queens` | 遞迴樹展開;剪枝的分支直接變灰,計數器顯示少走多少 |
