@@ -11,9 +11,12 @@
 2. **工程師 / EM 視角**:誠實回答「後端工程師到底用不用得到線段樹」——大部分用不到,但**估算複雜度、辨認問題屬於哪一類(尤其辨認 NP-hard 然後停手)**每天都在用。招人的角度也講:演算法面試在量什麼、沒量到什麼。
 3. **2026 年為什麼還學這個**:AI 寫得出 CSES 的 AC 解,但「它給的解在 n = 10^5 時會不會 TLE」「這個 greedy 對不對」是驗收問題——接 `[[ai-review-craft]]`:你看不出結構,就沒辦法 review AI 給的演算法。
 
+4. **能親手操作的逐步動畫**(2026-10-09 作者定案,本系列的招牌):每篇都有具體的例子,核心演算法做成**可以一步一步播放的動畫**——讀者能前進、後退、自動播放、拖進度條、改輸入重跑。靜態圖只能給結論,動畫讓讀者看見「暴力解浪費的那一步,快解法是怎麼省下來的」。這是紙本書和題解站給不出的東西。
+
 **罩門(寫成紀律)**:
 - **別寫成又一份題解 / 教科書翻譯**。原書已經很精簡,摘要要比原書更清楚(一張圖講清楚一個模型),證明只留直覺,形式證明指回原書。
 - **上班對照不准硬湊**。對不上真實系統的章(Nim、騎士巡邏、Burnside)就誠實寫「這招在工作上幾乎不會遇到,學它是為了 X」,不要編一個假的 Production 場景。
+- **動畫不是裝飾**。每一個 frame 的說明文字都要回答「這一步在做什麼、為什麼」,不是只把變數值換掉;動畫跑完,讀者應該能自己講出演算法。
 - **反思必須是真的**。作者自己的刷題經驗、面試經驗、工作上真的用到的那次——動筆前先跟作者確認,沒有就不寫,不腦補。
 
 **與既有系列的關係(差異化 / cross-link 分工)**:
@@ -82,6 +85,69 @@
 | 26 | `cphb-segment-tree-advanced` | Ch28 Segment trees revisited | 線段樹的進階:延遲、持久、二維 | 延遲標記(區間更新)、動態開點與**持久化線段樹**(只複製改到的那條路徑)、節點存資料結構、二維線段樹。上班:持久化 = 不可變快照(MVCC、Git 物件、copy-on-write)—— 接 `[[cphb-range-queries]]`、`[[ddia-transactions]]`、`[[sql-transactions]]` | ⬜ |
 | 27 | `cphb-geometry` | Ch29 Geometry | 外積解決一半的幾何題 | 用複數表示點、外積判斷左右 / 線段相交、多邊形面積(鞋帶公式、Pick 定理)、距離函數(曼哈頓距離旋轉 45° 變 Chebyshev)。【交換】:換座標系 —— 接 `[[cphb-sweep-line]]` | ⬜ |
 | 28 | `cphb-sweep-line` | Ch30 Sweep line algorithms | 把二維問題變成一串事件 | 交點計數(事件 + Fenwick)、最近點對(n log n)、凸包(Andrew 單調鏈)。**掃描線 = 按時間排序的事件處理**。上班:會議室 / 時段重疊、區間合併、事件串流的「同時在線人數」。【順序】收尾篇;全系列完結時扣回第 1 篇與 `[[ai-review-craft]]` —— 接 `[[cphb-range-queries]]`、`[[cphb-geometry]]`、`[[sql-gaps-islands]]` | ⬜ |
+
+## 互動動畫(本系列硬性要求)
+
+### 播放器(已建好)
+- 在 markdown 裡插一個 div 就有播放器,沒有 JS 時顯示 div 裡原本的內容:
+  ```html
+  <div data-algo="kadane" data-input="-1, 2, 4, -3, 5, 2, -5, 2"><p>(互動動畫需要 JavaScript)</p></div>
+  ```
+- 版面:左邊程式碼(目前執行的那一行會亮起來)、右邊資料視圖 + 變數表,下面一行說明;控制列有 ⇤ ← 播放 → ⇥、進度條、速度(慢 / 中 / 快),以及「改輸入 / 隨機」。鍵盤:← → 逐步、空白鍵播放;手動操作會自動暫停,讓讀者自己控制節奏。
+- 檔案:
+  - `src/lib/algo/<name>.mjs` — **frame 產生器**(純函式,可測試):`frames(input, lang)` 回傳每一步的 `{ line, note, array, cursor, ranges, vars }`;另外提供 `code`、`defaultInput`、`parseInput`、`randomInput`、`legend`。說明文字中英兩份,英文翻譯直接共用同一個動畫。
+  - `src/lib/algo/registry.mjs` — `data-algo` 名稱 → 模組,登記一行。
+  - `src/lib/algo/player.mjs` — 原生 DOM 播放器(不用 React,理由同站內搜尋:不為一個元件下載 react-dom)。
+  - `src/components/AlgoPlayers.astro` — 只在內文有 `data-algo=` 的文章載入;捲到附近才下載播放器與演算法模組。
+  - `test/algo-<name>.test.mjs` — **每個動畫都要有測試**:最後一個 frame 的答案要跟暴力解對拍(隨機輸入跑幾百次),frame 之間的不變量要成立(例如 Kadane 每一步 current 區間的和 = sum)。動畫畫錯比沒有動畫更糟。
+- 已完成:`kadane`(#1 最大子陣列和,CPHB Ch2 的範例輸入)。
+
+### 視圖類型(依需要逐步加進播放器)
+| 視圖 | 用在 | 狀態 |
+|---|---|---|
+| `array` 陣列 + 游標 + 區間色帶 | 1、2、3、7、8 | ✅(Kadane 已用) |
+| `table` 二維 DP 表(格子填值、箭頭指向來源格) | 6、9、20 | ⬜ |
+| `bars` 長條(排序、單調堆疊) | 2、7 | ⬜ |
+| `tree` 樹 / 遞迴樹(展開、剪枝變灰) | 4、12、16、23、24、26 | ⬜ |
+| `graph` 節點與邊(訪問順序、距離標籤、佇列 / 堆疊) | 10、11、13、14、15、17、18 | ⬜ |
+| `bits` 位元列 | 9 | ⬜ |
+| `plane` 二維平面(點、線段、掃描線) | 27、28 | ⬜ |
+
+每加一種視圖,播放器只多一個 render 函式;frame 的共同欄位(`line`、`note`、`vars`)不變。
+
+### 每篇的例子與動畫規劃
+原則:**一篇至少一個動畫**;★ 篇可以有兩個(暴力解 vs 快解法並排,讓讀者看見差在哪)。範例輸入優先用原書的例子,方便讀者對照原書。
+
+| # | 動畫(`data-algo`) | 例子 / 讀者要看見的事 |
+|---|---|---|
+| 1 | `kadane` ✅;`max-subarray-brute` | 原書陣列 [-1,2,4,-3,5,2,-5,2]:O(n²) 一個一個區間試 vs Kadane 一次掃完,步數計數器並排 |
+| 2 | `binary-search`、`counting-sort` | 每一步砍掉一半(剩餘區間縮小);對答案二分的判定函數 |
+| 3 | `vector-growth` | 倍增時的搬家次數,攤銷後每次 push 是 O(1) |
+| 4 | `subsets-backtrack`、`queens` | 遞迴樹展開;剪枝的分支直接變灰,計數器顯示少走多少 |
+| 5 | `activity-selection`、`coin-greedy` | 選最早結束的活動;硬幣 {1,3,4} 湊 6 時 greedy 失敗的反例 |
+| 6 | `coin-dp`、`lis`、`edit-distance` | DP 表一格一格填,箭頭指回它用到的格子;回溯出答案 |
+| 7 | `two-pointers`、`monotonic-stack`、`sliding-min` | 兩個指標只往右走;單調堆疊的 push/pop |
+| 8 | `prefix-sum`、`fenwick`、`segment-tree` | 區間和 = 兩個前綴相減;Fenwick 的 i & -i 跳法;線段樹更新沿路往上 |
+| 9 | `bitmask-subsets`、`tsp-dp` | 用整數列舉子集;位元列跟集合同步亮起 |
+| 10 | `dfs`、`bfs` | 同一張圖,DFS 用堆疊、BFS 用佇列,訪問順序不同 |
+| 11 | `dijkstra`、`bellman-ford` | 距離標籤一路變小;負邊讓 Dijkstra 出錯的反例 |
+| 12 | `tree-diameter` | 兩次 DFS 找直徑 |
+| 13 | `kruskal-union-find` | 邊照權重排序,併查集合併 / 拒絕成環 |
+| 14 | `topo-sort` | Kahn 演算法:入度歸零的節點進佇列;放一條成環的邊,看它卡住 |
+| 15 | `kosaraju` | 兩次 DFS、縮點 |
+| 16 | `euler-tour`、`binary-lifting` | 子樹攤平成連續區間;往上跳 2^k 步 |
+| 17 | `hierholzer` | 歐拉迴路一筆畫完 |
+| 18 | `max-flow` | 找增廣路徑、殘餘網路,最後畫出最小割 |
+| 19 | `sieve`、`mod-pow` | 篩法一輪一輪劃掉倍數;快速冪看指數的二進位 |
+| 20 | `pascal-triangle` | 帕斯卡三角形一層一層加出來 |
+| 21 | `matrix-pow` | 費氏數列:矩陣平方 log n 次 |
+| 22 | `monte-carlo-pi`、`fisher-yates` | 隨機點估 π;洗牌每一步的交換(接 lottery) |
+| 23 | `nim` | 每堆的二進位 XOR,必勝的拿法 |
+| 24 | `trie`、`z-algorithm` | trie 一個字一個字長出來;Z 盒子往右推 |
+| 25 | `sqrt-blocks`、`mo` | 分塊查詢;Mo 的查詢排序讓指標少走 |
+| 26 | `lazy-segment-tree` | 延遲標記往下推的時機 |
+| 27 | `cross-product`、`shoelace` | 外積正負 = 左轉右轉;鞋帶公式逐邊累加 |
+| 28 | `sweep-line`、`convex-hull` | 掃描線由左往右,事件進出;凸包的單調鏈 |
 
 ## 術語表(Ubiquitous Language)
 
@@ -166,6 +232,7 @@
 - front matter:`series: "Competitive Programmer's Handbook 讀書筆記"`、`seriesOrder: <#>`、`category: tech`、`draft: true`(寫好再發)。
 - tags 用 ASCII:`algorithms` + `cphb` + 該篇主題(如 `dynamic-programming`、`graph`、`segment-tree`)。
 - 依 `.claude/skills/writing-blog-post`:一張招牌深色 SVG + 比原書更清楚的摘要 + 一段真實反思。演算法篇的 SVG 優先畫「暴力解浪費在哪 → 快解法撿回了什麼」的對照,或資料結構在一次操作中的變化。
+- **例子與動畫(硬性要求)**:每篇至少一個具體例子,並把核心演算法做成逐步動畫(見〈互動動畫〉)。先寫 frame 產生器與對拍測試,再寫文章;文章裡先放動畫,再講它為什麼對。div 裡的備用內容放靜態 SVG 或文字說明,讓 RSS、鐵人賽轉貼這些沒有 JS 的地方也看得懂。
 - **程式碼範例硬性要求**:每篇至少一段可編譯的 C++(原書語言、CSES 判題語言),只放核心函式,不放競賽模板巨集;能凸顯差異時才加 Kotlin / Python 對照(如 `TreeMap` vs `std::set`、Python 遞迴深度)。
 - **CSES 練習**:每篇結尾列 2–3 題 CSES Problem Set 對應題(題名 + 連結),**只列作者實際 AC 過的**;作者踩過的 WA / TLE 是最好的反思素材。
 - **每篇固定一段「這招在哪裡上班」**:對得上就接站內文章;對不上就誠實寫「工作上很少見,學它是為了 X」,不准硬湊。
