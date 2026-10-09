@@ -47,6 +47,14 @@ export const seriesList: SeriesInfo[] = [
     color: 'var(--hue-green)',
   },
   {
+    slug: 'cphb',
+    name: "Competitive Programmer's Handbook 讀書筆記",
+    enName: "Competitive Programmer's Handbook — Reading Notes",
+    blurb: '讀 CSES 的《Competitive Programmer\'s Handbook》——每篇從暴力解開始,問它浪費了什麼;每個演算法都做成可以一步一步操作的動畫,再接回工作上真的用得到的地方。',
+    enBlurb: "Reading the CSES Competitive Programmer's Handbook — every post starts from the brute-force solution and asks what it wastes; every algorithm comes as a step-by-step animation you can drive yourself, then gets tied back to where it shows up at work.",
+    color: 'var(--hue-green)',
+  },
+  {
     slug: 'redis',
     name: 'Redis 學習筆記',
     enName: 'Redis — Learning Notes',

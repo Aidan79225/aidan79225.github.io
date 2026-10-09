@@ -47,7 +47,7 @@
 
 | # | slug | 章 | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|---|
-| 1 | `cphb-complexity` | Ch1–2 Introduction / Time complexity | 看到 n,就知道該寫什麼:時間複雜度與最大子陣列和 | 系列開場:競賽 = 看結構的訓練、本系列的三個承諾(上班對照/EM 視角/AI 時代)。複雜度計算規則;**從 n 反推可接受的複雜度**(照原書表:n ≤ 10 → n!、≤ 20 → 2^n、≤ 500 → n³、≤ 5000 → n²、≤ 10^6 → n log n 或 n)= 工程上的 back-of-the-envelope;最大子陣列和 O(n³) → O(n²) → O(n)(Kadane)當全系列的範本:暴力解浪費了什麼。招聘角度:演算法面試在量什麼。兩次加速撿回的都是【重疊】 —— 接 `[[sre-production-readiness]]`(容量估算)、`[[ai-review-craft]]`、`[[sql-explain]]` | 🚧 ★(草稿 2026-10-09:正文、兩張圖(作者已確認)、兩個動畫、反思完成;待確認 CSES 練習題是否 AC 過) |
+| 1 | `cphb-complexity` | Ch1–2 Introduction / Time complexity | 看到 n,就知道該寫什麼:時間複雜度與最大子陣列和 | 系列開場:競賽 = 看結構的訓練、本系列的三個承諾(上班對照/EM 視角/AI 時代)。複雜度計算規則;**從 n 反推可接受的複雜度**(照原書表:n ≤ 10 → n!、≤ 20 → 2^n、≤ 500 → n³、≤ 5000 → n²、≤ 10^6 → n log n 或 n)= 工程上的 back-of-the-envelope;最大子陣列和 O(n³) → O(n²) → O(n)(Kadane)當全系列的範本:暴力解浪費了什麼。招聘角度:演算法面試在量什麼。兩次加速撿回的都是【重疊】 —— 接 `[[sre-production-readiness]]`(容量估算)、`[[ai-review-craft]]`、`[[sql-explain]]` | ✅ 已發布(2026-10-09;作者複習後要重寫,之後再更新並補英文版) |
 | 2 | `cphb-sorting` | Ch3 Sorting | 排序是最便宜的結構 | O(n log n) 下界(比較排序的決策樹)與 counting sort 的例外;**排序本身就是在製造結構**(排好之後找重複、找配對都變線性);C++ `sort` / 自訂比較子的嚴格弱序陷阱;二分搜尋三種寫法 + **對答案二分**(單調判定函數)。上班:`git bisect`、B-tree 索引的 range scan、SSTable 為什麼要排序。【順序】【單調】 —— 接 `[[sql-index]]`、`[[ddia-storage-engines]]` | ⬜ |
 | 3 | `cphb-data-structures` | Ch4 Data structures | 選容器就是選複雜度 | vector 攤銷倍增、deque、`set`/`map`(平衡樹,有序、log n)vs `unordered_*`(雜湊,平均 O(1)、最壞與被攻擊時退化)、`priority_queue`、bitset;**Comparison to sorting:很多時候先排序比用 set 更快**(常數與快取友善)。上班:Redis Sorted Set、有序 vs 雜湊索引、hash flooding。可選:Kotlin `TreeMap`/`HashMap` 對照 —— 接 `[[redis-data-structures]]`、`[[sql-index]]` | ⬜ |
 | 4 | `cphb-complete-search` | Ch5 Complete search | 暴力也要暴力得有章法 | 產生子集(遞迴 / 位元)、產生排列(`next_permutation`)、回溯(n 皇后)、**剪枝**(格子路徑計數的五刀)、**折半搜尋**(2^n → 2^(n/2))。主軸的【極限】:當結構不存在時怎麼止損。上班:Fisher–Yates 洗牌(lottery)、組合爆炸的設定測試 —— 接 `[[lottery]]`、`[[rezero-promotion]]` | ⬜ |
@@ -250,10 +250,10 @@
 - **cross-link 是重點**:DAG ↔ `[[airflow-first-dag]]`;雙指標 ↔ `[[ddia-batch]]`;前綴和 ↔ `[[sql-window]]`;DP ↔ `[[rezero-promotion]]`;位元 ↔ `[[redis-data-structures]]`;貪婪 ↔ `[[travel-split]]`;第 1 篇與第 28 篇 ↔ `[[ai-review-craft]]`。
 - Git:開 branch → push → PR,不直接動 master(CLAUDE.md 硬規矩)。
 
-## 第一篇發布時的註冊(待辦)
-- `src/data/series.ts` 加一筆:`slug: 'cphb'`、`name` 與 front matter 一字不差、`enName: "Competitive Programmer's Handbook — Reading Notes"`(同步 `docs/en-translation-glossary.md` A 區)、blurb / enBlurb、color。
-- `src/components/Graph.jsx` 的 `SERIES` 加 `["Competitive Programmer's Handbook 讀書筆記", <hue>, 'CPHB']`。
-- `src/pages/start.astro`:**待決定放哪一層**——現有的 Domain / Application / Infrastructure / 橫切 / 戰爭故事 / 技術之外都不完全對。傾向在最底層新增「電腦科學地基」,或放進橫切;第一篇發布前跟作者定。
+## 系列註冊(2026-10-09 已完成)
+- `src/data/series.ts`:`slug: 'cphb'`、enName `Competitive Programmer's Handbook — Reading Notes`(`docs/en-translation-glossary.md` A 區已同步)、color green。
+- `src/components/Graph.jsx`:`['…', 'green', 'CPHB']`。
+- `src/pages/start.astro`:放在 **核心 · Domain** 層,標籤「演算法地基 · 」——演算法與複雜度是比 SQL / DDIA 更底下的可遷移觀念,不另開新層。
 
 ## 動筆前要跟作者確認的素材(2026-10-09 開檔)
 - ~~作者的競賽 / 刷題經歷~~ → 已收到(2026-10-09),見〈作者素材〉。

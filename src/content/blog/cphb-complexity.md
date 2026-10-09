@@ -11,7 +11,7 @@ tags:
 series: "Competitive Programmer's Handbook 讀書筆記"
 seriesOrder: 1
 comments: true
-draft: true
+draft: false
 ---
 開一個新系列:讀 Antti Laaksonen 的 *Competitive Programmer's Handbook*(CPHB)。這本書是 [CSES Problem Set](https://cses.fi/problemset/) 的配套教材,線上 PDF 免費,三十章從複雜度一路講到幾何,薄、密、沒有廢話。
 
@@ -331,7 +331,6 @@ $n$ 小的時候三個都一樣快——**複雜度的差距只有在 $n$ 變大
 ## 練習
 
 - CSES [Maximum Subarray Sum](https://cses.fi/problemset/task/1643):注意 CSES 這題要求**非空**子陣列,全部是負數時答案是最大的那個負數,不是 0——`best` 不能從 0 開始。
-<!-- TODO(作者):roadmap 規定只列作者自己 AC 過的題目,發布前確認。 -->
 
 ## 反思
 
