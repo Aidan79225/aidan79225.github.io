@@ -239,6 +239,7 @@
 - SVG 內不可有空行;wikilink label 內不可放 inline code / 反引號;figcaption 內不放 `[[wikilink]]`,要連結用 `<a href>`。
 - 數學式用 KaTeX(複雜度 `$O(n \log n)$`);證明只留直覺,形式證明指回原書章節。
 - 台灣用語(見 `docs/zh-tw-style-guide.md`)。
+- 發文前在 Chromium 實際操作過動畫:深淺兩種主題、手機寬度(375px)不出現水平捲動、鍵盤可操作。
 - **貫穿主軸**:每篇從暴力解開始、問「它浪費了什麼」,結尾點名用到的結構標記(【單調】【重疊】【可合併】【順序】【交換】【極限】)。
 - **cross-link 是重點**:DAG ↔ `[[airflow-first-dag]]`;雙指標 ↔ `[[ddia-batch]]`;前綴和 ↔ `[[sql-window]]`;DP ↔ `[[rezero-promotion]]`;位元 ↔ `[[redis-data-structures]]`;貪婪 ↔ `[[travel-split]]`;第 1 篇與第 28 篇 ↔ `[[ai-review-craft]]`。
 - Git:開 branch → push → PR,不直接動 master(CLAUDE.md 硬規矩)。
