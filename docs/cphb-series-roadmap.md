@@ -80,7 +80,7 @@
 | 21 | `cphb-matrices` | Ch23 Matrices | 線性遞迴,log n 步走完 | 矩陣運算、**矩陣快速冪**解線性遞迴(費氏數列 O(log n))、圖與矩陣(鄰接矩陣的 k 次方 = 長度 k 的路徑數)。【可合併】(矩陣乘法有結合律)—— 接 `[[cphb-number-theory]]`、`[[cphb-dag]]` | ⬜ |
 | 22 | `cphb-probability` | Ch24 Probability | 隨機不是運氣,是工具 | 期望值的線性性、事件與條件機率、隨機變數(幾何分布)、馬可夫鏈、**隨機化演算法**(Monte Carlo vs Las Vegas、快速選擇、圖著色)。上班:HyperLogLog、Bloom filter 誤判率、retry jitter、可重現的隨機(lottery 的 seed) —— 接 `[[redis-data-structures]]`、`[[redis-cache-patterns]]`、`[[lottery]]`、`[[ddia-storage-engines]]` | ⬜ |
 | 23 | `cphb-game-theory` | Ch25 Game theory | 必勝態與必敗態 | 遊戲狀態(勝/敗態的遞推)、Nim(XOR = 0 必敗)、Sprague–Grundy 定理(把多個遊戲合成一個)。上班對照誠實寫:幾乎沒有;學它是因為「把狀態分類再遞推」與 DP 同構 —— 接 `[[cphb-dp]]`、`[[cphb-bits]]` | ⬜ |
-| 24 | `cphb-strings` | Ch26 String algorithms | 字串比對的三種偷懶法 | 字串術語(前綴、後綴、週期)、trie、**字串雜湊**(多項式雜湊、生日悖論與碰撞機率、雙模數)、Z 演算法(線性找所有出現位置)。上班:自動完成 = trie、內容去重與 rolling hash(rsync / 分塊去重)、log 搜尋 —— 接 `[[cphb-probability]]`、`[[obs-logs-loki]]` | ⬜ |
+| 24 | `cphb-strings` | Ch26 String algorithms | 字串比對的三種偷懶法 | 字串術語(前綴、後綴、週期)、trie、**字串雜湊**(多項式雜湊、生日悖論與碰撞機率、雙模數)、Z 演算法(線性找所有出現位置)。**超出原書的一段:壓縮 trie**——把只有一個子節點的鏈併成一條邊(邊上存字串片段),節點數從「總字元數」降到「≤ 2 × 片語數」。上班(**作者第一手,見〈作者素材〉**):在 mobile 上實作本機的片語前綴快速搜尋,用的就是壓縮 trie;另有內容去重與 rolling hash(rsync / 分塊去重)、log 搜尋 —— 接 `[[cphb-probability]]`、`[[obs-logs-loki]]` | 📝 |
 | 25 | `cphb-sqrt` | Ch27 Square root algorithms | √n:兩種爛解法的中間值 | 平方根分解(分塊)、依大小換演算法(小的暴力、大的另解)、整數分拆、Mo's algorithm(離線排序查詢)。【順序】+【極限】:結構不夠漂亮時的工程折衷 —— 接 `[[cphb-range-queries]]` | ⬜ |
 | 26 | `cphb-segment-tree-advanced` | Ch28 Segment trees revisited | 線段樹的進階:延遲、持久、二維 | 延遲標記(區間更新)、動態開點與**持久化線段樹**(只複製改到的那條路徑)、節點存資料結構、二維線段樹。上班:持久化 = 不可變快照(MVCC、Git 物件、copy-on-write)—— 接 `[[cphb-range-queries]]`、`[[ddia-transactions]]`、`[[sql-transactions]]` | ⬜ |
 | 27 | `cphb-geometry` | Ch29 Geometry | 外積解決一半的幾何題 | 用複數表示點、外積判斷左右 / 線段相交、多邊形面積(鞋帶公式、Pick 定理)、距離函數(曼哈頓距離旋轉 45° 變 Chebyshev)。【交換】:換座標系 —— 接 `[[cphb-sweep-line]]` | ⬜ |
@@ -146,7 +146,7 @@
 | 21 | `matrix-pow` | 費氏數列:矩陣平方 log n 次 |
 | 22 | `monte-carlo-pi`、`fisher-yates` | 隨機點估 π;洗牌每一步的交換(接 lottery) |
 | 23 | `nim` | 每堆的二進位 XOR,必勝的拿法 |
-| 24 | `trie`、`z-algorithm` | trie 一個字一個字長出來;Z 盒子往右推 |
+| 24 | `trie`、`compressed-trie`、`z-algorithm` | trie 一個字一個字長出來;**同一組片語建普通 trie 與壓縮 trie 並排**(lane + 節點數計數條),看單一子節點的鏈被併成一條邊,再輸入前綴看兩邊各走幾步、怎麼在邊的中間停下來;Z 盒子往右推 |
 | 25 | `sqrt-blocks`、`mo` | 分塊查詢;Mo 的查詢排序讓指標少走 |
 | 26 | `lazy-segment-tree` | 延遲標記往下推的時機 |
 | 27 | `cross-product`、`shoelace` | 外積正負 = 左轉右轉;鞋帶公式逐邊累加 |
@@ -216,6 +216,7 @@
 | 必勝態 / 必敗態 | winning state / losing state | Ch25 |
 | Grundy 數 | Grundy number | Ch25;Sprague–Grundy 定理寫英文人名 |
 | 字典樹 | trie | Ch26;第一次出現寫「trie(字典樹)」,之後寫 trie |
+| 壓縮 trie | compressed trie / radix tree | 原書沒有,#24 的延伸段;第一次出現註明「又稱 radix tree」,之後寫壓縮 trie。不寫「基數樹」「壓縮字典樹」 |
 | 字串雜湊 | string hashing | Ch26 |
 | 平方根分解 | square root decomposition | Ch27;Mo's algorithm 寫英文 |
 | 外積 | cross product | Ch29 |
@@ -254,6 +255,21 @@
 
 ## 動筆前要跟作者確認的素材(2026-10-09 開檔)
 - 作者的競賽 / 刷題經歷(有沒有打過比賽、刷過 CSES 幾題、從什麼時候開始)——決定第 1 篇的開場和反思的可信度。
-- 工作上**真的**用到演算法的那幾次(例如 rezero 的優惠組合、分帳、抽籤之外還有沒有)。
+- 工作上**真的**用到演算法的那幾次(例如 rezero 的優惠組合、分帳、抽籤之外還有沒有)。→ 已收到一則,見〈作者素材〉;還有其他的再補。
 - 以面試官 / EM 身分出演算法題的經驗與看法(第 1 篇「演算法面試在量什麼」要用)。
 - 寫作節奏:邊刷題邊寫(每篇先 AC 對應的 CSES 題)還是先寫完一批再發。
+
+## 作者素材(口述,入檔即標日期)
+
+### 2026-10-09:mobile 本機片語前綴搜尋 = 壓縮 trie
+- **作者口述**:工作上實作過 mobile 上的本機(local)前綴快速搜尋,搜的是片語,資料結構用的是壓縮 trie(compressed trie)。
+- **用在**:#24 `cphb-strings` 的「上班」段與反思(主場);#1 `cphb-complexity` 可以一句帶過,當「工作上真的用到演算法」的例子;#3 `cphb-data-structures`「選容器就是選複雜度」也可以引用。
+- **為什麼值錢**:原書 Ch26 只講普通 trie,壓縮 trie 是作者自己補上的延伸,也是網路上 CPHB 筆記不會有的段落。
+- **動筆前要再問作者的細節**(問到才寫,不要腦補):
+  1. 片語的量級(幾千、幾萬、幾十萬筆?)、語言(中文、英文、混合?中文是以字為單位還是注音 / 拼音?)。
+  2. 為什麼要做在本機、不打 API:離線?延遲?隱私?
+  3. 為什麼選壓縮 trie:記憶體限制?跟哪些方案比較過(普通 trie、排序陣列 + 二分搜尋、SQLite FTS、Lucene 之類)?
+  4. 平台與語言(Android / Kotlin?iOS?跨平台?),資料是內建在 app 裡、還是下載更新?怎麼序列化 / 載入?
+  5. 搜尋結果怎麼排序(熱門度、權重、最近使用)?每個節點有沒有存 top-k?
+  6. 有沒有量過效果(記憶體省多少、查詢延遲、啟動時建樹要多久)?
+  7. 踩過的坑或後來改過的地方——這通常是反思最好的料。
