@@ -16,6 +16,7 @@
 | `fode` | Fundamentals of Data Engineering 讀書筆記 | Fundamentals of Data Engineering — Reading Notes |
 | `sql` | SQL 我以為我懂 | SQL: I Thought I Knew It |
 | `ddia` | Designing Data-Intensive Applications 讀書筆記 | Designing Data-Intensive Applications — Reading Notes |
+| `cphb` | Competitive Programmer's Handbook 讀書筆記 | Competitive Programmer's Handbook — Reading Notes |
 | `redis` | Redis 學習筆記 | Redis — Learning Notes |
 | `kafka` | Kafka 學習筆記 | Kafka — Learning Notes |
 | `spark` | Spark 學習筆記 | Spark — Learning Notes |

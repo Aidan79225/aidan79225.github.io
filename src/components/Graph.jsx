@@ -10,6 +10,7 @@ const SERIES = [
   ['Fundamentals of Data Engineering 讀書筆記', 'blue', 'FoDE'],
   ['SQL 我以為我懂', 'cyan', 'SQL'],
   ['Designing Data-Intensive Applications 讀書筆記', 'indigo', 'DDIA'],
+  ["Competitive Programmer's Handbook 讀書筆記", 'green', 'CPHB'],
   ['Spark 學習筆記', 'orange', 'Spark'],
   ['Kafka 學習筆記', 'purple', 'Kafka'],
   ['Airflow 學習筆記', 'green', 'Airflow'],

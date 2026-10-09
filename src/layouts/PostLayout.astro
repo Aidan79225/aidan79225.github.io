@@ -6,6 +6,7 @@ import BaseLayout from './BaseLayout.astro';
 import AuthorCard from '../components/AuthorCard.astro';
 import Comments from '../components/Comments.astro';
 import Toc from '../components/Toc.astro';
+import AlgoPlayers from '../components/AlgoPlayers.astro';
 import { getBacklinks } from '../lib/backlinks';
 import { groupBySection } from '../lib/group-backlinks.mjs';
 import { excerpt } from '../lib/post';
@@ -17,6 +18,8 @@ interface Props { post: CollectionEntry<'blog'>; headings?: MarkdownHeading[]; }
 const { post, headings = [] } = Astro.props;
 const { title, date, updated, category, tags = [], series, description } = post.data;
 const metaDescription = description ?? excerpt(post.body ?? '', 140);
+// 逐步動畫的播放器只放進真的有用到的文章(見 AlgoPlayers.astro)。
+const hasAlgoPlayer = (post.body ?? '').includes('data-algo=');
 const tagCounts = await getTagCounts();
 
 const lang = postLang(post);
@@ -125,6 +128,7 @@ const showToc = tocHeadings.length >= 3;
     <div class="prose max-w-none">
       <slot />
     </div>
+    {hasAlgoPlayer && <AlgoPlayers />}
 
     {series && (prevPost || nextPost) && (
       <nav class="flex justify-between gap-4 mt-8 text-sm">

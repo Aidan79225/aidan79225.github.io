@@ -1,0 +1,323 @@
+---
+// 文章內的逐步動畫。markdown 裡寫
+//   <div data-algo="kadane" data-input="-1, 2, 4, -3"><p>(互動動畫需要 JavaScript)</p></div>
+// 這個元件只在內文有 data-algo 的文章才會被 PostLayout 放進來;播放器與演算法模組
+// 都是動態 import,捲到附近才下載。沒有 JS 時保留 div 裡原本的文字。
+---
+<script>
+  import { ALGOS } from '../lib/algo/registry.mjs';
+
+  const lang = document.documentElement.lang.toLowerCase().startsWith('en') ? 'en' : 'zh-hant';
+
+  async function mount(el: HTMLElement) {
+    const load = ALGOS[el.dataset.algo as keyof typeof ALGOS];
+    if (!load) return;
+    const [{ mountPlayer }, mod] = await Promise.all([import('../lib/algo/player.mjs'), load()]);
+    mountPlayer(el, mod.default, lang);
+  }
+
+  const players = document.querySelectorAll<HTMLElement>('[data-algo]');
+  const io = new IntersectionObserver(
+    (entries) => {
+      for (const e of entries) {
+        if (!e.isIntersecting) continue;
+        io.unobserve(e.target);
+        mount(e.target as HTMLElement);
+      }
+    },
+    { rootMargin: '400px' },
+  );
+  players.forEach((el) => io.observe(el));
+</script>
+
+<style is:global>
+  .algo-player {
+    --algo-current: var(--hue-amber);
+    --algo-best: var(--hue-green);
+    margin: 1.5rem 0;
+    padding: 1rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.5rem;
+    background: var(--color-surface);
+    font-size: 0.9rem;
+  }
+  .algo-player:focus-visible {
+    outline: 2px solid var(--color-accent);
+    outline-offset: 2px;
+  }
+  .algo-stage {
+    display: grid;
+    gap: 1rem;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  @media (min-width: 720px) {
+    .algo-stage {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+  .prose .algo-code {
+    margin: 0;
+    padding: 0.5rem 0;
+    list-style: none;
+    background: var(--color-base);
+    border: 1px solid var(--color-line);
+    border-radius: 0.375rem;
+    overflow-x: auto;
+  }
+  .prose .algo-code li {
+    margin: 0;
+    line-height: 1.6;
+    padding: 0.1rem 0.75rem;
+    border-left: 3px solid transparent;
+    white-space: pre;
+  }
+  .prose .algo-code li code {
+    font-size: 0.8rem;
+    background: none;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+    color: var(--color-ink);
+  }
+  .prose .algo-code li code::before,
+  .prose .algo-code li code::after {
+    content: none;
+  }
+  .prose .algo-code li.is-active {
+    border-left-color: var(--color-accent);
+    background: color-mix(in srgb, var(--color-accent) 20%, transparent);
+  }
+  .algo-cells {
+    display: flex;
+    gap: 0.25rem;
+    overflow-x: auto;
+    padding: 0.75rem 0 0.25rem;
+  }
+  .algo-cell {
+    position: relative;
+    flex: 0 0 2.4rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding-bottom: 0.5rem;
+    border-radius: 0.25rem;
+  }
+  .algo-value {
+    width: 100%;
+    padding: 0.45rem 0;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    font-weight: 600;
+    border: 1px solid var(--color-line);
+    border-radius: 0.25rem;
+    background: var(--color-base);
+    transition: border-color 0.2s, transform 0.2s;
+  }
+  .algo-index {
+    font-size: 0.7rem;
+    color: var(--color-muted);
+  }
+  /* 兩條區間色帶畫在格子底下:上面一條是 current,下面一條是 best */
+  .algo-cell.in-current .algo-value {
+    background: color-mix(in srgb, var(--algo-current) 25%, var(--color-base));
+  }
+  .algo-cell.in-best::after {
+    content: '';
+    position: absolute;
+    left: -0.125rem;
+    right: -0.125rem;
+    bottom: 0;
+    height: 0.3rem;
+    background: var(--algo-best);
+  }
+  .algo-cell.is-cursor .algo-value {
+    border: 2px solid var(--color-accent);
+    transform: translateY(-0.25rem);
+  }
+  .prose .algo-legend {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 1rem;
+    margin: 0.25rem 0 0.75rem;
+    font-size: 0.8rem;
+    color: var(--color-muted);
+  }
+  .algo-swatch {
+    display: inline-block;
+    width: 0.8rem;
+    height: 0.8rem;
+    margin-right: 0.3rem;
+    vertical-align: -0.1rem;
+    border-radius: 0.15rem;
+  }
+  .algo-swatch.algo-current {
+    background: color-mix(in srgb, var(--algo-current) 60%, var(--color-base));
+  }
+  .algo-swatch.algo-best {
+    background: var(--algo-best);
+  }
+  .prose .algo-vars {
+    display: grid;
+    grid-template-columns: max-content 1fr;
+    gap: 0.2rem 0.75rem;
+    margin: 0;
+    font-family: ui-monospace, monospace;
+  }
+  .prose .algo-vars dt {
+    margin: 0;
+    color: var(--color-muted);
+    font-weight: 400;
+  }
+  .prose .algo-vars dd {
+    margin: 0;
+    padding: 0;
+    font-weight: 600;
+  }
+  .prose .algo-note {
+    min-height: 3em;
+    margin: 0.75rem 0;
+    padding: 0.5rem 0.75rem;
+    border-left: 3px solid var(--color-accent);
+    background: var(--color-base);
+  }
+  .algo-controls,
+  .algo-input {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+  }
+  .algo-player button,
+  .algo-player select,
+  .algo-player input[type='text'] {
+    min-height: 2.25rem;
+    padding: 0.25rem 0.6rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.375rem;
+    background: var(--color-base);
+    color: var(--color-ink);
+    font: inherit;
+  }
+  .algo-player button {
+    min-width: 2.5rem;
+    cursor: pointer;
+  }
+  .algo-player button:hover:not(:disabled) {
+    border-color: var(--color-accent);
+  }
+  .algo-player button:disabled {
+    opacity: 0.4;
+    cursor: default;
+  }
+  .algo-player button.algo-play {
+    background: var(--color-accent);
+    border-color: var(--color-accent);
+    color: #fff;
+  }
+  .algo-player input[type='range'] {
+    flex: 1 1 8rem;
+    accent-color: var(--color-accent);
+  }
+  .algo-player input[type='text'] {
+    width: min(16rem, 100%);
+  }
+  .algo-counter {
+    font-variant-numeric: tabular-nums;
+    color: var(--color-muted);
+  }
+  .prose .algo-error {
+    margin: 0.25rem 0 0;
+    color: var(--hue-red);
+  }
+  .prose .algo-error:empty {
+    display: none;
+  }
+  .prose .algo-hint {
+    margin: 0.5rem 0 0;
+    font-size: 0.75rem;
+    color: var(--color-muted);
+  }
+  /* 並排比較:每條 lane 自己一組程式碼、陣列、變數、計數條 */
+  .algo-lanes {
+    display: grid;
+    gap: 0.75rem;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  @media (min-width: 640px) {
+    .algo-lanes {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    }
+  }
+  .algo-lane {
+    min-width: 0;
+    padding: 0.75rem;
+    border: 1px solid var(--color-line);
+    border-radius: 0.375rem;
+    background: color-mix(in srgb, var(--color-base) 40%, transparent);
+  }
+  .prose .algo-lane-title {
+    margin: 0 0 0.5rem;
+    font-size: 0.95rem;
+  }
+  .algo-lane.is-done .algo-lane-title::after {
+    content: ' ✓';
+    color: var(--algo-best);
+  }
+  .algo-lane .algo-code li code {
+    font-size: 0.72rem;
+  }
+  .algo-lane .algo-cell {
+    flex-basis: 2rem;
+  }
+  .algo-lane .algo-vars {
+    grid-template-columns: repeat(4, max-content 1fr);
+    margin-top: 0.25rem;
+  }
+  .algo-meter {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    margin-top: 0.5rem;
+    font-size: 0.8rem;
+    font-variant-numeric: tabular-nums;
+  }
+  .algo-meter[hidden] {
+    display: none;
+  }
+  .algo-meter-track {
+    flex: 1;
+    height: 0.6rem;
+    border-radius: 999px;
+    background: var(--color-base);
+    border: 1px solid var(--color-line);
+    overflow: hidden;
+  }
+  .algo-meter-fill {
+    display: block;
+    height: 100%;
+    background: var(--color-accent);
+    transition: width 0.2s;
+  }
+  .algo-lane.is-done .algo-meter-fill {
+    background: var(--algo-best);
+  }
+  .algo-meter-text {
+    flex: 0 0 auto;
+    color: var(--color-muted);
+  }
+  .prose .algo-lane-note {
+    min-height: 2.6em;
+    margin: 0.5rem 0 0;
+    font-size: 0.8rem;
+    color: var(--color-muted);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .algo-meter-fill {
+      transition: none;
+    }
+    .algo-value {
+      transition: none;
+    }
+  }
+</style>
