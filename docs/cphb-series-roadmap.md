@@ -47,7 +47,7 @@
 
 | # | slug | 章 | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|---|
-| 1 | `cphb-complexity` | Ch1–2 Introduction / Time complexity | 看到 n,就知道該寫什麼 | 系列開場:競賽 = 看結構的訓練、本系列的三個承諾(上班對照/EM 視角/AI 時代)。複雜度計算規則;**從 n 反推可接受的複雜度**(n ≤ 10 → n!、≤ 20 → 2^n、≤ 10^5 → n log n、≤ 10^6 → n)= 工程上的 back-of-the-envelope;最大子陣列和 O(n³) → O(n²) → O(n)(Kadane)當全系列的範本:暴力解浪費了什麼。招聘角度:演算法面試在量什麼。【單調】【重疊】起手 —— 接 `[[sre-production-readiness]]`(容量估算)、`[[ai-review-craft]]`、`[[sql-explain]]` | ⬜ ★ |
+| 1 | `cphb-complexity` | Ch1–2 Introduction / Time complexity | 看到 n,就知道該寫什麼:時間複雜度與最大子陣列和 | 系列開場:競賽 = 看結構的訓練、本系列的三個承諾(上班對照/EM 視角/AI 時代)。複雜度計算規則;**從 n 反推可接受的複雜度**(照原書表:n ≤ 10 → n!、≤ 20 → 2^n、≤ 500 → n³、≤ 5000 → n²、≤ 10^6 → n log n 或 n)= 工程上的 back-of-the-envelope;最大子陣列和 O(n³) → O(n²) → O(n)(Kadane)當全系列的範本:暴力解浪費了什麼。招聘角度:演算法面試在量什麼。兩次加速撿回的都是【重疊】 —— 接 `[[sre-production-readiness]]`(容量估算)、`[[ai-review-craft]]`、`[[sql-explain]]` | 🚧 ★(草稿 2026-10-09:正文、兩張圖、兩個動畫完成;反思待作者素材) |
 | 2 | `cphb-sorting` | Ch3 Sorting | 排序是最便宜的結構 | O(n log n) 下界(比較排序的決策樹)與 counting sort 的例外;**排序本身就是在製造結構**(排好之後找重複、找配對都變線性);C++ `sort` / 自訂比較子的嚴格弱序陷阱;二分搜尋三種寫法 + **對答案二分**(單調判定函數)。上班:`git bisect`、B-tree 索引的 range scan、SSTable 為什麼要排序。【順序】【單調】 —— 接 `[[sql-index]]`、`[[ddia-storage-engines]]` | ⬜ |
 | 3 | `cphb-data-structures` | Ch4 Data structures | 選容器就是選複雜度 | vector 攤銷倍增、deque、`set`/`map`(平衡樹,有序、log n)vs `unordered_*`(雜湊,平均 O(1)、最壞與被攻擊時退化)、`priority_queue`、bitset;**Comparison to sorting:很多時候先排序比用 set 更快**(常數與快取友善)。上班:Redis Sorted Set、有序 vs 雜湊索引、hash flooding。可選:Kotlin `TreeMap`/`HashMap` 對照 —— 接 `[[redis-data-structures]]`、`[[sql-index]]` | ⬜ |
 | 4 | `cphb-complete-search` | Ch5 Complete search | 暴力也要暴力得有章法 | 產生子集(遞迴 / 位元)、產生排列(`next_permutation`)、回溯(n 皇后)、**剪枝**(格子路徑計數的五刀)、**折半搜尋**(2^n → 2^(n/2))。主軸的【極限】:當結構不存在時怎麼止損。上班:Fisher–Yates 洗牌(lottery)、組合爆炸的設定測試 —— 接 `[[lottery]]`、`[[rezero-promotion]]` | ⬜ |
@@ -161,6 +161,8 @@
 | 中文用詞 | 英文 | 備註 |
 |---|---|---|
 | 時間複雜度 | time complexity | Ch2;寫 O(n log n),不寫「時間複雜性」 |
+| 常數因子 | constant factor | Ch2;複雜度藏起來的部分 |
+| 最大子陣列和 | maximum subarray sum | Ch2;「子陣列」= 連續的一段,不寫「子數組」「子序列」(子序列不必連續) |
 | 暴力解 | brute force / complete search | 全系列主軸用詞;Ch5 的章名 complete search 譯「完全搜尋」 |
 | 完全搜尋 | complete search | Ch5 |
 | 回溯 | backtracking | Ch5 |
