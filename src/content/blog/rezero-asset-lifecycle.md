@@ -64,7 +64,7 @@ draft: false
 
 ## 活:一張表,和一張從沒理賠過的保險單
 
-圖存好了,誰記得它?**`image_metadata`**:存 GCS path,加上 content type + object id——[[rezero-cart-order|泛型外鍵]]在這個系統的**第四次登場**(購物車來源、[[rezero-risk|黑名單]]、留言溯源之後)。同時 product 和 style 也直接存 image_metadata 的 id。
+圖存好了,誰記得它?**`image_metadata`**:存 GCS path,加上 content type + object id——[[rezero-cart-order|泛型外鍵]]在這個系統的**第四次登場**(購物車來源、留言溯源、[[rezero-risk|黑名單]]之後)。同時 product 和 style 也直接存 image_metadata 的 id。
 
 注意這是**雙向引用**,而兩個方向的存在理由完全不同:**正向**(product → image)是為了讀取服務,每次出商品資料都在用;**反向**(image → 擁有者)只為一件事——**清理**。GCS 不在資料庫的管轄範圍裡,外鍵約束保護不了它;這張表等於把 FK 的紀律**手動延伸到 blob storage 上**——[[rezero-reconciliation|拆開的資料庫]]又補回了一塊:DB 有 pg 自己管的 TOAST 與 vacuum,我們的「大物件」在 GCS,就得自己記帳、自己回收。
 
