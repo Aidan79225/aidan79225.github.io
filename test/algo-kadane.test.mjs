@@ -19,7 +19,7 @@ test('the book example ends with best = 10 over array[1..5]', () => {
   const last = fs.at(-1);
   assert.equal(varOf(last, 'best'), 10);
   assert.deepEqual(last.ranges, [{ from: 1, to: 5, kind: 'best' }]);
-  assert.equal(last.line, 5);
+  assert.equal(last.line, 4);
 });
 
 test('one init frame, two frames per element, one done frame', () => {

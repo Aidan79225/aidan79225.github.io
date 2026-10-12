@@ -6,22 +6,19 @@
 import { parseInput, randomInput, DEFAULT_INPUT, MAX_LENGTH } from './kadane.mjs';
 
 const BRUTE_CODE = [
-  'int best = 0;',
-  'for (int a = 0; a < n; a++) {',
-  '    int sum = 0;',
-  '    for (int b = a; b < n; b++) {',
-  '        sum += array[b];',
-  '        best = max(best, sum);',
-  '    }',
-  '}',
+  'best = 0',
+  'for a in range(n):',
+  '    sum = 0',
+  '    for b in range(a, n):',
+  '        sum += array[b]',
+  '        best = max(best, sum)',
 ];
 
 const KADANE_CODE = [
-  'int best = 0, sum = 0;',
-  'for (int k = 0; k < n; k++) {',
-  '    sum = max(array[k], sum + array[k]);',
-  '    best = max(best, sum);',
-  '}',
+  'best = sum = 0',
+  'for k in range(n):',
+  '    sum = max(array[k], sum + array[k])',
+  '    best = max(best, sum)',
 ];
 
 const TEXT = {

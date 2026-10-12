@@ -3,12 +3,11 @@
 // 純函式、不碰 DOM:播放器(src/lib/algo/player.mjs)只負責把 frame 畫出來。
 
 const CODE = [
-  'int best = 0, sum = 0;',
-  'for (int k = 0; k < n; k++) {',
-  '    sum = max(array[k], sum + array[k]);',
-  '    best = max(best, sum);',
-  '}',
-  'cout << best << "\\n";',
+  'best = sum = 0',
+  'for k in range(n):',
+  '    sum = max(array[k], sum + array[k])',
+  '    best = max(best, sum)',
+  'print(best)',
 ];
 
 const NOTES = {
@@ -113,7 +112,7 @@ export function frames(array, lang = 'zh-hant') {
       snapshot(3, t.keep(sum, best), k, [range(start, k, 'current')]);
     }
   }
-  snapshot(5, t.done(best, bestLo, bestHi), -1);
+  snapshot(4, t.done(best, bestLo, bestHi), -1);
   return out;
 }
 

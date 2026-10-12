@@ -62,8 +62,10 @@ const h = (tag, attrs = {}, ...children) => {
 // 一條 lane = 一份程式碼 + 一個陣列 + 變數表(+ 並排時的標題、計數條、lane 說明)。
 // 單一演算法就是只有一條、沒有標題的 lane。
 function laneView({ title, code: lines }, meterLabel) {
+  // 沒有程式碼的 lane(例如 counting sort 的計數陣列)只畫陣列和變數。
   const code = h('ol', { class: 'algo-code', 'aria-label': 'code' });
-  lines.forEach((line) => code.append(h('li', {}, h('code', {}, line))));
+  (lines ?? []).forEach((line) => code.append(h('li', {}, h('code', {}, line))));
+  if (!lines) code.hidden = true;
   const cells = h('div', { class: 'algo-cells' });
   const vars = h('dl', { class: 'algo-vars' });
   const laneNote = h('p', { class: 'algo-lane-note' });
@@ -125,6 +127,9 @@ export function mountPlayer(root, algo, lang) {
   const pick = (v) => (v && typeof v === 'object' ? (v[lang] ?? v['zh-hant']) : v);
   const legend = pick(algo.legend) ?? {};
   const initial = algo.parseInput(root.dataset.input ?? '') ?? algo.defaultInput;
+  // 輸入框的文字格式由模組決定(預設是逗號分隔的陣列);模組也可以給自己的錯誤訊息。
+  const fmt = (v) => (algo.formatInput ? algo.formatInput(v) : v.join(', '));
+  const invalidMsg = () => pick(algo.invalid) ?? t.invalid(algo.maxLength);
 
   let frames = [];
   let index = 0;
@@ -133,7 +138,7 @@ export function mountPlayer(root, algo, lang) {
 
   // ── 版面 ──
   const lanes = (algo.lanes ?? [{ code: algo.code }]).map((def) =>
-    laneView({ title: pick(def.title), code: def.code }, pick(algo.meterLabel)),
+    laneView({ title: pick(def.title), code: def.code, meter: def.meter }, pick(algo.meterLabel)),
   );
   const note = h('p', { class: 'algo-note', 'aria-live': 'polite' });
   const legendRow = h(
@@ -173,7 +178,7 @@ export function mountPlayer(root, algo, lang) {
 
   const inputBox = h('input', {
     type: 'text',
-    value: initial.join(', '),
+    value: fmt(initial),
     'aria-label': t.input,
     inputmode: 'numeric',
   });
@@ -181,10 +186,11 @@ export function mountPlayer(root, algo, lang) {
   const apply = () => {
     const arr = algo.parseInput(inputBox.value);
     if (!arr) {
-      error.textContent = t.invalid(algo.maxLength);
+      error.textContent = invalidMsg();
       return;
     }
     error.textContent = '';
+    inputBox.value = fmt(arr); // 正規化(例如二分搜尋會先排序)
     load(arr);
   };
   inputBox.addEventListener('keydown', (e) => {
@@ -211,14 +217,14 @@ export function mountPlayer(root, algo, lang) {
     btn(t.apply, t.apply, apply),
     btn(t.random, t.random, () => {
       const arr = algo.randomInput();
-      inputBox.value = arr.join(', ');
+      inputBox.value = fmt(arr);
       error.textContent = '';
       load(arr);
     }),
   );
 
   root.replaceChildren(
-    lanes.length > 1 ? h('div', { class: 'algo-lanes' }, ...lanes.map((l) => l.el)) : lanes[0].el,
+    lanes.length > 1 ? h('div', { class: `algo-lanes algo-lanes-${lanes.length}` }, ...lanes.map((l) => l.el)) : lanes[0].el,
     legendRow,
     note,
     controls,

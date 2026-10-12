@@ -48,7 +48,7 @@
 | # | slug | 章 | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|---|
 | 1 | `cphb-complexity` | Ch1–2 Introduction / Time complexity | 看到 n,就知道該寫什麼:時間複雜度與最大子陣列和 | 系列開場:競賽 = 看結構的訓練、本系列的三個承諾(上班對照/EM 視角/AI 時代)。複雜度計算規則;**從 n 反推可接受的複雜度**(照原書表:n ≤ 10 → n!、≤ 20 → 2^n、≤ 500 → n³、≤ 5000 → n²、≤ 10^6 → n log n 或 n)= 工程上的 back-of-the-envelope;最大子陣列和 O(n³) → O(n²) → O(n)(Kadane)當全系列的範本:暴力解浪費了什麼。招聘角度:演算法面試在量什麼。兩次加速撿回的都是【重疊】 —— 接 `[[sre-production-readiness]]`(容量估算)、`[[ai-review-craft]]`、`[[sql-explain]]` | ✅ 已發布(中英,2026-10-09;作者複習後要重寫,之後中英一起更新) |
-| 2 | `cphb-sorting` | Ch3 Sorting | 排序是最便宜的結構 | O(n log n) 下界(比較排序的決策樹)與 counting sort 的例外;**排序本身就是在製造結構**(排好之後找重複、找配對都變線性);C++ `sort` / 自訂比較子的嚴格弱序陷阱;二分搜尋三種寫法 + **對答案二分**(單調判定函數)。上班:`git bisect`、B-tree 索引的 range scan、SSTable 為什麼要排序。【順序】【單調】 —— 接 `[[sql-index]]`、`[[ddia-storage-engines]]` | ⬜ |
+| 2 | `cphb-sorting` | Ch3 Sorting | 排序是最便宜的結構:比較的下界、counting sort 與二分搜尋 | O(n log n) 下界(比較排序的決策樹)與 counting sort 的例外;**排序本身就是在製造結構**(排好之後找重複、找配對都變線性);C++ `sort` / 自訂比較子的嚴格弱序陷阱;二分搜尋三種寫法 + **對答案二分**(單調判定函數)。上班:`git bisect`、B-tree 索引的 range scan、SSTable 為什麼要排序。【順序】【單調】 —— 接 `[[sql-index]]`、`[[ddia-storage-engines]]` | ✅ 已發布(中英,2026-10-12;練習題段先拿掉;反思待作者補充後中英一起更新) |
 | 3 | `cphb-data-structures` | Ch4 Data structures | 選容器就是選複雜度 | vector 攤銷倍增、deque、`set`/`map`(平衡樹,有序、log n)vs `unordered_*`(雜湊,平均 O(1)、最壞與被攻擊時退化)、`priority_queue`、bitset;**Comparison to sorting:很多時候先排序比用 set 更快**(常數與快取友善)。上班:Redis Sorted Set、有序 vs 雜湊索引、hash flooding。可選:Kotlin `TreeMap`/`HashMap` 對照 —— 接 `[[redis-data-structures]]`、`[[sql-index]]` | ⬜ |
 | 4 | `cphb-complete-search` | Ch5 Complete search | 暴力也要暴力得有章法 | 產生子集(遞迴 / 位元)、產生排列(`next_permutation`)、回溯(n 皇后)、**剪枝**(格子路徑計數的五刀)、**折半搜尋**(2^n → 2^(n/2))。主軸的【極限】:當結構不存在時怎麼止損。上班:Fisher–Yates 洗牌(lottery)、組合爆炸的設定測試 —— 接 `[[lottery]]`、`[[rezero-promotion]]` | ⬜ |
 | 5 | `cphb-greedy` | Ch6 Greedy algorithms | 貪婪什麼時候是對的 | 硬幣問題(某些幣值系統 greedy 失效)、活動排程(選最早結束)、任務與截止期限、最小化總和(中位數/平均數)、Huffman 編碼;**交換論證**是證明 greedy 的唯一工具。上班:分帳的最少筆數還款(greedy 給 ≤ n−1 筆,但真正最少筆數是 NP-hard——「夠用就好」的判斷)、K8s scheduler 的 bin packing —— 接 `[[travel-split]]`、`[[k8s-pod-node-scheduler]]` | ⬜ |
@@ -104,6 +104,10 @@
 - 已完成:
   - `kadane`(#1,CPHB Ch2 的範例輸入)
   - `max-subarray-race`(#1,O(n²) 暴力解與 Kadane 並排,共用同一個時鐘、每步各做一次加法;Kadane 第 8 步做完,暴力解要到第 36 步)
+  - `bubble-sort`(#2,單一 lane 但有計數條:剩餘 inversion 數)
+  - `binary-search-race`(#2,線性掃描 vs 二分搜尋;輸入格式「陣列 | x」,模組自訂 `parseInput` / `formatInput` / `invalid`)
+  - `counting-sort`(#2,三條 lane,其中兩條沒有程式碼;lane 可以不給 `code`)
+- 播放器可用的格子標記(`ranges[].kind`):`current`(黃底)、`best` / `sorted`(綠線)、`region`(藍底)、`swap`(紅框)、`found`(綠框)、`dim`(變淡)、`empty`(虛線)。三條以上的 lane 一律上下排。
 
 ### 視圖類型(依需要逐步加進播放器)
 | 視圖 | 用在 | 狀態 |
@@ -124,7 +128,7 @@
 | # | 動畫(`data-algo`) | 例子 / 讀者要看見的事 |
 |---|---|---|
 | 1 | `kadane` ✅;`max-subarray-race` ✅ | 原書陣列 [-1,2,4,-3,5,2,-5,2]:O(n²) 一個一個區間試 vs Kadane 一次掃完,步數計數器並排 |
-| 2 | `binary-search`、`counting-sort` | 每一步砍掉一半(剩餘區間縮小);對答案二分的判定函數 |
+| 2 | `bubble-sort` ✅、`binary-search-race` ✅、`counting-sort` ✅ | bubble sort 的計數條畫「剩餘 inversion」,每次交換剛好減一;線性掃描 vs 二分搜尋並排,範圍每步砍半、線性每步只排除一格;counting sort 三條 lane(原陣列 / 計數陣列 / 輸出),全程零比較 |
 | 3 | `vector-growth` | 倍增時的搬家次數,攤銷後每次 push 是 O(1) |
 | 4 | `subsets-backtrack`、`queens` | 遞迴樹展開;剪枝的分支直接變灰,計數器顯示少走多少 |
 | 5 | `activity-selection`、`coin-greedy` | 選最早結束的活動;硬幣 {1,3,4} 湊 6 時 greedy 失敗的反例 |
@@ -161,7 +165,13 @@
 | 中文用詞 | 英文 | 備註 |
 |---|---|---|
 | 時間複雜度 | time complexity | Ch2;寫 O(n log n),不寫「時間複雜性」 |
-| 常數因子 | constant factor | Ch2;複雜度藏起來的部分 |
+| 常數因子 | constant factor | Ch2;複雜度藏起來的部分。Python 比 C++ 慢一個數量級以上,第 1 篇起每篇都要記得 |
+| inversion | inversion | Ch3;寫英文,不譯「逆序對」(與 LeetCode 中文圈用法不同,但本站以原書用字為準) |
+| 決策樹 | decision tree | Ch3 比較排序下界的證明 |
+| 嚴格弱序 | strict weak ordering | Ch3 延伸(原書未講):自訂比較函式的前提,`a < a` 必須是 false |
+| `bisect_left` / `bisect_right` | lower_bound / upper_bound | Ch3;Python 對應 C++ 的兩個函式,第一次出現時註明對應 |
+| 對答案二分 | binary search on the answer | Ch3「finding the smallest solution」;判定函數寫 ok(x),不寫「二分答案」 |
+| 判定函數 | predicate / ok(x) | Ch3;單調 = 先 false 後 true |
 | 最大子陣列和 | maximum subarray sum | Ch2;「子陣列」= 連續的一段,不寫「子數組」「子序列」(子序列不必連續) |
 | 暴力解 | brute force / complete search | 全系列主軸用詞;Ch5 的章名 complete search 譯「完全搜尋」 |
 | 完全搜尋 | complete search | Ch5 |
@@ -239,7 +249,7 @@
 - tags 用 ASCII:`algorithms` + `cphb` + 該篇主題(如 `dynamic-programming`、`graph`、`segment-tree`)。
 - 依 `.claude/skills/writing-blog-post`:一張招牌深色 SVG + 比原書更清楚的摘要 + 一段真實反思。演算法篇的 SVG 優先畫「暴力解浪費在哪 → 快解法撿回了什麼」的對照,或資料結構在一次操作中的變化。
 - **例子與動畫(硬性要求)**:每篇至少一個具體例子,並把核心演算法做成逐步動畫(見〈互動動畫〉)。先寫 frame 產生器與對拍測試,再寫文章;文章裡先放動畫,再講它為什麼對。div 裡的備用內容放靜態 SVG 或文字說明,讓 RSS、鐵人賽轉貼這些沒有 JS 的地方也看得懂。
-- **程式碼範例硬性要求**:每篇至少一段可編譯的 C++(原書語言、CSES 判題語言),只放核心函式,不放競賽模板巨集;能凸顯差異時才加 Kotlin / Python 對照(如 `TreeMap` vs `std::set`、Python 遞迴深度)。
+- **程式碼一律用 Python**(2026-10-12 作者定案):原書是 C++,文章裡的程式碼和動畫的程式碼面板都改寫成 Python(CSES 收 Python 3 / PyPy3)。只放核心函式,不放競賽模板。原書講 C++ 特有的東西(`sort` 比較子、`lower_bound`、`bitset`、`__builtin_popcount`),寫成 Python 對應物(`key=`、`bisect`、int 當位元集合、`bin(x).count('1')` / `int.bit_count`)並註明對應關係,方便讀者對照原書。提到 C++ 只為了對照,不講 C++ 語法。**每篇記得提醒 Python 的常數比 C++ 慢一個數量級以上**(第 1 篇已寫:同一秒抓 10⁷ 次運算、O(n²) 只敢到 n ≈ 2000),涉及遞迴的篇要提 `sys.setrecursionlimit` 和改成迭代。
 - **CSES 練習**:每篇結尾列 2–3 題 CSES Problem Set 對應題(題名 + 連結),**只列作者實際 AC 過的**;作者踩過的 WA / TLE 是最好的反思素材。
 - **每篇固定一段「這招在哪裡上班」**:對得上就接站內文章;對不上就誠實寫「工作上很少見,學它是為了 X」,不准硬湊。
 - SVG 內不可有空行;wikilink label 內不可放 inline code / 反引號;figcaption 內不放 `[[wikilink]]`,要連結用 `<a href>`。
@@ -280,3 +290,36 @@
 - **競賽 / 刷題**:沒有特別的競賽經驗;LeetCode 累積約 1500 題;週賽打進前 50 一次。
 - **當面試官**:出演算法題時主要看面試者的討論、互動等細節,還有品味;題目不會出太難,通常都解得出來。
 - **工作上的估算**:很多時候是根據 DB table 的數據量,估算這個計算過程 OK 不 OK。→ 第 1 篇「看到 n 反推複雜度」的上班版本,後面講到 join / 掃表的篇(#2、#7)可以再引用。
+
+### 2026-10-12:作者的 CSES 進度
+- 作者正在照順序解 CSES Problem Set 的 **Introductory Problems**,目前解到 **Apple Division**(第 16 題;前面 15 題已解:Weird Algorithm、Missing Number、Repetitions、Increasing Array、Permutations、Number Spiral、Two Knights、Two Sets、Bit Strings、Trailing Zeros、Coin Piles、Palindrome Reorder、Gray Code、Tower of Hanoi、Creating Strings)。
+- **用法**:各篇的練習段只列作者解過的題。#2 的練習段先拿掉(Distinct Numbers、Apartments 在 Sorting and Searching,還沒到)。等作者解到對應的題,再回頭補:
+  - #4 完全搜尋:Apple Division(列舉子集 / 折半搜尋)、Creating Strings(排列)、Chessboard and Queens(回溯)、Grid Paths(剪枝)
+  - #5 貪婪:Increasing Array、Coin Piles
+  - #9 位元:Bit Strings、Gray Code
+  - #12 樹 / 遞迴:Tower of Hanoi
+  - #19 數論:Trailing Zeros
+  - #20 組合:Two Sets、Permutations、Number Spiral
+- 作者解題時的 WA / TLE 經驗是反思的好素材,之後寫到對應的篇再問。
+
+### 2026-10-12:Apple Division 的解題經驗(給 #4 完全搜尋的反思)
+- **作者口述**:一開始就知道窮舉是 2^n,也有看到 n 不大,但還是沒往那個方向想;想了很久想不出別的,不得已才先寫窮舉——結果窮舉就是正解。
+- **作者的問題**:想到窮舉法,是不是該先實作再想優化?
+- **當下的回答(2026-10-12)**:推薦。(1) n ≤ 20 時 2^n 就是出題者要的解,Apple Division 是 partition problem、NP-hard,不存在多項式解;(2) 窮舉解是之後快解的對拍基準(本系列動畫測試也是拿暴力解當 oracle);(3) 寫出來才看得見它浪費了什麼,優化從那裡長。但窮舉寫完要算一次運算量再送:Python 下 2^20 × 20 次加法 ≈ 2×10⁷,CPython 會 TLE,要用 PyPy3、讓遞迴帶著累計和(每個子集只加一次),或折半搜尋。
+- **用在**:#4 的反思主段——「看到 n 不大,還是沒往窮舉想」接回 #1「看到 n 之後的那個反應」;#4 正文的「上班對照」可以講「先寫笨的、拿它當基準」。
+- **作者的解(2026-10-12 提供)**:遞迴帶著「兩堆的差」,每顆蘋果 `cur + nums[idx]` 或 `cur - nums[idx]`,走到底 `cur` 就是差,取 `abs` 後取 min。2^n 片葉子、每個子集一次加法。
+
+  ```python
+  n = int(input())
+  nums = list(map(int, input().split()))
+  def find_min_diff(n: int, idx: int, cur: int, nums: list[int]):
+      if n == idx:
+          return cur
+      return min(
+          abs(find_min_diff(n, idx+1, cur+nums[idx], nums)),
+          abs(find_min_diff(n, idx+1, cur-nums[idx], nums))
+      )
+  print(find_min_diff(n, 0, 0, nums))
+  ```
+  - 可以在 #4 講的「浪費」:`+a −b` 與 `−a +b` 對稱,固定第一顆為 `+` 可砍一半;`abs` 放葉子比放父層省一半。再往下就是折半搜尋(2^(n/2)),n ≤ 40 才需要。
+- **交法**:PyPy3,一次 AC,沒有 TLE(2026-10-12 作者確認)。→ 第 4 篇可以順便講「CSES 的 Python 預設交 PyPy3」這條實務建議。
