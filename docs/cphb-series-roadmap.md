@@ -290,3 +290,14 @@
 - **競賽 / 刷題**:沒有特別的競賽經驗;LeetCode 累積約 1500 題;週賽打進前 50 一次。
 - **當面試官**:出演算法題時主要看面試者的討論、互動等細節,還有品味;題目不會出太難,通常都解得出來。
 - **工作上的估算**:很多時候是根據 DB table 的數據量,估算這個計算過程 OK 不 OK。→ 第 1 篇「看到 n 反推複雜度」的上班版本,後面講到 join / 掃表的篇(#2、#7)可以再引用。
+
+### 2026-10-12:作者的 CSES 進度
+- 作者正在照順序解 CSES Problem Set 的 **Introductory Problems**,目前解到 **Apple Division**(第 16 題;前面 15 題已解:Weird Algorithm、Missing Number、Repetitions、Increasing Array、Permutations、Number Spiral、Two Knights、Two Sets、Bit Strings、Trailing Zeros、Coin Piles、Palindrome Reorder、Gray Code、Tower of Hanoi、Creating Strings)。
+- **用法**:各篇的練習段只列作者解過的題。#2 的練習段先拿掉(Distinct Numbers、Apartments 在 Sorting and Searching,還沒到)。等作者解到對應的題,再回頭補:
+  - #4 完全搜尋:Apple Division(列舉子集 / 折半搜尋)、Creating Strings(排列)、Chessboard and Queens(回溯)、Grid Paths(剪枝)
+  - #5 貪婪:Increasing Array、Coin Piles
+  - #9 位元:Bit Strings、Gray Code
+  - #12 樹 / 遞迴:Tower of Hanoi
+  - #19 數論:Trailing Zeros
+  - #20 組合:Two Sets、Permutations、Number Spiral
+- 作者解題時的 WA / TLE 經驗是反思的好素材,之後寫到對應的篇再問。
