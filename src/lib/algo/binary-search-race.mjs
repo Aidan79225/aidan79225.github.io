@@ -6,21 +6,18 @@
 import { MAX_LENGTH } from './kadane.mjs';
 
 const LINEAR_CODE = [
-  'for (int i = 0; i < n; i++) {',
-  '    if (array[i] == x) {',
-  '        // found at i',
-  '    }',
-  '}',
+  'for i in range(n):',
+  '    if array[i] == x:',
+  '        return i  # found',
 ];
 
 const BINARY_CODE = [
-  'int a = 0, b = n-1;',
-  'while (a <= b) {',
-  '    int k = (a+b)/2;',
-  '    if (array[k] == x) // found',
-  '    if (array[k] > x) b = k-1;',
-  '    else a = k+1;',
-  '}',
+  'a, b = 0, n - 1',
+  'while a <= b:',
+  '    k = (a + b) // 2',
+  '    if array[k] == x: return k  # found',
+  '    if array[k] > x: b = k - 1',
+  '    else: a = k + 1',
 ];
 
 const TEXT = {

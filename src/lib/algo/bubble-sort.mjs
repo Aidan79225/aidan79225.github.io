@@ -6,13 +6,10 @@
 import { parseInput as parseArray, MAX_LENGTH } from './kadane.mjs';
 
 const CODE = [
-  'for (int i = 0; i < n; i++) {',
-  '    for (int j = 0; j < n-1; j++) {',
-  '        if (array[j] > array[j+1]) {',
-  '            swap(array[j], array[j+1]);',
-  '        }',
-  '    }',
-  '}',
+  'for i in range(n):',
+  '    for j in range(n - 1):',
+  '        if array[j] > array[j + 1]:',
+  '            array[j], array[j + 1] = array[j + 1], array[j]',
 ];
 
 const TEXT = {
@@ -97,12 +94,12 @@ export function frames(input, lang = 'zh-hant') {
       }
     }
     if (swappedThisRound === 0) {
-      snap(6, t.earlyDone(swaps, i), -1, [], 0);
+      snap(-1, t.earlyDone(swaps, i), -1, [], 0);
       return out;
     }
-    if (i < n - 1) snap(5, t.roundDone(i, n), -1, [], n - i - 1);
+    if (i < n - 1) snap(0, t.roundDone(i, n), -1, [], n - i - 1);
   }
-  snap(6, t.done(swaps, n), -1, [], 0);
+  snap(-1, t.done(swaps, n), -1, [], 0);
   return out;
 }
 

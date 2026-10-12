@@ -4,12 +4,12 @@
 // 元素限定 0..9,因為計數陣列要畫得下;真正的限制是 c = O(n)。
 
 const CODE = [
-  'int cnt[c+1] = {0};',
-  'for (int i = 0; i < n; i++)',
-  '    cnt[array[i]]++;',
-  'int p = 0;',
-  'for (int v = 0; v <= c; v++)',
-  '    while (cnt[v]--) out[p++] = v;',
+  'cnt = [0] * (c + 1)',
+  'for v in array:',
+  '    cnt[v] += 1',
+  'out = []',
+  'for v in range(c + 1):',
+  '    out += [v] * cnt[v]',
 ];
 
 const TEXT = {

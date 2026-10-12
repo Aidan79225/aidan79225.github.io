@@ -16,7 +16,7 @@ draft: true
 ---
 [[cphb-complexity|上一篇]]講的是看到 $n$ 就知道該寫什麼複雜度。這一篇講 CPHB 第 3 章:排序。原書這章很短,但它藏著一個我覺得比排序演算法本身更重要的觀念——**排序不是目的,是在替後面的問題製造結構。** 很多題目難在「元素是亂的」,排好之後,重複的會靠在一起、該配對的會變成鄰居、要找的東西可以用二分搜尋逼近。你付 $O(n \log n)$,買到的是之後每一步都變便宜。
 
-這篇照原書的三段走:排序的理論(為什麼是 $n \log n$、什麼時候能更快)、C++ 裡怎麼用、二分搜尋。
+這篇照原書的三段走:排序的理論(為什麼是 $n \log n$、什麼時候能更快)、程式裡怎麼用(原書講 C++,這裡換成 Python)、二分搜尋。
 
 ## 為什麼是 n log n
 
@@ -24,14 +24,11 @@ draft: true
 
 原書用 bubble sort 開場——$n$ 輪,每一輪從左到右,相鄰兩個順序不對就交換:
 
-```cpp
-for (int i = 0; i < n; i++) {
-    for (int j = 0; j < n-1; j++) {
-        if (array[j] > array[j+1]) {
-            swap(array[j], array[j+1]);
-        }
-    }
-}
+```python
+for i in range(n):
+    for j in range(n - 1):
+        if array[j] > array[j + 1]:
+            array[j], array[j + 1] = array[j + 1], array[j]
 ```
 
 兩層迴圈,$O(n^2)$。但原書接著講了一個很漂亮的論證,解釋為什麼**所有只交換相鄰元素的排序法都至少 $O(n^2)$**。工具是 **inversion**:一對位置 $a < b$ 但 $\text{array}[a] > \text{array}[b]$,也就是「前面的比後面的大」。陣列裡的 inversion 數就是「離排好還有多遠」:排好 = 0 個,完全倒序 = $n(n-1)/2$ 個。
@@ -119,26 +116,33 @@ $O(n \log n)$ 的排序法不受「相鄰交換」的限制。原書的代表是
 
 注意動畫跑完第一輪的那個狀態:計數陣列已經是「排好序的陣列的壓縮版」——每個值出現幾次。第二輪只是把它展開。它快,是因為它用了一個比較排序沒用的資訊:**元素的值本身就是位置。** 代價是這個資訊必須存在(整數、範圍小),不然就沒得用。
 
-## C++ 裡怎麼排
+## Python 裡怎麼排
 
-原書的態度很明確:**比賽裡幾乎不該自己寫排序。** 標準函式庫的 `sort` 又快又對,自己寫的不會更好。
+原書的態度很明確:**比賽裡幾乎不該自己寫排序。** 標準函式庫的排序又快又對,自己寫的不會更好。原書講的是 C++ 的 `sort`,換成 Python 是 `sorted` 和 `list.sort`——底下是 Timsort,穩定、$O(n \log n)$,而且是 C 實作的,比你用 Python 迴圈寫的任何排序都快得多。
 
-```cpp
-vector<int> v = {4, 2, 5, 3, 5, 8, 3};
-sort(v.begin(), v.end());           // 2 3 3 4 5 5 8
-sort(v.rbegin(), v.rend());         // 遞減
-sort(s.begin(), s.end());           // 字串也能排:"monkey" → "ekmnoy"
+```python
+v = [4, 2, 5, 3, 5, 8, 3]
+sorted(v)                        # [2, 3, 3, 4, 5, 5, 8],回傳新的 list
+v.sort()                         # 原地排
+v.sort(reverse=True)             # 遞減
+"".join(sorted("monkey"))        # 字串也能排:"ekmnoy"
 ```
 
-要排自訂的東西,就要給它比較的方法。三條路:
+要排自訂的東西,Python 的做法跟 C++ 不一樣:C++ 給 `sort` 一個「比較兩個元素」的函式,Python 給 `sorted` 一個 **`key`**——「每個元素拿什麼來排」。三條路:
 
 | 做法 | 什麼時候用 |
 |---|---|
-| 內建型別直接排;`pair` 先比 `first` 再比 `second`;`tuple` 依序比 | 多數情況。要「先依 A 再依 B」,把資料裝成 `pair`/`tuple` 就好 |
-| 在 `struct` 裡定義 `operator<` | 自己的型別,而且只有一種自然的順序 |
-| 傳一個比較函式給 `sort` | 同一型別要用不同順序排(例如字串先比長度再比字典序) |
+| 直接排;tuple 依序比較(先比第一個,相同再比第二個) | 多數情況。要「先依 A 再依 B」,把資料裝成 tuple 就好:`sorted(pairs)` |
+| `key=lambda x: (len(x), x)` | 同一型別要用不同順序排,例如字串先比長度再比字典序。`key` 回傳 tuple 就是多重排序鍵 |
+| 在 class 裡定義 `__lt__` | 自己的型別,而且只有一種自然的順序 |
 
-有一條陷阱原書沒講、但一定會踩到:比較函式必須是**嚴格弱序**(strict weak ordering)——`a < a` 要回傳 false。用 `<=` 寫比較函式,`sort` 在某些實作上會當掉或排出垃圾,而且只在特定資料才出現。
+```python
+words = ["banana", "kiwi", "apple", "fig"]
+sorted(words, key=lambda w: (len(w), w))     # ['fig', 'kiwi', 'apple', 'banana']
+sorted(words, key=len, reverse=True)         # 長的在前
+```
+
+`key` 這個設計避掉了 C++ 比較函式最常踩的坑:比較函式必須是**嚴格弱序**(strict weak ordering),`a < a` 要回傳 false,用 `<=` 寫會在特定資料上排出垃圾。`key` 只是把每個元素換成另一個值再用內建的 `<` 比,寫不出不一致的順序。真的需要「比較兩個元素」的舊式寫法,`functools.cmp_to_key` 可以轉,但幾乎用不到。
 
 ## 二分搜尋
 
@@ -146,14 +150,16 @@ sort(s.begin(), s.end());           // 字串也能排:"monkey" → "ekmnoy"
 
 沒排序的陣列裡找一個值,只能一格一格看,$O(n)$——沒有任何資訊告訴你該往哪找。**排好序之後,順序本身就是導航。** 二分搜尋每一步看中間那格:等於就找到了;比 $x$ 大,右半邊全部不用看;比 $x$ 小,左半邊全部不用看。
 
-```cpp
-int a = 0, b = n-1;
-while (a <= b) {
-    int k = (a+b)/2;
-    if (array[k] == x) { /* found at k */ }
-    if (array[k] > x) b = k-1;
-    else a = k+1;
-}
+```python
+a, b = 0, n - 1
+while a <= b:
+    k = (a + b) // 2
+    if array[k] == x:
+        return k          # 找到了
+    if array[k] > x:
+        b = k - 1
+    else:
+        a = k + 1
 ```
 
 「還有可能的範圍」$a \ldots b$ 每一步砍半,所以 $O(\log n)$。下面把它跟線性掃描並排,兩邊每一步各做一次比較。注意右邊藍色的範圍怎麼縮——還有左邊變淡的格子,那是線性掃描「已經排除」的,每一步只多一格。
@@ -164,15 +170,23 @@ $n = 9$ 時是 8 次對 3 次。$n = 10^6$ 時是最多 $10^6$ 次對最多 20 �
 
 原書還給了第二種寫法:從左邊開始**跳**,跳距從 $n/2$ 開始每輪減半,跳得過就跳、跳不過就縮小步伐。結果一樣是 $O(\log n)$,但這個寫法沒有「中間」的概念,之後樹上的倍增(第 16 篇)會再看到它。
 
-```cpp
-int k = 0;
-for (int b = n/2; b >= 1; b /= 2) {
-    while (k+b < n && array[k+b] <= x) k += b;
-}
-if (array[k] == x) { /* found at k */ }
+```python
+k = 0
+b = n // 2
+while b >= 1:
+    while k + b < n and array[k + b] <= x:
+        k += b
+    b //= 2
+if array[k] == x:
+    pass                  # 找到了,在 k
 ```
 
-標準函式庫也有:`lower_bound`(第一個 $\ge x$ 的位置)、`upper_bound`(第一個 $> x$ 的位置)、`equal_range`(兩個一起回傳)。兩者相減就是 $x$ 出現的次數。
+標準函式庫也有,在 `bisect` 模組:`bisect_left`(第一個 $\ge x$ 的位置,對應 C++ 的 `lower_bound`)、`bisect_right`(第一個 $> x$ 的位置,對應 `upper_bound`)。兩者相減就是 $x$ 出現的次數:
+
+```python
+from bisect import bisect_left, bisect_right
+count = bisect_right(array, x) - bisect_left(array, x)
+```
 
 ### 真正的二分搜尋:對答案二分
 
@@ -244,12 +258,14 @@ if (array[k] == x) { /* found at k */ }
 
 原書的寫法用的是跳躍版:
 
-```cpp
-int x = -1;
-for (int b = z; b >= 1; b /= 2) {
-    while (!ok(x+b)) x += b;
-}
-int k = x+1;   // 最小的 k 使得 ok(k) 成立
+```python
+x = -1
+b = z
+while b >= 1:
+    while not ok(x + b):
+        x += b
+    b //= 2
+k = x + 1        # 最小的 k 使得 ok(k) 成立
 ```
 
 $z$ 要夠大,大到確定 $\text{ok}(z)$ 是 true。每呼叫一次 $\text{ok}$ 就砍半,所以總共 $O(\log z)$ 次呼叫;整體複雜度取決於 $\text{ok}$ 本身多貴——$\text{ok}$ 是 $O(n)$,整體就是 $O(n \log z)$。

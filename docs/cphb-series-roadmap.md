@@ -165,10 +165,11 @@
 | 中文用詞 | 英文 | 備註 |
 |---|---|---|
 | 時間複雜度 | time complexity | Ch2;寫 O(n log n),不寫「時間複雜性」 |
-| 常數因子 | constant factor | Ch2;複雜度藏起來的部分 |
+| 常數因子 | constant factor | Ch2;複雜度藏起來的部分。Python 比 C++ 慢一個數量級以上,第 1 篇起每篇都要記得 |
 | inversion | inversion | Ch3;寫英文,不譯「逆序對」(與 LeetCode 中文圈用法不同,但本站以原書用字為準) |
 | 決策樹 | decision tree | Ch3 比較排序下界的證明 |
 | 嚴格弱序 | strict weak ordering | Ch3 延伸(原書未講):自訂比較函式的前提,`a < a` 必須是 false |
+| `bisect_left` / `bisect_right` | lower_bound / upper_bound | Ch3;Python 對應 C++ 的兩個函式,第一次出現時註明對應 |
 | 對答案二分 | binary search on the answer | Ch3「finding the smallest solution」;判定函數寫 ok(x),不寫「二分答案」 |
 | 判定函數 | predicate / ok(x) | Ch3;單調 = 先 false 後 true |
 | 最大子陣列和 | maximum subarray sum | Ch2;「子陣列」= 連續的一段,不寫「子數組」「子序列」(子序列不必連續) |
@@ -248,7 +249,7 @@
 - tags 用 ASCII:`algorithms` + `cphb` + 該篇主題(如 `dynamic-programming`、`graph`、`segment-tree`)。
 - 依 `.claude/skills/writing-blog-post`:一張招牌深色 SVG + 比原書更清楚的摘要 + 一段真實反思。演算法篇的 SVG 優先畫「暴力解浪費在哪 → 快解法撿回了什麼」的對照,或資料結構在一次操作中的變化。
 - **例子與動畫(硬性要求)**:每篇至少一個具體例子,並把核心演算法做成逐步動畫(見〈互動動畫〉)。先寫 frame 產生器與對拍測試,再寫文章;文章裡先放動畫,再講它為什麼對。div 裡的備用內容放靜態 SVG 或文字說明,讓 RSS、鐵人賽轉貼這些沒有 JS 的地方也看得懂。
-- **程式碼範例硬性要求**:每篇至少一段可編譯的 C++(原書語言、CSES 判題語言),只放核心函式,不放競賽模板巨集;能凸顯差異時才加 Kotlin / Python 對照(如 `TreeMap` vs `std::set`、Python 遞迴深度)。
+- **程式碼一律用 Python**(2026-10-12 作者定案):原書是 C++,文章裡的程式碼和動畫的程式碼面板都改寫成 Python(CSES 收 Python 3 / PyPy3)。只放核心函式,不放競賽模板。原書講 C++ 特有的東西(`sort` 比較子、`lower_bound`、`bitset`、`__builtin_popcount`),寫成 Python 對應物(`key=`、`bisect`、int 當位元集合、`bin(x).count('1')` / `int.bit_count`)並註明對應關係,方便讀者對照原書。提到 C++ 只為了對照,不講 C++ 語法。**每篇記得提醒 Python 的常數比 C++ 慢一個數量級以上**(第 1 篇已寫:同一秒抓 10⁷ 次運算、O(n²) 只敢到 n ≈ 2000),涉及遞迴的篇要提 `sys.setrecursionlimit` 和改成迭代。
 - **CSES 練習**:每篇結尾列 2–3 題 CSES Problem Set 對應題(題名 + 連結),**只列作者實際 AC 過的**;作者踩過的 WA / TLE 是最好的反思素材。
 - **每篇固定一段「這招在哪裡上班」**:對得上就接站內文章;對不上就誠實寫「工作上很少見,學它是為了 X」,不准硬湊。
 - SVG 內不可有空行;wikilink label 內不可放 inline code / 反引號;figcaption 內不放 `[[wikilink]]`,要連結用 `<a href>`。

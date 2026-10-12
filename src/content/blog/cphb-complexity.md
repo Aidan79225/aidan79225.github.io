@@ -74,6 +74,8 @@ draft: false
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">每一列的運算量都落在 10⁷~10⁸ 上下——表上的上限就是這樣算出來的。題目給的 n 等於在告訴你答案大概長什麼樣子。(表格依原書 Ch2〈Estimating efficiency〉)</figcaption>
 </figure>
 
+原書用 C++,這張表也是照 C++ 的速度算的。這個系列的程式碼用 Python——CSES 收 Python 3 和 PyPy3——所以要記得 **Python 的常數大約比 C++ 慢一個數量級以上**:同樣一秒,安全的運算量要抓在 $10^7$ 上下,表上每一列的 $n$ 都要再保守一點,$O(n^2)$ 大概只敢用到 $n \le 2000$。
+
 這張表是競賽選手看題目的第一個動作。$n \le 20$ 的題目在暗示「可以窮舉子集」;$n \le 10^6$ 的題目在暗示「排序或掃一遍,而且只有這兩條路」。它直接幫你劃掉一半的思路。
 
 但要記得原書的提醒:**複雜度只是估計,它藏起了常數。** 同樣是 $O(n)$,可能是 $n/2$ 次,也可能是 $5n$ 次——實際跑起來差十倍。
@@ -235,17 +237,14 @@ $$[-1,\ 2,\ 4,\ -3,\ 5,\ 2,\ -5,\ 2]$$
 
 最直接的做法:用 `a`、`b` 固定區間的頭尾,再用第三層迴圈把 `array[a..b]` 加起來。
 
-```cpp
-int best = 0;
-for (int a = 0; a < n; a++) {
-    for (int b = a; b < n; b++) {
-        int sum = 0;
-        for (int k = a; k <= b; k++) {
-            sum += array[k];
-        }
-        best = max(best, sum);
-    }
-}
+```python
+best = 0
+for a in range(n):
+    for b in range(a, n):
+        sum = 0
+        for k in range(a, b + 1):
+            sum += array[k]
+        best = max(best, sum)
 ```
 
 **浪費在哪**:算 `array[0..3]` 的時候,`array[0..2]` 剛剛才算過——但它把那個和丟掉,從頭再加一次。
@@ -254,15 +253,13 @@ for (int a = 0; a < n; a++) {
 
 把剛剛丟掉的撿回來:$\text{sum}(a..b) = \text{sum}(a..b-1) + \text{array}[b]$。右端每往右一格,只要再加一個數。第三層迴圈消失了。
 
-```cpp
-int best = 0;
-for (int a = 0; a < n; a++) {
-    int sum = 0;
-    for (int b = a; b < n; b++) {
-        sum += array[b];
-        best = max(best, sum);
-    }
-}
+```python
+best = 0
+for a in range(n):
+    sum = 0
+    for b in range(a, n):
+        sum += array[b]
+        best = max(best, sum)
 ```
 
 **還浪費在哪**:它還是把三角形裡**每一格**都算過一次。可是對同一個結尾 `b` 來說,我們只在乎「以 `b` 結尾的最大和」——其他起點根本不用看。
@@ -276,15 +273,14 @@ for (int a = 0; a < n; a++) {
 
 所以每一格只要跟前一格的答案比一下:
 
-```cpp
-int best = 0, sum = 0;
-for (int k = 0; k < n; k++) {
-    sum = max(array[k], sum + array[k]);
-    best = max(best, sum);
-}
+```python
+best = sum = 0
+for k in range(n):
+    sum = max(array[k], sum + array[k])
+    best = max(best, sum)
 ```
 
-`sum` 是「以 $k$ 結尾的最大和」,`best` 是一路看過來最大的那個。一個迴圈,$O(n)$。這也是能做到的最好——任何解法至少得把每個元素看過一次。(這個解法因 Jon Bentley 的 *Programming Pearls* 而出名,書中把它歸功於 J. B. Kadane。)
+`sum` 是「以 $k$ 結尾的最大和」,`best` 是一路看過來最大的那個。(正式的程式碼別拿 `sum` 當變數名,它會蓋掉 Python 的內建函式;這裡為了跟原書對照才沿用。)一個迴圈,$O(n)$。這也是能做到的最好——任何解法至少得把每個元素看過一次。(這個解法因 Jon Bentley 的 *Programming Pearls* 而出名,書中把它歸功於 J. B. Kadane。)
 
 ### 動手跑一次:暴力解和 Kadane 賽跑
 

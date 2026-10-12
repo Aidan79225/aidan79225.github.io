@@ -75,6 +75,8 @@ Run it the other way and it's even more useful: **read $n$, and you can infer th
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">Every row lands around 10⁷–10⁸ operations — that is where the limits in the table come from. The n a problem gives you is telling you roughly what the answer looks like. (Table after Ch2, “Estimating efficiency”, of the book.)</figcaption>
 </figure>
 
+The book is written in C++, and the table is calibrated for C++ speed. This series writes its code in Python — CSES accepts Python 3 and PyPy3 — so keep in mind that **Python's constant factor is more than an order of magnitude worse than C++'s**: in the same second, budget around $10^7$ operations, push every $n$ in the table down a notch, and treat $O(n^2)$ as safe only up to about $n \le 2000$.
+
 This table is the first thing a contestant does with a problem. An $n \le 20$ is a hint that "you may enumerate subsets"; an $n \le 10^6$ says "sort or scan — and those are the only two roads". It rules out half the ideas on the spot.
 
 But keep the book's own caveat in mind: **complexity is only an estimate, and it hides the constants.** Two $O(n)$ algorithms can do $n/2$ operations or $5n$ — a tenfold difference once you run them.
@@ -236,17 +238,14 @@ There are three solutions, at $O(n^3)$, $O(n^2)$ and $O(n)$. All three are looki
 
 The most direct approach: fix the two ends `a` and `b`, then use a third loop to add up `array[a..b]`.
 
-```cpp
-int best = 0;
-for (int a = 0; a < n; a++) {
-    for (int b = a; b < n; b++) {
-        int sum = 0;
-        for (int k = a; k <= b; k++) {
-            sum += array[k];
-        }
-        best = max(best, sum);
-    }
-}
+```python
+best = 0
+for a in range(n):
+    for b in range(a, n):
+        sum = 0
+        for k in range(a, b + 1):
+            sum += array[k]
+        best = max(best, sum)
 ```
 
 **What it wastes**: when it computes `array[0..3]`, it had `array[0..2]` a moment ago — and throws that sum away to add everything up again.
@@ -255,15 +254,13 @@ for (int a = 0; a < n; a++) {
 
 Reclaim what was just thrown away: $\text{sum}(a..b) = \text{sum}(a..b-1) + \text{array}[b]$. Every time the right end moves one cell, add one number. The third loop disappears.
 
-```cpp
-int best = 0;
-for (int a = 0; a < n; a++) {
-    int sum = 0;
-    for (int b = a; b < n; b++) {
-        sum += array[b];
-        best = max(best, sum);
-    }
-}
+```python
+best = 0
+for a in range(n):
+    sum = 0
+    for b in range(a, n):
+        sum += array[b]
+        best = max(best, sum)
 ```
 
 **What it still wastes**: it visits **every cell** in the triangle. But for a given right end `b`, all we care about is "the best sum that ends at `b`" — the other starting points don't need a look.
@@ -277,15 +274,14 @@ Ask a different question: **what is the maximum subarray sum ending at position 
 
 So each cell only needs a comparison against the previous cell's answer:
 
-```cpp
-int best = 0, sum = 0;
-for (int k = 0; k < n; k++) {
-    sum = max(array[k], sum + array[k]);
-    best = max(best, sum);
-}
+```python
+best = sum = 0
+for k in range(n):
+    sum = max(array[k], sum + array[k])
+    best = max(best, sum)
 ```
 
-`sum` is "the best sum ending at $k$"; `best` is the largest one seen so far. One loop, $O(n)$. It's also the best possible — any solution has to look at every element at least once. (The algorithm became famous through Jon Bentley's *Programming Pearls*, which credits it to J. B. Kadane.)
+`sum` is "the best sum ending at $k$"; `best` is the largest one seen so far. (Don't name a variable `sum` in real code — it shadows Python's built-in; it's kept here only to line up with the book.) One loop, $O(n)$. It's also the best possible — any solution has to look at every element at least once. (The algorithm became famous through Jon Bentley's *Programming Pearls*, which credits it to J. B. Kadane.)
 
 ### Run it yourself: brute force versus Kadane
 
