@@ -3,4 +3,7 @@
 export const ALGOS = {
   kadane: () => import('./kadane.mjs'),
   'max-subarray-race': () => import('./max-subarray-race.mjs'),
+  'bubble-sort': () => import('./bubble-sort.mjs'),
+  'binary-search-race': () => import('./binary-search-race.mjs'),
+  'counting-sort': () => import('./counting-sort.mjs'),
 };

@@ -34,6 +34,8 @@
   .algo-player {
     --algo-current: var(--hue-amber);
     --algo-best: var(--hue-green);
+    --algo-region: var(--hue-blue);
+    --algo-swap: var(--hue-red);
     margin: 1.5rem 0;
     padding: 1rem;
     border: 1px solid var(--color-line);
@@ -129,6 +131,53 @@
     bottom: 0;
     height: 0.3rem;
     background: var(--algo-best);
+  }
+  /* 其他區間種類:region = 還在考慮的範圍(藍底),sorted = 已經就定位(綠線,同 best),
+     swap = 這一步交換的兩格(紅框),found = 找到了(綠框),dim = 已經排除(變淡) */
+  .algo-cell.in-region .algo-value {
+    background: color-mix(in srgb, var(--algo-region) 22%, var(--color-base));
+  }
+  .algo-cell.in-sorted::after {
+    content: '';
+    position: absolute;
+    left: -0.125rem;
+    right: -0.125rem;
+    bottom: 0;
+    height: 0.3rem;
+    background: var(--algo-best);
+  }
+  .algo-cell.in-swap .algo-value {
+    border-color: var(--algo-swap);
+    background: color-mix(in srgb, var(--algo-swap) 22%, var(--color-base));
+  }
+  .algo-cell.in-found .algo-value {
+    border: 2px solid var(--algo-best);
+    background: color-mix(in srgb, var(--algo-best) 25%, var(--color-base));
+  }
+  .algo-cell.in-dim .algo-value,
+  .algo-cell.in-dim .algo-index {
+    opacity: 0.3;
+  }
+  .algo-cell.in-empty .algo-value {
+    color: var(--color-muted);
+    border-style: dashed;
+  }
+  .algo-swatch.algo-region {
+    background: color-mix(in srgb, var(--algo-region) 60%, var(--color-base));
+  }
+  .algo-swatch.algo-sorted {
+    background: var(--algo-best);
+  }
+  .algo-swatch.algo-swap {
+    background: color-mix(in srgb, var(--algo-swap) 60%, var(--color-base));
+  }
+  .algo-swatch.algo-found {
+    background: color-mix(in srgb, var(--algo-best) 60%, var(--color-base));
+    outline: 2px solid var(--algo-best);
+    outline-offset: -2px;
+  }
+  .algo-code[hidden] {
+    display: none;
   }
   .algo-cell.is-cursor .algo-value {
     border: 2px solid var(--color-accent);
@@ -245,9 +294,14 @@
     grid-template-columns: minmax(0, 1fr);
   }
   @media (min-width: 640px) {
-    .algo-lanes {
+    .algo-lanes-2 {
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     }
+  }
+  /* 三條以上的 lane 一律上下排(陣列要放得下 10 格以上),lane 之間留少一點 */
+  .algo-lanes-3 .algo-lane,
+  .algo-lanes-4 .algo-lane {
+    padding: 0.5rem 0.75rem;
   }
   .algo-lane {
     min-width: 0;
@@ -269,6 +323,14 @@
   }
   .algo-lane .algo-cell {
     flex-basis: 2rem;
+  }
+  @media (max-width: 639px) {
+    .algo-lane .algo-cell {
+      flex-basis: 1.8rem;
+    }
+    .algo-lane .algo-cells {
+      gap: 0.2rem;
+    }
   }
   .algo-lane .algo-vars {
     grid-template-columns: repeat(4, max-content 1fr);
