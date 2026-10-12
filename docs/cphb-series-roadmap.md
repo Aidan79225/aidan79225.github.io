@@ -307,4 +307,19 @@
 - **作者的問題**:想到窮舉法,是不是該先實作再想優化?
 - **當下的回答(2026-10-12)**:推薦。(1) n ≤ 20 時 2^n 就是出題者要的解,Apple Division 是 partition problem、NP-hard,不存在多項式解;(2) 窮舉解是之後快解的對拍基準(本系列動畫測試也是拿暴力解當 oracle);(3) 寫出來才看得見它浪費了什麼,優化從那裡長。但窮舉寫完要算一次運算量再送:Python 下 2^20 × 20 次加法 ≈ 2×10⁷,CPython 會 TLE,要用 PyPy3、讓遞迴帶著累計和(每個子集只加一次),或折半搜尋。
 - **用在**:#4 的反思主段——「看到 n 不大,還是沒往窮舉想」接回 #1「看到 n 之後的那個反應」;#4 正文的「上班對照」可以講「先寫笨的、拿它當基準」。
-- **待問作者**:最後 AC 的寫法是哪一種(itertools / 位元列舉 / 遞迴帶和 / 折半)?有沒有 TLE 過?用 CPython 還是 PyPy3 交?
+- **作者的解(2026-10-12 提供)**:遞迴帶著「兩堆的差」,每顆蘋果 `cur + nums[idx]` 或 `cur - nums[idx]`,走到底 `cur` 就是差,取 `abs` 後取 min。2^n 片葉子、每個子集一次加法。
+
+  ```python
+  n = int(input())
+  nums = list(map(int, input().split()))
+  def find_min_diff(n: int, idx: int, cur: int, nums: list[int]):
+      if n == idx:
+          return cur
+      return min(
+          abs(find_min_diff(n, idx+1, cur+nums[idx], nums)),
+          abs(find_min_diff(n, idx+1, cur-nums[idx], nums))
+      )
+  print(find_min_diff(n, 0, 0, nums))
+  ```
+  - 可以在 #4 講的「浪費」:`+a −b` 與 `−a +b` 對稱,固定第一顆為 `+` 可砍一半;`abs` 放葉子比放父層省一半。再往下就是折半搜尋(2^(n/2)),n ≤ 40 才需要。
+- **待問作者**:用 CPython 還是 PyPy3 交的?有沒有 TLE 過?
