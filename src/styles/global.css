@@ -68,6 +68,37 @@
   --hue-grey: #59647a;
 }
 
+/* Shared component classes — the handful of looks repeated across pages, named
+   once so they stay consistent and change in one place. Each is a Tailwind
+   utility, so it works in .astro and React alike and composes with other
+   utilities and variants. Spacing, font size and layout stay at the call site
+   (`card p-5`, `chip text-xs`), except on buttons, whose padding is the look. */
+@utility link {
+  @apply text-accent hover:underline;
+}
+/* Surface box with a hairline border: the TOC, series box, search dropdown. */
+@utility panel {
+  @apply bg-surface border border-line rounded;
+}
+/* Larger rounded box for content blocks; `card-link` when the whole card is
+   clickable and should light up on hover. */
+@utility card {
+  @apply bg-surface border border-line rounded-lg;
+}
+@utility card-link {
+  @apply bg-surface border border-line rounded-lg hover:border-accent transition-colors;
+}
+/* Small tag / series-jump pill. Colour and text size come from the call site. */
+@utility chip {
+  @apply bg-surface border border-line rounded px-2 py-1;
+}
+@utility btn {
+  @apply bg-surface border border-line text-ink rounded px-4 py-2 no-underline hover:border-accent;
+}
+@utility btn-primary {
+  @apply bg-accent text-ink font-bold rounded px-4 py-2 no-underline hover:opacity-90;
+}
+
 /* Tailwind Typography ships fixed light/dark palettes (`prose` / `prose-invert`),
    neither of which can follow a runtime token swap — so drive its variables
    from our own tokens instead and skip both presets. */

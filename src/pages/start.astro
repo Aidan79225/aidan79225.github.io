@@ -102,7 +102,7 @@ const layers = [
     {seriesList.map((s) => (
       <a
         href={`#${s.slug}`}
-        class="text-xs bg-surface border border-line rounded px-2 py-1 text-ink hover:text-accent no-underline"
+        class="text-xs chip text-ink hover:text-accent no-underline"
         style={`border-left:3px solid ${s.color}`}
       >{s.name}</a>
     ))}
@@ -144,7 +144,7 @@ const layers = [
 
   <div class="space-y-6">
     {layers.map((layer) => (
-      <section class="bg-surface border border-line rounded-lg p-5" style={`border-left:3px solid ${layer.color}`}>
+      <section class="card p-5" style={`border-left:3px solid ${layer.color}`}>
         <span
           class="inline-block text-[11px] font-mono font-bold mb-2 px-2 py-0.5 rounded"
           style={`color:${layer.color};border:1px solid ${layer.color}`}
@@ -175,6 +175,6 @@ const layers = [
   </div>
 
   <p class="text-muted text-sm mt-8">
-    想找特定主題?用右上角的搜尋,或到 <a href={withLocale(locale, "/tags/")} class="text-accent hover:underline">標籤頁</a> 依主題瀏覽。
+    想找特定主題?用右上角的搜尋,或到 <a href={withLocale(locale, "/tags/")} class="link">標籤頁</a> 依主題瀏覽。
   </p>
 </BaseLayout>

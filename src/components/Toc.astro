@@ -15,12 +15,12 @@ interface Props { headings: MarkdownHeading[]; locale?: Locale }
 const { headings, locale = DEFAULT_LOCALE } = Astro.props;
 const t = ui[locale];
 ---
-<details class="xl:hidden bg-surface border border-line rounded p-4 mb-6 text-sm">
+<details class="xl:hidden panel p-4 mb-6 text-sm">
   <summary class="font-bold cursor-pointer">📑 {t.tocLabel}</summary>
   <ul class="list-none m-0 mt-2 p-0 space-y-1">
     {headings.map((h) => (
       <li style={`padding-left:${(h.depth - 2)}rem`}>
-        <a href={`#${h.slug}`} class="text-accent hover:underline">{h.text}</a>
+        <a href={`#${h.slug}`} class="link">{h.text}</a>
       </li>
     ))}
   </ul>

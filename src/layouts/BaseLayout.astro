@@ -140,7 +140,7 @@ const fullTitle = title === SITE_NAME ? SITE_NAME : `${title} · ${SITE_NAME}`;
       <div class="bg-surface border-b border-line" lang="en">
         <p class="max-w-3xl mx-auto px-4 py-2 text-xs text-muted m-0">
           🌐 This page hasn't been translated yet — showing the original Chinese.
-          <a href="/en/" class="text-accent hover:underline">Translated posts</a>
+          <a href="/en/" class="link">Translated posts</a>
         </p>
       </div>
     )}
@@ -163,7 +163,7 @@ const fullTitle = title === SITE_NAME ? SITE_NAME : `${title} · ${SITE_NAME}`;
     </main>
     <footer class="max-w-3xl mx-auto px-4 py-8 mt-12 border-t border-line text-muted text-sm">
       © 2026 Aidan's Blog{contentLicense && (
-        <Fragment> · {t.licensePrefix}<a href="https://creativecommons.org/licenses/by/4.0/" rel="license" target="_blank" class="text-accent hover:underline">CC BY 4.0</a>{t.licenseSuffix}</Fragment>
+        <Fragment> · {t.licensePrefix}<a href="https://creativecommons.org/licenses/by/4.0/" rel="license" target="_blank" class="link">CC BY 4.0</a>{t.licenseSuffix}</Fragment>
       )}
     </footer>
     {CF_BEACON_TOKEN && (
