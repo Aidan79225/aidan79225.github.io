@@ -49,9 +49,9 @@ const alternates = [
       falls back to the Chinese original under the same URL, so links never dead-end.
     </p>
     <p class="flex flex-wrap gap-3 text-sm">
-      <a href="/en/start/" class="bg-accent text-ink font-bold rounded px-4 py-2 no-underline hover:opacity-90">Start here →</a>
-      <a href="/en/about/" class="bg-surface border border-line text-ink rounded px-4 py-2 no-underline hover:border-accent">About me</a>
-      <a href="/" class="bg-surface border border-line text-ink rounded px-4 py-2 no-underline hover:border-accent" lang="zh-Hant">中文首頁</a>
+      <a href="/en/start/" class="btn-primary">Start here →</a>
+      <a href="/en/about/" class="btn">About me</a>
+      <a href="/" class="btn" lang="zh-Hant">中文首頁</a>
     </p>
   </header>
 
@@ -60,7 +60,7 @@ const alternates = [
     {featured.map((s) => (
       <a
         href={`/en/start/#${s.slug}`}
-        class="block bg-surface border border-line rounded-lg p-4 no-underline hover:border-accent transition-colors"
+        class="block card-link p-4 no-underline"
         style={`border-top:3px solid ${s.color}`}
       >
         <p class="font-bold text-ink mb-1 leading-snug">{s.enName}</p>
@@ -71,7 +71,7 @@ const alternates = [
   </div>
   <p class="text-sm text-muted -mt-6 mb-10">
     The full map — all {seriesList.length} series, with the untranslated posts marked →
-    <a href="/en/start/" class="text-accent hover:underline">see everything</a>
+    <a href="/en/start/" class="link">see everything</a>
   </p>
 
   <h2 class="text-xl font-bold mb-3">Latest in English</h2>
@@ -79,8 +79,8 @@ const alternates = [
     {latest.map((p) => <PostCard post={p} />)}
   </div>
   <p class="text-sm">
-    <a href="/en/tech/" class="text-accent hover:underline">All English posts</a> ·
-    <a href="/en/tools/" class="text-accent hover:underline">Tools</a> ·
-    <a href="/en/guides/" class="text-accent hover:underline">Guides</a>
+    <a href="/en/tech/" class="link">All English posts</a> ·
+    <a href="/en/tools/" class="link">Tools</a> ·
+    <a href="/en/guides/" class="link">Guides</a>
   </p>
 </BaseLayout>

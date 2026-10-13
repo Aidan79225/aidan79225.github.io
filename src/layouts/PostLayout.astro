@@ -91,21 +91,21 @@ const showToc = tocHeadings.length >= 3;
       <p class="flex flex-wrap gap-2 mb-6">
         {tags.map((tag) => (
           tagHasPage(tagCounts, tag)
-            ? <a href={l(`/tags/${encodeURIComponent(tag)}/`)} class="text-xs bg-surface border border-line rounded px-2 py-1 text-accent hover:underline">#{tag}</a>
-            : <span class="text-xs bg-surface border border-line rounded px-2 py-1 text-muted">#{tag}</span>
+            ? <a href={l(`/tags/${encodeURIComponent(tag)}/`)} class="text-xs chip link">#{tag}</a>
+            : <span class="text-xs chip text-muted">#{tag}</span>
         ))}
       </p>
     )}
 
     {translation && (
-      <aside class="bg-surface border border-line rounded p-3 mb-6 text-sm" lang={lang === 'en' ? undefined : 'en'}>
+      <aside class="panel p-3 mb-6 text-sm" lang={lang === 'en' ? undefined : 'en'}>
         🌐 {t.translationNote}
-        <a href={postUrl(translation)} class="text-accent hover:underline" lang={HTML_LANG[postLang(translation)]}>{t.translationLink}</a>
+        <a href={postUrl(translation)} class="link" lang={HTML_LANG[postLang(translation)]}>{t.translationLink}</a>
       </aside>
     )}
 
     {series && (
-      <aside class="bg-surface border border-line rounded p-4 mb-6 text-sm">
+      <aside class="panel p-4 mb-6 text-sm">
         <p class="font-bold mb-2">
           {t.seriesLabel}{seriesByName.has(series)
             ? <a href={l(`/start/#${seriesByName.get(series)!.slug}`)} class="text-ink hover:text-accent no-underline">{series}</a>
@@ -116,7 +116,7 @@ const showToc = tocHeadings.length >= 3;
             <li>
               {p.id === post.id
                 ? <span class="text-ink">{p.data.title}{t.thisPost}</span>
-                : <a href={blogUrl(p)} class="text-accent hover:underline">{p.data.title}</a>}
+                : <a href={blogUrl(p)} class="link">{p.data.title}</a>}
             </li>
           ))}
         </ol>
@@ -132,8 +132,8 @@ const showToc = tocHeadings.length >= 3;
 
     {series && (prevPost || nextPost) && (
       <nav class="flex justify-between gap-4 mt-8 text-sm">
-        <span>{prevPost && <a href={blogUrl(prevPost)} class="text-accent hover:underline">← {prevPost.data.title}</a>}</span>
-        <span>{nextPost && <a href={blogUrl(nextPost)} class="text-accent hover:underline">{nextPost.data.title} →</a>}</span>
+        <span>{prevPost && <a href={blogUrl(prevPost)} class="link">← {prevPost.data.title}</a>}</span>
+        <span>{nextPost && <a href={blogUrl(nextPost)} class="link">{nextPost.data.title} →</a>}</span>
       </nav>
     )}
 
@@ -145,7 +145,7 @@ const showToc = tocHeadings.length >= 3;
             <p class="text-muted text-xs mb-1">{g.label}</p>
             <ul class="list-none p-0 m-0 space-y-1">
               {g.sources.map((s) => (
-                <li><a href={blogUrl(s)} class="text-accent hover:underline">{s.data.title}</a></li>
+                <li><a href={blogUrl(s)} class="link">{s.data.title}</a></li>
               ))}
             </ul>
           </div>

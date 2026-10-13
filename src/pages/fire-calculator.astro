@@ -26,7 +26,7 @@ import '../styles/tools.css';
 
     <h3>🏠 自住房 / 房貸</h3>
     <p class="hint">填剩餘本金即自動以等額本息算月付金與還清年齡。自住房本身<strong>不列入可投資資產</strong>（無法變現支應生活）。持有成本（房屋稅、地價稅、管理費、維修）請另計於下方支出。</p>
-    <div class="fire-grid panel">
+    <div class="fire-grid fire-panel">
       <label>房貸剩餘本金<input type="number" id="mortgageBalance" value="5000000" min="0" step="100000" oninput="updateMortgageInfo()"></label>
       <label>房貸年利率 (%)<input type="number" id="mortgageRate" value="2.1" min="0" step="0.05" oninput="updateMortgageInfo()"></label>
       <label>剩餘年數<input type="number" id="mortgageYears" value="20" min="0" step="1" oninput="updateMortgageInfo()"></label>
@@ -43,7 +43,7 @@ import '../styles/tools.css';
 
     <h3>💼 勞保老年年金</h3>
     <p class="hint">可由投保薪資自動估算（平均月投保薪資 × 保險年資 × 1.55%，薪資上限 45,800），或直接輸入月領金額。</p>
-    <div class="fire-grid panel">
+    <div class="fire-grid fire-panel">
       <label>估算方式
         <select id="laoBaoMode" onchange="updateLaoBaoInfo()">
           <option value="auto">由投保薪資估算</option>
@@ -90,7 +90,7 @@ import '../styles/tools.css';
       gap: 0.8rem;
       max-width: 860px;
     }
-    .tool-page .fire-grid.panel {
+    .tool-page .fire-grid.fire-panel {
       background: var(--color-surface); border: 1px solid var(--color-line); border-radius: 10px; padding: 0.9rem; max-width: 860px;
     }
     .tool-page .fire-grid label {

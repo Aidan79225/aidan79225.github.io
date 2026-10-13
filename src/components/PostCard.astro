@@ -19,7 +19,7 @@ const mins = readingMinutes(post.body ?? '');
 const cover = coverFromBody(post.body ?? '');
 const tagCounts = await getTagCounts();
 ---
-<article class="bg-surface border border-line rounded-lg hover:border-accent transition-colors overflow-hidden">
+<article class="card-link overflow-hidden">
   {cover && (
     <a href={url} class="block no-underline" aria-label={title}>
       <div class="card-cover bg-base border-b border-line">
@@ -41,7 +41,7 @@ const tagCounts = await getTagCounts();
       <p class="flex flex-wrap gap-2 m-0">
         {tags.map((t) => (
           tagHasPage(tagCounts, t)
-            ? <a href={withLocale(locale, `/tags/${encodeURIComponent(t)}/`)} class="text-xs bg-base border border-line rounded px-2 py-0.5 text-accent hover:underline no-underline">#{t}</a>
+            ? <a href={withLocale(locale, `/tags/${encodeURIComponent(t)}/`)} class="text-xs bg-base border border-line rounded px-2 py-0.5 link no-underline">#{t}</a>
             : <span class="text-xs bg-base border border-line rounded px-2 py-0.5 text-muted">#{t}</span>
         ))}
       </p>

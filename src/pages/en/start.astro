@@ -124,7 +124,7 @@ const alternates = [
     {seriesList.map((s) => (
       <a
         href={`#${s.slug}`}
-        class="text-xs bg-surface border border-line rounded px-2 py-1 text-ink hover:text-accent no-underline"
+        class="text-xs chip text-ink hover:text-accent no-underline"
         style={`border-left:3px solid ${s.color}`}
       >{s.enName ?? s.name}</a>
     ))}
@@ -166,7 +166,7 @@ const alternates = [
 
   <div class="space-y-6">
     {layers.map((layer) => (
-      <section class="bg-surface border border-line rounded-lg p-5" style={`border-left:3px solid ${layer.color}`}>
+      <section class="card p-5" style={`border-left:3px solid ${layer.color}`}>
         <span
           class="inline-block text-[11px] font-mono font-bold mb-2 px-2 py-0.5 rounded"
           style={`color:${layer.color};border:1px solid ${layer.color}`}
@@ -205,6 +205,6 @@ const alternates = [
   </div>
 
   <p class="text-muted text-sm mt-8">
-    Looking for a specific topic? Use the search at the top right, or browse by <a href="/en/tags/" class="text-accent hover:underline">tag</a>.
+    Looking for a specific topic? Use the search at the top right, or browse by <a href="/en/tags/" class="link">tag</a>.
   </p>
 </BaseLayout>

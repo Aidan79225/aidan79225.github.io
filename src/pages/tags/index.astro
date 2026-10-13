@@ -14,8 +14,8 @@ const tags = [...counts.entries()].sort((a, b) => b[1] - a[1] || a[0].localeComp
     {tags.map(([tag, count]) => (
       <li>
         {tagHasPage(counts, tag)
-          ? <a href={withLocale(locale, `/tags/${encodeURIComponent(tag)}/`)} class="text-sm bg-surface border border-line rounded px-2 py-1 text-accent hover:underline">#{tag} ({count})</a>
-          : <span class="text-sm bg-surface border border-line rounded px-2 py-1 text-muted" title="只有一篇,沒有獨立頁面">#{tag} ({count})</span>}
+          ? <a href={withLocale(locale, `/tags/${encodeURIComponent(tag)}/`)} class="text-sm chip link">#{tag} ({count})</a>
+          : <span class="text-sm chip text-muted" title="只有一篇,沒有獨立頁面">#{tag} ({count})</span>}
       </li>
     ))}
   </ul>

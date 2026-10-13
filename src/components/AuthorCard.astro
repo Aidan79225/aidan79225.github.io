@@ -13,7 +13,7 @@ const { locale = 'zh-hant' } = Astro.props;
     <p class="text-muted text-sm">{author.bio[locale]} · {author.location}</p>
     <p class="text-sm">
       {author.links.map((l, i) => (
-        <span>{i > 0 ? ' · ' : ''}<a href={l.url} class="text-accent hover:underline">{l.label}</a></span>
+        <span>{i > 0 ? ' · ' : ''}<a href={l.url} class="link">{l.label}</a></span>
       ))}
     </p>
   </div>

@@ -32,7 +32,7 @@ const tools: Tool[] = [
   <h1 class="text-2xl font-bold mb-6">Tools</h1>
   <div class="grid gap-4 sm:grid-cols-2">
     {tools.map((t) => (
-      <div class="relative p-4 bg-surface border border-line rounded-lg hover:border-accent transition-colors">
+      <div class="relative p-4 card-link">
         {/* Stretched link: the title's ::after covers the card, keeping the
             whole card clickable while footer links sit above it on z-10. */}
         <p class="font-bold text-ink mb-1">
@@ -45,8 +45,8 @@ const tools: Tool[] = [
         <p class="text-muted text-sm m-0">{t.desc}</p>
         {(t.post || t.source) && (
           <p class="relative z-10 flex gap-3 mt-2 mb-0 text-xs">
-            {t.post && <a href={withLocale(locale, t.post)} class="text-accent hover:underline">📝 介紹文章</a>}
-            {t.source && <a href={t.source} target="_blank" rel="noopener" class="text-accent hover:underline">Source</a>}
+            {t.post && <a href={withLocale(locale, t.post)} class="link">📝 介紹文章</a>}
+            {t.source && <a href={t.source} target="_blank" rel="noopener" class="link">Source</a>}
           </p>
         )}
       </div>

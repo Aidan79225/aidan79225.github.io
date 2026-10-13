@@ -30,8 +30,8 @@ const featured = ['ddia', 'rezero', 'btl']
       目前寫了 {seriesCount} 個系列、{all.length} 篇文章——從 SQL、DDIA、Kafka、Airflow、Kubernetes、SRE,到帶團隊的心得與實戰的電商系統設計。
     </p>
     <p class="flex flex-wrap gap-3 text-sm">
-      <a href="/start/" class="bg-accent text-ink font-bold rounded px-4 py-2 no-underline hover:opacity-90">從這裡開始 →</a>
-      <a href="/about/" class="bg-surface border border-line text-ink rounded px-4 py-2 no-underline hover:border-accent">關於我</a>
+      <a href="/start/" class="btn-primary">從這裡開始 →</a>
+      <a href="/about/" class="btn">關於我</a>
     </p>
   </header>
 
@@ -40,7 +40,7 @@ const featured = ['ddia', 'rezero', 'btl']
     {featured.map((s) => (
       <a
         href={`/start/#${s.slug}`}
-        class="block bg-surface border border-line rounded-lg p-4 no-underline hover:border-accent transition-colors"
+        class="block card-link p-4 no-underline"
         style={`border-top:3px solid ${s.color}`}
       >
         <p class="font-bold text-ink mb-1 leading-snug">{s.name}</p>
@@ -51,7 +51,7 @@ const featured = ['ddia', 'rezero', 'btl']
   </div>
   <p class="text-sm text-muted -mt-6 mb-10">
     還有 Redis、Kafka、Spark、Airflow、K8s、SRE 等共 {seriesCount} 個系列 →
-    <a href="/start/" class="text-accent hover:underline">看全部</a>
+    <a href="/start/" class="link">看全部</a>
   </p>
 
   <h2 class="text-xl font-bold mb-3">最新文章</h2>
@@ -59,8 +59,8 @@ const featured = ['ddia', 'rezero', 'btl']
     {posts.map((p) => <PostCard post={p} />)}
   </div>
   <p class="text-sm">
-    <a href="/tools/" class="text-accent hover:underline">Tools</a> ·
-    <a href="/guides/" class="text-accent hover:underline">Guides</a> ·
-    <a href="/rss.xml" class="text-accent hover:underline">RSS</a>
+    <a href="/tools/" class="link">Tools</a> ·
+    <a href="/guides/" class="link">Guides</a> ·
+    <a href="/rss.xml" class="link">RSS</a>
   </p>
 </BaseLayout>
