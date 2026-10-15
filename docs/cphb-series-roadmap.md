@@ -292,7 +292,7 @@
 - **工作上的估算**:很多時候是根據 DB table 的數據量,估算這個計算過程 OK 不 OK。→ 第 1 篇「看到 n 反推複雜度」的上班版本,後面講到 join / 掃表的篇(#2、#7)可以再引用。
 
 ### 2026-10-12:作者的 CSES 進度
-- 作者正在照順序解 CSES Problem Set 的 **Introductory Problems**,目前解到 **Apple Division**(第 16 題;前面 15 題已解:Weird Algorithm、Missing Number、Repetitions、Increasing Array、Permutations、Number Spiral、Two Knights、Two Sets、Bit Strings、Trailing Zeros、Coin Piles、Palindrome Reorder、Gray Code、Tower of Hanoi、Creating Strings)。
+- 作者正在照順序解 CSES Problem Set。**Introductory Problems 全部 19 題已解完(2026-10-15)**;2026-10-12 時解到 Apple Division(前面 15 題:Weird Algorithm、Missing Number、Repetitions、Increasing Array、Permutations、Number Spiral、Two Knights、Two Sets、Bit Strings、Trailing Zeros、Coin Piles、Palindrome Reorder、Gray Code、Tower of Hanoi、Creating Strings;之後 Apple Division、Chessboard and Queens、Digit Queries、Grid Paths)。
 - **用法**:各篇的練習段只列作者解過的題。#2 的練習段先拿掉(Distinct Numbers、Apartments 在 Sorting and Searching,還沒到)。等作者解到對應的題,再回頭補:
   - #4 完全搜尋:Apple Division(列舉子集 / 折半搜尋)、Creating Strings(排列)、Chessboard and Queens(回溯)、Grid Paths(剪枝)
   - #5 貪婪:Increasing Array、Coin Piles
@@ -323,3 +323,22 @@
   ```
   - 可以在 #4 講的「浪費」:`+a −b` 與 `−a +b` 對稱,固定第一顆為 `+` 可砍一半;`abs` 放葉子比放父層省一半。再往下就是折半搜尋(2^(n/2)),n ≤ 40 才需要。
 - **交法**:PyPy3,一次 AC,沒有 TLE(2026-10-12 作者確認)。→ 第 4 篇可以順便講「CSES 的 Python 預設交 PyPy3」這條實務建議。
+
+### CSES 題庫分區 ↔ 書的章節 ↔ 系列篇目(2026-10-15 整理)
+書按技巧切 30 章,CSES 按題型分區;一區對到好幾章,有些章的題散在好幾區。**刷題照 CSES 順序走,練習段照這張表回補**;`seriesOrder` 維持書的章節序。
+
+| CSES 區 | 書的章 | 系列篇 |
+|---|---|---|
+| Introductory Problems(19 題,✅ 已解完) | Ch1–2、5、6、10、22 散落 | #1、#4、#5、#9、#20 |
+| Sorting and Searching | Ch3、4、8(雙指標、滑動視窗) | #2、#3、#7 |
+| Dynamic Programming | Ch7、10(子集 DP) | #6、#9 |
+| Graph Algorithms | Ch11–13、15–17、19–20 | #10、#11、#13、#14、#15、#17、#18 |
+| Range Queries | Ch9、28 | #8、#26 |
+| Tree Algorithms | Ch14、18 | #12、#16 |
+| Mathematics | Ch21–25 | #19–#23 |
+| String Algorithms | Ch26 | #24 |
+| Geometry | Ch29–30 | #27、#28 |
+| Advanced Techniques | Ch5 折半、27、28 持久化,以及書上沒有的 | #4、#25、#26 |
+| Additional Problems 及後來新增的區 | 混合 | 不對應,遇到再說 |
+
+- Introductory 後 4 題對到 #4 的核心練習:Apple Division(列舉子集)、Chessboard and Queens(回溯)、Grid Paths(剪枝,原書那五刀就是講它)、Digit Queries(數學 / 找規律)。**待問作者**:Grid Paths 的剪枝踩到什麼?Chessboard and Queens 用什麼方式表示「這一格能不能放」?
