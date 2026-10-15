@@ -341,4 +341,10 @@
 | Advanced Techniques | Ch5 折半、27、28 持久化,以及書上沒有的 | #4、#25、#26 |
 | Additional Problems 及後來新增的區 | 混合 | 不對應,遇到再說 |
 
-- Introductory 後 4 題對到 #4 的核心練習:Apple Division(列舉子集)、Chessboard and Queens(回溯)、Grid Paths(剪枝,原書那五刀就是講它)、Digit Queries(數學 / 找規律)。**待問作者**:Grid Paths 的剪枝踩到什麼?Chessboard and Queens 用什麼方式表示「這一格能不能放」?
+- Introductory 後 4 題對到 #4 的核心練習:Apple Division(列舉子集)、Chessboard and Queens(回溯)、Grid Paths(剪枝,原書那五刀就是講它)、Digit Queries(數學 / 找規律)。**待問作者**:Chessboard and Queens 用什麼方式表示「這一格能不能放」?
+
+### 2026-10-15:Grid Paths 的解題經驗(給 #4 的剪枝段與反思)
+- **作者口述**:Python 解 Grid Paths 有三件事——(1) 遞迴改成**用 stack 顯式實作**;(2) 要剪「**撞牆(或撞到走過的格子)之後兩邊都是空的**」——那代表格子被切成兩塊,之後一定走不完,直接退;(3) 要 **cache 一些東西**(待問:cache 的是什麼?每格的鄰居 / 剩餘步數 / 方向表?)。
+- **對原書的對照**:原書 Ch5 的五道剪枝裡,「撞牆後兩邊空」就是第四、五刀(hitting a wall or a visited square with both sides empty → the grid splits);作者是自己踩出來的,文章裡可以先寫作者的版本再對照原書。
+- **Python 特有的部分**:遞迴深度 48 其實不深,但 2^... 次呼叫的函式呼叫成本在 CPython 很重,改 stack 是為了常數;這段正好接第 1 篇「Python 常數慢一個數量級」和 roadmap 的「涉及遞迴的篇要提 setrecursionlimit 和改迭代」。
+- **待問作者**:cache 的具體內容;最後是 CPython 還是 PyPy3 過的、跑了幾秒;有沒有哪一刀剪枝加了之後時間掉最多。
