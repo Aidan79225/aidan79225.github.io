@@ -12,7 +12,7 @@ tags:
 series: "Competitive Programmer's Handbook 讀書筆記"
 seriesOrder: 3
 comments: true
-draft: true
+draft: false
 ---
 CPHB 第 4 章是一章「工具介紹」:C++ 標準函式庫裡的 `vector`、`set`、`map`、`priority_queue`、`deque`、`bitset`。原書把它寫得很像使用手冊,但開頭有一句話比手冊重要得多:**選資料結構,關鍵的問題是「這個結構裡,哪些操作是便宜的?」** 每個容器都只對幾種操作便宜,其他的要嘛貴、要嘛做不到。你選的不是容器,是接下來每一步要付的價錢。
 
