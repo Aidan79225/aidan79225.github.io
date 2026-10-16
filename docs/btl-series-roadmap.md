@@ -32,7 +32,7 @@
 |---|---|---|---|---|
 | 9 | `btl-9` | Ch10–11 The First / Second Great Obstacle to Motivating Others | 激勵的兩大障礙:別人是隱形的(明星工程師的 solo 敘事)/ 把人當電腦下指令(失真鏈 SVG、人=任務);反思=重讀「成員不理解」+ KPI 是鏈尾輸出 | ✅ 已發布 |
 | 10 | `btl-10` | Ch12–13 The Problem of Helping People / Learning to Be a Motivator | 幫助的難題:四句判詞 → 三道閘門(他要嗎/問題一致嗎/幫他還是幫我;沒過=打擾/雞同鴨講/搶戲)+ 接鍵盤撞閘現場;激勵者先看懂自己。反思=LoL 動機樣本(達瑞文 vs 石頭人)→ 派任務=幫人選英雄 → 重讀 clean architecture(假幫助) | ✅ 已發布(中英) |
-| 11 | `btl-11` | Ch14–15 Where Power Comes From / Power, Imperfection, and Congruence | 力量的來源;不完美與言行一致(congruence) | 📝 未寫 |
+| 11 | `btl-11` | Ch14–15 Where Power Comes From / Power, Imperfection, and Congruence | 力量是一種關係(專業≠力量,junior/senior 對比);Ralph 的機械問題:主管五條路=Satir 五種應對姿態(討好/指責/超理智/打岔/言行一致,三點圖);機械問題≠品格問題、人看不見自己的機械問題(先給資訊、行動權留給他);反思=鼻毛十幾年後的回報、訂單統計的討好+指責成對、專業被分享才變力量(Part Three 完結) | 🚧 草稿(中英皆備,`draft: true`) |
 
 ## Part Four — 組織(Organization)
 
@@ -75,6 +75,10 @@
 | 激勵的兩大障礙 | the first / second great obstacle to motivating others | Ch10–11 |
 | 力量 | power | Ch14 Where Power Comes From;不寫「權力」除非確指職權 |
 | 言行一致 | congruence | Ch15;Weinberg/Satir 用語,不譯成「一致性」(那是技術詞) |
+| 力量是一種關係 | power as a relationship | Ch14 小節標題;專業(expertise)是你擁有的,力量取決於關係 |
+| 機械問題 | mechanical problem | Ch15 Ralph 案例:皮革藥水的味道——可解決的物理問題,不是品格問題 |
+| 應對姿態 | ⚠ coping stances(Satir 用語;Ch15 是否直接點名 Satir 待翻書確認) | btl-11 用來攤開 Ralph 案例的五條路;三要素 = 自己 / 對方 / 情境(self / other / context) |
+| 討好 / 指責 / 超理智 / 打岔 | placating / blaming / super-reasonable / irrelevant | 四種不一致的姿態;固定這四個中文詞,不寫「討好型」「指責型」 |
 | 蛻變 | transformation | Part Five |
 | 高峰時刻 | peak experience | btl-8 挖個人願景的方法 |
 | 幫助的難題 | the problem of helping others | Ch12;判詞:不想要的幫助永遠不會成功、每個幫忙都同時在幫自己 |
