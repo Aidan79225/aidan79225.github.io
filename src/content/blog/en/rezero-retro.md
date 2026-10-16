@@ -1,8 +1,9 @@
 ---
 title: "Re: If I Really Started Over"
 date: 2026-08-02
+updated: 2026-10-16
 category: tech
-description: "The finale. The politics get one line — we're engineers, and we focus where focus belongs; what deserves writing is the final month: one-on-ones, mock interviews, studying AI tools together, shipping right up to the day we disbanded; a meteor's appeal, three realisations that only surfaced mid-series, the two lists of \"wouldn't change\" and \"would add\" — and what the word Re: actually means."
+description: "The finale. The politics get one line — we're engineers, and we focus where focus belongs; what deserves writing is the final month: one-on-ones, mock interviews, studying AI tools together, shipping right up to the day we disbanded; a meteor's appeal, three realisations that only surfaced mid-series, the two lists of \"wouldn't change\" and \"would add\", what travels with the person through the AI wave — and what the word Re: actually means."
 tags:
   - war-story
   - live-commerce
@@ -13,21 +14,21 @@ comments: true
 draft: false
 translationOf: rezero-retro
 ---
-This series started with [[rezero-overview|the journey of one comment]] and ran for twenty chapters. The finale adds no architecture; it does four things: account for the ending, tell the last month, gather three realisations that only surfaced halfway through the writing, and answer the title's question — **if I really started over, what would I change?**
+This series started with [[rezero-overview|the journey of one comment]] and ran for twenty chapters. The finale adds no architecture; it does five things: account for the ending, tell the last month, gather three realisations that only surfaced halfway through the writing, answer the title's question — **if I really started over, what would I change?** — and finally, take one look at the AI wave: what travels with the person.
 
 ## After that day
 
-[[rezero-microservices|#19]] covered that day: development paused, the contract renegotiated, three people left a month later. After that, the project moved towards shutdown and redundancies for **political reasons**.
+[[rezero-microservices|#19]] covered that day: development paused, the contract renegotiated, a month later only three people remained. After that, the project moved towards shutdown and redundancies for **political reasons**.
 
-The political details aren't written here. Not because they can't be, but because they aren't worth it — **we're engineers, and we focus where focus belongs.** Commercial and political forces can switch a project off, and an engineer can't control that; what an engineer controls is doing the work right every day the project lives, and what they carry out on the day it dies. This chapter is only about the second.
+The political details aren't written here. Not because they can't be, but because they aren't worth it — **we're engineers, and we focus where focus belongs.** Commercial and political forces can switch a project off, and an engineer can't control that; what an engineer controls is doing the work right every day the project lives, and what they walk away with on the day it dies. This chapter is only about the second.
 
 ## The final month
 
-The first thing I did once the ending was certain was **book a one-on-one with everyone immediately.** Nobody needed consoling — they all understood the owner's decision; engineers accept a causal chain like "the contract collapsed, the money ran out" faster than you'd expect. What actually needed discussing was the next step.
+The first thing I did once the ending was certain was **book a one-on-one with everyone immediately.** Nobody needed consoling — they all understood the boss's decision; engineers accept a causal chain like "the contract collapsed, the money ran out" faster than you'd expect. What actually needed discussing was the next step.
 
 I told them: for this last month, **go and look for work** — and if it helps, I'll run mock interviews with you. Then we turned the remaining time into an acceleration period: studying the AI tools that were exploding at the time together — OpenClaw, opencode, Claude Code, multica — building the competitiveness that doesn't fit on a résumé.
 
-The last thing was that I **stood up multica so people in other departments could write tasks themselves, with engineers reviewing them.** The team was disbanding, but the requirements weren't going to disappear; better to leave behind a way of working — non-engineers write tasks, engineers hold the gate — than a pile of wishes with nobody to catch them. [[rezero-ops|#15]] said what we lacked was "a language for incidents"; the final delivery before leaving happened to give the people staying **a language for requirements**.
+The last thing was that I **stood up multica so people in other departments could write tasks themselves, with engineers reviewing them.** The team was disbanding, but the requirements weren't going to disappear; better to leave behind a way of working — non-engineers write tasks, engineers hold the gate — than a pile of wishes with nobody to catch them. [[rezero-ops|#15]] said what we lacked was "a language for incidents"; the final delivery before leaving happened to give the people staying "a language for requirements".
 
 Still shipping on the eve of disbanding isn't a performance of diligence. An engineer's dignity doesn't live in a project's success or failure — half of that is in other people's hands; **dignity lives in "right up to the last day, the work was good".**
 
@@ -35,11 +36,11 @@ Still shipping on the eve of disbanding isn't a performance of diligence. An eng
 
 There's a story owed since [[rezero-ops|#15]]: the post-selection variant feature.
 
-Tuesday, midnight, a call to the CTO: the host wanted a "post-selection variant" feature — customers call orders during the stream and pick the exact variant after it ends — **needed for Saturday's stream.** A colleague and I rushed it out, tested it thoroughly, felt entirely confident, and shipped on time.
+Tuesday, midnight, a call to the CTO: the host wanted a "post-selection variant" feature — customers call orders during the stream and pick the exact variant after it ends — **needed for Saturday's stream.** My colleagues and I rushed it out, tested it thoroughly, felt entirely confident, and shipped on time.
 
 And then it was **never used once in three months.**
 
-The CTO asked, and got this answer: "**Knowing I can use it and not being able to use it are different things.**" What my colleague, the CTO and I felt at the time was tragicomic — a midnight meteor, a week of crunch, in exchange for a button nobody touched.
+The CTO asked, and got this answer: "**There's a difference between knowing I can use it and not being able to.**" What my colleagues, the CTO and I felt at the time was tragicomic — a midnight meteor, a week of crunch, in exchange for a button nobody touched.
 
 But having written these twenty chapters, I'd like to appeal that meteor's verdict. [[rezero-asset-lifecycle|#17]] had an insurance policy never claimed on — image_metadata's reverse reference, taken out for entirely genuine reasons, with the day of the claim never coming; [[rezero-ops|#15]] said monitoring's ultimate product isn't information, it's **peace of mind**. The post-selection variant is the same thing: the host was never buying that button, she was buying "**if I need it on Saturday, I have it**". An unclaimed policy doesn't mean the premiums were wasted — **having it and not using it is itself an effect.** We recorded it in an engineer's ledger (zero usage = zero value) and the host was keeping a different one; only now, writing this series, do I see that hers was the right ledger.
 
@@ -49,7 +50,7 @@ Three things surfaced by themselves halfway through this series — not things I
 
 **One: we actually did rather well back then.** When I started this series I expected to write a confession; halfway through I found the "wouldn't change" list unusually long: [[rezero-comment-order|the FSM and lookup-as-validation]], [[rezero-payment|fact tables and derive-on-read]], [[rezero-flash-crowd|batches that silt but don't fall]], [[rezero-cart-order|3NF discipline]], [[rezero-stack|five boring components]], [[rezero-team|order the queue, don't schedule it]]… Why the gap between memory and fact? Because **good decisions are silent** — they don't cause incidents, and what causes no incident leaves no memory; a painful memory is always more vivid than a correct decision. An engineer looking back at themselves carries the inverse of survivorship bias: remembering only the scars and forgetting the armour.
 
-**Two: I wasn't a data engineer back then, and I did a great deal of what data engineers do.** Fetching comments is an EL pipeline, the FSM batch is stream consumption, the sold quantity is a materialised view, the hourly recomputation is scheduled repair, the allocation log is event sourcing, the export is data delivery — everything [[rezero-reconciliation|the reconciliation chapter]] gathered up is present in what my job title today calls Data Engineering. **DE isn't a job title, it's a set of problems**; back then that set grew on an e-commerce backend, and when I changed jobs later I only moved to a place where the same set is the main event. From backend to DE manager looks like a career change from outside; I know better: **the problems didn't change, they finally got a name.**
+**Two: I wasn't a DE back then, yet I did a great deal of what DEs do.** Fetching comments is an EL pipeline, the FSM batch is stream consumption, the sold quantity is a materialised view, the hourly recomputation is scheduled repair, the allocation log is event sourcing, the export is data delivery — everything [[rezero-reconciliation|the reconciliation chapter]] gathered up is present in what my job title today calls Data Engineering. **DE isn't a job title, it's a set of problems**; back then that set grew on an e-commerce backend, and when I changed jobs later I only moved to a place where the same set is the main event. From backend to EM of a DE team looks like a career change from outside; I know better: **the problems didn't change, they finally got a name.**
 
 **Three: the whole system is an unbundled database.** [[rezero-reconciliation|#16]] unpacked this; the finale only adds a last layer: the first two realisations are corollaries of it. "We did rather well" is because we unknowingly followed a database's internal discipline (write the log first, derive rather than materialise, repair from the facts); "I did DE work" is because every component of an unbundled database is a data engineer's daily life. Three realisations are three faces of one thing — **we spent eighteen months building a database by hand, and I only found out while writing this series.**
 
@@ -60,17 +61,17 @@ The title's question — surely the answer is some piece of architecture? The FS
 None of them. The core architecture, as the last section said, I wouldn't change. **What I'd most want to change is the monitoring.**
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 580 288" role="img" aria-label="Two lists. On the left in green, the core I wouldn't change: the FSM and lookup-as-validation, appending facts plus deriving on read, batches that silt but don't fall, 3NF and the two stock columns, per-provider payment fact tables, five boring components, ordering the queue rather than scheduling it, and transcoding as validation. On the right in amber, the protection a rebuild would add: the four golden signals plus a batch lag gauge, a language for incidents with severity and runbooks, dead-letter queues, Cloudflare on day one, scheduled invariant queries, deleted_at and a reverse lookup before sweeping, and load testing plus the other half of the checklist. The conclusion at the bottom: the core was right and everything owed was protection — which also explains why I later moved towards SRE." style="width:100%;max-width:620px;height:auto;margin:0 auto;">
+  <svg viewBox="0 0 580 288" role="img" aria-label="Two lists. On the left in green, the core I wouldn't change: the FSM and lookup-as-validation, appending facts plus deriving on read, batches that silt but don't fall, 3NF and the stock ledger's three numbers, per-provider payment fact tables, five boring components, ordering the queue rather than scheduling it, and transcoding-as-validation. On the right in amber, the protection a rebuild would add: the four golden signals plus a batch lag gauge, a language for incidents with severity and runbooks, dead-letter queues, Cloudflare on day one, scheduled invariant queries, deleted_at and a reverse lookup before sweeping, and load testing plus the other half of the checklist. The conclusion at the bottom: the core was right and everything owed was protection — which also explains why I later moved towards SRE." style="width:100%;max-width:620px;height:auto;margin:0 auto;">
     <text x="152" y="26" fill="#54b890" font-size="8" text-anchor="middle" font-weight="bold">Wouldn't change (the core)</text>
     <rect x="24" y="38" width="256" height="196" rx="8" fill="#233528" stroke="#54b890" stroke-width="1.3"/>
     <text x="152" y="60" fill="#e6e6e6" font-size="6.6" text-anchor="middle">the FSM · lookup-as-validation</text>
     <text x="152" y="82" fill="#e6e6e6" font-size="6.6" text-anchor="middle">append facts + derive on read</text>
     <text x="152" y="104" fill="#e6e6e6" font-size="6.6" text-anchor="middle">batches that silt but don't fall</text>
-    <text x="152" y="126" fill="#e6e6e6" font-size="6.6" text-anchor="middle">3NF · two stock columns</text>
+    <text x="152" y="126" fill="#e6e6e6" font-size="6.6" text-anchor="middle">3NF · three-number stock ledger</text>
     <text x="152" y="148" fill="#e6e6e6" font-size="6.6" text-anchor="middle">per-provider payment fact tables</text>
     <text x="152" y="170" fill="#e6e6e6" font-size="6.6" text-anchor="middle">five boring components · one VM</text>
-    <text x="152" y="192" fill="#e6e6e6" font-size="6.6" text-anchor="middle">order the queue · merge = release</text>
-    <text x="152" y="214" fill="#e6e6e6" font-size="6.6" text-anchor="middle">transcoding as validation · generic FKs</text>
+    <text x="152" y="192" fill="#e6e6e6" font-size="6.6" text-anchor="middle">order the queue, don't schedule · merge = release</text>
+    <text x="152" y="214" fill="#e6e6e6" font-size="6.6" text-anchor="middle">transcoding-as-validation · generic FKs</text>
     <text x="428" y="26" fill="#d6a45c" font-size="8" text-anchor="middle" font-weight="bold">Would add (protection)</text>
     <rect x="300" y="38" width="256" height="196" rx="8" fill="#1f2330" stroke="#d6a45c" stroke-width="1.3"/>
     <text x="428" y="60" fill="#d6a45c" font-size="6.6" text-anchor="middle" font-weight="bold">four golden signals + a batch lag gauge</text>
@@ -91,11 +92,19 @@ Pour out every "starting over" voice from twenty chapters and the right-hand lis
 
 So if I really started over, what I'd most want to change isn't a line of architecture, it's **doing the monitoring properly — so no engineer ever gets the chance to suffer the way I did.** The greatest do-over isn't for the system, it's for the people. The system's books balanced back then; the people's books are what I only learned to keep later.
 
+## In the AI wave, what travels with the person
+
+In the final month we studied AI tools together, and at the time it was for an edge in the job hunt; looking back a few months later, what we were really doing was seeing a bigger thing clearly: **AI made "writing" cheap and "judgment" expensive.** Nothing of value in this series was "written" into existence — the refusal to build a cache, the surrender of letting the hosts rip out the state machine, the granularity of punishing exactly what was done, the discipline of boring tech: all of it is judgment, and judgment comes from being there. AI can hand you five ways to deduct stock; it can't tell you "which one this team, this floor, this host should pick" — that answer isn't in the training data, it's in the sound of the stream.
+
+That final multica delivery looks, from here, like a rehearsal: non-engineers write the tasks, engineers review — give away the output, keep the gate. [[rezero-team|#18]] said a lead's job is three checkpoints: breakdown, review, technology choice; in the AI era those three stop being a lead's prerogative and become **every engineer's daily work** — your relationship with AI is a player-coach's relationship with the team. So the direction for improving yourself is concrete: the ability to hold the gate grows out of judgment, and judgment grows out of being there; and for the experience of being there to become a transferable asset, there is exactly one road — **write it down**. This series is its own demonstration: not one of the three realisations was something I knew back then; all of them were forced out by the writing. Experience unwritten is only memory; written down, it becomes judgment.
+
+Tools turn over every two years, and whoever chases tools resets to zero every two years; the set of problems — invariants, facts and derivations, boundaries, trade-offs — hasn't changed in ten. **Hold the problems, and AI is your lever; hold only the tools, and you're what AI replaces.**
+
 ## Re:
 
-The series' name plays on a joke, but writing to the end I found the word "Re:" has three meanings, and they happen to be three layers of an ending.
+The series' name is a nod to an anime, but writing to the end I found the word "Re:" has three meanings, and they happen to be three layers of an ending.
 
-**Re: is retry.** Every chapter carries a "if I started over" voice — not a list of regrets, but fighting each of those battles again with what I know now. The conclusion of refighting them is in the two lists above: keep the core, add the protection. Technically, the do-over is settled.
+**Re: is retry.** Every chapter carries an "if I started over" voice — not a list of regrets, but fighting each of those battles again with what I know now. The conclusion of refighting them is in the two lists above: keep the core, add the protection. The technical do-over is settled here.
 
 **Re: is reply.** Halfway through the writing I realised these twenty-one chapters are a letter of reply — to the version of me watching streams with his stomach in knots and fixing bugs at midnight. Summarised in one line: **you did better than you thought; and what you owed, you paid off later.**
 

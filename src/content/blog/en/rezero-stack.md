@@ -2,7 +2,7 @@
 title: "The Opening Move: Five Components and One CI/CD Pipeline"
 date: 2026-07-25
 category: tech
-description: "The arsenal we actually had: PostgreSQL, Django, RabbitMQ, Redis, Celery — five boring components, each with its own job, plus the CI/CD pipeline that let six engineers ship a dozen features a day. And why I wouldn't swap any of them."
+description: "The arsenal our live-commerce platform actually ran on back then: PostgreSQL, Django, RabbitMQ, Redis, Celery — how five boring components each do their own job, plus the CI/CD pipeline that let six engineers ship a dozen features a day. And why I wouldn't swap any of them."
 tags:
   - war-story
   - system-design
@@ -13,7 +13,7 @@ comments: true
 draft: false
 translationOf: rezero-stack
 ---
-With [[rezero-overview|the big picture]] laid out, and before we get into the battles over comments and stock, let's open the arsenal we had — because every trade-off in the chapters ahead was made inside the boundaries of this stack. The team was small: **3 backend, 3 frontend**, occasionally with 1–2 contractors. The arsenal was plain too: **PostgreSQL, Django (API + WebSocket), RabbitMQ, Redis, Celery**, all running on GCP. This post answers two questions: why these five, and — why a small team moves fast, which turns out not to be about the stack at all.
+With [[rezero-overview|the big picture]] laid out, and before we get into the battles over comments and stock, let's open the arsenal we had — because every trade-off in the chapters ahead was made inside the boundaries of this stack. The team was small: **3 backend, 3 frontend**, occasionally farming work out to 1–2 contract engineers. The arsenal was plain too: **PostgreSQL, Django (API + WebSocket), RabbitMQ, Redis, Celery**, all running on GCP. This post answers two questions: why these five, and — why a small team moves fast, which turns out not to be about the stack at all.
 
 ## Five components, three timescales
 
@@ -26,7 +26,7 @@ These five weren't thrown together at random. Looking back, they're exactly **on
     <rect x="20" y="34" width="170" height="64" rx="6" fill="#26324a" stroke="#4f6df5" stroke-width="1.4"/>
     <text x="105" y="56" fill="#4f6df5" font-size="9.4" text-anchor="middle" font-weight="bold">Django API</text>
     <text x="105" y="72" fill="#9aa4b2" font-size="7.2" text-anchor="middle">request in, response out</text>
-    <text x="105" y="86" fill="#9aa4b2" font-size="7.2" text-anchor="middle">cart · checkout · accounts</text>
+    <text x="105" y="86" fill="#9aa4b2" font-size="7.2" text-anchor="middle">cart · checkout · members</text>
     <text x="290" y="24" fill="#9b6ff0" font-size="9.6" text-anchor="middle" font-weight="bold">Real-time · push</text>
     <rect x="205" y="34" width="170" height="64" rx="6" fill="#2a2440" stroke="#9b6ff0" stroke-width="1.4"/>
     <text x="290" y="56" fill="#9b6ff0" font-size="9.4" text-anchor="middle" font-weight="bold">WebSocket</text>
@@ -56,17 +56,17 @@ These five weren't thrown together at random. Looking back, they're exactly **on
 
 A few details about that division that the diagram doesn't carry:
 
-- **The API layer is Django Ninja.** It writes almost exactly like FastAPI — type annotations, automatic OpenAPI docs, thin routers — but underneath it's still full Django: ORM, migrations, admin, all present. It's **FastAPI's developer experience with Django's ecosystem dividend**, which for a team with three backend engineers pays twice.
-- **WebSocket serves the host, not the viewers.** Its only job is pushing viewer comments to the host dashboard in real time — the host has to see the chat to keep the show moving. A viewer's order can lag by seconds (minutes, at peak), but the host's view has to be live. The system's whole **latency budget is bet on the host's experience**: the host controls the rhythm of the stream, and a host who never runs out of stock and never calls the wrong key generates far fewer complaints. That trade-off comes back in every later chapter.
+- **The API layer is Django Ninja.** It writes almost exactly like FastAPI — type annotations, automatic OpenAPI docs, thin routers — but underneath it's still full Django: ORM, migrations, admin, all present. It's **FastAPI's developer experience with Django's ecosystem dividend**, which for a team with three backend engineers is a double bargain.
+- **WebSocket serves the host, not the viewers.** Its only job is pushing viewer comments to the host dashboard in real time — the host has to see the live chat to keep the show moving. A viewer's order can lag by seconds (minutes, at peak), but the host's view has to be live. The system's whole **latency budget is bet on the host's experience**: the host controls the rhythm of the stream, and with a host who never runs out of stock and never calls the wrong key, complaints take care of themselves. That trade-off comes back in every later chapter.
 - **RabbitMQ does exactly one thing from start to finish: it's [[infra-rabbitmq|Celery]]'s pipe.** Everything that can be asynchronous is on Celery: fetching comments, FSM batch order placement, invoicing, email, order exports. An external call that's slow and mustn't fail, like invoicing, and a loop that runs every two seconds, like comment fetching, were never meant to share a request path.
-- **Redis holds only the banned-user list — no sessions.** Auth is straight JWT with permissions inside the token, completely stateless, so every API server can verify on its own without consulting shared state. And JWT's textbook weakness is that once issued you can't take it back; that Redis blocklist is precisely the **revocation mechanism**: a comment arrives, we ask Redis whether they're on the list, and if so we ignore it. Stateless speed plus one centralised veto — we assembled that combination on instinct at the time, and only later found out it's the industry's standard answer. What if Redis restarts? Rebuild from the blocklist table in the DB — **fast checks in Redis, the fact always in the DB**, which is the correct posture for a [[redis-cache-patterns|cache]].
+- **Redis holds only the banned-user list — no sessions.** Auth is straight JWT with permissions stuffed into the token — completely stateless, so every API server can verify on its own without consulting shared state. And JWT's textbook weakness is "once it's out, you can't take it back"; that Redis blocklist is precisely the **revocation mechanism**: a comment arrives, we first ask Redis whether they're on the list, and if so we ignore it. Stateless speed plus one centralised veto — we assembled that combination on instinct at the time, and only later found out it's the industry's standard answer. What if Redis restarts? Rebuild from the blocklist table in the DB — **fast checks in Redis, the truth always in the DB**, which is the correct posture for a [[redis-cache-patterns|cache]].
 
-## One pipeline: where a dozen features a day comes from
+## One CI/CD pipeline: where a dozen features a day comes from
 
 The stack was plain, but the pipeline was complete — and that was the real competitive advantage:
 
 <figure style="margin:1.5rem 0;text-align:center;">
-  <svg viewBox="0 0 580 190" role="img" aria-label="The CI/CD flow we had. After a developer pushes, GitHub Actions runs tests and checks. The branching strategy is GitLab flow, so merging into the staging branch deploys automatically to the staging environment; going to production means pushing the prod branch into Cloud Build, which waits for a manual approval before deploying to production on GCP. The result was a team shipping a dozen or more features a day." style="width:100%;max-width:620px;height:auto;margin:0 auto;">
+  <svg viewBox="0 0 580 190" role="img" aria-label="The CI/CD flow we had. After a developer pushes, GitHub Actions runs tests and checks. The branching strategy is GitLab flow, so merging into the staging branch deploys automatically to the staging environment; going to Production means pushing the prod branch into Cloud Build, which waits for a manual approval before deploying to Production on GCP. The result was a team shipping a dozen features a day." style="width:100%;max-width:620px;height:auto;margin:0 auto;">
     <defs><marker id="rsc" markerWidth="7" markerHeight="7" refX="5" refY="3" orient="auto"><path d="M0,0 L0,6 L6,3 z" fill="#4f6df5"/></marker></defs>
     <rect x="16" y="40" width="96" height="44" rx="6" fill="#262b3a" stroke="#9aa4b2" stroke-width="1"/>
     <text x="64" y="59" fill="#e6e6e6" font-size="8.6" text-anchor="middle" font-weight="bold">push</text>
@@ -79,7 +79,7 @@ The stack was plain, but the pipeline was complete — and that was the real com
     <text x="331" y="47" fill="#9aa4b2" font-size="6.8" text-anchor="middle">push and it ships</text>
     <rect x="266" y="68" width="130" height="40" rx="6" fill="#2e2a20" stroke="#d6a45c" stroke-width="1.3"/>
     <text x="331" y="85" fill="#d6a45c" font-size="8.4" text-anchor="middle" font-weight="bold">prod: Cloud Build</text>
-    <text x="331" y="99" fill="#9aa4b2" font-size="6.8" text-anchor="middle">deploys after approval</text>
+    <text x="331" y="99" fill="#9aa4b2" font-size="6.8" text-anchor="middle">manual approval → deploy</text>
     <rect x="428" y="40" width="130" height="44" rx="6" fill="#262b3a" stroke="#9aa4b2" stroke-width="1"/>
     <text x="493" y="59" fill="#e6e6e6" font-size="8.6" text-anchor="middle" font-weight="bold">GCP</text>
     <text x="493" y="73" fill="#9aa4b2" font-size="6.8" text-anchor="middle">the whole stack in the cloud</text>
@@ -96,18 +96,18 @@ The stack was plain, but the pipeline was complete — and that was the real com
 
 The flow is three sentences: after a push, GitHub Actions runs tests and checks; merge into the staging branch and it deploys itself, so anything you want to try is visible the moment you push it; to go to Production, push the prod branch and hit one approval button in Cloud Build. **Zero friction to staging, one human gate to Production, CI always standing in front** — and that's how a team of six shipped a dozen features a day.
 
-The conclusion I've since drawn: **your stack decides what you can build; your CI/CD decides how fast you build it.** Anyone can pick boring tech, but give two teams the same five components and one of them will still be white-knuckling a weekly release. The difference was never the components — it's how many manual steps sit between push and production. Every extra step slows the loop, and speed is a small team's only advantage.
+The conclusion I've since drawn: **your stack decides what you can build; your CI/CD decides how fast you build it.** Anyone can pick boring tech, but with the same five components, some teams still white-knuckle a once-a-week release. The difference was never the components — it's how many manual steps sit between push and Production — every extra step slows the iteration a notch, and speed is a small team's only advantage.
 
 ## Reflections
 
-### I wouldn't swap any of them
+### Even starting over, I wouldn't swap any of them
 
-This is my honest answer after thinking about it for a long time: **I'd keep all five of these components if I started over.** The biggest reason is Django admin — it's close to irreplaceable, but its role has to be stated precisely: **admin is for engineers only**. It's the engineer's safe operating console — far safer than running SQL against the DB directly — for setting up Celery schedules and handling every flavour of one-off request; register a model and you have an interface. Operations and support got purpose-built tools instead (this team took pride in good internal tooling; the console chapter goes into it). For a team with 3 backend engineers, admin is a free extra layer of "you won't fat-finger this". The second reason is Celery: pair it with RabbitMQ and heartbeat scheduling and you have **something close to [[infra-airflow|Airflow]]'s capability with none of Airflow's operational burden**. Comment fetching, batch ordering, invoicing, reconciliation jobs all ran on it. Workflow platforms are good things, but they come with their own servers to keep alive and their own potholes — and at a dozen features a day, "nothing to operate" is itself the biggest feature.
+This is my honest answer after thinking about it for a long time: **I'd keep all five of these components if I started over.** The biggest reason is Django admin — it's close to irreplaceable, but its role has to be stated precisely: **admin is for engineers only**. It's the engineer's safe operating console — far safer than running SQL against the DB directly — for setting up Celery schedules and handling every flavour of one-off request; register a model and you have an interface. Operations and support got purpose-built tools instead (this team took pride in good internal tooling; the console chapter goes into it). For a team with 3 backend engineers, admin is a free extra ops interface with "you can't fat-finger this" built in. The second reason is Celery: pair it with RabbitMQ and heartbeat scheduling and you have **something close to [[infra-airflow|Airflow]]'s capability with none of Airflow's operational burden**. Comment fetching, batch ordering, invoicing, reconciliation jobs all ran on it. Workflow platforms are good things, but they come with their own servers to keep alive and their own potholes — and at a dozen features a day, "nothing to operate" is itself the biggest feature.
 
 ### Spend the complexity budget where it cuts
 
-A small team's complexity budget is fixed: whatever you spend on infra, you don't have for the business. What was smart about these choices (half of it luck, honestly) is that almost the entire budget went to the business — the FSM for comment parsing, the invariants in stock, idempotency in payments. Those are this product's hard parts. The infra was picked as boring as possible: every component mature enough not to surprise you at 2am, and documented well enough that a contractor could be productive in a week. [[pain-before-power|Confirm the pain first]] — and the converse holds too: where you haven't felt pain yet, don't buy the cure.
+A small team's complexity budget is fixed: whatever you spend on infra, you don't have for the business. What was smart about these choices (half of it luck, honestly) is that almost the entire budget went to the business — the FSM for comment parsing, the inventory invariants, idempotency in payments — those are this product's hard parts. The infra was picked as boring as possible: every component mature enough not to surprise you in the middle of the night, and documented well enough that a contractor could be productive in a week. [[pain-before-power|Feel the pain first, and you know what the tool is solving]] — and the converse holds too: where you haven't felt pain yet, don't buy the cure.
 
 ### The speed was real; the stability was homework we did later
 
-But I have to say the other half out loud: the "fast" in this chapter was bought on credit against "stable". In the early days the API server ran a single process on a single CPU, got flattened the moment a stream went live, and we scrambled traefik in front with four processes to survive. There was no such role as SRE on that team; all the infrastructure was carried by me as backend lead on the side, watching every single stream by hand with my stomach in knots. CI/CD let us send features to production at speed — but **what happened after they landed, we were essentially running blind**. I'll settle that bill in the operations chapter. For now, one line: your opening move decides how fast you run; whether you can keep running is a different subject.
+But I have to say the other half out loud: the "fast" in this chapter was bought on credit against "stable". In the early days the API server ran a single process on a single CPU, got flattened the moment a stream went live, and we scrambled traefik in front with four processes to survive. In those days there was no such role as SRE on the team; all the infrastructure was carried by me as backend lead on the side, watching every single stream by hand with my stomach in knots. CI/CD let us send features to Production at speed — but **what happened after they landed, we were running basically naked**. I'll settle that bill in the operations chapter. For now, one line: your opening move decides how fast you run; how long you can keep running is a lesson of its own.

@@ -339,8 +339,56 @@
 | 庫存預扣 | inventory reservation | 不寫「鎖庫存」除非確指 DB lock |
 | 冪等 | idempotent | 與 IaC / Ansible 對齊 |
 | 一台拆開的資料庫 | an unbundled database | 借 DDIA Ch12 的 unbundling,cross-link 要指回去 |
-| 主播 | host / streamer | 固定用 host,dashboard 情境才用 streamer |
+| 主播 | host / streamer | 固定用 host,dashboard 情境才用 streamer。⚠ 已發布英文(#2/#9/#14/#15)的 dashboard 情境全寫 host dashboard,沒有一篇用 streamer;是否刪掉 streamer 子句、或整系列改 streamer dashboard,待作者裁決,裁決後記進 glossary D 區 |
 | 自留額 | retention (insurance) | 保險用語,ai-responsibility 那條線共用 |
+| 出貨前處理 | pre-shipment handling | 章名/圖內標籤可縮成 pre-shipment;不寫 fulfillment(那是 slug 不是用詞) |
+| 合併出貨 | consolidated shipping | 動詞用 consolidate;多場直播的單併一箱 |
+| 自建直播間 | own live studio | 圖內標籤縮成 own studio;與 FB / IG 並列的第三個留言來源 |
+| 喊 key | call a key | 主播口播商品代碼;不寫 announce / shout |
+| 佔庫存購物車 | reserving cart | 「佔庫存」動作本身寫 hold stock;與不佔庫存的一般購物車對比時用這個 |
+| 重喊 | re-call | 主播把同一個 key 重新開賣,舊場次的單全清、客人重留;名詞/動詞都用 re-call,不寫 re-announce / re-open(re-open 是 console 按鈕 UI 名)|
+| 場次 | round | 同一 key 的一次開賣;LWW 有效鍵「人+場次+款式」= person + round + variant;不寫 session / batch(batch 另有所指)|
+| 檔期 | round | 一週一個檔期的購買週期;order 按檔期切、跨檔期合併結帳;結束檔期 API = "close the round" API、檔期結算 = round settlement、跨檔期 = across rounds;已發布英文(#5/#6/#7/#9/#10)一律用 round,不寫 cycle / campaign / period。⚠ 與上列「場次 = round」撞字,上下文可分辨;是否要分開(例如 場次 → call)待作者裁決,裁決前不另造 sales round / call round 之類的分法 |
+| 兩本庫存 | the two stock books | #8 骨架:銷售庫存 = sales stock(承諾 the promise)、實體庫存 = physical stock(現實 reality);不寫 inventory books / two ledgers(三本帳才是 ledgers) |
+| 入庫單 | goods-in record | 營運登記實際到貨的 append 紀錄;圖內縮成 goods-in;不寫 receiving / inbound / stock-in |
+| 配貨 | allocation | 配貨系統 = allocation system、配貨紀錄表 = allocation log,動詞 allocate / assign;⚠ #10 優惠分攤也譯 allocation,靠上下文分辨 |
+| 出貨單 | shipping note | 不寫 shipping order / delivery note / packing slip |
+| 履約 | fulfilment | 英式拼法(全站 behaviour / organisation 同例),fulfillable / fulfilling 照英式規則雙 l;履約單位 = unit of fulfilment、可履約訂單 = fulfillable orders;slug `rezero-fulfillment` 是美式,不混用 |
+| 貨運系統 | shipping system | 重來版第三步拆出去的獨立系統;3PL 照寫 3PL,不寫 logistics system |
+| 機制歸系統,政策歸人 | mechanism to the system, policy to people | 系列反覆句(#6 狀態機、#7 退款、#8 配貨、#9 對帳),措辭固定 |
+| 智慧轉帳 | smart transfer | 台灣銀行的轉帳產品名(#7 兩家銀行提供的付款方式之一);英文已發布為 smart transfer,不寫 smart remittance / virtual-account transfer。若作者想給英文讀者一個 gloss(如 virtual-account bank transfer),在此裁決後全系列同步 |
+| 事實 append、狀態派生 | append facts, derive status | 系列主旋律的固定口號(#5 事實與派生、#7 金流、#12 資產生命週期、#14 對帳);英文引號內一律寫這七個字,派生動作本身寫 derive on read / derive-on-read(名詞)、固化寫 materialise |
+| 起標 / 結標 | open bidding / close bidding | 主播把一個 key 開賣/收單的動作,助理操作台的兩顆主按鈕;名詞「起標瞬間」= the instant bidding opens、「一場結標」= one bidding close;已發布英文(#3/#4/#9/#14)一律用 bidding,不寫 listing / auction start;重新起標 = re-open(console 按鈕 UI 名,見「重喊」列) |
+| 得標通知 | win notice | 結標後系統發給喊到的客人的那則訊息(附綁定 token);已發布英文(#4/#12/#14)一律用 win notice,不寫 winning notification / bid-won message |
+| 催付 / 催繳 | chase payment / chase | 檔期尾聲催客人付款的動作;催付名單 = the chase list、催繳簡訊 = chase SMS;已發布英文(#6/#12)用 chase,不寫 dunning / payment reminder |
+| 殘量 | residue | 自動化收不走、要交給人的那 1%(#4 綁定漏斗、#7 金流、#9 console、#12 通知);英文固定 residue,不寫 remainder / leftover(圖內空間不夠時可縮成 the rest) |
+| 觸達權 | reach / the right to reach someone | #12 的核心概念:渠道能讓對方看到的權利,是產品換來的資產;標題與圖內縮成 reach,內文完整說法 the right to reach someone;不寫 reachability / access |
+| 後選樣式 | post-selection variant | #15 半夜 call 的隕石本人、#21 終章翻案:客人直播中先喊單、下播後再選確定的樣式;已發布英文(#15/#21)一律用 post-selection variant,不寫 shortlist / pick-later style |
+| 把關 / 把關點 | hold the gate / checkpoint | lead 的三個把關點(拆解、review、選型)= three checkpoints(#18 已發布);動作「把關」= hold the gate、「把把關留下來」= keep the gate(#21);不寫 gatekeeping / quality gate / control point |
+| 在場 | being there | #21 AI 節的核心詞:判斷來自在場、在場的經驗要寫下來;固定 being there,不寫 presence / on-site;「現場」另譯 the floor(#13/#14/#21 已發布),兩者不混 |
+| 改版 | rework | #10 權限章「改了三次 / 三次改版」= reworked three times / three reworks;**rebuild 保留給「重來」**(各篇 "What a rebuild would do"),兩者同篇並現時不可混用 |
+| 個資 | personal data (PII) | 內文首次出現寫 personal data — PII,之後 personal data;圖內標籤縮成 PII(#10 圖二 "can see PII" / pii viewer);不寫 private data / personal information |
+| 承諾點 | the point of commitment | #6/#11:snapshot / 定格只發生在承諾點;cart 是意向(intent)、order 是承諾(commitment);形容詞用法可寫 commitment-point principle(#8 已發布);不寫 commit point / lock-in point |
+| 喊單 | a called order / call an order | 客人在直播留言喊 key 成單的那個動作/那筆單;名詞用 a called order(#3/#12 已發布),動詞 call an order,動名詞 calling orders;禁喊單 = ban from calling orders(#13 章名 "Ban calling orders, never the card");不寫 order call / shout order / call-out;與「喊 key」(call a key,指主播口播)分開 |
+| 淤而不倒 | silts but doesn't fall | #14 主題句(批次路徑淤而不倒 vs 同步路徑一觸即炸),#15/#20/#21 反覆引用;圖內/標題可縮成 silt but don't fall;動詞「淤」= silt(a batch silting up);不寫 clog / back up / degrade gracefully |
+| 雲端菩薩 | cloud bodhisattva | #14 讀路徑戰記的梗(Cloudflare 免費擋下 DDoS,「雲端菩薩拯救世人」= a cloud bodhisattva saving the mortal world);全系列固定,不寫 cloud saviour / guardian angel |
+| 自適應抓取 / 自適應輪詢 | adaptive polling | #3 來源(FB 輪詢的自適應節奏),#14/#20 引用;不寫 adaptive fetching / adaptive crawl。#20 `rezero-saas` 已於 2026-10-16 review pass 對齊為 adaptive polling |
+| 查詢即驗證 | lookup-as-validation | #3 的口號,#17/#20/#21 引用:解析出來的 key 查不到 DB 就自然丟棄,驗證是查詢的副產品;英文一律用連字號名詞形 lookup-as-validation(#17/#20/#21 已發布),不寫 the lookup is the validation / query-as-validation |
+| 轉檔即驗證 | transcoding-as-validation | #17 的口號,與查詢即驗證並列(#21 引用):後端一律重編碼,解不開的檔轉檔自己失敗;英文一律 transcoding-as-validation(#17 已發布),不寫 re-encoding as validation;#21 `rezero-retro` 圖內與 aria-label 已於 2026-10-16 review pass 對齊為 transcoding-as-validation |
+| 排序不排期 | order the queue, don't schedule it | #18 開發流程的口號(沒有估點、沒有 sprint、沒有 demo),#21 引用;內文與章名一律 order the queue, don't schedule it,圖內可縮成 order the queue, don't schedule;「merge 即上線」= merge = release(圖內)/ merge equals release(內文);不寫 prioritise not plan / no scheduling |
+| 蓋棺定論 | epitaph | #17 對 SoftDeleteModel 的「bug 產生器」= my epitaph for it / an epitaph reading "bug generator";作名詞固定 epitaph,不寫 final verdict / last word |
+| 商城 | storefront | 與直播/選標並列的第二條產品線與客人用的網站本體:商城線 = the storefront line、商城側 = the storefront side、商城期間 = the storefront period(#18);商城購物車 = storefront cart(#8/#11)、商城價 = storefront price、「商城還在但沒客人」= the storefront is still up, but there are no customers(#19);圖內標籤縮成 storefront line。不寫 commerce(與 live commerce 撞字)/ shop / mall |
+| 花式需求 | unusual requests | #9 admin 哲學的核心詞(不確定需求先做半成品、admin 補完),#20 引用;已發布英文 #9/#20 一律用 unusual requests,不寫 exotic requirements / fancy requests / edge-case features |
+| 客人 | viewer / customer | 直播觀看、留言情境用 viewer(#1/#2/#14/#15 已發布,#9 console 的留言視角亦同);有訂單之後用 customer(#3–#8/#10–#13/#16/#19/#21 已發布);同篇並現時以「有沒有單」分:還在看、還在留言 = viewer,單成立之後 = customer;不寫 user(全站通用詞,指系統帳號)/ buyer / shopper |
+| 合併結帳 | merged checkout | 跨檔期合併結帳 = cross-round merged checkout(#6 章名、#20 `rezero-saas` 連結標籤);不寫 combined / consolidated checkout(consolidated 留給合併出貨)|
+| 購物車操作帳 / 操作紀錄表 | cart operation log / operation log table | #6 重來要補的那張表;章名用 the cart's operation log,表名 operation log table;不寫 audit table / change log table |
+| 定格 | freeze | 成交時定格金額 = the amount freezes at the moment of sale、金額已定格 = amount frozen(#6 圖內 amount frozen at sale);不寫 lock / snapshot(snapshot 只用於「承諾點」口號)|
+| 多重綁定 | multiple binding | #2 身分章 / #9 console:客服把多個 identity 綁到同一 account 的動作;名詞 a multiple binding、複數 multiple bindings(圖內/aria-label);已發布英文(#2/#9)一律用 multiple binding,不寫 multi-binding / multi-bind |
+| 營運 | operations | 五種角色之一(#9 首次命名,圖內標籤 Operations);role 名稱、圖內標籤、內文一律 operations(「營運的人」= people in operations / someone in operations);**不寫 operator**(#10 內文與圖二已於 2026-10-16 對齊;程式碼裡的 `Role.OPERATOR = "operator"` 是作者原始識別字,照抄不動),**圖內也不縮成 ops**——全站 ops 是「維運」(`docs/ubiquitous-language.md` §5),#14/#15 的 ops 即此義 |
+| 客服 | support | 五種角色之一;圖內標籤 Support、phone (support);不寫 customer service / CS |
+| 直播助理 / 助理 | the live assistant / the assistant | 五種角色之一;內文首次出現寫 the live assistant(#9 圖內 Live assistant),之後 the assistant;不寫 helper / moderator |
+| 選標 / 選標系統 / 選標小組 / 選標線 | bidding / the bidding system / the bidding squad / the bidding line | 與商城線並列的另一條產品線(#18 組織、#19 拆 monolith 搬出去的那塊:bidding DB);與「起標 / 結標」(open / close bidding)同字根,刻意不分;不寫 auction / selection system |
+| 跟播 | watching the stream | #15 的日常(跟播的四個視窗 = the four windows during a stream / for watching the stream)、#19/#21 引用;不寫 following the stream / stream-sitting |
 
 ## 寫每篇時的慣例
 - **每章動筆前,先與作者討論當年的實際做法**,把口述記錄到上面「當年實際做法」段落,再開寫——當年聲部必須是真的,不能腦補。
