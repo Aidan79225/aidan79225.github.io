@@ -49,7 +49,7 @@
 |---|---|---|---|---|---|
 | 1 | `cphb-complexity` | Ch1–2 Introduction / Time complexity | 看到 n,就知道該寫什麼:時間複雜度與最大子陣列和 | 系列開場:競賽 = 看結構的訓練、本系列的三個承諾(上班對照/EM 視角/AI 時代)。複雜度計算規則;**從 n 反推可接受的複雜度**(照原書表:n ≤ 10 → n!、≤ 20 → 2^n、≤ 500 → n³、≤ 5000 → n²、≤ 10^6 → n log n 或 n)= 工程上的 back-of-the-envelope;最大子陣列和 O(n³) → O(n²) → O(n)(Kadane)當全系列的範本:暴力解浪費了什麼。招聘角度:演算法面試在量什麼。兩次加速撿回的都是【重疊】 —— 接 `[[sre-production-readiness]]`(容量估算)、`[[ai-review-craft]]`、`[[sql-explain]]` | ✅ 已發布(中英,2026-10-09;作者複習後要重寫,之後中英一起更新) |
 | 2 | `cphb-sorting` | Ch3 Sorting | 排序是最便宜的結構:比較的下界、counting sort 與二分搜尋 | O(n log n) 下界(比較排序的決策樹)與 counting sort 的例外;**排序本身就是在製造結構**(排好之後找重複、找配對都變線性);C++ `sort` / 自訂比較子的嚴格弱序陷阱;二分搜尋三種寫法 + **對答案二分**(單調判定函數)。上班:`git bisect`、B-tree 索引的 range scan、SSTable 為什麼要排序。【順序】【單調】 —— 接 `[[sql-index]]`、`[[ddia-storage-engines]]` | ✅ 已發布(中英,2026-10-12;練習題段先拿掉;反思待作者補充後中英一起更新) |
-| 3 | `cphb-data-structures` | Ch4 Data structures | 選容器就是選複雜度 | vector 攤銷倍增、deque、`set`/`map`(平衡樹,有序、log n)vs `unordered_*`(雜湊,平均 O(1)、最壞與被攻擊時退化)、`priority_queue`、bitset;**Comparison to sorting:很多時候先排序比用 set 更快**(常數與快取友善)。上班:Redis Sorted Set、有序 vs 雜湊索引、hash flooding。可選:Kotlin `TreeMap`/`HashMap` 對照 —— 接 `[[redis-data-structures]]`、`[[sql-index]]` | ⬜ |
+| 3 | `cphb-data-structures` | Ch4 Data structures | 選容器就是選複雜度:list、set、heapq,以及為什麼先排序常常更快 | vector 攤銷倍增、deque、`set`/`map`(平衡樹,有序、log n)vs `unordered_*`(雜湊,平均 O(1)、最壞與被攻擊時退化)、`priority_queue`、bitset;**Comparison to sorting:很多時候先排序比用 set 更快**(常數與快取友善)。上班:Redis Sorted Set、有序 vs 雜湊索引、hash flooding。可選:Kotlin `TreeMap`/`HashMap` 對照 —— 接 `[[redis-data-structures]]`、`[[sql-index]]` | 🚧(草稿 2026-10-16:正文、兩張圖、兩個動畫完成;反思用壓縮 trie 與「Python 沒有平衡樹」) |
 | 4 | `cphb-complete-search` | Ch5 Complete search | 暴力也要暴力得有章法 | 產生子集(遞迴 / 位元)、產生排列(`next_permutation`)、回溯(n 皇后)、**剪枝**(格子路徑計數的五刀)、**折半搜尋**(2^n → 2^(n/2))。主軸的【極限】:當結構不存在時怎麼止損。上班:Fisher–Yates 洗牌(lottery)、組合爆炸的設定測試 —— 接 `[[lottery]]`、`[[rezero-promotion]]` | ⬜ |
 | 5 | `cphb-greedy` | Ch6 Greedy algorithms | 貪婪什麼時候是對的 | 硬幣問題(某些幣值系統 greedy 失效)、活動排程(選最早結束)、任務與截止期限、最小化總和(中位數/平均數)、Huffman 編碼;**交換論證**是證明 greedy 的唯一工具。上班:分帳的最少筆數還款(greedy 給 ≤ n−1 筆,但真正最少筆數是 NP-hard——「夠用就好」的判斷)、K8s scheduler 的 bin packing —— 接 `[[travel-split]]`、`[[k8s-pod-node-scheduler]]` | ⬜ |
 | 6 | `cphb-dp` | Ch7 Dynamic programming | DP 是把暴力解記下來 | 從遞迴暴力出發 → 記憶化 → 迭代:**定義狀態是唯一的難點**;硬幣問題(最少數 vs 方法數)、LIS(n² 與 n log n)、格子路徑、背包、編輯距離、鋪磚計數(輪廓 DP)。上班:rezero 的優惠組合最佳化(背包 / NP-hard 的真實版本)、編輯距離 ↔ diff、模糊搜尋。【重疊】的主場 —— 接 `[[rezero-promotion]]`、`[[cphb-complete-search]]` | ⬜ ★ |
@@ -129,7 +129,7 @@
 |---|---|---|
 | 1 | `kadane` ✅;`max-subarray-race` ✅ | 原書陣列 [-1,2,4,-3,5,2,-5,2]:O(n²) 一個一個區間試 vs Kadane 一次掃完,步數計數器並排 |
 | 2 | `bubble-sort` ✅、`binary-search-race` ✅、`counting-sort` ✅ | bubble sort 的計數條畫「剩餘 inversion」,每次交換剛好減一;線性掃描 vs 二分搜尋並排,範圍每步砍半、線性每步只排除一格;counting sort 三條 lane(原陣列 / 計數陣列 / 輸出),全程零比較 |
-| 3 | `vector-growth` | 倍增時的搬家次數,攤銷後每次 push 是 O(1) |
+| 3 | `list-growth` ✅、`common-elements` ✅ | 倍增時的搬家(計數條 = 累計搬了幾個元素,上限 2n);原書「資料結構 vs 排序」的實驗:set 查表與排序後雙指標接著跑,四條 lane |
 | 4 | `subsets-backtrack`、`queens` | 遞迴樹展開;剪枝的分支直接變灰,計數器顯示少走多少 |
 | 5 | `activity-selection`、`coin-greedy` | 選最早結束的活動;硬幣 {1,3,4} 湊 6 時 greedy 失敗的反例 |
 | 6 | `coin-dp`、`lis`、`edit-distance` | DP 表一格一格填,箭頭指回它用到的格子;回溯出答案 |
@@ -185,7 +185,12 @@
 | 最長遞增子序列 | longest increasing subsequence | Ch7;簡稱 LIS |
 | 背包問題 | knapsack problem | Ch7 |
 | 編輯距離 | edit distance | Ch7 |
-| 攤銷分析 | amortized analysis | Ch8;不寫「均攤」 |
+| 攤銷分析 | amortized analysis | Ch8;不寫「均攤」。#3 的 list 倍增先用到 |
+| 動態陣列 | dynamic array | Ch4;Python 的 list |
+| 雜湊表 | hash table | Ch4;不寫「哈希表」「散列表」 |
+| 平衡樹 | balanced binary tree | Ch4;C++ set / map 的底層,Python 標準函式庫沒有 |
+| 優先佇列 | priority queue | Ch4;Python 的 heapq,不寫「優先隊列」 |
+| hash flooding | hash flooding | #3 延伸;對抗性輸入讓雜湊表退化,寫英文 |
 | 雙指標 | two pointers method | Ch8 |
 | 最近較小元素 | nearest smaller elements | Ch8;實作是單調堆疊(stack),「堆疊」不寫「棧」 |
 | 滑動視窗 | sliding window | Ch8;不寫「滑動窗口」 |
