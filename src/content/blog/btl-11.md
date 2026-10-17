@@ -1,6 +1,6 @@
 ---
 title: "領導力 - 力量與言行一致"
-date: 2026-10-16
+date: 2026-10-17
 category: tech
 description: "力量不是你擁有的東西,是一段關係——而讓這段關係撐得住的,是言行一致。Weinberg 用一個「Ralph 身上味道很重」的案例,把主管的五種回應攤開來看:只有一種三方都顧到,也只有那一種,換來一句謝謝。"
 tags:
@@ -8,7 +8,6 @@ tags:
 series: "成為 Tech Leader 讀書筆記"
 seriesOrder: 11
 comments: true
-draft: true
 ---
 ## 力量與言行一致
 

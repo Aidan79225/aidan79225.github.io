@@ -1,6 +1,6 @@
 ---
 title: "Leadership — Power and Congruence"
-date: 2026-10-16
+date: 2026-10-17
 category: tech
 description: "Power isn't something you own — it's a relationship, and what holds that relationship together is congruence. Weinberg uses a case about \"Ralph smells bad\" to lay out a manager's five possible responses: only one attends to all three sides, and only that one earns a thank-you."
 tags:
@@ -9,7 +9,6 @@ comments: true
 series: "Becoming a Tech Leader — Reading Notes"
 seriesOrder: 11
 translationOf: btl-11
-draft: true
 ---
 ## Power and congruence
 
