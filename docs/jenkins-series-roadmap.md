@@ -91,7 +91,7 @@
 
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
-| 10 | `jenkins-quality-gates` | 品質關卡:測試報告、覆蓋率與靜態分析怎麼變成「擋得住的門」 | **【可回滾】** JUnit/測試報告與趨勢圖;覆蓋率門檻的用與濫用(數字當目標就會被作弊);靜態分析/lint/SAST 接進 pipeline;**pipeline 晉級制**(每關越貴越慢、越前面越便宜)——接 `[[iac-test-deliver]]`、`[[sre-testing]]`;flaky test 為什麼是紅燈疲勞的根源:紅燈失去意義的那天,這道門就不存在了 | ⬜ |
+| 10 | `jenkins-quality-gates` | 品質關卡:測試報告、覆蓋率與靜態分析怎麼變成「擋得住的門」 | **【可回滾】** JUnit/測試報告與趨勢圖;覆蓋率門檻的用與濫用(數字當目標就會被作弊);靜態分析/lint/SAST 接進 pipeline;**pipeline 晉級制**(每關越貴越慢、越前面越便宜)——接 `[[iac-test-deliver]]`、`[[sre-testing]]`;flaky test 為什麼是紅燈疲勞的根源:紅燈失去意義的那天,這道門就不存在了;diff coverage 取代全域覆蓋率、靜態分析導入舊專案的 baseline(只擋新增)、結果比對(golden diff)守住「行為不變」的承諾——接 #8 的委外 SQL 情境 | ✅ 已發布 |
 | 11 | `jenkins-deploy` | 從 CI 到 CD:部署要怎麼交給 Jenkins 才安全 | **【可重現 + 可回滾】** build once, deploy many(同一顆 artifact 走過各環境,不要每環境重 build——重 build 就等於沒驗過);環境晉級與核准;部署手法(rolling / 藍綠 / canary)交給誰做——Jenkins 呼叫 `[[ansible-playbooks]]` 或 `kubectl`/Helm(`[[k8s-packaging]]`);**push 式 CD vs GitOps pull 式**的界線;**回滾要跟部署一樣一鍵、一樣常演練**;上線前的 production readiness——接 `[[sre-production-readiness]]`、`[[iac-changing-live]]` | ⬜ ★ |
 | 12 | `jenkins-on-kubernetes` | Jenkins 跑在 Kubernetes 上:動態 agent 與 pod template | **【可重現 + 路要夠快】** kubernetes plugin:每次 build 開一顆 pod、跑完就丟(agent 終於真的是 cattle,環境飄移歸零);pod template 與多容器(build 容器 + JNLP 容器);requests/limits 與排程(接 `[[k8s-scheduling-advanced]]`);**乾淨換來的代價是快取沒了**——PVC / 遠端快取怎麼補(接 `[[k8s-storage]]`);DinD / Kaniko 建 image 的取捨;controller 自己要不要上 K8s | ⬜ |
 
