@@ -1,6 +1,7 @@
 ---
 title: "How Big Should a Team Be: What the Number 6-to-8 Is Buying You"
 date: 2026-09-11
+updated: 2026-10-27
 category: tech
 description: "Larson's numbers are blunt: a manager supports six to eight engineers, a manager of managers supports four to six managers, and a team under four people behaves no differently from an individual. But the numbers aren't the point — each band turns you into a completely different kind of manager: a TLM, an investor, or nothing but a safety net. Plus the lower bound nobody talks about, and why scope isn't headcount."
 tags:
@@ -67,7 +68,7 @@ Most discussions of team size only cover the ceiling — "past N people, split i
 
 "The abstraction leaks" is exactly right here. You think you're talking to a team; you're actually talking to one person. The things the team abstraction is supposed to provide — **rotation, absorbing variance, continuing to run when someone is away** — none of them exist below four. One person takes leave and the team doesn't lose 33% of its output; **an entire area goes dark.**
 
-The book doesn't give a formula for the floor, so here's mine: **the real floor calculator is the on-call rotation.** A team that carries a pager and doesn't have the people for a rotation doesn't have a rotation — it has *that one person*. He takes a holiday, gets sick, resigns, and nobody picks it up. [[sre-alerting-oncall|The SRE post]] covers the mechanics of alerting and on-call, but every one of those mechanics assumes **there are people to rotate through**; below the floor, the prettiest runbook in the world is a document one person writes for himself.
+Larson actually does this arithmetic in the original essay behind this section ("Sizing engineering teams" on lethain.com), and he does it from the rotation: **a two-tier, 24/7 on-call rotation takes about eight engineers.** In other words, **the real floor calculator is the on-call rotation**: a team that carries a pager and doesn't have the people for a rotation doesn't have a rotation — it has *that one person*. He takes a holiday, gets sick, resigns, and nobody picks it up. [[sre-alerting-oncall|The SRE post]] covers the mechanics of alerting and on-call, but every one of those mechanics assumes **there are people to rotate through**; below the floor, the prettiest runbook in the world is a document one person writes for himself.
 
 So a squad of three isn't a "small team" — it's **one person plus two helpers**. That isn't necessarily bad; plenty of stages look exactly like that and move fast. What's bad is managing it in the language of teams: team goals, team process, an expectation of team resilience — and then discovering on the day that person resigns that none of it was real.
 
@@ -146,7 +147,7 @@ Chapter 4 has a section on **managerial scope**, and read alongside this chapter
 
 The practical value here is a route to growth **that doesn't require the org to expand**: take the mess nobody wants, take the cross-team coordination, take the system that ends up in the press. Headcount waits for the company to grow. Scope usually just needs you to raise your hand.
 
-One line to keep straight: managerial scope here isn't the same thing as the "neck" from [[responsibility-funnel|The Responsibility Funnel]] — **scope is the area you're accountable for, the neck is the bandwidth you review through**. Let the area grow without the bandwidth and you end up signing off on a pile of things you never understood.
+One line to keep straight: managerial scope here isn't the same thing as the "neck width" from [[responsibility-funnel|The Responsibility Funnel]] — **scope is the area you're accountable for; neck width is the bandwidth you can responsibly accept**. Let the area grow without the bandwidth and you end up signing off on a pile of things you never understood.
 
 ## The Four-Engineer Version
 
@@ -162,22 +163,22 @@ What this chapter gives a four-person team isn't a plan to reach 6–8 — you c
 
 [[rezero-team|That post about the team]] did this arithmetic once: six engineers, but the storefront line was really **four** — a backend lead (me), one backend engineer, two frontend engineers, plus a CTO who wrote no code and did product full time. Every system in the seventeen chapters before it was built by those four.
 
-At the time the number meant nothing to me; it just felt like "a bit short-handed, but we're moving". Reading this chapter now, we were **sitting exactly on the floor**: one person fewer and the team abstraction would have leaked out completely. And the fragility was invisible — with four people everyone knew "there are only two frontend and two backend", but nobody ever wrote down the sentence that mattered: **not one area of this system has more than one person who knows it.** That doesn't hurt on an ordinary day. It hurts the day someone needs a month off, or hands in notice.
+Measured against this chapter, that setup was **sitting exactly on the floor**: one person fewer and the team abstraction leaks out completely. And this kind of fragility has one defining trait: you can't see it on an ordinary day — with everyone in, the team looks like a team; it takes someone going on long leave, or handing in notice, to find out who each area was actually resting on. That's precisely the insurance the second point of The Four-Engineer Version is buying: **at least two people who have touched each area.**
 
-The more honest part is what came next: [[rezero-microservices|after the contract talks collapsed]], we were three people inside a month. Four to three looks like losing one person. By this chapter's standard it's **falling out of "barely a team" into "indistinguishable from individuals"** — and the only response we had at the time was for each of us to carry a little more.
+What came next: [[rezero-microservices|a month after development was paused]], the team was three people — me, one frontend engineer, and the CTO. By this chapter's standard that's no longer "barely a team"; it's **indistinguishable from individuals**.
 
-### I was a TLM for two years without realizing it was a role with a ceiling
+### A TLM is a position scale pushes you into, not a path that climbs on its own
 
-[[rezero-team|The same post]] records my own arc: at the start I was the only backend engineer, and the day the second one joined, I started leading. **A lead on a small team has no "leave the production line" option** — on top of keeping output high, you carry three checkpoints: breaking tasks down technically (the entrance), code review (the exit), and technology choices (the boundary).
+My own arc is recorded in [[rezero-team|the team post]]: at the start I was the only backend engineer, and the day the second one joined, I started leading. **A lead on a small team has no "leave the production line" option** — on top of sustaining high output came three checkpoints: technical breakdown of tasks (the entrance to work), review (the exit of code), and technology choices (the system's boundary).
 
-That's the definition of a TLM, word for word. And my self-image at the time was "I'm doing lead work" — with no idea I was standing in a role that Larson explicitly calls **limited in career opportunities**. Let me defend the TLM for a second: nothing I learned in those two years was wasted. How to place a checkpoint, what to block and what to let through — that's the foundation under every judgment I've made since. **But I did mistake a position for a path**, assuming that if I kept doing lead things well, the next level would arrive on its own.
+Set against this chapter, that job comes very close to what Larson calls a TLM — still sharing design and implementation, while also gatekeeping what the team ships; in other words, the row in the table above marked **limited career opportunities**. The role arrived together with headcount, and a role that arrives that way comes with a built-in trap: **it's easy to mistake for a path that climbs on its own**, as if doing the lead job well were enough for the next level to show up.
 
-The growth actually available then was something I couldn't see the shape of: **scope**. My stance on the sourcing line was "I don't know it, I don't touch it" — honest, and also a road not taken. Reaching into the other line, owning the technical boundary between the two, was the one thing at that stage that could have gotten bigger without a single new hire. That's what makes section 4.7 worth more to me than 2.1: **headcount waits for the company to hand it to you; scope only needs you to raise your hand.**
+The way out this chapter offers isn't headcount, it's **scope**. For the lead of a four-person team, the nearest piece of scope is usually right next door: the other line, the technical boundary between the two, the integration nobody owns. **Headcount waits for the company to hand it to you; scope only needs a raised hand.**
 
 ### Splitting the line splits the org — and the information boundary follows
 
-In [[rezero-team|that post]] I wrote one line: the split between the lines was the split in the org. Storefront and sourcing each had their own people and their own PM — and then the series ran for seventeen chapters with sourcing appearing exactly once, secondhand. **My not knowing that line is a result of org design, not a failure of curiosity.**
+The same post describes the two lines, storefront and bidding, each with their own people and their own PM — and across the seventeen chapters before it, bidding barely appears; the one appearance with a story is secondhand. That post says it plainly: **I don't know the bidding system well.** Its reflection has a line of my own on exactly this: **"That looked like a natural division of labour at the time, and now it reads as foreshadowing: how the organisation splits is how the system grows, and where the wall is built is where the split line falls."**
 
-Put that in this chapter's terms and it's obvious: when you sort people into two piles, you're also deciding **who gets to know what**. Conway's law says the shape of the org ends up in the system; the reverse holds too — **the boundary of the org sets the boundary of information, and the boundary of information eventually becomes the boundary between people.**
+Put that line in this chapter's terms: when you sort people into two piles, you're also deciding **who gets to know what**. Conway's law says the shape of the org ends up in the system; the reverse holds too — **the boundary of the org sets the boundary of information, and the boundary of information eventually becomes the boundary between people.** People on one line not knowing the other line is the default outcome of that kind of boundary.
 
-So "should we split into two teams" was never a headcount question. It's a question of whether you're willing to have these two areas talk only through meetings from now on. My test these days is simple: **if after the split the two sides will never read each other's code again, don't split yet.** Headcount grows back. A boundary, once up, almost never comes down.
+So "should we split into two teams" was never just a headcount question; it's also deciding whether these two areas will talk only through meetings from now on. One question worth asking before the split: **afterwards, will the two sides still read each other's code?** If not, the boundary costs more than one re-org — headcount will keep growing, but a boundary, once up, is very hard to take down.
