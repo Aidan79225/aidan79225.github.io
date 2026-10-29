@@ -31,10 +31,13 @@
 | `btl` | 成為 Tech Leader 讀書筆記 | Becoming a Tech Leader — Reading Notes |
 | `aep` | An Elegant Puzzle 讀書筆記 | An Elegant Puzzle — Reading Notes |
 | `ai-craft` | 帶 AI 的手藝(2026) | The Craft of Working with AI (2026) |
+| `white-dew` | 霧港白露 | White Dew of Fog Harbour |
 | *(未登記)* | Jenkins 學習筆記 | Jenkins — Learning Notes |
 
 命名規則:`X 讀書筆記` → `X — Reading Notes`(讀一本書);`X 學習筆記` → `X — Learning Notes`(學一個工具);
 其餘意譯,保住原標題的味道(`rezero` 的 `Re:` 是《Re:從零開始的異世界生活》的梗,英文照留)。
+小說(`category: fiction`)的系列名就是書名:`white-dew` 的章節檔名為 `white-dew-01.md`、`white-dew-02.md`……,
+英文版同名放在 `en/`,`series:` 用上表的英文書名。
 
 > **Jenkins 系列還沒登記進 `src/data/series.ts`**——中英文都拿不到 `/start/` 連結。
 > 要補的話兩邊(`name` + `enName`)一起加。
