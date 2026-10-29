@@ -9,7 +9,9 @@ const blog = defineCollection({
     // Optional date of the last substantive revision. Shown on the post and
     // fed to dateModified / article:modified_time; omit for unrevised posts.
     updated: z.coerce.date().optional(),
-    category: z.enum(['tech']),
+    // Coarse bucket, drives the top nav: `tech` (articles, /tech/) or
+    // `fiction` (chapters of the serialised novel 《霧港白露》, /fiction/).
+    category: z.enum(['tech', 'fiction']),
     // Optional hand-written SEO/social description. When omitted, an excerpt is
     // derived from the post body (see excerpt() in src/lib/post.ts).
     description: z.string().optional(),

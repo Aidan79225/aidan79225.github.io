@@ -52,16 +52,16 @@ public/assets/images/     # static assets (avatar, …)
 
 Two collections (`src/content.config.ts`):
 
-- **`blog`** — `title`, `date`, `category` (`tech`), `tags?`, `series?`, `seriesOrder?`, `comments` (default `true`), `commentsIssue?`, `translationOf?` (English posts only)
+- **`blog`** — `title`, `date`, `category` (`tech` | `fiction`), `tags?`, `series?`, `seriesOrder?`, `comments` (default `true`), `commentsIssue?`, `translationOf?` (English posts only)
 - **`guides`** — `title`, `description`
 
 Three-layer taxonomy:
 
 | Layer | Role |
 |---|---|
-| **category** (`tech`) | coarse bucket, drives the top nav |
+| **category** (`tech` \| `fiction`) | coarse bucket, drives the top nav: `tech` lists at `/tech/` (newest first), `fiction` — chapters of the serialised novel 《霧港白露》 — at `/fiction/` (in series order) |
 | **tags** | cross-cutting topics, browsable at `/tags/` and `/tags/<tag>/` |
-| **series** | ordered series (e.g. the *成為 Tech Leader* reading notes) — renders a series box + prev/next in each post |
+| **series** | ordered series (e.g. the *成為 Tech Leader* reading notes, or the novel's chapters) — renders a series box + prev/next in each post |
 
 ## Routes
 
@@ -69,6 +69,7 @@ Three-layer taxonomy:
 - `/blog/<slug>/` — a post
 - `/start/` — start-here map; every series has an anchor (`/start/#<slug>`, metadata in `src/data/series.ts`)
 - `/tech/` — category listing
+- `/fiction/` — the serialised novel, chapters in reading order
 - `/tags/`, `/tags/<tag>/` — tag browse
 - `/guides/`, `/guides/<slug>/` — guides (e.g. `/guides/odoo-usage-guide/`)
 - `/about/`
@@ -120,8 +121,11 @@ This repository is **dual-licensed**:
 | Part | License |
 |---|---|
 | **Site source code** (everything except `src/content/`) | [MIT](./LICENSE) |
-| **Articles & guides** (`src/content/`) — text and original diagrams | [CC BY 4.0](./LICENSE-CONTENT.md) |
+| **Articles & guides** (`src/content/`, except fiction) — text and original diagrams | [CC BY 4.0](./LICENSE-CONTENT.md) |
+| **Fiction** (`category: fiction` — the novel 《霧港白露》 / *White Dew of Fog Harbour*) | [All rights reserved](./LICENSE-CONTENT.md#fiction--all-rights-reserved) |
 
 Reuse the code freely under MIT; share or adapt the writing under CC BY 4.0 with
-attribution. Quoted book material, the MBTI questionnaire, and other third-party
-assets remain their owners' and are covered by neither license.
+attribution. The novel is not CC-licensed: link to it and quote short passages
+with attribution, but ask before redistributing, adapting or translating it.
+Quoted book material, the MBTI questionnaire, and other third-party assets
+remain their owners' and are covered by neither license.
