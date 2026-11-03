@@ -166,6 +166,16 @@ export const seriesList: SeriesInfo[] = [
     enBlurb: "An EM who leads people and AI at once takes AI collaboration apart as a craft: responsibility, standards, acceptance, guardrails and taste. Dated, because the craft is changing fast.",
     color: 'var(--hue-grey)',
   },
+  // Fiction (category: fiction, listed at /fiction/). Indigo is used by no
+  // tech layer on /start/, so the novel reads as its own thing on the map.
+  {
+    slug: 'white-dew',
+    name: '霧港白露',
+    enName: 'White Dew of Fog Harbour',
+    blurb: '原創長篇小說。架空 1930 年代的南方港埠,《節制令》之下,被海關檢驗所裁員的驗酒師何秋生蒸出一種乾淨到不會讓人瞎掉的私酒:白露。',
+    enBlurb: "An original novel. In a southern port city of an imagined 1930s, under Prohibition, a customs assayer laid off from the Assay Office distils a bootleg spirit clean enough that no one goes blind: White Dew.",
+    color: 'var(--hue-indigo)',
+  },
 ];
 
 export const seriesBySlug = new Map(seriesList.map((s) => [s.slug, s]));

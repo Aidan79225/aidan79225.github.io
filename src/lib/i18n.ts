@@ -45,6 +45,9 @@ export const ui = {
     // Footer: 本文採用 <CC BY 4.0> 授權
     licensePrefix: '本文採用 ',
     licenseSuffix: ' 授權',
+    // Footer on a fiction post (category: fiction) — all rights reserved
+    // instead of CC BY; the terms are in LICENSE-CONTENT.md.
+    licenseFiction: '本文 © 2026 Aidan Wang,保留一切權利。歡迎連結與註明出處的短篇引用;轉載、改作、翻譯或商業使用請先取得書面授權。',
     // Shown on a zh post that has an English translation.
     translationNote: '這篇文章也有英文版:',
     translationLink: 'Read in English →',
@@ -58,6 +61,7 @@ export const ui = {
     minutes: (n: number) => `${n} min read`,
     licensePrefix: 'Content licensed under ',
     licenseSuffix: '',
+    licenseFiction: 'Text © 2026 Aidan Wang, all rights reserved. Link freely and quote short passages with attribution; no redistribution, adaptation, translation or commercial use without written permission.',
     // Shown on an English post, pointing back at the zh original.
     translationNote: 'Translated from the Chinese original:',
     translationLink: '閱讀中文版 →',
