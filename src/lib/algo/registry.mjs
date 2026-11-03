@@ -6,4 +6,6 @@ export const ALGOS = {
   'bubble-sort': () => import('./bubble-sort.mjs'),
   'binary-search-race': () => import('./binary-search-race.mjs'),
   'counting-sort': () => import('./counting-sort.mjs'),
+  'list-growth': () => import('./list-growth.mjs'),
+  'common-elements': () => import('./common-elements.mjs'),
 };
