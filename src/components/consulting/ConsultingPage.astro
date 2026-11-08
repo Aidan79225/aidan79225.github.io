@@ -1,0 +1,164 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import ContactForm from './ContactForm.jsx';
+import { consulting } from '../../data/consulting';
+import { author } from '../../data/author';
+import { withLocale, type Locale } from '../../lib/i18n';
+
+// Shared body of /consulting/ and /en/consulting/ — copy comes from
+// src/data/consulting.ts, the inquiry form is a React island.
+interface Props {
+  locale: Locale;
+}
+const { locale } = Astro.props;
+const c = consulting[locale];
+
+// Formspree form id (the part after /f/ in the endpoint). Public by design —
+// it ships in client JS — so it's a repo Actions *variable*, like the CF
+// beacon token. Unset = the form falls back to a prefilled mailto link.
+const FORMSPREE_ID = import.meta.env.PUBLIC_FORMSPREE_ID ?? '';
+
+const pageUrl = new URL(withLocale(locale, '/consulting/'), Astro.site).href;
+const alternates = [
+  { hreflang: 'zh-Hant', href: new URL('/consulting/', Astro.site).href },
+  { hreflang: 'en', href: new URL('/en/consulting/', Astro.site).href },
+  { hreflang: 'x-default', href: new URL('/consulting/', Astro.site).href },
+];
+
+const serviceLd = {
+  '@context': 'https://schema.org',
+  '@type': 'ProfessionalService',
+  name: `${author.name} — ${c.title}`,
+  url: pageUrl,
+  description: c.description,
+  image: new URL(author.avatar, Astro.site).href,
+  areaServed: 'Worldwide',
+  availableLanguage: ['zh-Hant', 'en'],
+  address: { '@type': 'PostalAddress', addressCountry: 'TW' },
+  email: 'mailto:aidan79225@gmail.com',
+  founder: {
+    '@type': 'Person',
+    name: author.name,
+    url: new URL(withLocale(locale, '/about/'), Astro.site).href,
+    sameAs: author.links.map((l) => l.url),
+  },
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: c.servicesTitle,
+    itemListElement: c.services.map((s) => ({
+      '@type': 'Offer',
+      itemOffered: { '@type': 'Service', name: s.title, description: s.desc },
+    })),
+  },
+};
+
+const faqLd = {
+  '@context': 'https://schema.org',
+  '@type': 'FAQPage',
+  mainEntity: c.faq.map((f) => ({
+    '@type': 'Question',
+    name: f.q,
+    acceptedAnswer: { '@type': 'Answer', text: f.a },
+  })),
+};
+---
+<BaseLayout title={c.title} description={c.description} locale={locale} alternates={alternates}>
+  <script type="application/ld+json" set:html={JSON.stringify(serviceLd)} />
+  <script type="application/ld+json" set:html={JSON.stringify(faqLd)} />
+
+  <header class="mb-12">
+    <p class="mb-2 text-sm font-medium uppercase tracking-widest text-accent">{c.eyebrow}</p>
+    <h1 class="mb-4 text-3xl font-bold leading-tight sm:text-4xl">{c.headline}</h1>
+    <p class="mb-6 text-lg leading-relaxed text-muted">{c.lede}</p>
+    <div class="flex flex-wrap items-center gap-4">
+      <a href="#contact" class="rounded-md bg-accent px-5 py-2.5 font-medium text-white no-underline hover:opacity-90">{c.cta}</a>
+      <a href={withLocale(locale, '/about/')} class="text-sm text-accent hover:underline">{c.aboutLink}</a>
+    </div>
+  </header>
+
+  <section class="mb-12">
+    <h2 class="mb-4 text-xl font-bold">{c.servicesTitle}</h2>
+    <div class="grid gap-4 sm:grid-cols-2">
+      {c.services.map((s) => (
+        <div class="flex flex-col rounded-lg border border-line bg-surface p-5">
+          <p class="mb-2 text-2xl" aria-hidden="true">{s.icon}</p>
+          <h3 class="mb-2 font-bold text-ink">{s.title}</h3>
+          <p class="mb-4 flex-1 text-sm leading-relaxed text-muted">{s.desc}</p>
+          <p class="border-t border-line pt-3 text-sm text-ink">
+            <span class="text-muted">{c.deliverableLabel}</span>{s.deliverable}
+          </p>
+        </div>
+      ))}
+    </div>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="mb-4 text-xl font-bold">{c.proofTitle}</h2>
+    <dl class="grid grid-cols-2 gap-4">
+      {c.proof.map((p) => (
+        <div class="rounded-lg border border-line p-4">
+          <dt class="text-2xl font-bold text-accent">{p.stat}</dt>
+          <dd class="mt-1 text-sm text-muted">{p.label}</dd>
+        </div>
+      ))}
+    </dl>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="mb-2 text-xl font-bold">{c.readingTitle}</h2>
+    <p class="mb-4 text-muted">{c.readingIntro}</p>
+    <ul class="flex flex-wrap gap-2 list-none p-0">
+      {c.reading.map((r) => (
+        <li>
+          <a href={r.href} class="inline-block rounded-full border border-line px-4 py-1.5 text-sm text-ink no-underline hover:border-accent hover:text-accent">{r.title}</a>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="mb-12">
+    <h2 class="mb-4 text-xl font-bold">{c.processTitle}</h2>
+    <ol class="space-y-3 list-none p-0">
+      {c.process.map((step, i) => (
+        <li class="flex gap-4">
+          <span class="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-full bg-accent text-sm font-bold text-white">{i + 1}</span>
+          <span class="pt-1 text-ink">{step}</span>
+        </li>
+      ))}
+    </ol>
+  </section>
+
+  <section id="contact" class="mb-12 scroll-mt-4">
+    <h2 class="mb-2 text-xl font-bold">{c.formTitle}</h2>
+    <p class="mb-4 text-muted">{c.formIntro}</p>
+    <ContactForm client:visible locale={locale} formId={FORMSPREE_ID} />
+  </section>
+
+  <section>
+    <h2 class="mb-4 text-xl font-bold">{c.faqTitle}</h2>
+    <div class="space-y-2">
+      {c.faq.map((f) => (
+        <details class="group rounded-lg border border-line bg-surface px-4 py-3">
+          <summary class="cursor-pointer list-none font-medium text-ink marker:hidden">
+            <span class="mr-2 inline-block text-accent transition-transform group-open:rotate-90">›</span>{f.q}
+          </summary>
+          <p class="mt-2 text-sm leading-relaxed text-muted">{f.a}</p>
+        </details>
+      ))}
+    </div>
+  </section>
+</BaseLayout>
+
+<style is:global>
+  /* Each form step slides in when it mounts (the step <div> is keyed). */
+  .consulting-step {
+    animation: consulting-step-in 0.25s ease-out;
+  }
+  @keyframes consulting-step-in {
+    from { opacity: 0; transform: translateX(12px); }
+    to { opacity: 1; transform: none; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .consulting-step { animation: none; }
+  }
+</style>
