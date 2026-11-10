@@ -5,6 +5,8 @@
 
 DDD 與 Clean Architecture **合成一個系列**(兩者重疊大:分層、依賴反轉、邊界),不分開寫。
 
+**與 `OOAD 我以為我懂` 的分工(2026-11-10 作者拍板:兩個系列並存,OOAD 當前傳)**:那邊管物件層級(一個類別該知道什麼、做什麼、跟誰協作),這裡管模組 / 系統層級(依賴方向、分層、邊界、DDD 戰略)。交界題的歸屬表在 `docs/ooad-series-roadmap.md`〈與既有系列的關係〉,**以那張為準**。對本系列的影響:#2 可以假設讀者讀過「介面是使用者的」(`ooad-interface`),只講箭頭怎麼翻;#7 的 Value Object 細節連到 `ooad-value-object`、貧血模型連到 `ooad-when-not`,自己只扛 Entity 的身分與 Aggregate 的一致性邊界;#6 只講「不起 DB / UI 就能測 core」,test double 那一半在 `ooad-test-feedback`;#10 只講系統層級的過度設計,類別層級在 `ooad-wrong-abstraction`。
+
 定位:**架構的本質是管理「依賴的方向」與「邊界的畫法」,好讓改動變便宜。** 不走教科書,走「你以為你懂」的破除迷思路線:拆穿 cargo-cult、給打過仗的取捨、誠實講「什麼時候別用」。
 
 ## 最大差異化:雙 runtime 實戰對照
