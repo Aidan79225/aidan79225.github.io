@@ -11,7 +11,7 @@ DDD 與 Clean Architecture **合成一個系列**(兩者重疊大:分層、依�
 
 ## 最大差異化:雙 runtime 實戰對照
 
-作者 Android 5 年 + Backend 2 年,**每篇都內建「Android vs Backend」對照小節**——同一套原則在兩個 runtime 長得多像、又踩不同的坑(例:UseCase/ViewModel ↔ Application Service;Repository 兩邊都愛卻常做錯;依賴反轉在 UI 框架綁很死的 Android 上更痛)。這個跨領域視角是本系列的護城河,別人難複製。
+作者八年 Android、近兩年 Backend 與 Data(2026-11-10 作者定的寫法;這裡原本寫「Android 5 年 + Backend 2 年」),**每篇都內建「Android vs Backend」對照小節**——同一套原則在兩個 runtime 長得多像、又踩不同的坑(例:UseCase/ViewModel ↔ Application Service;Repository 兩邊都愛卻常做錯;依賴反轉在 UI 框架綁很死的 Android 上更痛)。這個跨領域視角是本系列的護城河,別人難複製。
 
 ## 避開兩個罩門(寫作紀律)
 1. **圖別畫成裝飾**:不要畫大家都畫過的 Clean Arch 同心圓、六邊形當「說明」。讓圖扛**決策**或 **before/after 重構**——例如「依賴方向反轉」把箭頭真的翻過來、「IO 推到邊緣」把 DB/UI 從核心移出去。圖要揭露機制,不是貼 logo。
