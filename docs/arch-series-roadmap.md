@@ -5,11 +5,13 @@
 
 DDD 與 Clean Architecture **合成一個系列**(兩者重疊大:分層、依賴反轉、邊界),不分開寫。
 
+**與 `OOAD 我以為我懂` 的分工(2026-11-10 作者拍板:兩個系列並存,OOAD 當前傳)**:那邊管物件層級(一個類別該知道什麼、做什麼、跟誰協作),這裡管模組 / 系統層級(依賴方向、分層、邊界、DDD 戰略)。交界題的歸屬表在 `docs/ooad-series-roadmap.md`〈與既有系列的關係〉,**以那張為準**。對本系列的影響:#2 可以假設讀者讀過「介面是使用者的」(`ooad-interface`),只講箭頭怎麼翻;#7 的 Value Object 細節連到 `ooad-value-object`、貧血模型連到 `ooad-when-not`,自己只扛 Entity 的身分與 Aggregate 的一致性邊界;#6 只講「不起 DB / UI 就能測 core」,test double 那一半在 `ooad-test-feedback`;#10 只講系統層級的過度設計,類別層級在 `ooad-wrong-abstraction`。
+
 定位:**架構的本質是管理「依賴的方向」與「邊界的畫法」,好讓改動變便宜。** 不走教科書,走「你以為你懂」的破除迷思路線:拆穿 cargo-cult、給打過仗的取捨、誠實講「什麼時候別用」。
 
 ## 最大差異化:雙 runtime 實戰對照
 
-作者 Android 5 年 + Backend 2 年,**每篇都內建「Android vs Backend」對照小節**——同一套原則在兩個 runtime 長得多像、又踩不同的坑(例:UseCase/ViewModel ↔ Application Service;Repository 兩邊都愛卻常做錯;依賴反轉在 UI 框架綁很死的 Android 上更痛)。這個跨領域視角是本系列的護城河,別人難複製。
+作者八年 Android、近兩年 Backend 與 Data(2026-11-10 作者定的寫法;這裡原本寫「Android 5 年 + Backend 2 年」),**每篇都內建「Android vs Backend」對照小節**——同一套原則在兩個 runtime 長得多像、又踩不同的坑(例:UseCase/ViewModel ↔ Application Service;Repository 兩邊都愛卻常做錯;依賴反轉在 UI 框架綁很死的 Android 上更痛)。這個跨領域視角是本系列的護城河,別人難複製。
 
 ## 避開兩個罩門(寫作紀律)
 1. **圖別畫成裝飾**:不要畫大家都畫過的 Clean Arch 同心圓、六邊形當「說明」。讓圖扛**決策**或 **before/after 重構**——例如「依賴方向反轉」把箭頭真的翻過來、「IO 推到邊緣」把 DB/UI 從核心移出去。圖要揭露機制,不是貼 logo。
