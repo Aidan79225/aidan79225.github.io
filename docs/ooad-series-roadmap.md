@@ -320,6 +320,8 @@
 | 角色刻板 | role stereotype | Wirfs-Brock;六種名稱(information holder / structurer / service provider / coordinator / controller / interfacer)一律寫英文 |
 | 這件事歸誰 | Who Owns This? ⚠ | 自創;每篇固定小節名,中英文標題都固定 |
 | 歸誰 / 藏什麼 / 叫什麼 | Who owns it? / What does it hide? / What is it called? ⚠ | 自創;三個 **【】** 標記 |
+| 好的物件設計,是讓下一個改動有一個明顯該去的地方 | Good object design gives the next change one obvious place to go. ⚠ | 貫穿主軸,每篇結尾扣回的那一句;英文措辭在 #1 的英文版定下來,之後照抄 |
+| 三個「我以為」 | Three things I thought I knew ⚠ | #1 的小節名,呼應系列名 |
 | 責任搬家 | moving a responsibility ⚠ | 自創;圖與重構篇的固定說法,不寫「遷移」(那是 migration) |
 | 判決 | the ruling ⚠ | 自創;〈這件事歸誰〉小節的結論 |
 | use case | use case | **內文一律英文**;不寫「用例」「使用案例」「使用個案」 |
@@ -383,7 +385,8 @@
 | 進食視窗 | eating window | `DietWindow`;不寫「進食窗口」「用餐區間」 |
 | 斷食 / 斷食達標 | fasting / fast complete | 階段是 `DietPhase`:IDLE / EATING / FASTING / SUCCESS |
 | 斷食類型 | fasting type | 進食與斷食時數的組合(16:8 這類),可以自訂 |
-| 階段 | phase | `DietPhase`;文章裡寫「進食中 / 斷食中 / 斷食達標」三個,還沒有任何紀錄時是 IDLE |
+| 階段 | phase | `DietPhase`;文章裡寫「進食中 / 斷食中 / 斷食達標」三個(英文 eating / fasting / fast complete),還沒有任何紀錄時是 IDLE |
+| 首頁圓環 / 標語 / 提醒 | the ring on the home screen / the home-screen tagline / reminders | #1 英文版用的寫法;「提醒」不寫 notifications(那是系統通知) |
 | 店家 | venue | `Venue`:食物從哪來。**不是**使用者人在哪 |
 | 位置 | location / position | `EatRecord.location` = 人當時在哪;`Venue.position` = 店在哪。兩個詞對應兩個事實,嚴格分用 |
 | 用餐時長 | meal duration | `MealDuration`(PR #93,尚未併入 `master`) |
@@ -443,6 +446,7 @@ roadmap 寫完、**第一篇發布時**一起做(`series.ts` 一登記,/start/ �
 - Git:開 branch → push → PR,不直接動 master(CLAUDE.md 硬規矩)。
 
 ## 修訂紀錄
+- **2026-11-11(#1 英文版)**:作者確認中文版兩張圖之後,建立 `src/content/blog/en/ooad-intro.md`,中英都留 `draft: true`。英文系列名 `OOAD: I Thought I Knew It` 先記進英譯詞彙表 A 區(標未登記)。圖的處理:圖 1 維持 640 寬,標籤走「先砍字」(`讀設定` → `Read settings`、`只算階段,現在幾點是參數` → `Phase only; "now" is a parameter`);圖 2 的英文標籤塞不進 116 寬的框,所以 viewBox 從 640 加寬到 720、五個框各 132 寬,幕名從「第一幕・分析」縮成 `1 · Analysis`。兩張英文圖都截圖看過,沒有溢出。術語表補了主軸句的英文定稿(`Good object design gives the next change one obvious place to go.`)與幾個案例詞彙的英文寫法。Larman 的引句直接用原文,沒有回譯。
 - **2026-11-11(第一篇動筆)**:`ooad-intro` 寫成草稿(`draft: true`),狀態改 🚧。定稿前的骨架:2021 年的三十行 → 招牌圖(一個函式三件事 → 三個家)→ 住過五個地方的搬家表 → 搬對家之後的三次改規則 → Larman 的分析 / 設計與「責任分配」→ 三個「我以為」→ 三個問題在同一段程式上各示範一次 →〈這件事歸誰〉→〈什麼時候別用〉→ 系列地圖 → 反思三節。**動筆前核對出來的更正**:搬家的第四站是 `729f986`(搬進 `domain/diet`),不是先前寫的 `773ddb1` / `30d8919`(那兩個是餐點的 domain model 與 use case,跟這個判斷無關),章節表已改;「五次搬家」改成「住過五個地方」(五個地方、四次搬家)。Larman 第三版第一章的四處用字對過原文。新增一條引用規矩:2026-06-21 之前的 commit 只寫 hash、不做成連結。**還沒做**:落地檢查清單(`series.ts`、`Graph.jsx`、`start.astro`、英譯詞彙表)照規矩與發布同一批做;英文版等中文定稿後接著翻。
 - **2026-11-10(追問回覆:一個更正、一個定案)**:① **更正**——作者說優惠券不是程式設計不好、是產品的設計不好;先前照第一次回答寫進 #15 與〈第四個素材來源〉的「最後悔的設計」已改掉,保留更正的痕跡在〈作者口述〉。② 作者補上更後悔的一筆:運送資訊掛在訂單而不是單品項,與已發布的 `[[rezero-fulfillment]]` 一致,排進 #3。③ 最得意的 calculator 與 `[[rezero-promotion]]` 的最優組合演算法是同一個元件(演算法換過,物件留著)。④ **#23 的框架定案**:標題用作者實際在問的三題,對上系列自創的三個大題。訪談題剩語音的一個字、跨檔期結帳算不算產品面、spec 的個別決定與〈還債上鏡〉。
 - **2026-11-10(第三輪訪談回填 + 四個拍板)**:作者回答 9a 與第 11–15 題,原話入檔。拍板:① 資歷寫「八年 Android,近兩年 Backend 與 Data」(arch roadmap 同步改);② 關聯圖顏色與 `SQL 我以為我懂` 共用 `cyan`;③ 前公司素材可以推上公開 PR,唯一的條件是不能有私密金鑰;④〈還債上鏡〉未定,作者要先看是哪五筆。**最大的更動是 #19 的定調**:作者指定走 Clean Architecture,理由是有 AI 之後明確的分層讓人好驗收——只轉呼叫的 use case 從「反例」改成「重算的帳」。另外 #9 的骨架改成 God class 的三站(Activity / Fragment → ViewModel → use case);#23 補上作者實際 review 的三題與 `code-review-loop`,並把「用哪一組問題當框架」列為待決定。

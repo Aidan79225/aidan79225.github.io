@@ -32,12 +32,16 @@
 | `aep` | An Elegant Puzzle 讀書筆記 | An Elegant Puzzle — Reading Notes |
 | `ai-craft` | 帶 AI 的手藝(2026) | The Craft of Working with AI (2026) |
 | *(未登記)* | Jenkins 學習筆記 | Jenkins — Learning Notes |
+| *(未登記,slug 預定 `ooad`)* | OOAD 我以為我懂 | OOAD: I Thought I Knew It |
 
 命名規則:`X 讀書筆記` → `X — Reading Notes`(讀一本書);`X 學習筆記` → `X — Learning Notes`(學一個工具);
 其餘意譯,保住原標題的味道(`rezero` 的 `Re:` 是《Re:從零開始的異世界生活》的梗,英文照留)。
 
 > **Jenkins 系列還沒登記進 `src/data/series.ts`**——中英文都拿不到 `/start/` 連結。
 > 要補的話兩邊(`name` + `enName`)一起加。
+>
+> **OOAD 系列也還沒登記**:第一篇 `ooad-intro` 目前中英都是草稿;英文名先定在這裡,
+> 發布那一批再連同 `series.ts`、`Graph.jsx`、`start.astro` 一起登記(見 `docs/ooad-series-roadmap.md` 的落地檢查清單)。
 
 ## B. 通用技術詞 → 看 `docs/ubiquitous-language.md`
 
