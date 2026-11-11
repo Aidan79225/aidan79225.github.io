@@ -42,17 +42,21 @@
 | 14 | `sre-consensus` | Ch 23 | 管理關鍵狀態:split brain(土砲選 leader 的死法)、多數決 quorum(任兩過半必重疊、2f+1 容忍 f、奇數)、safety vs liveness、replicated log;三種實作對照 Paxos/Raft/Zab(領導模型 × 好不好懂);別自己造輪子(etcd/ZooKeeper/KRaft) | ✅ 已發布 |
 | 14.5 | `sre-onboarding-inhouse` | 補充(非章節,實戰) | SRE 空降「全自建」公司前 90 天:trace 一個請求走完全程、Grafana LGTM 全家桶看可觀測性、從零重建環境逼出隱藏依賴、先理解後動手的節奏 | ✅ 已發布 |
 | 15 | `sre-cron` | Ch 24 | 可靠的 cron:單機=SPOF、分散式難在「跑過沒」的狀態要靠共識(Paxos)存;崩潰空窗 → 跳過 vs 重複無 exactly-once、冪等是逃生門;午夜 thundering herd 加 jitter——接 `[[airflow-scheduling]]`、`[[sre-consensus]]` | ✅ 已發布 |
-| 16 | `sre-swe-launches` | Ch 18, 27 | SRE 裡的軟體工程、可靠的產品發表(launch checklist) | ⬜ |
+| 18 | `sre-swe-launches` | Ch 18, 27 | SRE 裡的軟體工程、可靠的產品發表(launch checklist) | ⬜ |
 
 ## 第四批 — 管理與文化(最後)
 
 | # | slug | 對應章 | 主題 | 狀態 |
 |---|---|---|---|---|
-| 17 | `sre-management` | Ch 28, 29, 30 | 帶新人上 on-call、處理中斷(interrupt)、拯救過載的團隊 | ⬜ |
-| 18 | `sre-collaboration` | Ch 31, 32 | 溝通協作、演進中的 SRE 合作模式 | ⬜ |
-| 19 | `sre-lessons` | Ch 33, 34 | 借鏡其他產業、全書結語 | ⬜ |
+| 16 | `sre-production-readiness` | Ch 32 | PRR 是一道關,不是一份文件;審什麼=把前面每一篇在上線前驗收一遍;為什麼一定要在上線「前」(把可靠度左移);SRE 可以說不——pager 是一種貨幣;接手不是終點,engagement 可以撤回——接 `[[sre-slo]]`、`[[sre-alerting-oncall]]`、`[[sre-testing]]`、`[[sre-automation-release]]` | ✅ 已發布 |
+| 17 | `sre-interrupts` | Ch 29 | 中斷的成本不是它花掉的那幾分鐘,是被切碎的時間;interrupt shield:用一個人的專注,換回一整隊的專注;產能看「完整時間塊」不是「忙不忙」;中斷率升高是症狀,不是「該多請人」——接 `[[sre-toil]]`、`[[sre-alerting-oncall]]`、`[[sre-production-readiness]]` | ✅ 已發布 |
+| 19 | `sre-management` | Ch 28, 30(Ch 29 已由 #17 寫掉) | 帶新人上 on-call、拯救過載的團隊 | ⬜ |
+| 20 | `sre-collaboration` | Ch 31(Ch 32 已由 #16 寫掉) | 溝通協作 | ⬜ |
+| 21 | `sre-lessons` | Ch 33, 34 | 借鏡其他產業、全書結語 | ⬜ |
 
 ★ = 投報率最高(1、2、4、7、10、11)。第一批七篇是地基,優先寫;第三、四批依興趣調順序。34 章全數涵蓋(部分併篇)。
+
+**目前進度(2026-11-11 同步)**:已發布 19 篇(其中 1.5、14.5 兩篇是非章節的補充)。還沒寫到的章:18、27、28、30、31、33、34。#16、#17 發布時沒有照原本規劃的併法——PRR(Ch 32)與中斷(Ch 29)各自獨立成篇——所以剩下四列的編號順延成 18–21,對應章也扣掉已經寫過的。**剩下這四列要不要重新併篇,待作者決定**:Ch 31 單獨一章、Ch 28 + 30 兩章,各自撐不撐得起一篇,還沒評估。
 
 ## 術語表(Ubiquitous Language)
 
@@ -93,3 +97,6 @@
 - 依 `.claude/skills/writing-blog-post`:摘要比原書更清楚 + 一段真實反思;台灣用語(見 `docs/zh-tw-style-guide.md`)。
 - 每篇一張以上站台深色 SVG(SVG 內不可有空行;wikilink label 內不可放 inline code / 反引號)。
 - 跨系列連結是重點:error budget/可逆性 ↔ `[[pain-before-power]]`;連鎖失效/背壓 ↔ Kafka、Spark;資料完整性/pipeline ↔ FoDE、Airflow;blameless/文化 ↔ 成為 Tech Leader。
+
+## 修訂紀錄
+- **2026-11-11(與已發布的文章同步)**:章節表補上 `sre-production-readiness`(#16,Ch 32)與 `sre-interrupts`(#17,Ch 29)——兩篇都在 2026-08-04 發布,當時沒有回填。原本佔著 #16–#19 的四列未寫篇目順延成 #18–#21,對應章扣掉已寫的 Ch 29、Ch 32;併法是否要重排,待作者決定。順帶記一個用詞不一致:術語表寫「上線就緒審查」,`sre-production-readiness` 的標題用的是「生產就緒審查」(全站術語表另有「Production 一律寫英文」的規矩)——哪一個為準也待作者決定,這次沒有動文章。
