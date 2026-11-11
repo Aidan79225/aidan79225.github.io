@@ -32,6 +32,7 @@
 | `aep` | An Elegant Puzzle 讀書筆記 | An Elegant Puzzle — Reading Notes |
 | `ai-craft` | 帶 AI 的手藝(2026) | The Craft of Working with AI (2026) |
 | *(未登記)* | Jenkins 學習筆記 | Jenkins — Learning Notes |
+| `ooad` | OOAD 我以為我懂 | OOAD: I Thought I Knew It |
 
 命名規則:`X 讀書筆記` → `X — Reading Notes`(讀一本書);`X 學習筆記` → `X — Learning Notes`(學一個工具);
 其餘意譯,保住原標題的味道(`rezero` 的 `Re:` 是《Re:從零開始的異世界生活》的梗,英文照留)。
