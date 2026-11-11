@@ -77,6 +77,7 @@ const showToc = tocHeadings.length >= 3;
   tags={tags}
   image={new URL(`/og/${post.id}.png`, Astro.site).href}
   contentLicense
+  license={category === 'fiction' ? 'all-rights-reserved' : 'cc-by'}
   locale={lang}
   alternates={alternates}
 >

@@ -183,7 +183,8 @@ async function main() {
     const fm = parseFrontMatter(md);
     if (!fm || fm.draft || !fm.title) continue;
     const isEn = slug.startsWith('en/');
-    const kicker = isEn ? 'Tech' : '技術';
+    const kicker =
+      fm.category === 'fiction' ? (isEn ? 'Fiction' : '小說') : isEn ? 'Tech' : '技術';
     const footer = fm.series
       ? `${isEn ? 'Series' : '系列'} · ${fm.series}`
       : (fm.tags || []).slice(0, 4).map((t) => `#${t}`).join('  ');

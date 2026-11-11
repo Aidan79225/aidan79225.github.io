@@ -12,6 +12,10 @@ const {
   modifiedTime,
   tags = [],
   contentLicense = false,
+  // Which licence the footer states when contentLicense is set. Posts are
+  // CC BY 4.0 by default; fiction chapters are all rights reserved (see
+  // LICENSE-CONTENT.md). PostLayout picks this from the post's category.
+  license = 'cc-by' as 'cc-by' | 'all-rights-reserved',
   locale = 'zh-hant' as Locale,
   alternates = [],
 } = Astro.props;
@@ -162,7 +166,9 @@ const fullTitle = title === SITE_NAME ? SITE_NAME : `${title} · ${SITE_NAME}`;
       <slot />
     </main>
     <footer class="max-w-3xl mx-auto px-4 py-8 mt-12 border-t border-line text-muted text-sm">
-      © 2026 Aidan's Blog{contentLicense && (
+      © 2026 Aidan's Blog{contentLicense && license === 'all-rights-reserved' && (
+        <Fragment> · {t.licenseFiction}</Fragment>
+      )}{contentLicense && license === 'cc-by' && (
         <Fragment> · {t.licensePrefix}<a href="https://creativecommons.org/licenses/by/4.0/" rel="license" target="_blank" class="link">CC BY 4.0</a>{t.licenseSuffix}</Fragment>
       )}
     </footer>
