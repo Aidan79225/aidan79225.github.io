@@ -7,6 +7,14 @@
 //
 // Note: images are pre-rendered bitmaps committed to the repo — regenerate when
 // you add a post, change a title, or restyle this template.
+//
+// On a machine without the canonical font (WenQuanYi Zen Hei — e.g. Windows,
+// where the fallback is Noto Sans TC), a full run would redraw every committed
+// image in a slightly different typeface. Render only the posts you added:
+//
+//   node scripts/gen-og.mjs <slug> [en/<slug> …]
+//
+// With slugs given, default.png and every other image are left untouched.
 import sharp from 'sharp';
 import { readdir, readFile, mkdir, writeFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
@@ -24,7 +32,10 @@ const C = {
   line: '#3a4154',
   accent: '#4f6df5',
 };
-const FONT = 'WenQuanYi Zen Hei, Noto Sans CJK TC, sans-serif';
+// First match wins: WenQuanYi Zen Hei where the images are normally rendered;
+// Noto Sans TC is what a stock Windows install has. Without a named match,
+// fontconfig's generic sans-serif can resolve to a monospace face.
+const FONT = 'WenQuanYi Zen Hei, Noto Sans CJK TC, Noto Sans TC, sans-serif';
 const W = 1200;
 const H = 630;
 
@@ -75,12 +86,19 @@ function wrap(text, maxWidth, fontSize, maxLines) {
 
 // Minimal front-matter parse for the fields we need.
 function parseFrontMatter(md) {
-  const m = md.match(/^---\n([\s\S]*?)\n---/);
+  // A Windows checkout (core.autocrlf) hands us CRLF; the patterns below are LF.
+  const m = md.replace(/\r\n/g, '\n').match(/^---\n([\s\S]*?)\n---/);
   if (!m) return null;
   const fm = m[1];
   const pick = (k) => {
     const r = fm.match(new RegExp(`^${k}:\\s*(.*)$`, 'm'));
-    return r ? r[1].trim().replace(/^["']|["']$/g, '') : undefined;
+    if (!r) return undefined;
+    const raw = r[1].trim();
+    // Undo YAML's quoting so the image shows the title as the page does:
+    // "…\"quoted\"…" escapes with a backslash, '…it''s…' doubles the quote.
+    if (/^".*"$/.test(raw)) return raw.slice(1, -1).replace(/\\(["\\])/g, '$1');
+    if (/^'.*'$/.test(raw)) return raw.slice(1, -1).replace(/''/g, "'");
+    return raw;
   };
   const tags = [];
   const tagBlock = fm.match(/^tags:\s*\n((?:\s*-\s*.*\n?)+)/m);
@@ -138,25 +156,32 @@ async function render(svg, outPath) {
 async function main() {
   await mkdir(OUT_DIR, { recursive: true });
 
+  // Slugs on the command line restrict the run to those posts (see the header).
+  const only = new Set(process.argv.slice(2).map((s) => s.replace(/\\/g, '/').replace(/\.md$/, '')));
+
   // Site-wide default.
-  await render(
-    template({
-      title: '用圖像加精簡的文字,把複雜的東西講清楚',
-      kicker: 'Data Engineering · Tech Lead',
-      footer: 'Airflow · Spark · Kafka · dbt · 資料架構',
-    }),
-    join(OUT_DIR, 'default.png'),
-  );
+  if (only.size === 0) {
+    await render(
+      template({
+        title: '用圖像加精簡的文字,把複雜的東西講清楚',
+        kicker: 'Data Engineering · Tech Lead',
+        footer: 'Airflow · Spark · Kafka · dbt · 資料架構',
+      }),
+      join(OUT_DIR, 'default.png'),
+    );
+  }
 
   // Recursive: English translations live in en/ and get their own image
   // (en/<slug>.png), so a shared /en/ link previews with the English title.
   const files = (await readdir(BLOG_DIR, { recursive: true })).filter((f) => f.endsWith('.md'));
   let count = 0;
   for (const f of files) {
+    // readdir yields en\<slug>.md on Windows; slugs are always forward-slashed.
+    const slug = f.replace(/\\/g, '/').replace(/\.md$/, '');
+    if (only.size && !only.has(slug)) continue;
     const md = await readFile(join(BLOG_DIR, f), 'utf8');
     const fm = parseFrontMatter(md);
     if (!fm || fm.draft || !fm.title) continue;
-    const slug = f.replace(/\.md$/, '');
     const isEn = slug.startsWith('en/');
     const kicker =
       fm.category === 'fiction' ? (isEn ? 'Fiction' : '小說') : isEn ? 'Tech' : '技術';
@@ -168,7 +193,11 @@ async function main() {
     await render(template({ title: fm.title, kicker, footer }), outPath);
     count++;
   }
-  console.log(`Generated ${count} post OG images + default.png in public/og/`);
+  console.log(
+    only.size
+      ? `Generated ${count} of ${only.size} requested post OG images in public/og/ (default.png untouched)`
+      : `Generated ${count} post OG images + default.png in public/og/`,
+  );
 }
 
 await main();

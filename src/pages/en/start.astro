@@ -45,9 +45,10 @@ const layers = [
     color: 'var(--hue-blue)',
     title: 'Transformation and architecture: organising concepts into systems',
     blurb:
-      'The layer between concepts and tools — how raw data is refined into usable models, how transformation and layering are arranged, and a few architectural ideas I think are most worth understanding.',
+      'The layer between concepts and tools — how raw data is refined into usable models, how transformation and layering are arranged, and a few architectural ideas I think are most worth understanding. Object-level design — which piece of logic belongs to whom, and what each one hides — lives here too.',
     groups: [
       { heading: null, posts: pick(['dbt-intro', 'medallion-architecture', 'pain-before-power']) },
+      sGroup('ooad', 'Object-level design · '),
     ],
   },
   {

@@ -55,6 +55,14 @@ export const seriesList: SeriesInfo[] = [
     color: 'var(--hue-green)',
   },
   {
+    slug: 'ooad',
+    name: 'OOAD 我以為我懂',
+    enName: 'OOAD: I Thought I Knew It',
+    blurb: '把「以為懂了」的物件導向重新拆開——封裝、繼承、多型、use case、領域模型、設計模式,其實都在回答同一個問題:這件事歸誰。拿一支從 2021 活到現在的真 App 當案例。',
+    enBlurb: "Taking apart the object-oriented design you thought you knew — encapsulation, inheritance, polymorphism, use cases, domain models and patterns all answer one question: who owns this? Worked through on a real app that has lived from 2021 to now.",
+    color: 'var(--hue-blue)',
+  },
+  {
     slug: 'redis',
     name: 'Redis 學習筆記',
     enName: 'Redis — Learning Notes',

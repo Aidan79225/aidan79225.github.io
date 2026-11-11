@@ -1,6 +1,7 @@
 ---
 title: "Engineering Management Is an Elegant Puzzle: Fix the System, Not the Events"
 date: 2026-09-10
+updated: 2026-10-27
 category: tech
 description: "A new series: reading Will Larson's An Elegant Puzzle. The book takes a hard line — management isn't solving things one at a time, it's designing the system that keeps emitting them. First the shift itself, then the five chapters read as five questions, and finally an honest answer: how does a team of four read a book written for rocket ships?"
 tags:
@@ -13,9 +14,9 @@ draft: false
 ---
 There's already a leadership series on this site ([[btl-1|Becoming a Tech Leader]]), so why start another one?
 
-Because that book is about **how a person grows into a leader** — influence, self-awareness, vision. Will Larson's *An Elegant Puzzle: Systems of Engineering Management* is about **the system that leader is holding**: how big a team should be, how to diagnose the state it's in, where the risk sits, how technical debt actually gets repaid, how policy gets written, how levels get defined, how hiring gets measured. Larson's résumé is what earns him the angle — Digg, Uber, Stripe, places where the org doubles every year and a management problem gets rewritten by scale before you've finished solving it.
+Because that book is about **how a person grows into a leader** — influence, self-awareness, vision. Will Larson's *An Elegant Puzzle: Systems of Engineering Management* is about **the system that leader is holding**: how big a team should be, how to diagnose the state it's in, where the risk sits, how technical debt actually gets repaid, how policy gets written, how levels get defined, how hiring gets measured. Larson's résumé is what earns him the angle — Digg, Uber, Stripe, the last two places where the org grew so fast that a management problem got rewritten by scale before you'd finished solving it.
 
-The title isn't decoration, it's a **stance**: Larson writes every management problem as a systems problem, with stocks, flows and lag. That happens to be the language this blog already speaks — the last dozen series pointed it at databases and clusters; this one points it at the organization.
+The title isn't decoration, it's a **stance**: Larson writes every management problem as a systems problem, with stocks, flows and lag. That happens to be the lens this blog keeps using — earlier series pointed "the system" at databases and clusters; this one points it at the organization.
 
 ## The shift: your output isn't "things handled", it's "things that stopped happening"
 
@@ -52,7 +53,7 @@ A release broke again, a request jumped the queue again, someone got burned out 
   <figcaption style="font-size:.85rem;color:#9aa4b2;margin-top:.4rem;">This week's workload looks about the same on both sides. Next week is where they diverge: the left never touched the source, the right emits a little less — and the right pays nothing back this week, which is exactly why most people never do it</figcaption>
 </figure>
 
-Two consequences follow. First, **the way you measure yourself has to change**: "how many things I caught this week" is a timesheet; "which class of thing stopped happening this month" is output. Second, **every change to a system pays back late** — a policy takes a quarter to show, a hire takes three to six months to produce, a levelling system takes a full cycle before you know whether it's fair. Changing code tells you today; changing an organization doesn't. That lag runs through the whole book, and this series flags it in every post.
+Two consequences follow. First, **the way you measure yourself has to change**: "how many things I caught this week" is a timesheet; "which class of thing stopped happening this month" is output. Second, **every change to a system pays back late** — a policy takes a quarter to show, a hire takes three to six months to produce, a levelling system takes a full cycle before you know whether it's fair. Changing code tells you today; changing an organization doesn't. That lag runs through the whole book, and this series keeps flagging it.
 
 One line you can actually use: **when the same thing happens for the third time, stop handling that thing — go change the system that keeps emitting it.**
 
@@ -117,36 +118,38 @@ The third one is this series' signature — and it's what the next section is ab
 
 ## The honest part: a book written for rocket ships, read by four engineers
 
-This book's raw material comes from places that add a whole team every quarter: HR, recruiters, calibration meetings, a written career ladder. My own most complete stretch of leading people was the opposite — [[rezero-team|six engineers, with only four on the storefront line]], no estimation and no demos, fully remote, with product handled full-time by a CTO who didn't write code. And it didn't end in growth: [[rezero-retro|the contract talks collapsed, we were down to three people a month later, and then it shut down]].
+This book's raw material comes from places that add a whole team every quarter. The stretch of leading people I've written about on this blog was a different scale entirely — [[rezero-team|six engineers, with only four on the storefront line]], no estimation and no demos, fully remote, with product handled full-time by a CTO who didn't write code. And it didn't end in growth: [[rezero-retro|development was paused, the contract went into renegotiation, the team was three people a month later, and then it shut down]].
 
-So let me be explicit from post one about how I'm reading this book: **it's a translation, not a repost.** Three rules for it:
+So let me be explicit from post one about how this series reads the book: **it's a translation, not a repost.** Three rules for it:
 
 1. **Ask what a move is solving before you look at the shape it takes.** The shape — a committee, a calibration meeting, a promotion packet — is a product of scale. The problem behind it (who decides, on what grounds, does it still hold next time) exists just as much on a team of four; it's just that the answer shrinks from an institution to a shared understanding and a one-page doc.
-2. **No written system doesn't mean no system.** A team without a written career ladder still has one — it lives in the manager's head and moves with their mood. That implicit version is the expensive kind.
-3. **When the org is shrinking, one prescription disappears outright.** The book assumes throughout that you're growing, so its handiest answer is always "hire". When headcount is going the other way, that road is gone and you're left with consolidating effort and buying time. **This is the half the book barely covers, and the only half I can add** — it's the last post of the series.
+2. **No written system doesn't mean no system.** A team without a written career ladder still has one — it lives in the manager's head, and nobody can be sure this time's standard matches last time's. The trouble with that implicit system is that it can't be checked.
+3. **When the org is shrinking, one prescription disappears outright.** The book's material comes almost entirely from growing organizations, and the first prescription in its four states of a team is "hire". When headcount is going the other way, that road is gone and you're left with consolidating your efforts and adding time. **The shrinking half gets its own post at the end of this series** — which is exactly where the ending of that stretch falls.
 
-Larson deserves credit here, though: he writes at the top of chapter 6 that **a rocket ship is a weak predictor of personal growth** — what actually decides how fast you grow is the role and the opportunities you get, not how fast the company grows. So the small-team lens isn't me arguing with the book; it's me pulling that line further.
+Larson deserves credit here, though: he opens chapter 6 with a section titled *Roles over rocket ships, and why hypergrowth is a weak predictor of personal growth* — what actually decides how fast you grow is the role and the opportunities you get, not how fast the company grows. So the small-team lens isn't an argument with the book; it pulls that line further.
 
 ## Reflection
 
-### The most manager-like things I did back then were my own attention, used as a mechanism
+### Four practices from back then: two handed to tools, two resting on a person
 
-In [[btl-1|the first leadership post on this blog]] I described what I was doing at the time: passing on knowledge through code review, a coding style to keep things consistent, a type checker to lower the cost of keeping them consistent, regular 1-on-1s. Then, in the reflection of that same post, I admitted two things — **code review that I sat on slowed the whole team down, and 1-on-1s with no follow-up were worth nothing.**
+In [[btl-1|the first leadership post on this blog]] I described what I was doing at the time: passing on knowledge through code review, holding the team together with a coding style, a type checker to take the weight of consistency off everyone's shoulders, regular 1-on-1s. The reflection in that same post named two problems: **"when I let code review sit too long, I become the thing slowing the team down; and 1-on-1s without follow-up end up feeling like a formality."**
 
-Reading that paragraph again with this book in hand, the problem wasn't that I wasn't diligent enough. It's that **the mechanism in both cases was me**: the review cadence tracked how busy my week was, and the value of a 1-on-1 tracked whether I remembered where we left off. Once a person is the mechanism, it drifts with how busy that person is — and **when it breaks, it breaks silently**. Nobody comes to tell you that your attention ran out this week.
+Read that list again through this book and it splits cleanly. Of the four practices, **coding style and type consistency were handed to tools** — that post itself says the type checker is there "to take the weight of consistency off everyone's shoulders", and [[rezero-team|the team post]] says it outright: "Matters of form never reach a human brain — ruff and mypy mechanise style and types". **The two that got flagged as problems are exactly the two that could only run on a person**: the rhythm of review, and the follow-up on 1-on-1s. That's the class of thing this book's first shift is aimed at — a mechanism that rests on a person rises and falls with that person, and when it slips, nothing usually raises a warning first.
 
-The first concrete thing this book changed: every time I'm about to say "just a reminder", I ask myself which time this is. If it's the third, what I need to fix isn't my memory — it's whatever keeps making this need a reminder. A checklist, a default, a CI rule, anything, as long as it isn't me.
+The book's prescription turns straight into a habit: when you're about to say "just a reminder", count which time this is. If it's the third, what needs fixing isn't anyone's memory — it's whatever keeps making this need a reminder. A checklist, a default, a CI rule, anything, as long as it isn't somebody's attention.
 
-### Low friction was real, but I treated a by-product as a method
+### "Speed is a function of process shape" — the same shift, from the trenches
 
-In [[rezero-team|that post about the team]] I landed on this: four people moved like twenty not because of heroics, but because friction was low — no estimation, no demos, requirements discussed directly. I still think that call was right, but this book forces me to finish the sentence: **that low friction wasn't something I designed. It was a by-product of four people who happened to work well together.**
+In the reflection of [[rezero-team|that post about the team]] I wrote this: **"Speed is structural, not heroic. … To reproduce this team's speed, don't look for four superhumans — dismantle those four frictions first — speed is a function of process shape; people are the coefficient and the shape is the exponent."** The same post lists how those four frictions were taken apart: near-zero ritual, merge equals release, order the queue rather than schedule it, zero translation of specs.
 
-Why does that matter? Because it doesn't survive a change of people. An unwritten understanding can't be inherited on someone's first day; the moment one person leaves, the friction grows straight back. **Low friction you can reproduce is a system; low friction you can't is luck** — and back then I couldn't tell them apart, and took the luck for skill.
+Read next to this book, the two are saying the same thing: **don't put more force into the events — change the shape that produces them.** Heroics is exactly putting more force into the events — somebody pushing harder, holding out longer; Larson treats it as serious enough to title a chapter 5 section *Kill your heroes, stop doing it harder*.
 
-### With AI in the room, this book is worth more, not less
+The next question this book asks: **does that shape still run with a different set of people?** How much of it is written down, how far a new hire can follow it on day one, which piece actually rests on one person — the later posts on where risk sits and on heroes will come back to it.
+
+### With AI in the room, the layer this book covers matters more
 
 In [[responsibility-funnel|The Responsibility Funnel]] I described a shape: what AI eats is the wide top of the funnel — code, tests, research, first drafts; what it can't eat is the person at the neck who has to sign.
 
-Lay that shape over this book and the conclusion is blunt: **once the unit cost of handling events collapses, almost the only difference left between managers is whether they're changing the system.** Handling events quickly is table stakes now, not a skill — while how you write the spec, where you put your review bandwidth, and which decisions can't be delegated all live in the layer this book is about. That's also why I'm writing this series alongside the AI one but **deliberately not touching the responsibility axis here**: [[responsibility-funnel|that line already has its own series]]. This one is about the organization itself.
+Lay that shape over this book and you can derive an extension — an inference, not something the book says: **as AI pushes down the unit cost of handling events, the gap between managers becomes more concentrated on whether they're changing the system.** The book came out in 2019, and nothing in its table of contents is about AI; but the layer it covers — structure, process, policy — is exactly what the person at the neck still has to decide. That's also where this series and the AI series divide the work: **the responsibility axis of AI stays out of here** — [[responsibility-funnel|that line already has its own series]]. This one is about the organization itself.
 
-One verdict to close on, the thing I most want to keep from the book: **the most expensive illusion in management is mistaking "I caught everything" for doing the job well — catching it only means the system hasn't been fixed yet, and it's still charging you interest.**
+One verdict to close this post on: **the most expensive illusion in management is mistaking "I caught everything" for doing the job well — catching it only means the system hasn't been fixed yet, and it's still charging you interest.**
