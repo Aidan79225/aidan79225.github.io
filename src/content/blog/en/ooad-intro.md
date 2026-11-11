@@ -10,7 +10,7 @@ tags:
 series: "OOAD: I Thought I Knew It"
 seriesOrder: 1
 comments: true
-draft: true
+draft: false
 translationOf: ooad-intro
 ---
 This site already has one "I Thought I Knew It" series — [[sql-execution-order|the SQL one]] takes queries apart. This is the second, and it takes object orientation apart.

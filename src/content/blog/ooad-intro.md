@@ -10,7 +10,7 @@ tags:
 series: "OOAD 我以為我懂"
 seriesOrder: 1
 comments: true
-draft: true
+draft: false
 ---
 站內已經有一個「我以為我懂」了——[[sql-execution-order|SQL 那個系列]]拆的是查詢;這是第二個,拆的是物件導向。
 

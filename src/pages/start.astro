@@ -38,9 +38,10 @@ const layers = [
     color: 'var(--hue-blue)',
     title: '轉換與架構:把觀念組織成系統',
     blurb:
-      '介於觀念與工具之間的一層——怎麼把原始資料煉成可用模型、怎麼安排轉換與分層,以及幾個我認為最該懂的架構觀念。',
+      '介於觀念與工具之間的一層——怎麼把原始資料煉成可用模型、怎麼安排轉換與分層,以及幾個我認為最該懂的架構觀念。物件層級的設計(一段邏輯該歸誰、該藏什麼)也放在這一層。',
     groups: [
       { heading: null, posts: pick(['dbt-intro', 'medallion-architecture', 'pain-before-power']) },
+      sGroup('ooad', '物件層級的設計 · '),
     ],
   },
   {

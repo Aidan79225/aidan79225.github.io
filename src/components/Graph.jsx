@@ -11,6 +11,8 @@ const SERIES = [
   ['SQL 我以為我懂', 'cyan', 'SQL'],
   ['Designing Data-Intensive Applications 讀書筆記', 'indigo', 'DDIA'],
   ["Competitive Programmer's Handbook 讀書筆記", 'green', 'CPHB'],
+  // 與 SQL 我以為我懂 共用 cyan:同一個「我以為我懂」家族,靠標籤區分
+  ['OOAD 我以為我懂', 'cyan', 'OOAD'],
   ['Spark 學習筆記', 'orange', 'Spark'],
   ['Kafka 學習筆記', 'purple', 'Kafka'],
   ['Airflow 學習筆記', 'green', 'Airflow'],
