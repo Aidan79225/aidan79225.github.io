@@ -9,7 +9,7 @@
 - ↔ **從 Infra 角度看資料工具**(`[[infra-platform]]` 的「一塊玻璃」):那篇點到 LGTM 是平台監控的收斂,這系列把那塊玻璃拆開講透。
 - ↔ 收尾扣回 **DE × SRE 焊點**:最後一篇把 LGTM 用在資料平台上(pipeline 指標、freshness/lag、資料 SLO、data incident),接回作者 EM(DE)+ SRE 的定位。
 
-★ = 框架 / 最高投報(1、3、8、10、11)。邊寫邊發:`draft: true` → `false`。`seriesOrder` = 寫作順序。
+★ = 框架 / 最高投報(1、3、7、10、11)。邊寫邊發:`draft: true` → `false`。`seriesOrder` = 寫作順序。
 
 ## 第一批 — 地基(觀念 + Grafana 本身)
 
@@ -31,13 +31,13 @@
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
 | 6 | `obs-collection` | 採集層:資料怎麼進來——OpenTelemetry 與 Alloy | M×N→M+N(直連 vs collector:OTLP 一協定、批次/重試/脫敏/路由集中、換後端不改 app);OTel 統一三訊號一套 SDK+共用 context(trace-id 進 log、exemplar 掛 metric=互跳的地基)、auto vs manual 埋測;Alloy=collector(OTLP+scrape+撿 log);K8s 三種佈法(DaemonSet 首選/sidecar 特例/gateway 做 tail sampling 全域決策)+兩層組合——接 `[[obs-intro]]`、`[[obs-traces-tempo]]`、`[[kafka-ecosystem]]`、`[[k8s-networkpolicy-cni]]`、`[[ddia-encoding]]`、`[[pain-before-power]]` | ✅ 已發布 |
-| 7 | `obs-correlation` | 三支柱關聯:從一個尖峰,跳到 trace,再跳到 log | 「一塊玻璃」的真義=三支柱能互跳;exemplars(metric→trace)、trace→logs、共用 label 關聯;沒關聯的三支柱只是三個孤島 | ⬜ |
+| 8 | `obs-correlation` | 三支柱關聯:從一個尖峰,跳到 trace,再跳到 log | 「一塊玻璃」的真義=三支柱能互跳;exemplars(metric→trace)、trace→logs、共用 label 關聯;沒關聯的三支柱只是三個孤島 | ✅ 已發布 |
 
 ## 第四批 — 把觀測變行動(SRE 實踐)
 
 | # | slug | 標題(暫定) | 主題 | 狀態 |
 |---|---|---|---|---|
-| 8 | `obs-alerting` | 告警:Alertmanager 與好告警的設計 | Prometheus alerting rules、Alertmanager(去重/分組/靜默/路由)、**告警疲勞**、symptom-based vs cause-based、只在該叫醒人時叫——接 `[[sre-monitoring]]`、`[[airflow-reliability]]` | ⬜ ★ |
+| 7 | `obs-alerting` | 告警:Alertmanager 與好告警的設計 | Prometheus alerting rules、Alertmanager(去重/分組/靜默/路由)、**告警疲勞**、symptom-based vs cause-based、只在該叫醒人時叫——接 `[[sre-monitoring]]`、`[[airflow-reliability]]` | ✅ 已發布 ★ |
 | 9 | `obs-dashboards` | 儀表板設計:RED、USE 與四個黃金訊號 | 別做沒人看的儀表板;服務看 **RED**(Rate/Errors/Duration)、資源看 **USE**(Utilization/Saturation/Errors)、Google 四個黃金訊號;一張圖要能回答一個問題 | ⬜ |
 | 10 | `obs-slo` | SLO 與 error budget 在 Grafana 落地 | 從 SLI 到 SLO、burn-rate alerting、error budget 怎麼算與怎麼用、用 Grafana/Mimir 落地——接 `[[sre-slo]]`(觀念)這裡談實作 | ⬜ ★ |
 
@@ -50,8 +50,8 @@
 ## 建議閱讀順序
 1. **地基**(1→2):先懂三支柱與「Grafana 只是玻璃」的定位。
 2. **三支柱**(3→4→5):Prometheus/Loki/Tempo 各講透,3 是重中之重(metrics 是骨幹)。
-3. **串起來**(6 採集→7 關聯):資料怎麼進來、三支柱怎麼互跳成一塊玻璃。
-4. **變行動**(8 告警→9 儀表板→10 SLO):把「看到」變「行動」,這批最貼 SRE 日常。
+3. **串起來**(6 採集→8 關聯):資料怎麼進來、三支柱怎麼互跳成一塊玻璃。
+4. **變行動**(7 告警→9 儀表板→10 SLO):把「看到」變「行動」,這批最貼 SRE 日常。(告警比關聯先寫、先發,所以編號是 7;閱讀順序仍然建議先讀關聯。)
 5. **焊點**(11):把整套用回資料平台,收束到 DE×SRE 定位。
 
 ## 術語表(Ubiquitous Language)
@@ -88,3 +88,6 @@
 - 台灣用語(見 `docs/zh-tw-style-guide.md`);程式碼/查詢語言(PromQL/LogQL)用 code block,工程師視角要有實際查詢範例。
 - **貫穿主軸**:每篇結尾扣回「觀測的終點是**行動**,不是看到」;三支柱、告警、SLO 都是為了讓人在對的時間做對的事。
 - **cross-link 是重點**:可靠性觀念/文化 ↔ SRE 系列(`[[sre-monitoring]]`、`[[sre-slo]]`、`[[sre-cascading-failures]]`);一塊玻璃/平台 ↔ `[[infra-platform]]`、`[[infra-k8s]]`;資料可靠性 ↔ `[[airflow-reliability]]`、(未來)Data Quality;pull/時序 ↔ `[[infra-kafka]]`(拉模型對照)。
+
+## 修訂紀錄
+- **2026-11-11(與已發布的文章同步)**:`obs-correlation`、`obs-alerting` 兩列補上 ✅ 已發布(分別在 2026-08-04、2026-07-27 發布,當時沒有回填)。兩篇的發布順序與原本的規劃相反——告警先寫——所以編號對調成 #7 `obs-alerting`、#8 `obs-correlation`,★ 清單與〈建議閱讀順序〉裡的編號一併改掉;分批與閱讀順序本身沒有動。
