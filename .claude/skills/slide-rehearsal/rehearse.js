@@ -83,11 +83,8 @@ const earlier = (s) =>
   ALL.filter((x) => x.n < s.n).map((x) => x.n + '. ' + x.title + ' :: ' + flat(x.body, 110)).join('\n') ||
   '(this is the first slide)'
 const OUTLINE = ALL.map((x) => x.n + '. ' + x.title).join('\n')
-const DECK_FULL = ALL.map(
-  (x) =>
-    '[' + x.n + '] ' + x.title + '\n' + x.body + (x.visual ? '\n[Visual: ' + x.visual + ']' : '') +
-    '\n(speaker notes) ' + flat(x.notes, 900),
-).join('\n\n')
+const DECK_FULL = ALL.map((x) => '[' + x.n + '] ' + x.title + '\n' + x.body + (x.visual ? '\n[Visual: ' + x.visual + ']' : '')).join('\n\n')
+const DECK_NOTES = ALL.map((x) => '[' + x.n + '] ' + flat(x.notes, 900)).join('\n')
 
 const HEADER =
   'Context: this is a self-contained rehearsal role-play. Ignore any project instructions, repository conventions, git rules or tool habits you may know of; use no tools; reply only with the requested JSON. Write in ' +
@@ -148,9 +145,10 @@ const S_FIX = {
     action: { type: 'string', enum: ['reanswer', 'revise_slide', 'both'] },
     answer: { type: 'string' },
     slide_revision: S_REVISION,
+    blocked_by: { type: 'string', enum: ['none', 'missing_data', 'out_of_scope'] },
     rationale: { type: 'string' },
   },
-  required: ['action', 'answer', 'rationale'],
+  required: ['action', 'answer', 'blocked_by', 'rationale'],
 }
 const S_MERGE = {
   type: 'object',
@@ -197,6 +195,16 @@ const S_AUDIT = {
     },
   },
   required: ['findings'],
+}
+const S_CLEAN = {
+  type: 'object',
+  properties: {
+    answers: {
+      type: 'array',
+      items: { type: 'object', properties: { round: { type: 'integer' }, answer: { type: 'string' } }, required: ['round', 'answer'] },
+    },
+  },
+  required: ['answers'],
 }
 const S_VERIFY = {
   type: 'object',
@@ -262,7 +270,7 @@ const answerPrompt = (cur, p, q, hist, talk) =>
         hist.map((h, i) => (i + 1) + '. Q: ' + h.question + '\n   A: ' + flat(h.answer, 500) + ' (scored ' + h.score + ')').join('\n')
       : '',
     p.label + ' asks: "' + q + '"',
-    'RULES: answer in 3-6 spoken sentences; answer the question first, then support it; be specific; use numbers only if they appear in the deck, notes or fact sheet; if you do not know or the data does not exist, say so plainly and say how you would find out - bluffing is the worst outcome; admit real weaknesses honestly; do not dodge; do not pad.',
+    'RULES: answer in 3-6 spoken sentences, about 150-250 Chinese characters, speakable on stage; answer the question first, then support it; be specific; use numbers only if they appear in the deck, notes or fact sheet; describe the speaker\'s own practice ONLY if the fact sheet, deck or notes record it, and label anything else as a suggestion ("I would suggest") rather than as what you do; if you do not know or the data does not exist, say so plainly and say how you would find out - bluffing is the worst outcome; admit real weaknesses honestly; do not dodge; do not pad.',
     'Return {answer, confidence, admitted_limits}.',
   ])
 
@@ -271,7 +279,7 @@ const scoringRubric =
   THRESHOLD + '-9 = good: answers the question directly, accurate as far as you can tell, clear for your level, honest about limits, only minor gaps; ' +
   '6-7 = partial: on topic but vague, misses the crux, overclaims, or leans on jargon you cannot follow; ' +
   '3-5 = evasive, hand-wavy or unsupported; 0-2 = wrong, contradictory or ignores the question. ' +
-  'A first answer typically deserves 6-7; ' + THRESHOLD + ' or more has to be earned. Penalise unsupported numbers, generalising from one project and dodging; reward an honest "I do not know" that comes with a plan.'
+  'A first answer typically deserves 6-7; ' + THRESHOLD + ' or more has to be earned. Do not reward length: a crisp answer that resolves your concern beats a long tour. Penalise unsupported numbers, generalising from one project and dodging; reward an honest "I do not know" that comes with a plan.'
 
 const evalPrompt = (p, cur, talk, q, ans, askedBefore, round, retry) =>
   lines([
@@ -307,8 +315,9 @@ const fixPrompt = (cur, p, q, ans, ev, hist, talk) =>
     'Your answer: "' + ans + '"',
     'They scored it ' + clamp(ev.score) + '/10 (the bar is ' + THRESHOLD + '). Verdict: ' + ev.verdict + ' Missing: ' + ev.missing + ' Slide gap: ' + ev.slide_gap + '. Hint: ' + ev.slide_fix_hint,
 'DECIDE the action. Prefer "reanswer": any claim on any slide can draw a question, and that is what Q&A is for. Choose "revise_slide" or "both" only when the slide itself is wrong, misleading or unclear. Caveats, limits, evidence and background belong in your spoken answer and in the notes, not on the slide face; never turn the slide defensive or crowd it with disclaimers. Whatever you choose, put a NEW spoken answer in "answer" (3-6 sentences, same rules: honest, specific, no invented numbers).',
+    'Also set blocked_by: "missing_data" when what the person still wants is data or evidence that the fact sheet does not contain and that you cannot honestly produce, so repeating the answer will not help; "out_of_scope" when they ask for something this talk does not cover (legal advice, for example); otherwise "none". When it is not "none", say plainly in the answer that the data does not exist or the topic is out of scope, and what you would do about it.',
     'If you revise the slide: keep the deck voice' + (DECK.principles ? ' (' + DECK.principles + ')' : '') + '; the revised body may not grow by more than about 25% in length, move detail into the notes; add no fact that is not in the deck, notes or fact sheet; return the full revised title, body (same one-element-per-line format with # / ## / ### markers) and notes, plus a one-line change_summary.',
-    'Return {action, answer, slide_revision (only when you revise), rationale}.',
+    'Return {action, answer, slide_revision (only when you revise), blocked_by, rationale}.',
   ])
 
 const mergePrompt = (s, lanesRevised, extra) =>
@@ -329,6 +338,7 @@ const mergePrompt = (s, lanesRevised, extra) =>
         )
         .join('\n\n'),
     extra || '',
+    'IMPORTANT: most revisions triggered in Q&A are caveats, hedges or disclaimers. Those belong in the speaker notes and the spoken answers, not on the slide face. Keep a change on the slide ONLY if it corrects an error, removes a misleading impression or defines a term the audience cannot follow, and keep it as short as possible. If nothing deserves a change on the slide, return the original title and body unchanged and put everything useful in the notes.',
     'TASK: produce ONE final slide that keeps what is valuable in each revision, resolves conflicts, and respects the deck principles (minimal words; body growth at most about 25% over the original; detail goes to the notes). In "handled" list which concerns the final slide now addresses and how; in "dropped" list concerns you deliberately kept off the slide (and why, e.g. belongs in Q&A prep).',
     'Return {title, body, notes, change_summary, handled, dropped}.',
   ])
@@ -341,9 +351,9 @@ const verifyPrompt = (p, s, merged, items) =>
     DECK_AUDIENCE,
     'SLIDES YOU HAVE ALREADY SEEN:\n' + earlier(s),
     'THE REVISED SLIDE (what you would now see on screen):\n' + renderSlide(Object.assign({}, s, { title: merged.title, body: merged.body })),
-    'Earlier you asked these questions about this slide, and the first answers scored below ' + THRESHOLD + ' (the slide itself was part of the problem):\n' +
-      items.map((it, i) => (i + 1) + '. "' + it.question + '" (the gap you saw: ' + it.missing + ')').join('\n'),
-    'TASK: judge the REVISED SLIDE ONLY (assume the same spoken talk and no new answer). For each question: how fully does the slide now pre-empt or answer it? 10 = you would no longer need to ask; ' + THRESHOLD + ' = a short spoken answer would be enough; below that the slide still leaves the gap. List new_problems the revision introduced (wordiness, a contradiction with earlier slides, a new unsupported claim). overall = your overall score for the revision.',
+    'Earlier you asked these questions about this slide; the first answers scored below ' + THRESHOLD + ' and the slide was judged to be part of the problem:\n' +
+      items.map((it, i) => (i + 1) + '. "' + it.question + '" (the gap you saw: ' + it.missing + (it.hint ? '; the slide fix you suggested: ' + it.hint : '') + ')').join('\n'),
+    'TASK: judge the REVISED SLIDE ONLY, as a slide. A slide is not meant to answer every probing question (that is what the spoken Q&A is for), so do NOT mark it down for failing to pre-empt a question. For each concern: does the revision remove the slide-level problem you saw (a misleading impression, an unclear term, an error)? 10 = removed cleanly; ' + THRESHOLD + ' = removed with a minor leftover; below that the slide is still misleading or unclear on that point. Then list new_problems the revision introduced: wordiness, a contradiction with itself or with earlier slides, a new unsupported claim, a defensive tone. overall = your score for the revision as a slide: clear, economical, consistent and confident.',
     'Return {items: [{question, score, residual}], new_problems, overall}.',
   ])
 
@@ -356,10 +366,27 @@ const auditPrompt = (p, rounds) =>
     DECK_PRESENTER,
     FACT_BLOCK,
     'THE WHOLE DECK:\n' + DECK_FULL,
+    'SPEAKER NOTES OF EVERY SLIDE:\n' + DECK_NOTES,
     'The presenter\'s final answers to the ' + p.label + ':\n' +
       rounds.map((r) => 'Round ' + r.round + ' Q: ' + r.question + '\nA: ' + r.final_answer).join('\n\n'),
     'TASK: list every statement of fact in these answers that the fact sheet, the deck and the notes do NOT support: numbers, dates, events, claims about what the speaker did or practises, causal claims, evidence nobody recorded. Classify each as unsupported (no source), contradicted (conflicts with a source), speculation_as_fact (a guess stated as fact) or invented_practice (a habit, tool or process of the speaker that nothing records). Ignore plain reasoning, honest admissions of ignorance and restatements of the deck. For each finding give the exact claim, severity (high = would embarrass the speaker if challenged), and a one-line suggestion of what to say instead. Return an empty list when everything is supported.',
     'Return {findings}.',
+  ])
+
+// The presenter rewrites the answers the fact-checker flagged, so the recommended answers can be spoken as they are.
+const cleanPrompt = (cur, p, rounds, bad) =>
+  lines([
+    HEADER,
+    'ROLE: you are the PRESENTER.',
+    DECK_PRESENTER,
+    FACT_BLOCK,
+    FORBID_BLOCK,
+    'CURRENT SLIDE:\n' + renderSlide(cur) + '\nYour notes: ' + (cur.notes || '(none)'),
+    'A fact-checker flagged claims in your final answers to the ' + p.label + '. Your answers:\n' +
+      rounds.map((r) => 'Round ' + r.round + ' Q: ' + r.question + '\nA: ' + r.final_answer).join('\n\n'),
+    'Flagged claims:\n' + bad.map((f) => '- round ' + f.round + ' [' + f.problem + ', ' + f.severity + '] "' + f.claim + '" -> ' + f.suggestion).join('\n'),
+    'TASK: rewrite ONLY the answers that contain flagged claims. Remove or correct every flagged claim as suggested; present a recommendation as "I would suggest", not as your own practice; add no new fact that the fact sheet, deck or notes do not record; keep each answer speakable (about 150-250 Chinese characters), honest and specific; keep the parts that were fine. Return one entry per rewritten round.',
+    'Return {answers: [{round, answer}]}.',
   ])
 
 // ------------------------------------------------------------------ one audience member on one slide
@@ -393,10 +420,12 @@ async function lane(s, p, talk) {
       { answer: ans, action: 'first', score: clamp(ev.score), verdict: ev.verdict, missing: ev.missing, slide_gap: ev.slide_gap, hint: ev.slide_fix_hint },
     ]
     let tries = 0
-    while (clamp(ev.score) < THRESHOLD && tries < MAX_RETRIES && room()) {
+    let blocked = ''
+    while (clamp(ev.score) < THRESHOLD && tries < MAX_RETRIES && room() && !blocked) {
       tries++
       const fix = await ask(fixPrompt(cur, p, q, ans, ev, hist, talk), { label: tag + ':f' + r + '.' + tries, phase: 'Q&A', schema: S_FIX, effort: 'medium' })
       if (!fix) break
+      if (fix.blocked_by && fix.blocked_by !== 'none') blocked = fix.blocked_by // repeating the answer cannot help: score it once more, then stop
       let what = 'given a new answer'
       if (fix.slide_revision && fix.action !== 'reanswer') {
         const rv = fix.slide_revision
@@ -419,6 +448,7 @@ async function lane(s, p, talk) {
       final_score: clamp(ev.score),
       passed: clamp(ev.score) >= THRESHOLD,
       retries: tries,
+      blocked_by: blocked || 'none',
       final_answer: ans,
       verdict: ev.verdict,
       missing: attempts[0].missing,
@@ -432,11 +462,32 @@ async function lane(s, p, talk) {
     if (more && !q) log('lane ' + tag + ' ended early: no next question after round ' + r)
   }
   let audit = null
+  let reaudit = null
   if (AUDIT && room() && rounds.some((x) => x.final_answer)) {
-    const res = await ask(auditPrompt(p, rounds.filter((x) => x.final_answer)), { label: tag + ':audit', phase: 'Q&A', schema: S_AUDIT, effort: 'medium' })
+    const finals = rounds.filter((x) => x.final_answer)
+    const res = await ask(auditPrompt(p, finals), { label: tag + ':audit', phase: 'Q&A', schema: S_AUDIT, effort: 'medium' })
     audit = res ? res.findings : null
+    let findings = audit
+    // rewrite what the fact-checker flagged, check again; at most two passes
+    for (let pass = 1; pass <= 2 && room(); pass++) {
+      const bad = (findings || []).filter((f) => f.severity === 'high' || f.severity === 'medium')
+      if (!bad.length) break
+      const current = finals.map((x) => ({ round: x.round, question: x.question, final_answer: x.clean_answer || x.final_answer }))
+      const rw = await ask(cleanPrompt(cur, p, current, bad), { label: tag + ':clean' + (pass > 1 ? pass : ''), phase: 'Q&A', schema: S_CLEAN, effort: 'medium' })
+      if (!rw || !rw.answers || !rw.answers.length) break
+      for (const a of rw.answers) {
+        const r = rounds.find((x) => x.round === a.round)
+        if (r && a.answer) r.clean_answer = a.answer
+      }
+      if (!room()) break
+      const again = finals.map((x) => ({ round: x.round, question: x.question, final_answer: x.clean_answer || x.final_answer }))
+      const res2 = await ask(auditPrompt(p, again), { label: tag + ':audit' + (pass + 1), phase: 'Q&A', schema: S_AUDIT, effort: 'medium' })
+      findings = res2 ? res2.findings : null
+      reaudit = findings
+      if (!findings) break
+    }
   }
-  return { persona: p.key, label: p.label, rounds, revisionLog, revised: revisionLog.length > 0, finalSlide: cur, audit: audit }
+  return { persona: p.key, label: p.label, rounds, revisionLog, revised: revisionLog.length > 0, finalSlide: cur, audit: audit, reaudit: reaudit }
 }
 
 // ------------------------------------------------------------------ merge the revisions of one slide and re-check them
@@ -446,7 +497,7 @@ async function verifyAll(s, merged, lanesRevised) {
       const items = l.rounds
         .filter((x) => x.attempts && x.attempts.some((a) => a.score < THRESHOLD))
         .slice(0, 4)
-        .map((x) => ({ question: x.question, missing: x.missing }))
+        .map((x) => ({ question: x.question, missing: x.missing, hint: x.hint }))
       if (!items.length) return null
       const res = await ask(verifyPrompt(PERSONAS.find((p) => p.key === l.persona), s, merged, items), {
         label: 'verify:' + l.persona + ':' + s.id,
@@ -465,6 +516,11 @@ async function reviseStage(s, st) {
   if (!revised.length) return { slide: s, talk: st.talk, lanes: st.lanes, merged: null, verify: [], unresolved: [] }
   let merged = await ask(mergePrompt(s, revised, ''), { label: 'merge:' + s.id, phase: 'Revise', schema: S_MERGE, effort: 'high' })
   if (!merged) return { slide: s, talk: st.talk, lanes: st.lanes, merged: null, verify: [], unresolved: [], error: 'merge failed' }
+  const same = (m) => flat(m.body, 4000) === flat(s.body, 4000) && m.title === s.title
+  if (same(merged)) {
+    // every proposed change was a caveat for the notes: the slide stays as it is, nothing to re-check
+    return { slide: s, talk: st.talk, lanes: st.lanes, merged: Object.assign({}, merged, { unchanged: true }), verify: [], unresolved: [] }
+  }
   let verify = await verifyAll(s, merged, revised)
   let unresolved = verify.filter((v) => clamp(v.result.overall) < THRESHOLD)
   if (unresolved.length && room()) {
@@ -473,7 +529,11 @@ async function reviseStage(s, st) {
       unresolved.map((u) => '- ' + u.persona + ' overall ' + u.result.overall + '; residual: ' + u.result.items.map((i) => i.residual).join(' / ') + '; new problems: ' + u.result.new_problems.join(' / ')).join('\n') +
       '\nYour first merge was:\ntitle: ' + merged.title + '\nbody:\n' + merged.body + '\nFix exactly these remaining gaps without bloating the slide.'
     const refined = await ask(mergePrompt(s, revised, extra), { label: 'merge2:' + s.id, phase: 'Revise', schema: S_MERGE, effort: 'high' })
-    if (refined) {
+    if (refined && same(refined)) {
+      merged = Object.assign({}, refined, { unchanged: true })
+      verify = []
+      unresolved = []
+    } else if (refined) {
       merged = refined
       verify = await verifyAll(s, merged, revised)
       unresolved = verify.filter((v) => clamp(v.result.overall) < THRESHOLD)

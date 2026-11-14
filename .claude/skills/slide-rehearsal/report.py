@@ -91,6 +91,12 @@ def build(results: list[Json], threshold: int) -> tuple[str, str]:
         f"| 全部 | {len(rs)} | {mean([r['first_score'] for r in rs])} | {mean([r['final_score'] for r in rs])} "
         f"| {sum(1 for r in rs if r['retries'] > 0)} | {sum(1 for r in rs if not r['passed'])} |"
     )
+    blocked_n = Counter(r.get("blocked_by", "none") for r in rs)
+    if blocked_n["missing_data"] or blocked_n["out_of_scope"]:
+        out.append(
+            f"\n簡報者宣告重答也沒用的問題:缺資料 {blocked_n['missing_data']} 個、不在範圍 {blocked_n['out_of_scope']} 個"
+            "(這些是「你需要先去量或先決定怎麼回」的清單)。"
+        )
 
     out.append("\n## 二、逐頁熱度(數字 = 該觀眾三輪首答的平均;最低 = 重答後的最低分)")
     out.append("| # | 頁 | " + " | ".join(names[p] for p in personas) + " | 最低 | 修頁 | 複核未過 |")
@@ -116,8 +122,17 @@ def build(results: list[Json], threshold: int) -> tuple[str, str]:
     ]
     unchecked = sum(1 for s in slides for lane in s["lanes"] if lane.get("audit") is None)
     sev = Counter(f["severity"] for _, _, f in findings)
+    remaining = [
+        (s, lane, f)
+        for s in slides
+        for lane in s["lanes"]
+        for f in (lane.get("reaudit") or [])
+        if f["severity"] in ("high", "medium")
+    ]
+    rewritten = sum(1 for _, _, r in all_rounds if r.get("clean_answer"))
     out.append(
         f"\n事實查核:簡報者的最終回答裡有 {len(findings)} 項說法沒有依據(高 {sev['high']}、中 {sev['medium']}、低 {sev['low']})"
+        + f";其中高、中度的已改寫 {rewritten} 個回答,改寫後複查仍有 {len(remaining)} 項高、中度"
         + (f";{unchecked} 條對話沒有查核結果" if unchecked else "")
         + "。見第七節。"
     )
@@ -126,9 +141,12 @@ def build(results: list[Json], threshold: int) -> tuple[str, str]:
     below = [(s, p, r) for s, p, r in all_rounds if not r["passed"]]
     if not below:
         out.append("無。")
+    blocked_label = {"missing_data": "缺資料:觀眾要的數據或證據不存在,重答也補不了", "out_of_scope": "不在這場演講的範圍"}
     for s, p, r in below:
         out.append(f"\n### 第 {s['slide']['n']} 頁 {s['slide']['title']} · {names[p]} · {r['final_score']} 分")
         out.append(f"- 問題:{r['question']}")
+        if r.get("blocked_by", "none") != "none":
+            out.append(f"- 卡住原因:{blocked_label.get(r['blocked_by'], r['blocked_by'])}")
         out.append(f"- 最後的回答:{cell(r['final_answer'], 500)}")
         out.append(f"- 觀眾的評語:{cell(r.get('verdict', ''))}")
         out.append(f"- 還缺:{cell(r.get('missing', ''))}")
@@ -146,6 +164,11 @@ def build(results: list[Json], threshold: int) -> tuple[str, str]:
             for rev in lane.get("revisionLog", []):
                 triggers.append(f"- {names.get(lane['persona'], lane['persona'])}:「{cell(rev['question'], 120)}」→ {cell(rev['change_summary'])}")
         out.append("觸發:\n" + "\n".join(triggers))
+        if m.get("unchanged"):
+            out.append("\n合併後決定**不改版面**:建議都是但書或補充,已放進講者備忘。")
+            if m.get("notes") and m["notes"] != orig.get("notes"):
+                out.append(f"\n講者備忘改為:{cell(m['notes'], 800)}")
+            continue
         out.append(f"\n摘要:{cell(m['change_summary'])}")
         if m["title"] != orig["title"]:
             out.append(f"\n標題:`{orig['title']}` → `{m['title']}`")
@@ -166,7 +189,8 @@ def build(results: list[Json], threshold: int) -> tuple[str, str]:
     hard = sorted(all_rounds, key=lambda t: (t[2]["first_score"], -t[2]["retries"]))[:20]
     for s, p, r in hard:
         out.append(f"\n**第 {s['slide']['n']} 頁 · {names[p]} · 首答 {r['first_score']} → {r['final_score']}**:{r['question']}")
-        out.append(f"> {cell(r['final_answer'], 600)}")
+        clean = r.get("clean_answer")
+        out.append(f"> {cell(clean or r['final_answer'], 700)}" + ("(已移除沒有依據的說法)" if clean else ""))
 
     out.append("\n## 六、各觀眾愛問的角度(第一輪)")
     out.append("| 觀眾 | 角度(次數) |")
@@ -188,6 +212,11 @@ def build(results: list[Json], threshold: int) -> tuple[str, str]:
                 f"| {f['problem']} | {f['severity']} | {cell(f['suggestion'], 160)} |"
             )
 
+    if remaining:
+        out.append("\n改寫後複查仍有的高、中度問題(需要人工處理):")
+        for s, lane, f in remaining:
+            out.append(f"- 第 {s['slide']['n']} 頁 · {names.get(lane['persona'], lane['persona'])} · 第 {f['round']} 輪:{cell(f['claim'], 160)}({f['problem']},{f['severity']})")
+
     t: list[str] = ["# 簡報演練逐字稿"]
     for s in slides:
         t.append(f"\n## 第 {s['slide']['n']} 頁 {s['slide']['title']}")
@@ -199,6 +228,8 @@ def build(results: list[Json], threshold: int) -> tuple[str, str]:
                 for i, a in enumerate(r.get("attempts", []), start=1):
                     label = "首答" if i == 1 else f"重答 {i - 1}({a.get('action', '')})"
                     t.append(f"- {label} · {a['score']} 分:{a['answer']}\n  - 評語:{a['verdict']}")
+                if r.get("clean_answer"):
+                    t.append(f"- 查核後改寫(建議講法):{r['clean_answer']}")
                 if not r.get("attempts") and r.get("error"):
                     t.append(f"- 錯誤:{r['error']}")
     return "\n".join(out) + "\n", "\n".join(t) + "\n"
