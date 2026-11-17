@@ -1,13 +1,12 @@
 ---
 title: "霧港白露 - 第一章 驗酒師"
-date: 2026-11-11
+date: 2026-11-17
 category: fiction
 tags:
   - fiction
 series: "霧港白露"
 seriesOrder: 1
 comments: true
-draft: true
 ---
 *七月・小暑後*
 

@@ -1,6 +1,6 @@
 ---
 title: "White Dew of Fog Harbour — Chapter One: The Assayer"
-date: 2026-11-11
+date: 2026-11-17
 category: fiction
 tags:
   - fiction
@@ -8,7 +8,6 @@ series: "White Dew of Fog Harbour"
 seriesOrder: 1
 comments: true
 translationOf: white-dew-01
-draft: true
 ---
 *July · After Lesser Heat*
 
