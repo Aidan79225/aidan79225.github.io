@@ -1,0 +1,38 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '../../../layouts/BaseLayout.astro';
+import PostCard from '../../../components/PostCard.astro';
+import Pagination from '../../../components/Pagination.astro';
+import { getPublishedPosts } from '../../../lib/posts';
+import { sortBySeriesOrder } from '../../../lib/series-order.mjs';
+
+// English counterpart of /fiction/: every translated chapter, in reading order
+// (first chapter on top — see src/lib/series-order.mjs). Without this file
+// /en/fiction/ would be the zh list served as a fallback.
+export const getStaticPaths: GetStaticPaths = async ({ paginate }) => {
+  const posts = sortBySeriesOrder(
+    (await getPublishedPosts('en')).filter((p) => p.data.category === 'fiction'),
+  );
+  return paginate(posts, { pageSize: 20 });
+};
+
+const { page } = Astro.props;
+const suffix = page.currentPage === 1 ? '' : `${page.currentPage}/`;
+const alternates = [
+  { hreflang: 'zh-Hant', href: new URL(`/fiction/${suffix}`, Astro.site).href },
+  { hreflang: 'en', href: new URL(`/en/fiction/${suffix}`, Astro.site).href },
+  { hreflang: 'x-default', href: new URL(`/fiction/${suffix}`, Astro.site).href },
+];
+---
+<BaseLayout
+  title={page.currentPage === 1 ? 'Fiction' : `Fiction (page ${page.currentPage})`}
+  description="Fiction in English — the serialised original novel White Dew of Fog Harbour: bootleg spirits, the customs house and the people caught between them, in a southern port of an imagined 1930s under Prohibition. Chapters run in reading order; start from the first."
+  locale="en"
+  alternates={alternates}
+>
+  <h1 class="text-2xl font-bold mb-4">Fiction</h1>
+  <div class="space-y-4">
+    {page.data.map((p) => <PostCard post={p} />)}
+  </div>
+  <Pagination page={page} />
+</BaseLayout>
