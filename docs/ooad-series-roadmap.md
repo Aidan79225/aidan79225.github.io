@@ -80,9 +80,9 @@
 **誠實面(寫成紀律)**:
 1. **它不是教科書式的 OO。** 規則住在無狀態的 `object` 計算器與 repository 的 SQL 裡,model 幾乎都是不可變的 `data class`,多型多半是 sealed + `when`,介面大多只有「一個正式實作 + 一份 fake」。**沒有的東西不硬寫**:繼承(#13)的當年聲部靠作者 Android 職場的口述 + rezero 的 `SoftDeleteModel`;mixin(#14)的主場是 GitCrisp;模式(#17)只講兩個 repo 真的出現過的。這個「不太 OO」本身是 #22 的題目,不是要藏的缺點。
 2. **「之後」不是作者一個人寫的。** SportRecorder `master` 上非 merge 的 516 個 commit 裡 431 個帶 AI 共同作者(第一個在 2026-06-10);GitCrisp 是 1451 個裡的 1067 個。所以:2021 的程式可以寫「我當年這樣寫」;2026 的重構要寫成「我訂了規格、AI 實作、我驗收」。**哪個決定是作者自己下的,以 spec 的文字或訪談為準**——例如 venue spec 明寫便宜的字串欄位才是被建議的方案,選實體的是 owner。
-3. **2021 的基線很小。** 44 個 `.kt`、只有範例測試、commit 訊息幾乎只有檔名(「Update DailyAdapter.kt, DailyFragment.kt, and 4 more files...」),看不出當時的意圖。當年聲部撐得起來的只有 #1、#5、#6、#7、#9、#11、#12、#13、#20;其他篇不要硬湊「2021 對照」。
+3. **2021 的基線很小。** 44 個 `.kt`、只有範例測試、commit 訊息幾乎只有檔名(「Update DailyAdapter.kt, DailyFragment.kt, and 4 more files...」),看不出當時的意圖。當年聲部撐得起來的只有 #1、#2(只有「時間在未來」那一條規則和它的訊息)、#5、#6、#7、#9、#11、#12、#13、#20;其他篇不要硬湊「2021 對照」。
 4. **引用歷史的邊界。** 2021 年的歷史只引 `.kt` 原始碼,不引 build 設定與簽章相關的檔案。**2026-06-21 之前的 commit,文章裡只寫 hash、不做成連結**——那個 repo 整理成公開狀態之前的歷史,不主動把讀者導過去(#1 就是這樣寫的);之後的檔案才連,而且一律用釘了 commit hash 的 GitHub 永久連結,不連 branch。
-5. **兩個 repo 都還在快速變動。** 這份 roadmap 提到的檔名與數字是 2026-11-10 的快照:GitCrisp 是 `master` @ `f5aa99fc`;SportRecorder 看的是當時 checkout 的 `claude/meal-duration` @ `34618e7`(PR #93「用餐時長」,**還沒併入 `master`**)。只存在於那條分支上的東西有:`EatRecord.endTime`、`MealSpan`、`MealDuration`、commit `4081bda`,以及 789 行這個數字(`master` 是 784 行)——#93 若沒併、或併的時候改了形狀,#6、#12、#17 用到它們的例子要跟著換。動筆時以 repo 當下為準,文章裡的引用釘 hash。**2026-11-11 更新**:PR #93 已在 11-10 併入 `master`,上面那幾樣現在都在主線上;#1 引用的「現在」是 `master` @ `1fa8f8a`。
+5. **兩個 repo 都還在快速變動。** 這份 roadmap 提到的檔名與數字是 2026-11-10 的快照:GitCrisp 是 `master` @ `f5aa99fc`;SportRecorder 看的是當時 checkout 的 `claude/meal-duration` @ `34618e7`(PR #93「用餐時長」,**還沒併入 `master`**)。只存在於那條分支上的東西有:`EatRecord.endTime`、`MealSpan`、`MealDuration`、commit `4081bda`,以及 789 行這個數字(`master` 是 784 行)——#93 若沒併、或併的時候改了形狀,#6、#12、#17 用到它們的例子要跟著換。動筆時以 repo 當下為準,文章裡的引用釘 hash。**2026-11-11 更新**:PR #93 已在 11-10 併入 `master`,上面那幾樣現在都在主線上;#1 引用的「現在」是 `master` @ `1fa8f8a`。**2026-11-18 更新**:#2 引用的「現在」是 `master` @ `d294a3b`(2026-11-17):`EatTimeEditorViewModel` 789 行、10 個名字以 `UseCase` 結尾的 class、38 份 spec。
 6. **拿 GitCrisp 當反例要公平。** 那些設計是在「一個人 + AI、七個月做到能發布」的條件下做的取捨,repo 的 spec 裡有當時的理由,也記著被否決的替代案。文章要寫出當時為什麼這樣選,不是事後挑毛病——而且那是作者自己的專案,要嘲諷也只能嘲諷自己。作者指定走 Clean Architecture 的理由(2026-11-10 口述):有 AI 之後,明確的分層更方便人去 review,看資料夾就能預先知道裡面該是哪一類實作。
 7. **別把「當年的我」寫成笨蛋。** 作者對 2021 那一版的說法是「純粹求快,而且當時邏輯還不複雜,所以抽進 MVVM 反而看起來更像是 over design」(2026-11-10 口述)。所以案例的教訓不是「當初不該放在 Fragment」,是**邏輯長大之後,什麼訊號告訴你該搬了**——跟 `[[pain-before-power]]` 是同一個判準,也讓 #1 與 #19 互相呼應,而不是互相打架。
 
@@ -144,7 +144,7 @@
 | # | slug | 標題(暫定) | 主題 | 案例 | 狀態 |
 |---|---|---|---|---|---|
 | 1 | `ooad-intro` | OOAD 到底在做什麼:一連串「這件事歸誰」的決定 | **【歸誰】** 全系列論點在這裡立起來。分析 = 弄清楚問題裡有哪些概念,設計 = 決定軟體物件各自的責任與怎麼協作(Larman 的切法:do the right thing / do the thing right);Larman 開宗明義的那句——OO 開發最關鍵的能力是**把責任分配給軟體物件**——就是本系列的脊椎;**要破的迷思**:OOAD = 畫 UML / 背 23 個模式 / 把名詞變成 class——UML、模式、SOLID 都是工具,不是那門手藝本身;三個問題(歸誰、藏什麼、叫什麼)各示範一次;全系列地圖與「為什麼是這個順序」;誠實面:OO 不是唯一解(預告 #22);2026 的理由:class 可以叫 AI 寫,責任歸誰要你判——接 `[[gitcrisp]]`、`[[ai-review-craft]]`、`[[arch-what-problem]]`(等 arch 開寫) | 案例登場。**一個判斷,住過五個地方**:「現在是進食還是斷食」這個判斷,2021 年住在 `DietFragment.updateTime()`——同一個函式裡讀設定、算階段、改畫面(`a6633b5`)→ 2026-06-10 搬進 ViewModel(`6838606`,還自己讀設定與系統時間)→ 06-11 抽成純計算的 `DietWindow`,同一個 commit 帶進這個 repo 第一批真的單元測試,十個(`d2955a0`)→ 06-12 搬進 `domain/diet`(`729f986`)→ 06-20 搬進 `:shared` 模組(`5bd1e2e`)。之後規則又在同一個檔案改了三次(`7e0ad7f`、`83f84f3`、`9e15ba6`),現在四個地方共用它、測試二十五個——這是「下一個改動有地方去」的證據。招牌圖畫 before / after(一個函式三件事 → 三個家),搬家路線用表格。**定調照作者口述**:2021 那樣寫是純粹求快,當時邏輯不複雜,抽進 MVVM 反而像過度設計——所以這篇問的不是「當初為什麼放錯」,是「什麼時候該搬」。回來重構的理由也是口述:有 AI 才有時間、一直想要一個自己的飲食日記、原 repo 已經上架 Google Play、目標是做成 Compose Multiplatform 上 iOS | ✅ 已發布(中英,2026-11-11)★ |
-| 2 | `ooad-use-case` | Use case 不是功能清單:難的都不在主線上 | **【叫什麼】** use case = 一個 actor 為了達成一個目標、與系統互動的**一段文字**,不是那張橢圓圖;Cockburn 的骨架:primary actor、目標層級(以 user goal 為主)、main success scenario、extensions、成功保證;**要破的迷思**:① use case 圖 = use case(圖只是目錄)② use case = user story = 功能清單(三者回答的問題不同:行為 / 排程單位 / 範圍)③ 主線寫完就寫完了——設計的難度大半在 extensions(失敗、中斷、重複、離線);把系統當黑箱:寫「系統做什麼」,不寫「怎麼做」;後面每一個要分配的責任,都是從某一條 extension 長出來的;它是「把要求寫清楚給 AI」這門手藝的老祖宗——接 `[[ai-spec-craft]]`、`[[lottery]]`、`[[rezero-overview]]` | 逆向替 SportRecorder 寫兩個 use case:「記一餐」與「從 Google 地圖分享一個地點進來」。extensions 從 repo 修過的規則裡挖:不能記未來的時間(`30d8919`)、自訂斷食類型不能重複(`7f0671d`)、分享進來的店已經存在但位置不同。對照 repo 自己的 spec 格式(Goal / 決定 / Out of scope / 初衷對照):它好在哪、跟 use case 差在哪 | ⬜ |
+| 2 | `ooad-use-case` | Use case 不是功能清單:難的都不在主線上 | **【叫什麼】** use case = 一個 actor 為了達成一個目標、與系統互動的**一段文字**,不是那張橢圓圖;Cockburn 的骨架:primary actor、目標層級(以 user goal 為主)、main success scenario、extensions、成功保證;**要破的迷思**:① use case 圖 = use case(圖只是目錄)② use case = user story = 功能清單(三者回答的問題不同:行為 / 排程單位 / 範圍)③ 主線寫完就寫完了——設計的難度大半在 extensions(失敗、中斷、重複、離線);把系統當黑箱:寫「系統做什麼」,不寫「怎麼做」;後面每一個要分配的責任,都是從某一條 extension 長出來的;它是「把要求寫清楚給 AI」這門手藝的老祖宗——接 `[[ai-spec-craft]]`、`[[lottery]]`、`[[rezero-overview]]` | 逆向替 SportRecorder 寫兩個 use case(以下是寫成的版本)。**①「記一餐」**:主線四步、六條 extensions(快速記一餐、沒有位置、時間在未來、照片匯不進來、兩餐重疊、沒存就關掉),每一條對得到程式或 spec 的一句話。**核心發現**:`30d8919` 與 `7f0671d` 不是規則的出生點,是 2026-06 重構時把 2021 年就有的規則搬進 use case 類別的 commit(「時間在未來」出生在 `583bdfb`,2021-08-11);搬過去的只有**條件**——**處理**(2021 年 Fragment 裡的那則 Toast)在 2026-06-10 換成 Compose 時就不見了(`a3293b5`、`9ea95cd`),到 `master` @ `d294a3b` 都沒有補:存檔被拒絕時畫面沒有任何回饋,訊息的字串還在資源檔裡、lint 標成未使用。圖一畫的就是這次只搬了一半的搬家,也是本篇的 before / after 程式碼。**②「從 Google 地圖分享一個地點進來」**:主線就是 spec 的 Goal 那一句(Share → SportRecorder → Save),最低保證是 spec 的小節標題(a share never blocks a meal);七條 extensions 各對到一個有名字的東西(`MapsLink.find()`、`MapsLinkResolver`、`MapsPlaceReader`、`SharedVenueMatch.Use` / `AskWhichStore`、`dropSharedPlace()`、`PlaceRun.Share`)。三個 PR:#88(15 個 commit)→ #90(19,連鎖店同名不同店)→ #91(44,App 產生的連結沒有位置——主線的假設是拿網站產生的連結驗的)。〈這件事歸誰〉判的是 **actor 與系統的邊界**:同名但離很遠的店是不是同一家,從「系統看有沒有歷史決定」(`AskToMove`,`6d0a065`)隔天改成「問使用者」(`AskWhichStore`,`3050f8b`、`f0c7c3b`)。spec 對照:38 份 spec、20 份有初衷對照、只有 3 份有專門寫失敗的小節、標題叫「Use cases」的兩個小節指的都是 Clean Architecture 那一層 class——spec 照時間排(一次改動一份),use case 照目標排 | ✅ 已發布(中英,2026-11-18) |
 | 3 | `ooad-domain-model` | 領域模型不是資料表,也不是類別圖 | **【叫什麼】** 三張長得很像的圖:**領域模型**(問題裡有哪些概念)、**資料模型**(怎麼存)、**設計類別圖**(軟體類別長怎樣)——各自回答不同的問題,混著畫是多數設計走歪的起點;找概念的來源(名詞、既有的分類)與名詞法的陷阱;「這是屬性、關聯,還是另一個概念」的判準;**表徵落差要低**(low representational gap):軟體類別的名字與結構貼著領域模型,程式讀起來才像業務;**要破的迷思**:先開資料表、再讓 ORM 長出 class,就算做過領域建模——那是資料模型;概念的增、刪、改名本身就是分析的產出——接 `[[ddia-data-models]]`、`[[fode-8]]`(正規化留在那邊)、`[[rezero-identity]]`(identity 是事實、account 是聚合)、`[[arch-ddd-strategic]]`(通用語言與 Bounded Context 往那邊走) | **店家是一個實體,還是餐點上的一個字串欄位?** `2026-10-05-venue-design.md` 把兩個選項的代價寫下來了:便宜的字串欄位是被建議的那一個,作者選了實體(改名會傳播到每一筆舊紀錄、位置可以事後修正;口述的理由更直接:「因為店家實際上就是實體,有很多附帶資訊」——這正是分辨屬性與概念的判準)。同一份 spec 的核心:`EatRecord.location`(你當時人在哪)與 `Venue` 的位置(食物從哪來)是**兩個事實,不是同一個事實的兩份**——外帶回家吃,兩個都是真的。另外三個現成的例子:`FoodRecord` 整個概念被拿掉(`c039c71`);`CreateEatTime*` 改名 `EatTimeEditor*`(`c14a301`,名字跟著責任變);App 叫 SportRecorder,但裡面沒有運動(把使用者看得到的名字改掉的 PR #87 還開著)。rezero 的判例,作者說這是他覺得設計更不好的地方(口述):運送資訊掛在訂單上,沒有掛到單品項——但貨會拆單先出、也會跨訂單併箱,所以它該跟著 order item。**一個資訊該掛在哪個概念上,看它跟著誰變**(`[[rezero-fulfillment]]` 的重來版:履約單位下放到 order item、shipment 升為一級實體) | ⬜ ★ |
 | 4 | `ooad-contracts` | 不變量與契約:先寫下系統要保證什麼 | **【歸誰】** 從 use case 到**系統操作**:使用者的一步 = 系統收到的一個事件(系統循序圖只畫這一層);操作契約:前置條件、後置條件;**不變量**:不管走哪條路都必須成立的那句話;Meyer 的 Design by Contract(precondition / postcondition / invariant)真正的重點是**誰負責檢查**;**要破的迷思**:驗證 = 到處加 if——契約是在決定「這條規則歸誰守」,而守的人只能有一個;不變量就是 #7 的封裝要守的東西;並行下怎麼守,不在這裡講——接 `[[rezero-inventory]]`(「不變量是語意契約,寫在程式碼之前」)、`[[rezero-reconciliation]]`(把不變量寫成定時的自我對帳)、`[[rezero-cart-order]]`(硬不變量守死、軟狀態只記錄)、`[[ddia-transactions]]`、`[[sql-transactions]]` | 「地址跟著位置走」這條規則,現在同時寫在 `Venue` 的註解、`VenueRepositoryImpl`、`VenueDao` 的 SQL 與兩份 fake 裡——**一條規則好幾個家**(債單上的一筆)。「不能記未來的時間」「自訂斷食類型不重複」各守在哪一層。`GluedVenueRepair` 用多次 repository 呼叫做 check-then-act(債單上的另一筆) | ⬜ |
 
@@ -209,7 +209,8 @@
 | #19 | ★★★ | 2026-11-10 口述:作者對「多一層」的立場是第一手(有 AI 之後,分層是為了讓人好驗收)——這篇因此不能只寫反例 |
 | #15 | ★★ | 靠兩個 repo 的 commit 與 spec。優惠券條件那一段,作者已更正為產品面的問題,不當「早該多型」的反例 |
 | #23 | ★★★ | 2026-11-10 口述:實際 review 的三題、為什麼很少退回重做、`code-review-loop` 的做法。框架已定:標題用作者的三題,對上系列的三個大題 |
-| #2 #4 #8 #16 #17 #21 | ★ | 模型為主,案例是 2026 年 AI 協作的產出;反思寫成不掛名的分析,或問到作者的看法再掛名 |
+| #2 | ★★ | 2021 年的 `createEatingTime()` 和它的 Toast 是手寫的原始碼,可以逐行對照(動筆時才發現的);反思只用口述裡有的(UML 那一句)與已發布的 `[[ai-spec-craft]]`,其餘寫成不掛名的分析。作者有沒有正式寫過 use case,還沒問 |
+| #4 #8 #16 #17 #21 | ★ | 模型為主,案例是 2026 年 AI 協作的產出;反思寫成不掛名的分析,或問到作者的看法再掛名 |
 | #18 | — | 索引篇,不需要第一手 |
 
 ## 作者口述(訪談紀錄)
@@ -302,6 +303,7 @@
 - **跨檔期結帳**:作者第一次回答時把它列為後悔,更正時只說優惠券是產品面的問題。結帳這一塊算程式設計的債,還是同樣是產品規則的結果?(#9 要拿那個結帳 use case 當 God class 的第三站,動筆前先問清楚)
 - **兩個 repo 的 spec**:大方向已答(走 Clean Architecture 是作者指定的)。個別決定——例如拆 mixin、每個操作一個 use case——是誰提的,每篇動筆前對該篇用到的 spec 再問一次(誠實面紀律 2)。
 - **還債上鏡**:作者問「是哪五筆」,已列給他,等回覆。不願意的話,那幾篇改成只做判決、不落 PR。
+- **#2 寫完後冒出來的三題**(2026-11-18):① 工作上有沒有正式寫過 use case?(#2 的反思目前只有 UML 那一句是作者的話,其餘是不掛名的分析)② 文章指出 SportRecorder 現在存檔被拒絕時沒有任何提示(未來的時間、重複的斷食類型)——要先修掉、讓文章連過去(〈還債上鏡〉的做法),還是照現狀發?**→ 作者 2026-11-18 決定照現狀發布**;App 的那兩個缺口還沒修,之後修了要回頭在文章補一行並填 `updated`。③ UML 那句口述裡的「第一份 Android 工作」,文章先寫成「工作上」,要不要寫明?
 
 ## 術語表(Ubiquitous Language)
 
@@ -326,9 +328,19 @@
 | 判決 | the ruling ⚠ | 自創;〈這件事歸誰〉小節的結論 |
 | use case | use case | **內文一律英文**;不寫「用例」「使用案例」「使用個案」 |
 | actor | actor | 內文英文;primary actor 同 |
-| 主線 | main success scenario | Cockburn;首次出現附英文 |
+| 主線 | main success scenario | Cockburn;首次出現附英文。**英文版的寫法**(#2 定):欄位名與首次出現用 main success scenario,之後的口語短稱一律用 the happy path(Larman 同一章說它也叫 happy path);不寫 main line、main flow |
 | extensions | extensions | Cockburn;內文英文,解釋時說「主線以外的每一種走法」。不寫「例外流程」——它不只是例外 |
-| 目標層級 | goal level | summary / user goal / subfunction |
+| 目標層級 | goal level | summary / user goal / subfunction(三個層級名一律英文);比喻是雲與風箏 / 海平面 / 海面下 |
+| 最低保證 | minimal guarantee | Cockburn;就算 actor 的目標沒達成,系統也要守住的那句話。#2 首次出現 |
+| 條件 / 處理 | condition / handling | 一條 extension 的兩半(Larman);#2 的圖一用這兩個詞,#4 接著用 |
+| 黑箱 | black-box (use case) | Larman;只寫系統做什麼,不寫怎麼做 |
+| 功能清單 | feature list | 不寫「功能列表」(`[[rezero-overview]]` 的原文是「功能列表」,引用時照原文;它的英文版寫 the feature list isn't hard) |
+| 萬一 | "what if" ⚠ | #2 對 extension 的口語說法;英文版一律 "what if",不寫 edge case(那是另一個意思) |
+| 寫在哪個高度 | which altitude to write at ⚠ | #2 的小節名;對應 Cockburn 的海平面比喻(cloud / kite、sea level、underwater) |
+| 照時間排 / 照目標排 | filed by date / filed by goal ⚠ | #2 對 spec 與 use case 的對照說法 |
+| 逆向寫(use case) | reverse-engineer ⚠ | 從既有的程式與 spec 把 use case 寫回來 |
+| user story | user story | 內文英文;不譯「使用者故事」 |
+| Technology and Data Variations | Technology and Data Variations | Cockburn 骨架的一欄,內文英文;指「要做的事一樣,資料或技術進來的樣子不只一種」 |
 | 領域模型 | domain model | 不寫「領域模式」「域模型」 |
 | 概念類別 / 軟體類別 | conceptual class / software class | Larman;兩個詞嚴格分用 |
 | 表徵落差 | representational gap ⚠ | Larman 的 low representational gap;中文是自譯,首次出現附英文 |
@@ -391,15 +403,22 @@
 | 位置 | location / position | `EatRecord.location` = 人當時在哪;`Venue.position` = 店在哪。兩個詞對應兩個事實,嚴格分用 |
 | 用餐時長 | meal duration | `MealDuration`(PR #93,尚未併入 `master`) |
 | 回顧 | Insights | App 內的分頁名 |
+| 記一餐 | Log a meal | #2 的 use case 名;也是下拉通知欄那顆快速設定按鈕的標籤(`quick_tile_label`),首頁「+」的無障礙名稱是「新增一餐」 |
+| 分享一個地點進來 | share a place (from Google Maps) | #2 的第二個 use case;spec 的標題是「從 Google 地圖分享進來 · Share a place from Google Maps」 |
+| 分店 | branch | 同名的另一家店;對話框三個選項:是另一家分店 / 同一家,更新位置 / 同一家,位置不變(App 的英文字串:It's another branch / Same place — update its position / Same place — keep its position) |
+| 「新增」按鈕 / 無位置 / 下拉通知欄 | CREATE / No location / the notification shade | 英文版照 App 自己的英文字串;編輯畫面(bottom sheet)寫 the sheet |
 
 ## 引用來源
 
 ⚠ **這張書目與章節表裡的原典用字是憑記憶排的,沒有逐一對過原文。** `An Elegant Puzzle` 那份 roadmap 核對目次時就抓到過兩個二手訛傳——動筆前回原文確認該篇會引到的句子、名稱與年份,有出入就回填這裡。
 
-- Craig Larman,*Applying UML and Patterns*(3rd ed.,Prentice Hall 2004)——GRASP、領域模型、系統循序圖、操作契約、low representational gap。#1、#3、#4、#6、#8、#9、#15、#16 的主要來源。**第一章已核對**(2026-11-11,對的是 InformIT 上的試讀章):「OO 開發最關鍵的能力是把責任分配給軟體物件」那一句、分析與設計各自強調什麼、`do the right thing` / `do the thing right`、UML 是 `just diagramming notation`,四處都與原文一致;其餘章節仍待核對。
+- Craig Larman,*Applying UML and Patterns*(3rd ed.,Prentice Hall 2004)——GRASP、領域模型、系統循序圖、操作契約、low representational gap。#1、#3、#4、#6、#8、#9、#15、#16 的主要來源。**第一章已核對**(2026-11-11,對的是 InformIT 上的試讀章):「OO 開發最關鍵的能力是把責任分配給軟體物件」那一句、分析與設計各自強調什麼、`do the right thing` / `do the thing right`、UML 是 `just diagramming notation`,四處都與原文一致。**講 use case 的那一章核對的是第二版的第六章**(2026-11-18,課程讀物的 PDF):text documents, not diagrams、黑箱與 responsibilities、extension 的 condition 與 handling、Extensions 比主線長是常態、nothing object-oriented、「登入二十次」那個例子、功能清單何時合適——第三版同一章的用字沒有核對,所以 #2 文內標明引的是第二版。其餘章節仍待核對。
 - Rebecca Wirfs-Brock & Alan McKean,*Object Design: Roles, Responsibilities, and Collaborations*(Addison-Wesley 2002)——責任驅動設計、角色刻板。#5。
 - Kent Beck & Ward Cunningham,〈A Laboratory for Teaching Object-Oriented Thinking〉(OOPSLA 1989)——CRC 卡。#5。
-- Alistair Cockburn,*Writing Effective Use Cases*(Addison-Wesley 2000)。#2。
+- Alistair Cockburn,*Writing Effective Use Cases*(Addison-Wesley 2000)。#2。**已核對的部分**(2026-11-18,出版社的試讀頁):封面內頁 The Writing Process 十二步(主線 3 到 9 步;窮舉系統偵測得到、而且必須處理的 extension conditions)、序言(寫 use case 根本上是在寫文章)、目次(三個目標層級與海平面的比喻、Minimal Guarantees、Technology and Data Variations、CRUD 那一章)。**第一章的定義句沒有對到原文**,#2 改用 Larman 的非正式定義;最低保證的定義也是轉述,沒有引原句。
+- Alistair Cockburn,〈Why I still use use cases〉(2008 年 2 月已經有人在回應它;原站已不在,對的是經作者同意轉載的版本)——五個理由、extension conditions 那一條的「80% of the development time and budget」、user story 給不了脈絡與完整性、use case 比較重也比較難寫。#2。
+- Martin Fowler,bliki〈UseCasesAndStories〉(2003-08-18)——story 是為了排計畫切的塊;一張 story 可以是 use case 的一條情境,或其中幾步。#2。
+- Ron Jeffries,〈Essential XP: Card, Conversation, Confirmation〉(2001-08-30)——卡片不是需求本身,是代表需求的信物。#2。
 - Bertrand Meyer,*Object-Oriented Software Construction*(2nd ed.,Prentice Hall 1997)——Design by Contract、Command–Query Separation。#4、#7。
 - David Parnas,〈On the Criteria To Be Used in Decomposing Systems into Modules〉(CACM 1972)。#7。
 - Barbara Liskov,〈Data Abstraction and Hierarchy〉(OOPSLA 1987);Liskov & Wing,〈A Behavioral Notion of Subtyping〉(1994)。#13。
@@ -447,6 +466,9 @@
 - Git:開 branch → push → PR,不直接動 master(CLAUDE.md 硬規矩)。
 
 ## 修訂紀錄
+- **2026-11-18(#2 發布)**:作者確認英文版的圖之後,決定照現狀發布(不先修 SportRecorder 的那兩個缺口),並指示合併 PR。中英兩篇 `draft: false`;分享圖用 `node scripts/gen-og.mjs ooad-use-case en/ooad-use-case` 只產這兩張(這台 Windows 用的是 Noto Sans TC,字型與標準環境略有不同,同 #1)。**後續**:SportRecorder 修掉那兩個缺口之後,回頭在 #2 的「寫這篇的當下還沒修」補一行並填 `updated`;訪談題 ①(有沒有正式寫過 use case)與 ③(UML 那句要不要寫明是哪份工作)還開著。
+- **2026-11-18(#2 英文版)**:作者確認中文版兩張圖之後,建立 `src/content/blog/en/ooad-use-case.md`,中英都留 `draft: true`。標題定為 `A Use Case Is Not a Feature List: The Hard Parts Are Off the Happy Path`。**主線的英文寫法**:欄位名與首次出現用 main success scenario,之後一律 the happy path(已記進術語表)。UI 上的字照 App 自己的英文字串(CREATE、No location、Log a meal、對話框三個選項)。引句照規矩還原成原文:Larman 的三句、Fowler 與 Cockburn 的片語、`[[rezero-overview]]`、`[[lottery]]`、`[[ai-spec-craft]]` 三篇英文版裡既有的句子,以及案例 repo 裡本來就是英文的 spec 與註解;原本是中文的 spec 句子與 bug 回報翻成英文並註明原文是中文。圖的處理:兩張都不用動 viewBox——圖一只改字(`條件` → `Condition`、`處理:沒有跟來` → `Handling: didn't come along`),圖二的卡片本來就夠寬,左欄步驟的小字走「先砍字」(`在地圖按分享,選這個 App` → `shares in Maps, picks the app`)。兩張英文圖都截圖看過,沒有溢出。小節、表格、圖、程式碼區塊、清單與連結的數量與中文版逐項一致;站內連結的 slug 沒動。同日作者確認英文版兩張圖。**還沒做**:發布(`draft: false` 與分享圖);發布前要先決定 SportRecorder 那兩個缺口是先修還是照現狀發。
+- **2026-11-18(第二篇動筆)**:`ooad-use-case` 寫成草稿(`draft: true`),狀態改 🚧。骨架:功能清單答不了「有哪些事要判」→ 把「記一餐」寫成 use case(主線四步、六條 extensions,各附出處)→ 一條 extension 的五年(2021 的 `createEatingTime()` 對現在的 `SaveEatRecordUseCase`;圖一:條件搬了家,處理沒有跟來)→ Use case 是什麼(文字、actor 的目標、主線與 extensions、黑箱)→ 三個「我以為」→ 寫在哪個高度(三個目標層級;十個叫 `UseCase` 的 class 不是這篇講的 use case)→ 第二個 use case(分享一個地點進來;圖二:主線四步對七條 extensions;三個 PR)→ spec 照時間排、use case 照目標排 →〈這件事歸誰〉(判的是 actor 與系統的邊界)→〈什麼時候別用〉→ 反思兩節。**動筆前核對出來的更正**:① `30d8919`、`7f0671d` 是把 2021 年的規則搬進 use case 類別的 refactor,不是規則的出生點;② 兩條規則搬家時都只搬了條件,2021 年畫面上的訊息在 2026-06-10 換 Compose 時就不見了,`master` 到今天沒有補——這是查證時才發現的,**文章照實寫了;發布前要由作者決定先修還是照現狀發**(已列進〈仍待補的訪談題〉);③ spec 的小節名是 Decisions taken with the owner(不是「決定」),只有五份有;「初衷對照」從 2026-06-20 起每一份都有。原典:Larman 講 use case 的那一章只對到第二版,文內標明;Cockburn 的書對到試讀頁(寫作步驟、序言、目次),第一章的定義句沒對到,改用 Larman 的說法;新增三個來源(Cockburn 的文章、Fowler 的 bliki、Jeffries 的 3C)。術語表補了最低保證、條件 / 處理、黑箱、功能清單、user story、Technology and Data Variations;案例詞彙補了記一餐、分享一個地點進來、分店;誠實面第 3 條把 #2 加進「當年聲部撐得起來」的名單,素材對照把 #2 從 ★ 改成 ★★。頁面在手機寬度看過:use case 原本用引言區塊排,站上的引言樣式是斜體加引號,改成一般的清單;兩張四欄的表太擠,一張併成三欄、一張改成清單。**還沒做**:英文版等中文定稿(作者確認兩張圖)之後接著翻。
 - **2026-11-11(#1 發布 + 落地登記)**:作者確認英文版的圖之後,中英兩篇一起發布(`draft: false`),落地檢查清單同一批做完(見該節,多了第 7 項分享圖,也補記英文版 /start/ 是另一個檔)。產圖腳本修掉一個既有的 bug:標題裡的 `\"` 會被原樣印進圖裡——已發布的 `en/sql-null` 與 `en/rezero-console` 兩張分享圖目前還帶著反斜線,這次沒有重產,等下次在有標準字型的環境整批重產時會一起修掉。
 - **2026-11-11(#1 英文版)**:作者確認中文版兩張圖之後,建立 `src/content/blog/en/ooad-intro.md`,中英都留 `draft: true`。英文系列名 `OOAD: I Thought I Knew It` 先記進英譯詞彙表 A 區(標未登記)。圖的處理:圖 1 維持 640 寬,標籤走「先砍字」(`讀設定` → `Read settings`、`只算階段,現在幾點是參數` → `Phase only; "now" is a parameter`);圖 2 的英文標籤塞不進 116 寬的框,所以 viewBox 從 640 加寬到 720、五個框各 132 寬,幕名從「第一幕・分析」縮成 `1 · Analysis`。兩張英文圖都截圖看過,沒有溢出。術語表補了主軸句的英文定稿(`Good object design gives the next change one obvious place to go.`)與幾個案例詞彙的英文寫法。Larman 的引句直接用原文,沒有回譯。
 - **2026-11-11(第一篇動筆)**:`ooad-intro` 寫成草稿(`draft: true`),狀態改 🚧。定稿前的骨架:2021 年的三十行 → 招牌圖(一個函式三件事 → 三個家)→ 住過五個地方的搬家表 → 搬對家之後的三次改規則 → Larman 的分析 / 設計與「責任分配」→ 三個「我以為」→ 三個問題在同一段程式上各示範一次 →〈這件事歸誰〉→〈什麼時候別用〉→ 系列地圖 → 反思三節。**動筆前核對出來的更正**:搬家的第四站是 `729f986`(搬進 `domain/diet`),不是先前寫的 `773ddb1` / `30d8919`(那兩個是餐點的 domain model 與 use case,跟這個判斷無關),章節表已改;「五次搬家」改成「住過五個地方」(五個地方、四次搬家)。Larman 第三版第一章的四處用字對過原文。新增一條引用規矩:2026-06-21 之前的 commit 只寫 hash、不做成連結。**還沒做**:落地檢查清單(`series.ts`、`Graph.jsx`、`start.astro`、英譯詞彙表)照規矩與發布同一批做;英文版等中文定稿後接著翻。
