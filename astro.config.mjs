@@ -1,3 +1,4 @@
+import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'astro/config';
 import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
@@ -6,6 +7,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import remarkCjkFriendly from 'remark-cjk-friendly';
 import remarkWikiLink from './src/lib/remark-wiki-link.mjs';
+import rehypeImg from './src/lib/rehype-img.mjs';
 
 export default defineConfig({
   site: 'https://blog.aidan.tw',
@@ -27,7 +29,7 @@ export default defineConfig({
   integrations: [react(), sitemap()],
   markdown: {
     remarkPlugins: [remarkCjkFriendly, remarkMath, remarkWikiLink],
-    rehypePlugins: [rehypeKatex],
+    rehypePlugins: [rehypeKatex, [rehypeImg, { publicDir: fileURLToPath(new URL('./public', import.meta.url)) }]],
     // Highlight every block twice and emit both palettes as CSS variables
     // (--shiki-light / --shiki-dark); global.css picks one per theme, so code
     // blocks switch with the rest of the page and need no re-render.

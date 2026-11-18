@@ -128,6 +128,16 @@
   color: var(--color-muted) !important;
 }
 
+/* Pictures placed in a post with markdown (the novel's illustrations): centred
+   in the column, with a hairline frame so a pale print keeps its edge on the
+   light theme and a dark one on the dark theme. */
+.prose img {
+  display: block;
+  margin-inline: auto;
+  border: 1px solid var(--color-line);
+  border-radius: 0.375rem;
+}
+
 /* Inline code: Tailwind Typography wraps it in literal backtick characters
    (code::before/::after) and gives no background. Drop the backticks and use
    a subtle "pill" (background + border) instead — far cleaner. */

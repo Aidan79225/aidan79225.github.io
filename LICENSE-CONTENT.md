@@ -25,9 +25,9 @@ were made.
 
 | Part of the repository | License |
 |---|---|
-| **Site source code** (everything except `src/content/`) | MIT — see [`LICENSE`](./LICENSE) |
+| **Site source code** (everything except `src/content/` and the novel's illustrations) | MIT — see [`LICENSE`](./LICENSE) |
 | **Articles & guides** (`src/content/`, except fiction) | CC BY 4.0 — this file |
-| **Fiction** (posts with `category: fiction` — `src/content/blog/white-dew-*.md`, `src/content/blog/en/white-dew-*.md`) | All rights reserved — see below |
+| **Fiction** (posts with `category: fiction` — `src/content/blog/white-dew-*.md`, `src/content/blog/en/white-dew-*.md` — and their illustrations under `public/images/white-dew/`) | All rights reserved — see below |
 
 Third-party assets, trademarks, and embedded works (e.g. quoted book material,
 the MBTI questionnaire, external images) remain the property of their respective
@@ -39,6 +39,9 @@ The novel 《霧港白露》 / *White Dew of Fog Harbour* — every post with
 `category: fiction` in its front matter, i.e. the chapters under
 `src/content/blog/white-dew-*.md` and their English versions under
 `src/content/blog/en/white-dew-*.md` — is **not** licensed under CC BY 4.0.
+The same goes for the novel's illustrations, the pictures under
+`public/images/white-dew/` that those chapters show: they are part of the novel,
+and neither CC BY 4.0 nor the MIT license of the site's source code covers them.
 
 > Copyright © 2026 Aidan Wang. All rights reserved.
 
