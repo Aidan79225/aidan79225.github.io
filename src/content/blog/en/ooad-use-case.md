@@ -11,7 +11,7 @@ tags:
 series: "OOAD: I Thought I Knew It"
 seriesOrder: 2
 comments: true
-draft: true
+draft: false
 translationOf: ooad-use-case
 ---
 [[ooad-intro|The previous post]] described OOAD as a chain of "who owns this?" decisions. But there is an earlier question, before any ruling: **which things are there to rule on?**

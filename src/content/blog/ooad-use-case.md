@@ -11,7 +11,7 @@ tags:
 series: "OOAD 我以為我懂"
 seriesOrder: 2
 comments: true
-draft: true
+draft: false
 ---
 [[ooad-intro|上一篇]]把 OOAD 講成一連串「這件事歸誰」的決定。可是在判之前還有更早的一題:**有哪些事要判?**
 
