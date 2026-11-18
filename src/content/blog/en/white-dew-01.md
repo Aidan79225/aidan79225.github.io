@@ -19,6 +19,8 @@ Twenty years, half past seven. The doorman did not have to look up to know him b
 
 The coat went on the third peg. The pegs to left and right of it were empty. One had been Old Zhang’s, who had gone last year, and one Old Wu’s, who had gone the year before. Under Old Zhang’s a black cloth umbrella still leaned against the foot of the wall. In a year no one had come for it. The two men’s benches were still there too, piled with the new forms the Prohibition Bureau had sent, bundle on bundle, tied with hemp string. The assay room faced the sea. Three benches in a row, and pinned to the wall a boiling-point table, the paper gone yellow and curling at the corners. The smell of spirit from the spirit lamps had not cleared in twenty years. The drawer slid open, the velvet-lined case opened. The hydrometer had been in use eleven years. Once over with the chamois, and the glass tube held up to the window. A foggy day gave no light. He turned slightly to one side and borrowed a little of the grey-white to see whether there were bubbles in the tube. There were none. He gave it a nod, as he would an old colleague.
 
+![A thin man with round glasses and a moustache stands side-on by a window, holding a slender glass tube upright in his fist and studying it.](/images/white-dew/white-dew-01-1.webp)
+
 “Morning, Master He.”
 
 Young Zhou was already settled on the high stool beside him, oversleeves pulled up to the elbow, the forms spread on his knees. He was a little over twenty and had been at the Office a year and a half. He wrote more than he spoke. Qiusheng nodded and pulled on his own oversleeves.
@@ -157,6 +159,8 @@ Qiusheng walked past him. The sign was in the fog. The one stroke still floated.
 
 He walked along the railway line by the docks. It was noon and the fog had not lifted. Under the cranes a row of workers sat eating, lunch tins on their knees. One man brought a flat bottle out from inside his shirt, took a mouthful and passed it to the man beside him; that man drank and passed it on. In the few steps it took Qiusheng to go by, the wind blew over from their side. Sweet. He did not stop. The pot at the noodle stall was steaming under its canvas. The owner stirred with long chopsticks and gave him a look. He walked to the corner of Warehouse No. 7 and got on the bus for the South Slope roundabout. The fare was ten cents.
 
+![On a pale, hazy quay, dock workers sit in a row beneath tall cranes; a black-hulled ship lies at the left, a red shed at the right.](/images/white-dew/white-dew-01-2.webp)
+
 The bus was empty. The conductor dozed against the door. Qiusheng sat by the window with his coat on his knees. The bus passed the Customs wall and the union’s red-brick gate, and went over the level crossing at the goods yard—the barrier was up, no train had come. On the climb the bus shook. He pressed his hand to his coat pocket. The newspaper was still there.
 
 ---
@@ -170,6 +174,8 @@ The surgery was halfway up the slope of South Slope, on the first floor. At the 
 The front page was the provincial capital’s news. At the foot of page two was one column under the headline FORTY-ONE DEAD OF POISONING ON THE DOCKS LAST MONTH: BAD LIQUOR BLAMED, and below it a short paragraph saying the Prohibition Bureau had sent men to investigate, and that most of the dead were dock coolies. He read the column twice and folded the paper back. When his name was called he put the paper back in his pocket.
 
 In the consulting room were a desk, a light box and a medicine cabinet along one wall. Dr Lin listened to the chest first. The stethoscope stayed a long time on the right side, moved down, stayed again; the left it only touched. “Breathe in. Again. Cough for me.” Qiusheng coughed for him. Dr Lin hung the stethoscope back round his neck, slid the film onto the light box and with the end of his pencil tapped a blurred patch of white at the top of the right lung. “Infiltration,” he said. “There’s a cavity now. Mr He, how long have you been coughing?”
+
+![In a consulting room a doctor in a white coat and glasses points a thin rod at a large chest X-ray, white ribs on black.](/images/white-dew/white-dew-01-3.webp)
 
 “Since the summer came in.”
 
@@ -266,6 +272,8 @@ At half past five Xiaoman came in and slung her satchel onto a chair. She saw hi
 The wireless downstairs gave six o’clock and went on to the news. When it came to the word “docks” Mrs Chen turned the sound down, and the rest could not be made out.
 
 Xiaoman pushed the balcony door open a little and said it was stuffy indoors. She wiped the table and laid three sets of bowls and chopsticks. At her own place her hand stopped. She drew a sheet of paper out of her satchel, looked at it, folded it, tucked it under her bowl, and set the bowl straight.
+
+![A schoolgirl with bobbed hair stands head bowed at a table by a large window, setting out dishes; low rooftops show outside and light slants across the wall.](/images/white-dew/white-dew-01-4.webp)
 
 At six Su Qi came home, a vegetable basket in one hand, the cloth bundle from the tailor’s stall under the other arm. She put the bundle on the chair by the door and carried the basket into the kitchen. Passing the rattan chair she gave Qiusheng a look.
 
@@ -386,6 +394,8 @@ That night the coughing woke him. Afraid of disturbing Su Qi, he went out onto t
 The July night was not cold, and he wore only a singlet. The lamps of South Slope had gone out one by one. Only over at the docks were they still lit, and the fog blurred the lamplight into dim yellow balls of fluff. Cicadas shrilled in the trees below the slope; further off the crane chains sounded in the night, slack, then taut. Someone was unloading a night ship.
 
 The foghorn on the breakwater gave its low roar once a minute. He counted the blasts and waited for the coughing to stop. One, two, and the cough bent him double with a hand on the rail; four, five, and the thing in his throat loosened a little; at the seventh the coughing stopped. He straightened up and pressed his palm to the right side of his chest. Through the singlet that side was hotter than the other. Indoors Su Qi turned over. The bed boards creaked once and were quiet.
+
+![On a balcony at night a thin man in a singlet leans on the railing, head lowered; a line of distant lights hangs in the dark.](/images/white-dew/white-dew-01-5.webp)
 
 He thought of the crate of medicinal wine that morning, of the oily sheen in the measuring cylinder, of the Fog Harbour Daily saying that forty-one workers had died on the docks last month, all from drinking firewater. Forty-one people. At the Assay Office he had found this stuff in hundreds of crates and written hundreds of reports. The reports went up, the crates were sealed, and the next day men on the docks drank it all the same.
 

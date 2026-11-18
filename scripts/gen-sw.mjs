@@ -10,7 +10,7 @@ import { createHash } from 'node:crypto';
 import { readdir, readFile, writeFile, stat } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join, relative } from 'node:path';
-import { shouldPrecache, toUrl } from '../src/lib/sw-manifest.mjs';
+import { shouldPrecache, cachedOnDemand, toUrl } from '../src/lib/sw-manifest.mjs';
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const DIST = join(ROOT, 'dist');
@@ -32,10 +32,9 @@ try {
   process.exit(1);
 }
 
-const files = (await walk(DIST))
-  .map((f) => relative(DIST, f))
-  .filter(shouldPrecache)
-  .sort();
+const all = (await walk(DIST)).map((f) => relative(DIST, f)).sort();
+const files = all.filter(shouldPrecache);
+const onDemand = all.filter(cachedOnDemand);
 
 // Bump when the worker template below changes behaviour, so clients rotate
 // to a fresh cache even if site content is identical.
@@ -50,6 +49,12 @@ for (const f of files) {
   const buf = await readFile(join(DIST, f));
   bytes += buf.length;
   h.update(f).update('\0').update(buf);
+}
+// Files cached on demand are served cache-first too (handleAsset), so they
+// count towards the version without being precached: otherwise a picture
+// replaced under the same name would never reach a reader who has the old one.
+for (const f of onDemand) {
+  h.update(f).update('\0').update(await readFile(join(DIST, f)));
 }
 const version = h.digest('hex').slice(0, 12);
 const urls = files.map(toUrl);

@@ -9,12 +9,35 @@
 //
 // Skipped: OG share images (crawler-only, the bulk of dist/), machine-facing
 // files (sitemap/RSS/robots), the worker itself, the /en/ i18n-fallback tree,
-// tag pages (~3.2MB across 100 pages) and listing pages past page 1.
+// tag pages (~3.2MB across 100 pages), listing pages past page 1 and the
+// novel's illustrations other than each chapter's cover.
+
+// The novel's illustrations: public/images/white-dew/white-dew-NN-N.webp,
+// ~70KB each, a few per chapter, seventeen chapters.
+const ILLUSTRATION = /^images\/white-dew\//;
+// A chapter's first picture is also the cover of its card (PostCard takes a
+// post's first image), and the pages that list the cards are precached.
+const CHAPTER_COVER = /^images\/white-dew\/white-dew-\d+-1\.webp$/;
+
+/**
+ * Left out of the precache but cached once a reader has seen it (handleAsset
+ * in the worker). gen-sw.mjs still feeds these files into the worker's
+ * VERSION: they are served cache-first, so a picture replaced under the same
+ * name would otherwise never reach a reader who has the old one.
+ */
+export function cachedOnDemand(relPath) {
+  const p = relPath.replace(/\\/g, '/');
+  return ILLUSTRATION.test(p) && !CHAPTER_COVER.test(p);
+}
 
 /** Should this dist-relative file path be precached? */
 export function shouldPrecache(relPath) {
   const p = relPath.replace(/\\/g, '/');
   if (p.startsWith('og/')) return false; // social share images: ~8.5MB, crawler-only
+  // A chapter reads fine without its pictures, so they are cached on demand —
+  // all but each chapter's cover: without it the offline home page would open
+  // with a broken picture.
+  if (cachedOnDemand(p)) return false;
   // /en/ is mostly i18n fallback pages — duplicates of the zh content at a
   // second URL. Precaching them would double the HTML payload (~10MB) for
   // little value, so the English side is online-only.

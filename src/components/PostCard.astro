@@ -3,6 +3,7 @@ import type { CollectionEntry } from 'astro:content';
 import { excerpt, readingMinutes, coverFromBody } from '../lib/post';
 import { postLang, getTagCounts } from '../lib/posts';
 import { tagHasPage } from '../lib/tags.mjs';
+import { publicImageSize } from '../lib/image-size.mjs';
 import { currentLocale, withLocale, DATE_LOCALE, ui } from '../lib/i18n';
 interface Props { post: CollectionEntry<'blog'>; }
 const { post } = Astro.props;
@@ -17,6 +18,9 @@ const url = withLocale(locale, `/blog/${post.id.replace(/^en\//, '')}/`);
 const summary = excerpt(post.body ?? '');
 const mins = readingMinutes(post.body ?? '');
 const cover = coverFromBody(post.body ?? '');
+// A picture cover gets its file's size, so the card keeps its height while the
+// picture loads and the cards below it do not jump.
+const coverSize = cover?.type === 'img' ? publicImageSize(cover.src) : null;
 const tagCounts = await getTagCounts();
 ---
 <article class="card-link overflow-hidden">
@@ -25,7 +29,7 @@ const tagCounts = await getTagCounts();
       <div class="card-cover bg-base border-b border-line">
         {cover.type === 'svg'
           ? <Fragment set:html={cover.svg} />
-          : <img src={cover.src} alt={cover.alt} loading="lazy" decoding="async" />}
+          : <img src={cover.src} alt={cover.alt} width={coverSize?.width} height={coverSize?.height} loading="lazy" decoding="async" />}
       </div>
     </a>
   )}

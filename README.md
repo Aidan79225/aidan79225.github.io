@@ -44,6 +44,7 @@ src/
   data/author.ts          # author info for the post author card
   styles/                 # global.css (theme tokens), tools.css
 public/assets/images/     # static assets (avatar, …)
+public/images/white-dew/  # the novel's illustrations (all rights reserved; written by the exporter in the letscook repo, not by hand)
 .github/workflows/        # deploy.yml (GitHub Pages)
 .claude/skills/           # project skills (e.g. writing-blog-post)
 ```
@@ -120,9 +121,9 @@ This repository is **dual-licensed**:
 
 | Part | License |
 |---|---|
-| **Site source code** (everything except `src/content/`) | [MIT](./LICENSE) |
+| **Site source code** (everything except `src/content/` and the novel's illustrations) | [MIT](./LICENSE) |
 | **Articles & guides** (`src/content/`, except fiction) — text and original diagrams | [CC BY 4.0](./LICENSE-CONTENT.md) |
-| **Fiction** (`category: fiction` — the novel 《霧港白露》 / *White Dew of Fog Harbour*) | [All rights reserved](./LICENSE-CONTENT.md#fiction--all-rights-reserved) |
+| **Fiction** (`category: fiction` — the novel 《霧港白露》 / *White Dew of Fog Harbour*, with its illustrations in `public/images/white-dew/`) | [All rights reserved](./LICENSE-CONTENT.md#fiction--all-rights-reserved) |
 
 Reuse the code freely under MIT; share or adapt the writing under CC BY 4.0 with
 attribution. The novel is not CC-licensed: link to it and quote short passages
